@@ -1,4 +1,4 @@
-package Task;
+package main.java.backend.Storage.Task;
 
 public class Task {
 	private int priority;

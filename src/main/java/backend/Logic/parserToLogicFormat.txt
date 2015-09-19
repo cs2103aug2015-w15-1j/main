@@ -1,0 +1,8 @@
+Add floating task:
+("addFT", Task Name, Task Description, Priority, Reminder, Category)
+
+Add Event:
+("addE", Event Name, Event Description, Start Date, End Date, Start Time, End Time, Priority, Reminder, Category)
+
+Add Task:
+("addT", Task Name, Task Description, Deadline, Priority, Reminder, Category)

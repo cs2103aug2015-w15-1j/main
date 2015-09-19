@@ -3,16 +3,17 @@ package main.java.backend.History;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import main.java.backend.Storage.Task.Task;
+
 public class History {
 	
-	Stack<ArrayList<String>> stateStack = new Stack<ArrayList<String>>();
+	Stack<ArrayList<Task>> stateStack = new Stack<ArrayList<Task>>();
 
-	public void push(ArrayList<String> currentState) {
+	public void push(ArrayList<Task> currentState) {
 		stateStack.push(currentState);
-		
 	}
 
-	public ArrayList<String> pop() {
+	public ArrayList<Task> pop() {
 		return stateStack.pop();
 	}
 

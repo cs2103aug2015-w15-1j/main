@@ -57,3 +57,15 @@ Setting a colour to a category:
 
 Search:
 ("search", keyword)
+
+Delete:
+("delete", TaskID)
+
+Show Tasks:
+("showT",)
+
+Show Events:
+("showE",)
+
+Show Floating Tasks:
+("showFT",)

@@ -6,3 +6,54 @@ Add Event:
 
 Add Task:
 ("addT", Task Name, Task Description, Deadline, Priority, Reminder, Category)
+
+SetDeadline:
+("deadline", TaskID, Task Deadline)
+
+Set Start and End Time:
+("event", EventID, Start Time, End Time)
+
+Set Description:
+("description", TaskID, Description)
+
+Set Reminder:
+("reminder", TaskID, Reminder)
+
+Return To Home Screen:
+("return",)
+
+Set Done:
+("done", TaskID)
+
+Set Undone:
+("undone", Task ID)
+
+Undo:
+("undo",)
+
+Sort Priority:
+("sortP",)
+
+Sort Date:
+("sortD",)
+
+Setting a Task to be subtasked(So that it can be subtasked)
+("subtask", TaskID)
+
+Adding a Subtask:
+("addS", TaskID, Subtask Description)
+
+Adding a Category:
+("addCat", Category Name)
+
+Setting a task/event to the specified Category:
+("setCat", TaskID, Category Name)
+
+Show specific category:
+("showCat", Category Name)
+
+Setting a colour to a category:
+("setCol", CategoryName, ColourID)
+
+Search:
+("search", keyword)

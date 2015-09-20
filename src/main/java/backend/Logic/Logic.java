@@ -14,17 +14,17 @@ public class Logic {
 	private static final String COMMAND_DELETE = "delete";
 	private static final String EXECUTION_SET_DEADLINE_SUCCESSFUL = "Task %1$s deadline has been set to %2$s";
 	private static final String EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL = "Event %1$s has been setted to %2$s till %3$s";
-	private static final String EXECUTION_SET_DESCRIPTION_SUCCESSFUL = "Description for task %1$s has be set";
-	private static final String EXECUTION_SET_REMINDER_SUCCESSFUL = "Reminder for %1$s has been set to be at %2$s";
+	private static final String EXECUTION_SET_DESCRIPTION_SUCCESSFUL = "Description for task %1$s has been set";
+	private static final String EXECUTION_SET_REMINDER_SUCCESSFUL = "Reminder for Task %1$s has been set to be at %2$s";
 	private static final String EXECUTION_SUBTASK_SUCCESSFUL = "Task %1$s is now able to implement subtasks";
 	private static final String EXECUTION_ADD_SUBTASK_SUCCESSFUL = "SubTask %1$s is added to Task %2$s";
 	private static final String EXECUTION_ADD_CATEGORY_SUCCESSFUL = "Category %1$s has been added";
-	private static final String EXECUTION_SET_CATEGORY_SUCCESSFUL = "%1$s is set to the category %2$s";
+	private static final String EXECUTION_SET_CATEGORY_SUCCESSFUL = "Task %1$s is set to the category %2$s";
 	private static final String EXECUTION_SHOW_CATEGORY_SUCCESSFUL = "category shown";
 	private static final String EXECUTION_SHOW_TASKS_SUCCESSFUL = "tasks shown";
 	private static final String EXECUTION_SHOW_FLOATING_TASKS_SUCCESSFUL = "floating tasks shown";
 	private static final String EXECUTION_SHOW_EVENT_SUCCESSFUL = "events shown";
-	private static final String EXECUTION_SET_COLOUR_SUCCESSFUL = "%1$s is set to the colour %2$s";
+	private static final String EXECUTION_SET_COLOUR_SUCCESSFUL = "Category %1$s is set to the colour %2$s";
 	private static final String EXECUTION_RETURN_COMMAND_SUCCESSFUL = "Returning to home";
 	private static final String EXECUTION_UNDONE_COMMAND_SUCCESSFUL = "Task %1$s is completed";
 	private static final String EXECUTION_DONE_COMMAND_SUCCESSFUL = "Task %1$s is not completed";
@@ -71,7 +71,7 @@ public class Logic {
 		initLogic(filename);
 	}
 
-	private void initLogic(String filename) {
+	void initLogic(String filename) {
 		historyComponent = new History();
 		parserComponent = new ParserStub();
 		storageComponent = new StorageStub(filename);
@@ -80,58 +80,94 @@ public class Logic {
 
 	public String executeCommand(String userInput) {
 		ArrayList<String> getParsedInput = parserComponent.parseInput(userInput);
+//		arrayChecker(getParsedInput);
+//		System.out.println("Array got");
+//		System.out.println(getParsedInput);
 		String commandType = getParsedInput.get(0);
+//		System.out.println("Command type: "+commandType);
 		switch (commandType) {
 			case COMMAND_ADD_TASK:
 				getFeedbackAfterCommandExecution = addTask(getParsedInput);
+				break;
 			case COMMAND_ADD_EVENT:
 				getFeedbackAfterCommandExecution = addEvent(getParsedInput);
+				break;
 			case COMMAND_ADD_FLOATING_TASK:
 				getFeedbackAfterCommandExecution = addFloatingTask(getParsedInput);
+				break;
 			case COMMAND_SET_DEADLINE:
 				getFeedbackAfterCommandExecution = setDeadline(getParsedInput);
+				break;
 			case COMMAND_SET_START_AND_END_TIME:
 				getFeedbackAfterCommandExecution = setEventStartAndEndTime(getParsedInput);
+				break;
 			case COMMAND_SET_DESCRIPTION:
 				getFeedbackAfterCommandExecution = setDescription(getParsedInput);
+				break;
 			case COMMAND_SET_REMINDER:
 				getFeedbackAfterCommandExecution = setReminder(getParsedInput);
+				break;
 			case COMMAND_RETURN:
 				getFeedbackAfterCommandExecution = returnToHomeScreen(currentState);
+				break;
 			case COMMAND_DONE:
 				getFeedbackAfterCommandExecution = setDone(getParsedInput);
+				break;
 			case COMMAND_UNDONE:
 				getFeedbackAfterCommandExecution = setUndone(getParsedInput);
+				break;
 			case COMMAND_UNDO:
 				getFeedbackAfterCommandExecution = undo();
+				break;
 			case COMMAND_SORT_PRIORITY:
 				getFeedbackAfterCommandExecution = sort(COMMAND_SORT_PRIORITY,currentState);
+				break;
 			case COMMAND_SORT_DEADLINE:
 				getFeedbackAfterCommandExecution = sort(COMMAND_SORT_DEADLINE,currentState);
+				break;
 			case COMMAND_SUBTASK:
 				getFeedbackAfterCommandExecution = subTask(getParsedInput);
+				break;
 			case COMMAND_ADD_SUBTASK:
 				getFeedbackAfterCommandExecution = addSubTask(getParsedInput);
+				break;
 			case COMMAND_ADD_CATEGORY:
 				getFeedbackAfterCommandExecution = addCategory(getParsedInput);
+				break;
 			case COMMAND_SET_CATEGORY:
 				getFeedbackAfterCommandExecution = setCategory(getParsedInput);
+				break;
 			case COMMAND_SHOW_CATEGORY:
 				getFeedbackAfterCommandExecution = showCategory(getParsedInput);
+				break;
 			case COMMAND_SET_CATEGORY_COLOUR:
 				getFeedbackAfterCommandExecution = setColour(getParsedInput);
+				break;
 			case COMMAND_SEARCH:
 				getFeedbackAfterCommandExecution = search(getParsedInput);
+				break;
 			case COMMAND_DELETE:
 				getFeedbackAfterCommandExecution = delete(getParsedInput);
+				break;
 			case COMMAND_SHOW_TASK:
 				getFeedbackAfterCommandExecution = showTask();
+				break;
 			case COMMAND_SHOW_FLOATING_TASK:
 				getFeedbackAfterCommandExecution = showFloatingTask();
+				break;
 			case COMMAND_SHOW_EVENT:
 				getFeedbackAfterCommandExecution = showEvent();
-		};
+				break;
+		}
 		return getFeedbackAfterCommandExecution;
+		
+	}
+
+	private void arrayChecker(ArrayList<String> getParsedInput) {
+		System.out.println("Parsed Input Array Check");
+		for (int i = 0; i < getParsedInput.size(); i++) {
+			System.out.print(getParsedInput.get(i)+" ");
+		}
 		
 	}
 
@@ -218,6 +254,7 @@ public class Logic {
 	}
 
 	private String sort(String field,ArrayList<Task> currentState) {
+		System.out.println(currentState);
 		currentState = sortComponent.sort(field,currentState);
 		storageComponent.updateState(currentState);
 		updateHistoryStack();
@@ -253,6 +290,8 @@ public class Logic {
 		String taskId = getParsedInput.get(1);
 		String reminder = getParsedInput.get(2);
 		storageComponent.setReminder(taskId,reminder);
+		updateCurrentState();
+		updateHistoryStack();
 		return String.format(EXECUTION_SET_REMINDER_SUCCESSFUL,taskId,reminder);
 	}
 
@@ -260,6 +299,8 @@ public class Logic {
 		String taskId = getParsedInput.get(1);
 		String description = getParsedInput.get(2);
 		storageComponent.setDescription(taskId,description);
+		updateCurrentState();
+		updateHistoryStack();
 		return String.format(EXECUTION_SET_DESCRIPTION_SUCCESSFUL, taskId);
 	}
 
@@ -267,6 +308,8 @@ public class Logic {
 		String eventId = getParsedInput.get(1);
 		String startTime = getParsedInput.get(2);
 		String endTime = getParsedInput.get(3);
+		updateCurrentState();
+		updateHistoryStack();
 		return String.format(EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL, eventId,startTime,endTime);
 	}
 
@@ -274,16 +317,25 @@ public class Logic {
 		String taskId = getParsedInput.get(1);
 		String deadline = getParsedInput.get(2);
 		storageComponent.setDeadline(taskId,deadline);
+		updateCurrentState();
+		updateHistoryStack();
 		return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskId,deadline);
 	}
 
 	private String addFloatingTask(ArrayList<String> getParsedInput) {
 		String taskName = getParsedInput.get(1);
+//		System.out.println("taskName: "+ taskName);
 		String taskDescription = getParsedInput.get(2);
+//		System.out.println("task Description: "+taskDescription);
 		String priority = getParsedInput.get(3);
+//		System.out.println("priority: "+priority);
 		String reminder = getParsedInput.get(4);
+//		System.out.println("reminder: "+reminder);
 		String category = getParsedInput.get(5);
+//		System.out.println("category: "+category);
 		storageComponent.addFloatingTask(taskName,taskDescription,priority,reminder,category);
+		updateCurrentState();
+		updateHistoryStack();
 		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, getParsedInput.get(1));
 	}
 
@@ -298,6 +350,8 @@ public class Logic {
 		String reminder = getParsedInput.get(8);
 		String category = getParsedInput.get(9);
 		storageComponent.addEvent(eventName,eventDescription,startDate,endDate,startTime,endTime,priority,reminder,category);
+		updateCurrentState();
+		updateHistoryStack();
 		return String.format(EXECUTION_ADD_EVENT_SUCCESSFUL, getParsedInput.get(1));
 	}
 
@@ -309,6 +363,8 @@ public class Logic {
 		String reminder = getParsedInput.get(5);
 		String category = getParsedInput.get(6);
 		storageComponent.addTask(taskName,taskDescription,deadline,priority,reminder,category);
+		updateCurrentState();
+		updateHistoryStack();
 		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, getParsedInput.get(1));
 	}
 

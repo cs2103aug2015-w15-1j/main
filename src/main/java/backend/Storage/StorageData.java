@@ -24,9 +24,14 @@ public class StorageData {
 	private HashMap<String, CategoryWrapper> allCategories;
 	
 	private StorageFile storageFile;
-
+	
 	public StorageData() throws FileNotFoundException, IOException  { 
 		storageFile = new StorageFile();
+		allCategories = storageFile.getAllCategoriesFromFile();
+	}
+
+	public StorageData(String fileName) throws FileNotFoundException, IOException  { 
+		storageFile = new StorageFile(fileName);
 		allCategories = storageFile.getAllCategoriesFromFile();
 	}
 	
@@ -124,7 +129,7 @@ public class StorageData {
 		return allCategoriesArray;
 	}
 	
-	public ArrayList<Task> getAllTargetCategoryTasks(String categoryName, String taskType) 
+	public ArrayList<Task> getTargetCategoryTaskList(String categoryName, String taskType) 
 			throws ParseException, IOException, JSONException {
 		
 		ArrayList<Task> allCategoryTasks = new ArrayList<Task> ();
@@ -137,7 +142,7 @@ public class StorageData {
 		return allCategoryTasks;
 	}
 	
-	public ArrayList<Task> getAllTargetTypeTasks(String taskType) 
+	public ArrayList<Task> getTargetTaskList(String taskType) 
 			throws ParseException, IOException, JSONException {
 		
 		ArrayList<Task> allTypeTasks = new ArrayList<Task> ();

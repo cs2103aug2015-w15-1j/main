@@ -79,6 +79,10 @@ public class StorageFile {
 		closeWriter();
 	}
 	
+	public String getFileName() {
+		return INPUT_FILE_NAME;
+	}
+	
 	private void setFileName(String fileName) {
 		INPUT_FILE_NAME = fileName;
 	}

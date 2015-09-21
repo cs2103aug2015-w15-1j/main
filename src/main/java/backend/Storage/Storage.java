@@ -67,12 +67,18 @@ public abstract class Storage {
 	// TODO: Not completed
 	public abstract void deleteTaskFromCategory(String categoryName);
 
-	public abstract ArrayList<CategoryWrapper> getAllCategories()
+	public abstract ArrayList<CategoryWrapper> getCategoryList()
 			throws JsonParseException, JsonMappingException, JSONException, IOException;
 
-	public abstract ArrayList<Task> getAllTargetCategoryTasks(String categoryName, String taskType) 
+	public abstract ArrayList<Task> getTargetCategoryTaskList(String categoryName, String taskType) 
 			throws ParseException, IOException, JSONException;
 
-	public abstract ArrayList<Task> getAllTargetTypeTasks(String taskType) 
-			throws ParseException, IOException, JSONException;
+	public abstract ArrayList<Task> getTasks() 
+			throws IOException, JSONException, ParseException;
+	
+	public abstract ArrayList<Task> getFloatingTasks() 
+			throws IOException, JSONException, ParseException;
+	
+	public abstract ArrayList<Task> getEvents() 
+			throws IOException, JSONException, ParseException;
 }

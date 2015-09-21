@@ -21,10 +21,15 @@ public class StorageStub extends Storage {
 	
 	private StorageData storageData;
 	private StorageFile storageFile;
-
+	
 	public StorageStub () throws FileNotFoundException, IOException {
 		storageData = new StorageData();
 		storageFile = new StorageFile();
+	}
+
+	public StorageStub (String fileName) throws FileNotFoundException, IOException {
+		storageData = new StorageData(fileName);
+		storageFile = new StorageFile(fileName);
 	}
 	
 	public void addFloatingTask(String taskName, String taskDescription, int priority, long reminder,
@@ -126,21 +131,33 @@ public class StorageStub extends Storage {
 		
 	}
 	
-	public ArrayList<CategoryWrapper> getAllCategories()
+	public ArrayList<CategoryWrapper> getCategoryList()
 			throws JsonParseException, JsonMappingException, JSONException, IOException {
 		
 		return storageData.getAllCategories();
 	}
 	
-	public ArrayList<Task> getAllTargetCategoryTasks(String categoryName, String taskType) 
+	public ArrayList<Task> getTargetCategoryTaskList(String categoryName, String taskType) 
 			throws IOException, JSONException, ParseException {
 
-		return storageData.getAllTargetCategoryTasks(categoryName, taskType);
+		return storageData.getTargetCategoryTaskList(categoryName, taskType);
 	}
 	
-	public ArrayList<Task> getAllTargetTypeTasks(String taskType) 
+	public ArrayList<Task> getTasks() 
 			throws IOException, JSONException, ParseException {
 		
-		return storageData.getAllTargetTypeTasks(taskType);
+		return storageData.getTargetTaskList(TYPE_TASK);
+	}
+	
+	public ArrayList<Task> getFloatingTasks() 
+			throws IOException, JSONException, ParseException {
+		
+		return storageData.getTargetTaskList(TYPE_FLOAT);
+	}
+	
+	public ArrayList<Task> getEvents() 
+			throws IOException, JSONException, ParseException {
+		
+		return storageData.getTargetTaskList(TYPE_EVENT);
 	}
 }

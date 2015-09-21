@@ -67,12 +67,28 @@ public abstract class Storage {
 	// TODO: Not completed
 	public abstract void deleteTaskFromCategory(String categoryName);
 
+	/**
+	 * This operation retrieves all tasks from the file.
+	 * TODO: change CategoryWrapper to task 
+	 */
 	public abstract ArrayList<CategoryWrapper> getCategoryList()
 			throws JsonParseException, JsonMappingException, JSONException, IOException;
-
-	public abstract ArrayList<Task> getTargetCategoryTaskList(String categoryName, String taskType) 
+	
+	/**
+	 * This operation retrieves the tasks under target category.
+	 * 
+	 */
+	public abstract ArrayList<Task> getCategoryTaskList(String categoryName) 
 			throws ParseException, IOException, JSONException;
-
+	
+	/**
+	 * This operation retrieves the tasks of a specific type
+	 * (either task, floating task or event) under target category.
+	 * 
+	 */
+	public abstract ArrayList<Task> getCategoryTaskTypeList(String categoryName, String taskType) 
+			throws ParseException, IOException, JSONException;
+	
 	public abstract ArrayList<Task> getTasks() 
 			throws IOException, JSONException, ParseException;
 	

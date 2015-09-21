@@ -67,6 +67,7 @@ public class StorageFile {
 		mapper.writeValue(textFile, categoryWrapper);
 		bufferedWriter.write(mapper.writeValueAsString(categoryWrapper));
 		bufferedWriter.flush();
+		// TODO: Debug purpose; to be removed
 		System.out.println(mapper.writeValueAsString(categoryWrapper));
 	}
 	

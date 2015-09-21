@@ -137,10 +137,16 @@ public class StorageStub extends Storage {
 		return storageData.getAllCategories();
 	}
 	
-	public ArrayList<Task> getTargetCategoryTaskList(String categoryName, String taskType) 
+	public ArrayList<Task> getCategoryTaskList(String categoryName, String taskType) 
 			throws IOException, JSONException, ParseException {
 
-		return storageData.getTargetCategoryTaskList(categoryName, taskType);
+		return storageData.getCategoryTaskList(categoryName, taskType);
+	}
+	
+	public ArrayList<Task> getCategoryTaskTypeList(String categoryName, String taskType) 
+			throws IOException, JSONException, ParseException {
+
+		return storageData.getCategoryTaskTypeList(categoryName, taskType);
 	}
 	
 	public ArrayList<Task> getTasks() 

@@ -62,21 +62,6 @@ public class StorageData {
 		storageFile.setAllCategoriesToFile(allCategories);
 	}
 	
-	private Category setTaskToCategory(Category category, HashMap<String, Task> allTasks, String taskType) {
-		switch(taskType) {
-		case TYPE_TASK:
-			category.setTasks(allTasks);
-			return category;
-		case TYPE_FLOAT:
-			category.setFloatTasks(allTasks);
-			return category;
-		case TYPE_EVENT:
-			category.setEvents(allTasks);
-			return category;
-		}
-		return new Category();
-	}
-	
 	public void setCategoryColour(String categoryName, String colourId) 
 			throws JsonParseException, JsonMappingException, IOException {
 
@@ -129,7 +114,7 @@ public class StorageData {
 		return allCategoriesArray;
 	}
 	
-	public ArrayList<Task> getTargetCategoryTaskList(String categoryName, String taskType) 
+	public ArrayList<Task> getCategoryTaskList(String categoryName, String taskType) 
 			throws ParseException, IOException, JSONException {
 		
 		ArrayList<Task> allCategoryTasks = new ArrayList<Task> ();
@@ -140,6 +125,13 @@ public class StorageData {
 		allCategoryTasks.addAll(getTasks(category.getEvents()));
 
 		return allCategoryTasks;
+	}
+	
+	public ArrayList<Task> getCategoryTaskTypeList(String categoryName, String taskType) 
+			throws ParseException, IOException, JSONException {
+		
+		Category category = allCategories.get(categoryName).getCategory();
+		return getTasks(getTargetTaskList(category, taskType));
 	}
 	
 	public ArrayList<Task> getTargetTaskList(String taskType) 
@@ -181,6 +173,21 @@ public class StorageData {
 	private HashMap<String, Task> getTargetTaskList(String categoryName, String taskName) {
 		Category category = allCategories.get(categoryName).getCategory();
 		return getTargetTaskList(category, getTargetTaskType(category, taskName));
+	}
+	
+	private Category setTaskToCategory(Category category, HashMap<String, Task> allTasks, String taskType) {
+		switch(taskType) {
+		case TYPE_TASK:
+			category.setTasks(allTasks);
+			return category;
+		case TYPE_FLOAT:
+			category.setFloatTasks(allTasks);
+			return category;
+		case TYPE_EVENT:
+			category.setEvents(allTasks);
+			return category;
+		}
+		return new Category();
 	}
 	
 	private ArrayList<Task> getTypeTaskArray(Category category, String taskType) {

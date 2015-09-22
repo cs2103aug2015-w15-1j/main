@@ -114,6 +114,24 @@ public class StorageStub extends Storage {
 		storageData.setDeadline(taskId, deadline);
 	}
 	
+	public void setSubTaskUndone(String taskId) 
+			throws JsonParseException, JsonMappingException, JSONException, IOException {
+		
+		
+	}
+
+	public void setSubTaskDone(String taskId) 
+			throws JsonParseException, JsonMappingException, IOException {
+		
+		
+	}
+	
+	public void setSubtaskDescription(String taskId, String description) 
+			throws JsonParseException, JsonMappingException, IOException {
+		
+		
+	}
+	
 	public void deleteSubTask(String taskId, String subtaskDescription) {
 		// TODO Auto-generated method stub
 		

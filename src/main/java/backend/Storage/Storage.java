@@ -27,7 +27,6 @@ public abstract class Storage {
 			String endDate, long startDateMilliseconds, long endDateMilliseconds, int priority, 
 			long reminder, String category) throws IOException, JSONException;
 	
-	// TODO: Not completed
 	public abstract void addSubTask(String subTaskId, String subtaskDescription, boolean isDone) 
 			throws JsonParseException, JsonMappingException, IOException;
 
@@ -37,7 +36,7 @@ public abstract class Storage {
 	public abstract void setCategoryColour(String categoryName, String colourId) 
 			throws JsonParseException, JsonMappingException, IOException;
 
-	// TODO: Not completed
+	// TODO: Not completed - note: set a default category if category is null
 	public abstract void setCategory(String taskId, String categoryName);
 
 	public abstract void setUndone(String taskId) 
@@ -56,6 +55,18 @@ public abstract class Storage {
 			throws JsonParseException, JsonMappingException, IOException;
 	
 	// TODO: Not completed
+	public abstract void setSubTaskUndone(String taskId) 
+			throws JsonParseException, JsonMappingException, JSONException, IOException;
+
+	// TODO: Not completed
+	public abstract void setSubTaskDone(String taskId) 
+			throws JsonParseException, JsonMappingException, IOException;
+	
+	// TODO: Not completed
+	public abstract void setSubtaskDescription(String taskId, String description) 
+			throws JsonParseException, JsonMappingException, IOException;
+	
+	// TODO: Not completed
 	public abstract void deleteSubTask(String subTaskId, String subtaskDescription);
 
 	public abstract void deleteAll() throws IOException;
@@ -69,30 +80,15 @@ public abstract class Storage {
 	// TODO: Not completed
 	public abstract void deleteTask(String taskId);
 
-	/**
-	 * This operation retrieves all categories from the file.
-	 */
 	public abstract ArrayList<Category> getCategoryList()
 			throws JsonParseException, JsonMappingException, JSONException, IOException;
 	
-	/**
-	 * This operation retrieves all tasks from the file.
-	 */
 	public abstract ArrayList<Task> getTaskList()
 			throws JsonParseException, JsonMappingException, JSONException, IOException;
 	
-	/**
-	 * This operation retrieves the tasks under target category.
-	 * 
-	 */
 	public abstract ArrayList<Task> getCategoryAllTasks(String categoryName) 
 			throws ParseException, IOException, JSONException;
 	
-	/**
-	 * This operation retrieves the tasks of a specific type
-	 * (either task, floating task or event) under target category.
-	 * 
-	 */
 	public abstract ArrayList<Task> getCategoryTasks(String categoryName) 
 			throws ParseException, IOException, JSONException;
 	

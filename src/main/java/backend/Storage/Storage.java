@@ -77,6 +77,9 @@ public abstract class Storage {
 
 	// TODO: Not completed
 	public abstract void deleteTaskTypeFromCategory(String categoryName);
+	
+	// TODO: Not completed
+	public abstract void deleteTaskFromCategory(String categoryName);
 
 	// TODO: Not completed
 	public abstract void deleteTask(String taskId);

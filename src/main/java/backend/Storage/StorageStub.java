@@ -37,6 +37,7 @@ public class StorageStub extends Storage {
 		allCategories = storageFile.getAllCategoriesFromFile();
 	}
 	
+	@Override
 	public void addFloatingTask(String taskName, String taskDescription, int priority, 
 			long reminder, String category, boolean done) throws JsonParseException, 
 			JsonMappingException, IOException, JSONException {
@@ -46,6 +47,7 @@ public class StorageStub extends Storage {
 		addNewTask(category, TYPE_FLOAT, newFloatingTask);
 	}
 	
+	@Override
 	public void addTask(String taskName, String taskDescription, String deadline, long endTime, int priority, 
 			int reminder, String category, boolean done) throws IOException, JSONException {	
 		
@@ -54,6 +56,7 @@ public class StorageStub extends Storage {
 		addNewTask(category, TYPE_TASK, newTask);
 	}
 
+	@Override
 	public void addEvent(String eventName, String eventDescription, String startDate, 
 			String endDate, long startDateMilliseconds, long endDateMilliseconds, int priority, 
 			long reminder, String category) throws IOException, JSONException {
@@ -63,6 +66,7 @@ public class StorageStub extends Storage {
 		addNewTask(category, TYPE_EVENT, newEvent);
 	}
 	
+	@Override
 	public void addSubTask(String taskId, String subtaskDescription, boolean isDone) 
 			throws JsonParseException, JsonMappingException, IOException {
 
@@ -70,6 +74,7 @@ public class StorageStub extends Storage {
 		addSubTask(taskId, subTask);
 	}
 	
+	@Override
 	public CategoryWrapper addCategory(String categoryName) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
@@ -84,6 +89,7 @@ public class StorageStub extends Storage {
 		return categoryWrapper;
 	}
 	
+	@Override
 	public void setCategoryColour(String categoryName, String colourId) 
 			throws JsonParseException, JsonMappingException, IOException {
 
@@ -98,18 +104,21 @@ public class StorageStub extends Storage {
 		
 	}
 	
+	@Override
 	public void setUndone(String taskId) 
 			throws JsonParseException, JsonMappingException, JSONException, IOException {
 		
 		setDone(taskId, false);
 	}
-
+	
+	@Override
 	public void setDone(String taskId) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
 		setDone(taskId, true);
 	}
 	
+	@Override
 	public void setReminder(String taskId, long reminder) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
@@ -118,6 +127,7 @@ public class StorageStub extends Storage {
 		storageFile.setAllCategoriesToFile(allCategories);
 	}
 	
+	@Override
 	public void setDescription(String taskId, String description) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
@@ -126,6 +136,7 @@ public class StorageStub extends Storage {
 		storageFile.setAllCategoriesToFile(allCategories);
 	}
 	
+	@Override
 	public void setDeadline(String taskId, long deadline) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
@@ -135,54 +146,64 @@ public class StorageStub extends Storage {
 		storageFile.setAllCategoriesToFile(allCategories);
 	}
 	
+	@Override
 	public void setSubTaskUndone(String taskId) 
 			throws JsonParseException, JsonMappingException, JSONException, IOException {
 		
 		
 	}
 
+	@Override
 	public void setSubTaskDone(String taskId) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
 		
 	}
 	
+	@Override
 	public void setSubtaskDescription(String taskId, String description) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
 		
 	}
 	
+	@Override
 	public void deleteSubTask(String taskId, String subtaskDescription) {
 		// TODO Auto-generated method stub
 		
 	}
 	
+	@Override
 	public void deleteAll() throws IOException {
-		
+		storageFile.setAllCategoriesToFile(new HashMap<String, CategoryWrapper> ());
 		storageFile.clearTextFromFile();
 	}
 	
+	@Override
 	public void deleteCategory(String categoryName) {
 		// TODO Auto-generated method stub
 		
 	}
 	
+	@Override
 	public void deleteTaskTypeFromCategory(String categoryName) {
 		// TODO Auto-generated method stub
 		
 	}
 	
+	@Override
 	public void deleteTaskFromCategory(String categoryName) {
 		// TODO Auto-generated method stub
 		
 	}
 
+	@Override
 	public void deleteTask(String taskId) {
 		// TODO Auto-generated method stub
 		
 	}
 	
+	@Override
 	public ArrayList<Category> getCategoryList() {
 		
 		ArrayList<Category> categoryList = new ArrayList<Category> ();
@@ -194,6 +215,7 @@ public class StorageStub extends Storage {
 		return categoryList;
 	}
 
+	@Override
 	public ArrayList<Task> getTaskList() {
 
 		ArrayList<Task> taskList = new ArrayList<Task> ();
@@ -206,6 +228,7 @@ public class StorageStub extends Storage {
 		return taskList;
 	}
 	
+	@Override
 	public ArrayList<Task> getCategoryAllTasks(String categoryName) 
 			throws ParseException, IOException, JSONException {
 		
@@ -219,36 +242,42 @@ public class StorageStub extends Storage {
 		return allCategoryTasks;
 	}
 	
+	@Override
 	public ArrayList<Task> getCategoryTasks(String categoryName) 
 			throws IOException, JSONException, ParseException {
 
 		return getCategoryTaskTypes(categoryName, TYPE_TASK);
 	}
 	
+	@Override
 	public ArrayList<Task> getCategoryFloatingTasks(String categoryName) 
 			throws IOException, JSONException, ParseException {
 
 		return getCategoryTaskTypes(categoryName, TYPE_FLOAT);
 	}
 	
+	@Override
 	public ArrayList<Task> getCategoryEvents(String categoryName) 
 			throws IOException, JSONException, ParseException {
 
 		return getCategoryTaskTypes(categoryName, TYPE_EVENT);
 	}
 	
+	@Override
 	public ArrayList<Task> getTasks() 
 			throws IOException, JSONException, ParseException {
 		
 		return getTargetTasks(TYPE_TASK);
 	}
 	
+	@Override
 	public ArrayList<Task> getFloatingTasks() 
 			throws IOException, JSONException, ParseException {
 		
 		return getTargetTasks(TYPE_FLOAT);
 	}
 	
+	@Override
 	public ArrayList<Task> getEvents() 
 			throws IOException, JSONException, ParseException {
 		

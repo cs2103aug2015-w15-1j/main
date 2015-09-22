@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import main.java.backend.Storage.Task.Category;
+import main.java.backend.Storage.Task.CategoryWrapper;
 import main.java.backend.Storage.Task.Task;
 
 public abstract class Storage {
@@ -30,7 +31,7 @@ public abstract class Storage {
 	public abstract void addSubTask(String subTaskId, String subtaskDescription, boolean isDone) 
 			throws JsonParseException, JsonMappingException, IOException;
 
-	public abstract void addCategory(String categoryName) 
+	public abstract CategoryWrapper addCategory(String categoryName) 
 			throws JsonParseException, JsonMappingException, IOException, JSONException;
 
 	public abstract void setCategoryColour(String categoryName, String colourId) 

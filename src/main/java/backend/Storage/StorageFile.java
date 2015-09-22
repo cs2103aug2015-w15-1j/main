@@ -24,7 +24,7 @@ import main.java.backend.Storage.Task.CategoryWrapper;
 public class StorageFile {
 
 	private static final String DEFAULT_FILE_NAME = "mytasklist.txt";
-	private static final String INPUT_FILE_NAME = "%1$s";
+	private String INPUT_FILE_NAME;
 	
 	private File textFile;
 	private FileReader textFileReader;
@@ -40,48 +40,6 @@ public class StorageFile {
 			throws FileNotFoundException, IOException {
 		setFileName(fileName);
 		initializeFile();
-	}
-	
-	public HashMap<String, CategoryWrapper> getAllCategoriesFromFile() 
-			throws JsonParseException, JsonMappingException, IOException {
-		
-		if(isFileEmpty()) {
-			return new HashMap<String, CategoryWrapper>();
-		} else {
-			ObjectMapper mapper = new ObjectMapper();
-			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-			HashMap<String, CategoryWrapper> allTasks = 
-					mapper.readValue(getAllTextsFromFile(), new TypeReference<HashMap<String, CategoryWrapper>>() {});
-			return allTasks;
-		} 
-	}
-	
-	public void setAllCategoriesToFile(HashMap<String, CategoryWrapper> categoryWrapper) 
-			throws JsonParseException, JsonMappingException, IOException {
-		clearTextFromFile();
-		
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.enable(SerializationFeature.INDENT_OUTPUT);
-		mapper.writeValue(textFile, categoryWrapper);
-		bufferedWriter.write(mapper.writeValueAsString(categoryWrapper));
-		bufferedWriter.flush();
-	}
-	
-	public void clearTextFromFile() throws IOException {
-		initializeWriter(textFile);
-	}
-	
-	public void exitProgram() throws IOException {
-		closeReader();
-		closeWriter();
-	}
-	
-	public String getFileName() {
-		return INPUT_FILE_NAME;
-	}
-	
-	public void setFileName(String fileName) {
-		String.format(INPUT_FILE_NAME , fileName);
 	}
 	
 	private void createFile(File file) throws IOException {
@@ -138,5 +96,47 @@ public class StorageFile {
 		bufferedWriter.flush();
 		textFileWriter.close();
 		bufferedWriter.close();
+	}
+	
+	public HashMap<String, CategoryWrapper> getAllCategoriesFromFile() 
+			throws JsonParseException, JsonMappingException, IOException {
+		
+		if(isFileEmpty()) {
+			return new HashMap<String, CategoryWrapper>();
+		} else {
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			HashMap<String, CategoryWrapper> allTasks = 
+					mapper.readValue(getAllTextsFromFile(), new TypeReference<HashMap<String, CategoryWrapper>>() {});
+			return allTasks;
+		} 
+	}
+	
+	public void setAllCategoriesToFile(HashMap<String, CategoryWrapper> categoryWrapper) 
+			throws JsonParseException, JsonMappingException, IOException {
+		clearTextFromFile();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.enable(SerializationFeature.INDENT_OUTPUT);
+		mapper.writeValue(textFile, categoryWrapper);
+		bufferedWriter.write(mapper.writeValueAsString(categoryWrapper));
+		bufferedWriter.flush();
+	}
+	
+	public void clearTextFromFile() throws IOException {
+		initializeWriter(textFile);
+	}
+	
+	public void exitProgram() throws IOException {
+		closeReader();
+		closeWriter();
+	}
+	
+	public String getFileName() {
+		return INPUT_FILE_NAME;
+	}
+	
+	public void setFileName(String fileName) {
+		this.INPUT_FILE_NAME = fileName;
 	}
 }

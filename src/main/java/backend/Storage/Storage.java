@@ -10,12 +10,13 @@ import org.json.simple.parser.ParseException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.CategoryWrapper;
 import main.java.backend.Storage.Task.Task;
 
 public abstract class Storage {
 	
-	public abstract void addFloatingTask (String taskName, String taskDescription, 
+	public abstract void addFloatingTask(String taskName, String taskDescription, 
 			int priority, long reminder, String category, boolean done)
 					throws IOException, JSONException;
 
@@ -35,26 +36,23 @@ public abstract class Storage {
 	// TODO: Not completed
 	public abstract void setCategory(String taskId, String categoryName);
 
-	public abstract void setUndone(String categoryName, String taskName) 
+	public abstract void setUndone(String taskId) 
 			throws JsonParseException, JsonMappingException, JSONException, IOException;
 
-	public abstract void setDone(String categoryName, String taskName) 
+	public abstract void setDone(String taskId) 
 			throws JsonParseException, JsonMappingException, IOException;
 
-	public abstract void setReminder(String categoryName, String taskName, long reminder) 
+	public abstract void setReminder(String taskId, long reminder) 
 			throws JsonParseException, JsonMappingException, IOException;
 
-	public abstract void setDescription(String categoryName, String taskName, String description) 
+	public abstract void setDescription(String taskId, String description) 
 			throws JsonParseException, JsonMappingException, IOException;
 
-	public abstract void setDeadline(String categoryName, String taskName, long deadline) 
+	public abstract void setDeadline(String taskId, long deadline) 
 			throws JsonParseException, JsonMappingException, IOException;
 
 	// TODO: Not completed
 	public abstract void addSubTask(String taskId, String subtaskDescription);
-
-	// TODO: Not completed
-	public abstract void searchTask(String taskName);
 
 	public abstract void deleteAll(String categoryName) throws IOException;
 
@@ -68,17 +66,22 @@ public abstract class Storage {
 	public abstract void deleteTaskFromCategory(String categoryName);
 
 	/**
-	 * This operation retrieves all tasks from the file.
-	 * TODO: change CategoryWrapper to task 
+	 * This operation retrieves all categories from the file.
 	 */
-	public abstract ArrayList<CategoryWrapper> getCategoryList()
+	public abstract ArrayList<Category> getCategoryList()
+			throws JsonParseException, JsonMappingException, JSONException, IOException;
+	
+	/**
+	 * This operation retrieves all tasks from the file.
+	 */
+	public abstract ArrayList<Task> getTaskList()
 			throws JsonParseException, JsonMappingException, JSONException, IOException;
 	
 	/**
 	 * This operation retrieves the tasks under target category.
 	 * 
 	 */
-	public abstract ArrayList<Task> getCategoryTaskList(String categoryName) 
+	public abstract ArrayList<Task> getCategoryAllTasks(String categoryName) 
 			throws ParseException, IOException, JSONException;
 	
 	/**
@@ -86,7 +89,13 @@ public abstract class Storage {
 	 * (either task, floating task or event) under target category.
 	 * 
 	 */
-	public abstract ArrayList<Task> getCategoryTaskTypeList(String categoryName, String taskType) 
+	public abstract ArrayList<Task> getCategoryTasks(String categoryName) 
+			throws ParseException, IOException, JSONException;
+	
+	public abstract ArrayList<Task> getCategoryFloatingTasks(String categoryName) 
+			throws ParseException, IOException, JSONException;
+	
+	public abstract ArrayList<Task> getCategoryEvents(String categoryName) 
 			throws ParseException, IOException, JSONException;
 	
 	public abstract ArrayList<Task> getTasks() 

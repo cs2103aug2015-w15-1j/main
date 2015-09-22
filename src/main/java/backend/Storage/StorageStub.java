@@ -3,6 +3,7 @@ package main.java.backend.Storage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.json.JSONException;
 import org.json.simple.parser.ParseException;
@@ -10,6 +11,7 @@ import org.json.simple.parser.ParseException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.CategoryWrapper;
 import main.java.backend.Storage.Task.Task;
 
@@ -35,14 +37,16 @@ public class StorageStub extends Storage {
 	public void addFloatingTask(String taskName, String taskDescription, int priority, long reminder,
 			String category, boolean done) throws IOException, JSONException {
 		
-		Task newFloatingTask = new Task(taskName, taskDescription, priority, reminder, done);
+		Task newFloatingTask = new Task(UUID.randomUUID().toString(), taskName, 
+				taskDescription, priority, reminder, done);
 		storageData.addNewTask(category, TYPE_FLOAT, newFloatingTask);
 	}
 	
 	public void addTask(String taskName, String taskDescription, String deadline, long endTime, int priority, 
 			int reminder, String category, boolean done) throws IOException, JSONException {	
 		
-		Task newTask = new Task(taskName, taskDescription, deadline, endTime, priority, reminder, done);
+		Task newTask = new Task(UUID.randomUUID().toString(), taskName, 
+				taskDescription, deadline, endTime, priority, reminder, done);
 		storageData.addNewTask(category, TYPE_TASK, newTask);
 	}
 
@@ -50,8 +54,8 @@ public class StorageStub extends Storage {
 			String endDate, long startDateMilliseconds, long endDateMilliseconds, int priority, 
 			long reminder, String category) throws IOException, JSONException {
 		
-		Task newEvent = new Task(eventName, eventDescription, startDate, endDate, startDateMilliseconds,
-				endDateMilliseconds, priority, reminder, category);
+		Task newEvent = new Task(UUID.randomUUID().toString(), eventName, eventDescription, startDate, 
+				endDate, startDateMilliseconds, endDateMilliseconds, priority, reminder, category);
 		storageData.addNewTask(category, TYPE_EVENT, newEvent);
 	}
 	
@@ -72,42 +76,38 @@ public class StorageStub extends Storage {
 		
 	}
 	
-	public void setUndone(String categoryName, String taskName) 
+	public void setUndone(String taskId) 
 			throws JsonParseException, JsonMappingException, JSONException, IOException {
 		
-		storageData.setDone(categoryName, taskName, false);
+		storageData.setDone(taskId, false);
 	}
 
-	public void setDone(String categoryName, String taskName) 
+	public void setDone(String taskId) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
-		storageData.setDone(categoryName, taskName, true);
+		storageData.setDone(taskId, true);
 	}
 
-	public void setReminder(String categoryName, String taskName, long reminder) 
+	public void setReminder(String taskId, long reminder) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
-		storageData.setReminder(categoryName, taskName, reminder);
+		storageData.setReminder(taskId, reminder);
 	}
 
-	public void setDescription(String categoryName, String taskName, String description) 
+	public void setDescription(String taskId, String description) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
-		storageData.setDescription(categoryName, taskName, description);
+		storageData.setDescription(taskId, description);
 	}
 
-	public void setDeadline(String categoryName, String taskName, long deadline) 
+	public void setDeadline(String taskId, long deadline) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
-		storageData.setDeadline(categoryName, taskName, deadline);
+		storageData.setDeadline(taskId, deadline);
 	}
 	
 	public void addSubTask(String taskId, String subtaskDescription) {
 		// TODO Auto-generated method stub
-		
-	}
-	
-	public void searchTask(String taskName) {
 		
 	}
 	
@@ -131,39 +131,57 @@ public class StorageStub extends Storage {
 		
 	}
 	
-	public ArrayList<CategoryWrapper> getCategoryList()
+	public ArrayList<Category> getCategoryList()
 			throws JsonParseException, JsonMappingException, JSONException, IOException {
 		
-		return storageData.getAllCategories();
+		return storageData.getCategoryList();
 	}
 	
-	public ArrayList<Task> getCategoryTaskList(String categoryName, String taskType) 
-			throws IOException, JSONException, ParseException {
-
-		return storageData.getCategoryTaskList(categoryName, taskType);
+	public ArrayList<Task> getTaskList()
+			throws JsonParseException, JsonMappingException, JSONException, IOException {
+		
+		return storageData.getTaskList();
 	}
 	
-	public ArrayList<Task> getCategoryTaskTypeList(String categoryName, String taskType) 
+	public ArrayList<Task> getCategoryAllTasks(String categoryName) 
 			throws IOException, JSONException, ParseException {
 
-		return storageData.getCategoryTaskTypeList(categoryName, taskType);
+		return storageData.getCategoryAllTasks(categoryName);
+	}
+	
+	public ArrayList<Task> getCategoryTasks(String categoryName) 
+			throws IOException, JSONException, ParseException {
+
+		return storageData.getCategoryTaskTypes(categoryName, TYPE_TASK);
+	}
+	
+	public ArrayList<Task> getCategoryFloatingTasks(String categoryName) 
+			throws IOException, JSONException, ParseException {
+
+		return storageData.getCategoryTaskTypes(categoryName, TYPE_FLOAT);
+	}
+	
+	public ArrayList<Task> getCategoryEvents(String categoryName) 
+			throws IOException, JSONException, ParseException {
+
+		return storageData.getCategoryTaskTypes(categoryName, TYPE_EVENT);
 	}
 	
 	public ArrayList<Task> getTasks() 
 			throws IOException, JSONException, ParseException {
 		
-		return storageData.getTargetTaskList(TYPE_TASK);
+		return storageData.getTargetTasks(TYPE_TASK);
 	}
 	
 	public ArrayList<Task> getFloatingTasks() 
 			throws IOException, JSONException, ParseException {
 		
-		return storageData.getTargetTaskList(TYPE_FLOAT);
+		return storageData.getTargetTasks(TYPE_FLOAT);
 	}
 	
 	public ArrayList<Task> getEvents() 
 			throws IOException, JSONException, ParseException {
 		
-		return storageData.getTargetTaskList(TYPE_EVENT);
+		return storageData.getTargetTasks(TYPE_EVENT);
 	}
 }

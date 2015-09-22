@@ -35,6 +35,85 @@ public class StorageData {
 		allCategories = storageFile.getAllCategoriesFromFile();
 	}
 	
+	private Category setTaskToCategory(Category category, HashMap<String, Task> allTasks, String taskType) {
+		switch(taskType) {
+		case TYPE_TASK:
+			category.setTasks(allTasks);
+			return category;
+		case TYPE_FLOAT:
+			category.setFloatTasks(allTasks);
+			return category;
+		case TYPE_EVENT:
+			category.setEvents(allTasks);
+			return category;
+		}
+		return new Category();
+	}
+	
+	private HashMap<String, Task> getTargetTaskList(Category category, String taskType) {
+		switch(taskType) {
+			case TYPE_TASK:
+				return category.getTasks();
+			case TYPE_FLOAT:
+				return category.getFloatTasks();
+			case TYPE_EVENT:
+				return category.getEvents();
+		}
+		return new HashMap<String, Task> ();
+	}
+	
+	private HashMap<String, Task> getAllTasks() {
+		HashMap<String, Task> allTasks = new HashMap<String, Task> ();
+		
+		for(String categoryName : allCategories.keySet()) {
+			Category category = allCategories.get(categoryName).getCategory();
+			
+			for(String taskId : category.getTasks().keySet()) {
+				allTasks.put(taskId, category.getTasks().get(taskId));
+			}
+			
+			for(String taskId : category.getFloatTasks().keySet()) {
+				allTasks.put(taskId, category.getFloatTasks().get(taskId));
+			}
+			
+			for(String taskId : category.getEvents().keySet()) {
+				allTasks.put(taskId, category.getEvents().get(taskId));
+			}
+			
+		}
+		
+		return allTasks;
+	}
+	
+	private ArrayList<Task> getTypeTaskArray(Category category, String taskType) {
+		
+		switch(taskType) {
+			case TYPE_TASK:
+				return getTasks(category.getTasks());
+			case TYPE_FLOAT:
+				return getTasks(category.getFloatTasks());
+			case TYPE_EVENT:
+				return getTasks(category.getEvents());
+		}
+		
+		return new ArrayList<Task> ();
+	}
+	
+	private ArrayList<Task> getTasks(HashMap<String, Task> tasks) {
+		
+		ArrayList<Task> allTasks = new ArrayList<Task> ();
+		
+		for(String taskName : tasks.keySet()) {
+			allTasks.add(tasks.get(taskName));
+		}
+		
+		return allTasks;
+	}
+	
+	private boolean isCategoryExist(CategoryWrapper categoryWrapper) {
+		return categoryWrapper!= null && categoryWrapper.getCategory() != null;
+	}
+	
 	public CategoryWrapper addNewCategory(String categoryName) 
 			throws JsonParseException, JsonMappingException, IOException, JSONException {
 		
@@ -160,84 +239,5 @@ public class StorageData {
 		}
 
 		return allTypeTasks;
-	}
-	
-	private Category setTaskToCategory(Category category, HashMap<String, Task> allTasks, String taskType) {
-		switch(taskType) {
-		case TYPE_TASK:
-			category.setTasks(allTasks);
-			return category;
-		case TYPE_FLOAT:
-			category.setFloatTasks(allTasks);
-			return category;
-		case TYPE_EVENT:
-			category.setEvents(allTasks);
-			return category;
-		}
-		return new Category();
-	}
-	
-	private HashMap<String, Task> getTargetTaskList(Category category, String taskType) {
-		switch(taskType) {
-			case TYPE_TASK:
-				return category.getTasks();
-			case TYPE_FLOAT:
-				return category.getFloatTasks();
-			case TYPE_EVENT:
-				return category.getEvents();
-		}
-		return new HashMap<String, Task> ();
-	}
-	
-	private HashMap<String, Task> getAllTasks() {
-		HashMap<String, Task> allTasks = new HashMap<String, Task> ();
-		
-		for(String categoryName : allCategories.keySet()) {
-			Category category = allCategories.get(categoryName).getCategory();
-			
-			for(String taskId : category.getTasks().keySet()) {
-				allTasks.put(taskId, category.getTasks().get(taskId));
-			}
-			
-			for(String taskId : category.getFloatTasks().keySet()) {
-				allTasks.put(taskId, category.getFloatTasks().get(taskId));
-			}
-			
-			for(String taskId : category.getEvents().keySet()) {
-				allTasks.put(taskId, category.getEvents().get(taskId));
-			}
-			
-		}
-		
-		return allTasks;
-	}
-	
-	private ArrayList<Task> getTypeTaskArray(Category category, String taskType) {
-		
-		switch(taskType) {
-			case TYPE_TASK:
-				return getTasks(category.getTasks());
-			case TYPE_FLOAT:
-				return getTasks(category.getFloatTasks());
-			case TYPE_EVENT:
-				return getTasks(category.getEvents());
-		}
-		
-		return new ArrayList<Task> ();
-	}
-	
-	private ArrayList<Task> getTasks(HashMap<String, Task> tasks) {
-		
-		ArrayList<Task> allTasks = new ArrayList<Task> ();
-		
-		for(String taskName : tasks.keySet()) {
-			allTasks.add(tasks.get(taskName));
-		}
-		
-		return allTasks;
-	}
-	
-	private boolean isCategoryExist(CategoryWrapper categoryWrapper) {
-		return categoryWrapper!= null && categoryWrapper.getCategory() != null;
 	}
 }

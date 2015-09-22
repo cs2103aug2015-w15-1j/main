@@ -98,6 +98,23 @@ public class StorageFile {
 		bufferedWriter.close();
 	}
 	
+	public String getFileName() {
+		return INPUT_FILE_NAME;
+	}
+	
+	public void setFileName(String fileName) {
+		this.INPUT_FILE_NAME = fileName;
+	}
+	
+	public void clearTextFromFile() throws IOException {
+		initializeWriter(textFile);
+	}
+	
+	public void exitProgram() throws IOException {
+		closeReader();
+		closeWriter();
+	}
+	
 	public HashMap<String, CategoryWrapper> getAllCategoriesFromFile() 
 			throws JsonParseException, JsonMappingException, IOException {
 		
@@ -112,7 +129,7 @@ public class StorageFile {
 		} 
 	}
 	
-	public void setAllCategoriesToFile(HashMap<String, CategoryWrapper> categoryWrapper) 
+	public HashMap<String, CategoryWrapper> setAllCategoriesToFile(HashMap<String, CategoryWrapper> categoryWrapper) 
 			throws JsonParseException, JsonMappingException, IOException {
 		clearTextFromFile();
 		
@@ -121,22 +138,7 @@ public class StorageFile {
 		mapper.writeValue(textFile, categoryWrapper);
 		bufferedWriter.write(mapper.writeValueAsString(categoryWrapper));
 		bufferedWriter.flush();
-	}
-	
-	public void clearTextFromFile() throws IOException {
-		initializeWriter(textFile);
-	}
-	
-	public void exitProgram() throws IOException {
-		closeReader();
-		closeWriter();
-	}
-	
-	public String getFileName() {
-		return INPUT_FILE_NAME;
-	}
-	
-	public void setFileName(String fileName) {
-		this.INPUT_FILE_NAME = fileName;
+		
+		return categoryWrapper;
 	}
 }

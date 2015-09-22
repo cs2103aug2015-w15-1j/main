@@ -1,5 +1,7 @@
 package main.java.backend.Storage.Task;
 
+import java.util.HashMap;
+
 public class Task {
 	
 	private String taskId;
@@ -12,6 +14,8 @@ public class Task {
     private long reminder;
 	private int priority;
     private boolean isDone;
+    
+    private HashMap<String, SubTask> subTask;
     
     public Task() {
     	
@@ -30,6 +34,7 @@ public class Task {
 		setPriority(priority);
 		setReminder(reminder);
 		setDone(isDone);
+		setSubTask(new HashMap<String, SubTask> ());
 	}
     
     // Task
@@ -45,6 +50,7 @@ public class Task {
 		setPriority(priority);
 		setReminder(reminder);
 		setDone(isDone);
+		setSubTask(new HashMap<String, SubTask> ());
 	}
 
 	// Event
@@ -59,6 +65,7 @@ public class Task {
 		setEndTime(endTime);
 		setPriority(priority);
 		setReminder(reminder);
+		setSubTask(new HashMap<String, SubTask> ());
 	}
 	
 	public String getTaskId() {
@@ -154,4 +161,12 @@ public class Task {
     	sb.append(isDone + System.getProperty("line.separator"));
     	return sb.toString();
     }
+
+	public HashMap<String, SubTask> getSubTask() {
+		return subTask;
+	}
+
+	public void setSubTask(HashMap<String, SubTask> subTask) {
+		this.subTask = subTask;
+	}
 }

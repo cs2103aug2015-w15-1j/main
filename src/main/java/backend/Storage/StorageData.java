@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.CategoryWrapper;
+import main.java.backend.Storage.Task.SubTask;
 import main.java.backend.Storage.Task.Task;
 
 public class StorageData {
@@ -33,6 +34,147 @@ public class StorageData {
 	public StorageData(String fileName) throws FileNotFoundException, IOException  { 
 		storageFile = new StorageFile(fileName);
 		allCategories = storageFile.getAllCategoriesFromFile();
+	}
+	
+	public CategoryWrapper addNewCategory(String categoryName) 
+			throws JsonParseException, JsonMappingException, IOException {
+		
+		CategoryWrapper categoryWrapper = allCategories.get(categoryName);
+
+		if(!isCategoryExist(categoryWrapper)) {
+			categoryWrapper = new CategoryWrapper(new Category(), categoryName);
+			allCategories.put(categoryName, categoryWrapper);
+			storageFile.setAllCategoriesToFile(allCategories);
+		}
+		
+		return categoryWrapper;
+	}
+	
+	public HashMap<String, Task> addNewTask(String categoryName, String taskType, Task newTask) 
+			throws JsonParseException, JsonMappingException, IOException, JSONException {
+
+		CategoryWrapper categoryWrapper = addNewCategory(categoryName);
+		Category category = categoryWrapper.getCategory();
+		HashMap<String, Task> allTasks = getTargetTaskList(category, taskType);
+		
+		allTasks.put(newTask.getTaskId(), newTask);
+		categoryWrapper.setCategory(setTaskToCategory(category, allTasks, taskType));
+		allCategories.put(categoryName, categoryWrapper);
+
+		storageFile.setAllCategoriesToFile(allCategories);
+		
+		return allTasks;
+	}
+	
+	public void setCategoryColour(String categoryName, String colourId) 
+			throws JsonParseException, JsonMappingException, IOException {
+
+		Category category = allCategories.get(categoryName).getCategory();
+		category.setCategoryColour(colourId);
+		storageFile.setAllCategoriesToFile(allCategories);
+	}
+
+	public void setDone(String taskId, boolean isDone) 
+			throws JsonParseException, JsonMappingException, IOException {
+		
+		HashMap<String, Task> targetTask = getAllTasks();
+		targetTask.get(taskId).setDone(isDone);
+		storageFile.setAllCategoriesToFile(allCategories);
+	}
+	
+	public void setReminder(String taskId, long reminder) 
+			throws JsonParseException, JsonMappingException, IOException {
+		
+		HashMap<String, Task> targetTask = getAllTasks();
+		targetTask.get(taskId).setReminder(reminder);
+		storageFile.setAllCategoriesToFile(allCategories);
+	}
+	
+	public void setDescription(String taskId, String description) 
+			throws JsonParseException, JsonMappingException, IOException {
+		
+		HashMap<String, Task> targetTask = getAllTasks();
+		targetTask.get(taskId).setDescription(description);
+		storageFile.setAllCategoriesToFile(allCategories);
+	}
+	
+	public void setDeadline(String taskId, long deadline) 
+			throws JsonParseException, JsonMappingException, IOException {
+		
+		HashMap<String, Task> targetTask = getAllTasks();
+		// TODO: When updating enddate, update endtime as well
+		targetTask.get(taskId).setEndTime(deadline);
+		storageFile.setAllCategoriesToFile(allCategories);
+	}
+	
+	public void addSubTask(String taskId, SubTask subTask) 
+			throws JsonParseException, JsonMappingException, IOException {
+		
+		Task targetTask = getAllTasks().get(taskId);
+		HashMap<String, SubTask> subTaskList = targetTask.getSubTask();
+		subTaskList.put(subTask.getSubTaskId(), subTask);
+		storageFile.setAllCategoriesToFile(allCategories);
+	}
+	
+	public void deleteSubTask(String taskId, String subtaskDescription) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public ArrayList<Category> getCategoryList() {
+		
+		ArrayList<Category> categoryList = new ArrayList<Category> ();
+		
+		for(String categoryName : allCategories.keySet()) {
+			categoryList.add(allCategories.get(categoryName).getCategory());
+		}
+		
+		return categoryList;
+	}
+
+	public ArrayList<Task> getTaskList() {
+
+		ArrayList<Task> taskList = new ArrayList<Task> ();
+		HashMap<String, Task> allTasks = getAllTasks();
+
+		for(String taskId : allTasks.keySet()) {
+			taskList.add(allTasks.get(taskId));
+		}
+
+		return taskList;
+	}
+	
+	public ArrayList<Task> getCategoryAllTasks(String categoryName) 
+			throws ParseException, IOException, JSONException {
+		
+		ArrayList<Task> allCategoryTasks = new ArrayList<Task> ();
+		Category category = allCategories.get(categoryName).getCategory();
+		
+		allCategoryTasks.addAll(getTasks(category.getTasks()));
+		allCategoryTasks.addAll(getTasks(category.getFloatTasks()));
+		allCategoryTasks.addAll(getTasks(category.getEvents()));
+
+		return allCategoryTasks;
+	}
+	
+	public ArrayList<Task> getCategoryTaskTypes(String categoryName, String taskType) 
+			throws ParseException, IOException, JSONException {
+		
+		Category category = allCategories.get(categoryName).getCategory();
+		return getTasks(getTargetTaskList(category, taskType));
+	}
+	
+	public ArrayList<Task> getTargetTasks(String taskType) 
+			throws ParseException, IOException, JSONException {
+		
+		ArrayList<Task> allTypeTasks = new ArrayList<Task> ();
+		int size = allCategories.size();
+		
+		for(int i = 0; i < size; i++) {
+			allTypeTasks.addAll(getTypeTaskArray(allCategories.get(i).getCategory(), taskType));	
+		}
+
+		return allTypeTasks;
 	}
 	
 	private Category setTaskToCategory(Category category, HashMap<String, Task> allTasks, String taskType) {
@@ -112,132 +254,5 @@ public class StorageData {
 	
 	private boolean isCategoryExist(CategoryWrapper categoryWrapper) {
 		return categoryWrapper!= null && categoryWrapper.getCategory() != null;
-	}
-	
-	public CategoryWrapper addNewCategory(String categoryName) 
-			throws JsonParseException, JsonMappingException, IOException, JSONException {
-		
-		CategoryWrapper categoryWrapper = allCategories.get(categoryName);
-
-		if(!isCategoryExist(categoryWrapper)) {
-			categoryWrapper = new CategoryWrapper(new Category(), categoryName);
-			allCategories.put(categoryName, categoryWrapper);
-			storageFile.setAllCategoriesToFile(allCategories);
-		}
-		
-		return categoryWrapper;
-	}
-	
-	public HashMap<String, Task> addNewTask(String categoryName, String taskType, Task newTask) 
-			throws JsonParseException, JsonMappingException, IOException, JSONException {
-
-		CategoryWrapper categoryWrapper = addNewCategory(categoryName);
-		Category category = categoryWrapper.getCategory();
-		HashMap<String, Task> allTasks = getTargetTaskList(category, taskType);
-		
-		allTasks.put(newTask.getTaskId(), newTask);
-		categoryWrapper.setCategory(setTaskToCategory(category, allTasks, taskType));
-		allCategories.put(categoryName, categoryWrapper);
-
-		storageFile.setAllCategoriesToFile(allCategories);
-		
-		return allTasks;
-	}
-	
-	public void setCategoryColour(String categoryName, String colourId) 
-			throws JsonParseException, JsonMappingException, IOException {
-
-		Category category = allCategories.get(categoryName).getCategory();
-		category.setCategoryColour(colourId);
-		storageFile.setAllCategoriesToFile(allCategories);
-	}
-
-	public void setDone(String taskId, boolean isDone) 
-			throws JsonParseException, JsonMappingException, IOException {
-		
-		HashMap<String, Task> targetTask = getAllTasks();
-		targetTask.get(taskId).setDone(isDone);
-		storageFile.setAllCategoriesToFile(allCategories);
-	}
-	
-	public void setReminder(String taskId, long reminder) 
-			throws JsonParseException, JsonMappingException, IOException {
-		
-		HashMap<String, Task> targetTask = getAllTasks();
-		targetTask.get(taskId).setReminder(reminder);
-		storageFile.setAllCategoriesToFile(allCategories);
-	}
-	
-	public void setDescription(String taskId, String description) 
-			throws JsonParseException, JsonMappingException, IOException {
-		
-		HashMap<String, Task> targetTask = getAllTasks();
-		targetTask.get(taskId).setDescription(description);
-		storageFile.setAllCategoriesToFile(allCategories);
-	}
-	
-	public void setDeadline(String taskId, long deadline) 
-			throws JsonParseException, JsonMappingException, IOException {
-		
-		HashMap<String, Task> targetTask = getAllTasks();
-		// TODO: When updating enddate, update endtime as well
-		targetTask.get(taskId).setEndTime(deadline);
-		storageFile.setAllCategoriesToFile(allCategories);
-	}
-	
-	public ArrayList<Category> getCategoryList() {
-		
-		ArrayList<Category> categoryList = new ArrayList<Category> ();
-		
-		for(String categoryName : allCategories.keySet()) {
-			categoryList.add(allCategories.get(categoryName).getCategory());
-		}
-		
-		return categoryList;
-	}
-
-	public ArrayList<Task> getTaskList() {
-
-		ArrayList<Task> taskList = new ArrayList<Task> ();
-		HashMap<String, Task> allTasks = getAllTasks();
-
-		for(String taskId : allTasks.keySet()) {
-			taskList.add(allTasks.get(taskId));
-		}
-
-		return taskList;
-	}
-	
-	public ArrayList<Task> getCategoryAllTasks(String categoryName) 
-			throws ParseException, IOException, JSONException {
-		
-		ArrayList<Task> allCategoryTasks = new ArrayList<Task> ();
-		Category category = allCategories.get(categoryName).getCategory();
-		
-		allCategoryTasks.addAll(getTasks(category.getTasks()));
-		allCategoryTasks.addAll(getTasks(category.getFloatTasks()));
-		allCategoryTasks.addAll(getTasks(category.getEvents()));
-
-		return allCategoryTasks;
-	}
-	
-	public ArrayList<Task> getCategoryTaskTypes(String categoryName, String taskType) 
-			throws ParseException, IOException, JSONException {
-		
-		Category category = allCategories.get(categoryName).getCategory();
-		return getTasks(getTargetTaskList(category, taskType));
-	}
-	
-	public ArrayList<Task> getTargetTasks(String taskType) 
-			throws ParseException, IOException, JSONException {
-		
-		ArrayList<Task> allTypeTasks = new ArrayList<Task> ();
-		int size = allCategories.size();
-		
-		for(int i = 0; i < size; i++) {
-			allTypeTasks.addAll(getTypeTaskArray(allCategories.get(i).getCategory(), taskType));	
-		}
-
-		return allTypeTasks;
 	}
 }

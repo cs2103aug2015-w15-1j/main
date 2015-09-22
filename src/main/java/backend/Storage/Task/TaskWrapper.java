@@ -11,7 +11,7 @@ public class TaskWrapper {
 	private HashMap<String, Task> task;
 	
 	public TaskWrapper() {
-		
+		setTask(new HashMap<String, Task> ());
 	}
 
 	public HashMap<String, Task> getTask() {

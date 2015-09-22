@@ -11,21 +11,25 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import main.java.backend.Storage.Task.Category;
-import main.java.backend.Storage.Task.CategoryWrapper;
 import main.java.backend.Storage.Task.Task;
 
 public abstract class Storage {
 	
 	public abstract void addFloatingTask(String taskName, String taskDescription, 
 			int priority, long reminder, String category, boolean done)
-					throws IOException, JSONException;
+					throws JsonParseException, JsonMappingException, IOException, JSONException;
 
-	public abstract void addTask(String taskName, String taskDescription, String deadline, long endTime, int priority, 
-			int reminder, String category, boolean done) throws IOException, JSONException;
+	public abstract void addTask(String taskName, String taskDescription, 
+			String deadline, long endTime, int priority, int reminder, String category, 
+			boolean done) throws IOException, JSONException;
 
 	public abstract void addEvent(String eventName, String eventDescription, String startDate, 
 			String endDate, long startDateMilliseconds, long endDateMilliseconds, int priority, 
 			long reminder, String category) throws IOException, JSONException;
+	
+	// TODO: Not completed
+	public abstract void addSubTask(String subTaskId, String subtaskDescription, boolean isDone) 
+			throws JsonParseException, JsonMappingException, IOException;
 
 	public abstract void addCategory(String categoryName) 
 			throws JsonParseException, JsonMappingException, IOException, JSONException;
@@ -50,11 +54,11 @@ public abstract class Storage {
 
 	public abstract void setDeadline(String taskId, long deadline) 
 			throws JsonParseException, JsonMappingException, IOException;
-
+	
 	// TODO: Not completed
-	public abstract void addSubTask(String taskId, String subtaskDescription);
+	public abstract void deleteSubTask(String subTaskId, String subtaskDescription);
 
-	public abstract void deleteAll(String categoryName) throws IOException;
+	public abstract void deleteAll() throws IOException;
 
 	// TODO: Not completed
 	public abstract void deleteCategory(String categoryName);
@@ -63,7 +67,7 @@ public abstract class Storage {
 	public abstract void deleteTaskTypeFromCategory(String categoryName);
 
 	// TODO: Not completed
-	public abstract void deleteTaskFromCategory(String categoryName);
+	public abstract void deleteTask(String taskId);
 
 	/**
 	 * This operation retrieves all categories from the file.

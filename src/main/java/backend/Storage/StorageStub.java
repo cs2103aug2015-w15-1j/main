@@ -12,7 +12,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import main.java.backend.Storage.Task.Category;
-import main.java.backend.Storage.Task.CategoryWrapper;
+import main.java.backend.Storage.Task.SubTask;
 import main.java.backend.Storage.Task.Task;
 
 public class StorageStub extends Storage {
@@ -34,8 +34,9 @@ public class StorageStub extends Storage {
 		storageFile = new StorageFile(fileName);
 	}
 	
-	public void addFloatingTask(String taskName, String taskDescription, int priority, long reminder,
-			String category, boolean done) throws IOException, JSONException {
+	public void addFloatingTask(String taskName, String taskDescription, int priority, 
+			long reminder, String category, boolean done) throws JsonParseException, 
+			JsonMappingException, IOException, JSONException {
 		
 		Task newFloatingTask = new Task(UUID.randomUUID().toString(), taskName, 
 				taskDescription, priority, reminder, done);
@@ -57,6 +58,13 @@ public class StorageStub extends Storage {
 		Task newEvent = new Task(UUID.randomUUID().toString(), eventName, eventDescription, startDate, 
 				endDate, startDateMilliseconds, endDateMilliseconds, priority, reminder, category);
 		storageData.addNewTask(category, TYPE_EVENT, newEvent);
+	}
+	
+	public void addSubTask(String taskId, String subtaskDescription, boolean isDone) 
+			throws JsonParseException, JsonMappingException, IOException {
+
+		SubTask subTask = new SubTask(UUID.randomUUID().toString(), subtaskDescription, isDone);
+		storageData.addSubTask(taskId, subTask);
 	}
 	
 	public void addCategory(String categoryName) 
@@ -106,12 +114,12 @@ public class StorageStub extends Storage {
 		storageData.setDeadline(taskId, deadline);
 	}
 	
-	public void addSubTask(String taskId, String subtaskDescription) {
+	public void deleteSubTask(String taskId, String subtaskDescription) {
 		// TODO Auto-generated method stub
 		
 	}
 	
-	public void deleteAll(String categoryName) throws IOException {
+	public void deleteAll() throws IOException {
 		
 		storageFile.clearTextFromFile();
 	}
@@ -127,6 +135,11 @@ public class StorageStub extends Storage {
 	}
 	
 	public void deleteTaskFromCategory(String categoryName) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void deleteTask(String taskId) {
 		// TODO Auto-generated method stub
 		
 	}

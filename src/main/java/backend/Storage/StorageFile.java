@@ -24,13 +24,11 @@ import main.java.backend.Storage.Task.CategoryWrapper;
 public class StorageFile {
 
 	private static final String DEFAULT_FILE_NAME = "mytasklist.txt";
-	private static String INPUT_FILE_NAME;
+	private static final String INPUT_FILE_NAME = "%1$s";
 	
 	private File textFile;
-
 	private FileReader textFileReader;
 	private BufferedReader bufferedReader;
-
 	private FileWriter textFileWriter;
 	private BufferedWriter bufferedWriter;
 	
@@ -67,8 +65,6 @@ public class StorageFile {
 		mapper.writeValue(textFile, categoryWrapper);
 		bufferedWriter.write(mapper.writeValueAsString(categoryWrapper));
 		bufferedWriter.flush();
-		// TODO: Debug purpose; to be removed
-		System.out.println(mapper.writeValueAsString(categoryWrapper));
 	}
 	
 	public void clearTextFromFile() throws IOException {
@@ -84,8 +80,8 @@ public class StorageFile {
 		return INPUT_FILE_NAME;
 	}
 	
-	private void setFileName(String fileName) {
-		INPUT_FILE_NAME = fileName;
+	public void setFileName(String fileName) {
+		String.format(INPUT_FILE_NAME , fileName);
 	}
 	
 	private void createFile(File file) throws IOException {
@@ -94,6 +90,22 @@ public class StorageFile {
 			initializeReader(textFile);
 			initializeWriter(textFile);
 		}
+	}
+
+	private boolean isFileEmpty() throws IOException {    
+		initializeFile();
+		initializeReader(textFile);
+		
+		if (bufferedReader.readLine() == null) {
+		    return true;
+		}
+		
+		return false;
+	}
+	
+	private String getAllTextsFromFile() throws IOException {
+		return new String(Files.readAllBytes
+				(Paths.get(INPUT_FILE_NAME)), StandardCharsets.UTF_8);
 	}
 	
 	private void initializeFile() 
@@ -126,21 +138,5 @@ public class StorageFile {
 		bufferedWriter.flush();
 		textFileWriter.close();
 		bufferedWriter.close();
-	}
-
-	private boolean isFileEmpty() throws IOException {    
-		initializeFile();
-		initializeReader(textFile);
-		
-		if (bufferedReader.readLine() == null) {
-		    return true;
-		}
-		
-		return false;
-	}
-	
-	private String getAllTextsFromFile() throws IOException {
-		return new String(Files.readAllBytes
-				(Paths.get(INPUT_FILE_NAME)), StandardCharsets.UTF_8);
 	}
 }

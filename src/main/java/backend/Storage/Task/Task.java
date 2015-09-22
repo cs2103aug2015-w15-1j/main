@@ -2,6 +2,7 @@ package main.java.backend.Storage.Task;
 
 public class Task {
 	
+	private String taskId;
 	private String name;
 	private String description;
     private String startDate;
@@ -17,8 +18,9 @@ public class Task {
     }
     
     // Floating task
-    public Task(String taskName, String taskDescription, int priority, 
+    public Task(String taskId, String taskName, String taskDescription, int priority, 
     		long reminder, boolean isDone) {
+    	setTaskId(taskId);
     	setName(taskName);
 		setDescription(taskDescription);
 		setStartDate(null);
@@ -31,8 +33,9 @@ public class Task {
 	}
     
     // Task
-	public Task(String taskName, String taskDescription, String deadline, long endTime, 
+	public Task(String taskId, String taskName, String taskDescription, String deadline, long endTime, 
 			int priority, int reminder, boolean isDone) {
+		setTaskId(taskId);
 		setName(taskName);
 		setDescription(taskDescription);
 		setStartDate(null);
@@ -45,8 +48,9 @@ public class Task {
 	}
 
 	// Event
-	public Task(String eventName, String eventDescription, String startDate, String endDate, long startTime,
-			long endTime, int priority, long reminder, String categoryName) {
+	public Task(String taskId, String eventName, String eventDescription, String startDate, 
+			String endDate, long startTime, long endTime, int priority, long reminder, String categoryName) {
+		setTaskId(taskId);
 		setName(eventName);
 		setDescription(eventDescription);
 		setStartDate(startDate);
@@ -55,6 +59,14 @@ public class Task {
 		setEndTime(endTime);
 		setPriority(priority);
 		setReminder(reminder);
+	}
+	
+	public String getTaskId() {
+		return taskId;
+	}
+
+	public void setTaskId(String taskId) {
+		this.taskId = taskId;
 	}
 
 	public int getPriority() {

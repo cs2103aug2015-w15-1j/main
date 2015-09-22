@@ -4,7 +4,10 @@ import java.util.HashMap;
 
 public class Category {
 	
-	/* The following represents the list of task types */
+	/* The following represents the list of task types 
+	 * where hash map key represents the category name
+	 * and value represents tasks under each category.
+	 */
 	private HashMap<String, Task> tasks;
 	private HashMap<String, Task> floatTasks;
 	private HashMap<String, Task> events;

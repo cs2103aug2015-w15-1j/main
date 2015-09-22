@@ -124,7 +124,8 @@ public class StorageFile {
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			HashMap<String, CategoryWrapper> allTasks = 
-					mapper.readValue(getAllTextsFromFile(), new TypeReference<HashMap<String, CategoryWrapper>>() {});
+					mapper.readValue(getAllTextsFromFile(), 
+							new TypeReference<HashMap<String, CategoryWrapper>>() {});
 			return allTasks;
 		} 
 	}

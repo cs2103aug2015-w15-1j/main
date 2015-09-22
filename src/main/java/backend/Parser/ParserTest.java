@@ -1,4 +1,4 @@
-package main.java.backend;
+package main.java.backend.Parser;
 
 import static org.junit.Assert.*;
 
@@ -14,6 +14,8 @@ public class ParserTest {
 	public void basicTest() {
 	    ArrayList<String> parsed = parser.parseInput("add Project Proposal");
 	    ArrayList<String> expected = new ArrayList<String>( Arrays.asList("add", "Project Proposal") );
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual: " + parsed.toString());
 	    assertEquals(expected, parsed);
 	}
 }

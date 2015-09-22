@@ -25,16 +25,16 @@ public class StorageStub extends Storage {
 
 	private HashMap<String, CategoryWrapper> allCategories;
 	
-	private StorageFile storageFile;
+	private StorageJson storageJson;
 	
 	public StorageStub() throws FileNotFoundException, IOException  { 
-		storageFile = new StorageFile();
-		allCategories = storageFile.getAllCategoriesFromFile();
+		storageJson = new StorageJson();
+		allCategories = storageJson.getAllDataFromFile();
 	}
 
 	public StorageStub(String fileName) throws FileNotFoundException, IOException  { 
-		storageFile = new StorageFile(fileName);
-		allCategories = storageFile.getAllCategoriesFromFile();
+		storageJson = new StorageJson(fileName);
+		allCategories = storageJson.getAllDataFromFile();
 	}
 	
 	@Override
@@ -83,7 +83,7 @@ public class StorageStub extends Storage {
 		if(!isCategoryExist(categoryWrapper)) {
 			categoryWrapper = new CategoryWrapper(new Category(), categoryName);
 			allCategories.put(categoryName, categoryWrapper);
-			storageFile.setAllCategoriesToFile(allCategories);
+			storageJson.setAllDataToFile(allCategories);
 		}
 		
 		return categoryWrapper;
@@ -95,7 +95,7 @@ public class StorageStub extends Storage {
 
 		Category category = allCategories.get(categoryName).getCategory();
 		category.setCategoryColour(colourId);
-		storageFile.setAllCategoriesToFile(allCategories);
+		storageJson.setAllDataToFile(allCategories);
 	}
 	
 	@Override
@@ -124,7 +124,7 @@ public class StorageStub extends Storage {
 		
 		HashMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setReminder(reminder);
-		storageFile.setAllCategoriesToFile(allCategories);
+		storageJson.setAllDataToFile(allCategories);
 	}
 	
 	@Override
@@ -133,7 +133,7 @@ public class StorageStub extends Storage {
 		
 		HashMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setDescription(description);
-		storageFile.setAllCategoriesToFile(allCategories);
+		storageJson.setAllDataToFile(allCategories);
 	}
 	
 	@Override
@@ -143,7 +143,7 @@ public class StorageStub extends Storage {
 		HashMap<String, Task> targetTask = getAllTasks();
 		// TODO: When updating enddate, update endtime as well
 		targetTask.get(taskId).setEndTime(deadline);
-		storageFile.setAllCategoriesToFile(allCategories);
+		storageJson.setAllDataToFile(allCategories);
 	}
 	
 	@Override
@@ -175,8 +175,8 @@ public class StorageStub extends Storage {
 	
 	@Override
 	public void deleteAll() throws IOException {
-		storageFile.setAllCategoriesToFile(new HashMap<String, CategoryWrapper> ());
-		storageFile.clearTextFromFile();
+		storageJson.setAllDataToFile(new HashMap<String, CategoryWrapper> ());
+		storageJson.clearTextFromFile();
 	}
 	
 	@Override
@@ -295,7 +295,7 @@ public class StorageStub extends Storage {
 		categoryWrapper.setCategory(setTaskToCategory(category, allTasks, taskType));
 		allCategories.put(categoryName, categoryWrapper);
 
-		storageFile.setAllCategoriesToFile(allCategories);
+		storageJson.setAllDataToFile(allCategories);
 		
 		return allTasks;
 	}
@@ -306,7 +306,7 @@ public class StorageStub extends Storage {
 		Task targetTask = getAllTasks().get(taskId);
 		HashMap<String, SubTask> subTaskList = targetTask.getSubTask();
 		subTaskList.put(subTask.getSubTaskId(), subTask);
-		storageFile.setAllCategoriesToFile(allCategories);
+		storageJson.setAllDataToFile(allCategories);
 	}
 	
 	private void setDone(String taskId, boolean isDone) 
@@ -314,7 +314,7 @@ public class StorageStub extends Storage {
 		
 		HashMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setDone(isDone);
-		storageFile.setAllCategoriesToFile(allCategories);
+		storageJson.setAllDataToFile(allCategories);
 	}
 	
 	private Category setTaskToCategory(Category category, HashMap<String, Task> allTasks, String taskType) {

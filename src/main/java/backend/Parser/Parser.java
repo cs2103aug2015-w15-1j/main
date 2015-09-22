@@ -10,6 +10,7 @@ public class Parser {
 											   Arrays.asList("add", "deadline", "description", 
 											   "delete", "done", "event", "priority", "reminder", 
 											   "return", "undo") );
+	
 	private final ArrayList<String> commandsWithoutParameter 
 									= new ArrayList<String>( Arrays.asList("return", "undo") );
 	
@@ -18,6 +19,9 @@ public class Parser {
 	
 	//Temporary holder for the next parameter of result
 	private String parameter = "";
+	
+	//List of commands that have appeared in the current input
+	private final ArrayList<String> seenCommands = new ArrayList<String>();
 	
 	/**
 	 * This method parses the user input and returns it as an arraylist
@@ -32,8 +36,23 @@ public class Parser {
 		
 		} else {
 			for (String token: inputTokens) {
+				if (seenCommands.contains(token)) {
+					pushParameter();
+					int commandIndex = parsed.indexOf(token);
+					
+					//Remove the original command and its parameter
+					parsed.remove(commandIndex);
+					while (parsed.size() > commandIndex){
+						if (commands.contains( parsed.get(commandIndex) )) {
+							break;
+						}
+						parsed.remove(commandIndex);
+					}
+				}
+				
 				if (commands.contains(token.toLowerCase())) {
 					pushParameter();
+					seenCommands.add(token);
 					parsed.add(token.toLowerCase());
 				} else {
 					parameter += token + " ";
@@ -43,6 +62,7 @@ public class Parser {
 	
 			result = new ArrayList<String>(parsed);
 			parsed.clear();
+			seenCommands.clear();
 		}
 		
 		return result;

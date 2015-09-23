@@ -17,18 +17,18 @@ import main.java.backend.Storage.Task.Task;
 public abstract class Storage {
 	
 	public abstract void addFloatingTask(String taskName, String taskDescription, 
-			int priority, long reminder, String category, boolean done)
+			int priority, long reminder, String category)
 					throws JsonParseException, JsonMappingException, IOException, JSONException;
 
 	public abstract void addTask(String taskName, String taskDescription, 
-			String deadline, long endTime, int priority, int reminder, String category, 
-			boolean done) throws IOException, JSONException;
+			String deadline, long endTime, int priority, int reminder, String category) 
+					throws IOException, JSONException;
 
 	public abstract void addEvent(String eventName, String eventDescription, String startDate, 
 			String endDate, long startDateMilliseconds, long endDateMilliseconds, int priority, 
 			long reminder, String category) throws IOException, JSONException;
 	
-	public abstract void addSubTask(String subTaskId, String subtaskDescription, boolean isDone) 
+	public abstract void addSubTask(String subTaskId, String subtaskDescription) 
 			throws JsonParseException, JsonMappingException, IOException;
 
 	public abstract CategoryWrapper addCategory(String categoryName) 
@@ -46,6 +46,7 @@ public abstract class Storage {
 	public abstract void setDone(String taskId) 
 			throws JsonParseException, JsonMappingException, IOException;
 
+	// long reminder should be string
 	public abstract void setReminder(String taskId, long reminder) 
 			throws JsonParseException, JsonMappingException, IOException;
 
@@ -76,13 +77,15 @@ public abstract class Storage {
 	public abstract void deleteCategory(String categoryName);
 
 	// TODO: Not completed
-	public abstract void deleteTaskTypeFromCategory(String categoryName);
+	public abstract void deleteTaskTypeFromCategory(String categoryName, String taskType);
 	
 	// TODO: Not completed
-	public abstract void deleteTaskFromCategory(String categoryName);
+	public abstract void deleteTaskFromCategory(String categoryName, String taskId);
 
 	// TODO: Not completed
 	public abstract void deleteTask(String taskId);
+	
+	public abstract ArrayList<String> getCategories();
 
 	public abstract ArrayList<Category> getCategoryList()
 			throws JsonParseException, JsonMappingException, JSONException, IOException;

@@ -1,6 +1,7 @@
 package main.java.backend.Storage.Task;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 public class Task {
 	
@@ -39,7 +40,7 @@ public class Task {
     
     // Task
 	public Task(String taskId, String taskName, String taskDescription, String deadline, long endTime, 
-			int priority, int reminder, boolean isDone) {
+			int priority, long reminder, boolean isDone) {
 		setTaskId(taskId);
 		setName(taskName);
 		setDescription(taskDescription);

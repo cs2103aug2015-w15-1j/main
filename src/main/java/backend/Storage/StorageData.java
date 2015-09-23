@@ -39,20 +39,21 @@ public class StorageData extends Storage {
 	
 	@Override
 	public void addFloatingTask(String taskName, String taskDescription, int priority, 
-			long reminder, String category, boolean done) throws JsonParseException, 
+			long reminder, String category) throws JsonParseException, 
 			JsonMappingException, IOException, JSONException {
 		
 		Task newFloatingTask = new Task(UUID.randomUUID().toString(), taskName, 
-				taskDescription, priority, reminder, done);
+				taskDescription, priority, reminder, false);
 		addNewTask(category, TYPE_FLOAT, newFloatingTask);
 	}
 	
 	@Override
-	public void addTask(String taskName, String taskDescription, String deadline, long endTime, int priority, 
-			int reminder, String category, boolean done) throws IOException, JSONException {	
+	public void addTask(String taskName, String taskDescription, String deadline, 
+			long endTime, int priority, long reminder, String category) 
+					throws IOException, JSONException {	
 		
 		Task newTask = new Task(UUID.randomUUID().toString(), taskName, 
-				taskDescription, deadline, endTime, priority, reminder, done);
+				taskDescription, deadline, endTime, priority, reminder, false);
 		addNewTask(category, TYPE_TASK, newTask);
 	}
 
@@ -67,10 +68,10 @@ public class StorageData extends Storage {
 	}
 	
 	@Override
-	public void addSubTask(String taskId, String subtaskDescription, boolean isDone) 
+	public void addSubTask(String taskId, String subtaskDescription) 
 			throws JsonParseException, JsonMappingException, IOException {
 
-		SubTask subTask = new SubTask(UUID.randomUUID().toString(), subtaskDescription, isDone);
+		SubTask subTask = new SubTask(UUID.randomUUID().toString(), subtaskDescription, false);
 		addSubTask(taskId, subTask);
 	}
 	
@@ -186,13 +187,13 @@ public class StorageData extends Storage {
 	}
 	
 	@Override
-	public void deleteTaskTypeFromCategory(String categoryName) {
+	public void deleteTaskTypeFromCategory(String categoryName, String taskType) {
 		// TODO Auto-generated method stub
 		
 	}
 	
 	@Override
-	public void deleteTaskFromCategory(String categoryName) {
+	public void deleteTaskFromCategory(String categoryName, String taskId) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -201,6 +202,16 @@ public class StorageData extends Storage {
 	public void deleteTask(String taskId) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<String> getCategories() {
+		
+		ArrayList<String> categories = new ArrayList<String> ();
+	
+		
+		return categories;
 	}
 	
 	@Override

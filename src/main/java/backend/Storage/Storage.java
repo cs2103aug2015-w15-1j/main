@@ -21,14 +21,14 @@ public abstract class Storage {
 					throws JsonParseException, JsonMappingException, IOException, JSONException;
 
 	public abstract void addTask(String taskName, String taskDescription, 
-			String deadline, long endTime, int priority, int reminder, String category) 
+			String deadline, long endTime, int priority, long reminder, String category) 
 					throws IOException, JSONException;
 
 	public abstract void addEvent(String eventName, String eventDescription, String startDate, 
 			String endDate, long startDateMilliseconds, long endDateMilliseconds, int priority, 
 			long reminder, String category) throws IOException, JSONException;
 	
-	public abstract void addSubTask(String subTaskId, String subtaskDescription) 
+	public abstract void addSubTask(String taskId, String subtaskDescription) 
 			throws JsonParseException, JsonMappingException, IOException;
 
 	public abstract CategoryWrapper addCategory(String categoryName) 

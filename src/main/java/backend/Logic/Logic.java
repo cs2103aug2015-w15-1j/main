@@ -243,6 +243,7 @@ public class Logic {
 	}
 
 	private String addSubTask(ArrayList<String> getParsedInput) throws JsonParseException, JsonMappingException, IOException {
+		arrayChecker(getParsedInput);
 		String taskId = getParsedInput.get(1);
 		String subTaskDescription = getParsedInput.get(2);
 		storageComponent.addSubTask(taskId,subTaskDescription);

@@ -2,31 +2,32 @@ package main.java.backend.Sorter;
 
 import java.util.ArrayList;
 
+import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
 public class Sorter {
 
-	public ArrayList<Task> sort(String field, ArrayList<Task> currentState) {
-		ArrayList<Task> sortedCurrentState = null;
+	public ArrayList<Category> sort(String field, ArrayList<Category> currentState2) {
+		ArrayList<Category> sortedCurrentState = null;
 		switch (field) {
 			case "sortP":
-				sortedCurrentState = sortPriority(currentState);
+				sortedCurrentState = sortPriority(currentState2);
 				break;
 			case "sortD":
-				sortedCurrentState = sortDate(currentState);
+				sortedCurrentState = sortDate(currentState2);
 				break;
 		}
 		return sortedCurrentState;
 	}
 
-	private ArrayList<Task> sortDate(ArrayList<Task> currentState) {
+	private ArrayList<Category> sortDate(ArrayList<Category> currentState2) {
 		// TODO Auto-generated method stub
-		return currentState;
+		return currentState2;
 	}
 
-	private ArrayList<Task> sortPriority(ArrayList<Task> currentState) {
+	private ArrayList<Category> sortPriority(ArrayList<Category> currentState2) {
 		// TODO Auto-generated method stub
-		return currentState;
+		return currentState2;
 	}
 
 }

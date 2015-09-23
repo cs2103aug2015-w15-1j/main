@@ -43,24 +43,33 @@ public class Parser {
 					pushParameter();
 					if (seenCommands.contains(token)) {
 						if (parsed.indexOf(token) == 0) { //if original command is first word of input
-							removeOriginalCommand(token);
+							if (commandsWithWordParameter.contains(token)) {
+								parameter += token + " ";
+							} else {
+								removeOriginalCommand(token);
+								parsed.add(token.toLowerCase());
+							}
 						} else {
 							if (seenCommands.indexOf(token) == 0) { //if original command is first command that appeared
-								appendToPrevParameter(token);
+								String merged = mergeWithParameter(token);
+								appendToPrevParameter(merged);
 							} else {
 								String prevCommand = seenCommands.get( seenCommands.indexOf(token)-1 );
 								if (commandsWithWordParameter.contains(prevCommand)) {
-									appendToPrevParameter(token);
+									String merged = mergeWithParameter(token);
+									appendToPrevParameter(merged);
 								} else {
 									removeOriginalCommand(token);
 								}
 							}
+							parsed.add(token.toLowerCase());
 						}
 
 					} else {
 						seenCommands.add(token);
+						parsed.add(token.toLowerCase());
 					}
-					parsed.add(token.toLowerCase());
+					
 				} else {
 					parameter += token + " ";
 				}
@@ -75,24 +84,35 @@ public class Parser {
 		return result;
 	}
 
-	private void appendToPrevParameter(String command) {
-		int currIndex = parsed.indexOf(command);
-		String prevParameter = parsed.get(currIndex - 1);
-		
-		String currParameter = parsed.get(currIndex);
-		prevParameter += " " + currParameter;
-		parsed.remove(currIndex);
-		currParameter = parsed.get(currIndex);
-		
-		while (parsed.size() > currIndex) {
-			currParameter = parsed.get(currIndex);
-			if (commands.contains(currParameter)){
+	private String mergeWithParameter(String token) {
+		int cmdIndex = parsed.indexOf(token);
+		int paraIndex = cmdIndex + 1;
+		String parameter = parsed.get(paraIndex);
+		while (!commands.contains(parameter)) {	
+			token += " " + parameter;
+			parsed.remove(paraIndex);
+			if (parsed.size() <= paraIndex) {
 				break;
 			}
-			prevParameter += " " + currParameter;
-			parsed.remove(currIndex);
+			parameter = parsed.get(paraIndex);
 		}
-		parsed.set(currIndex - 1, prevParameter);
+		parsed.set(cmdIndex, token);
+		return token;
+	}
+
+	private void appendToPrevParameter(String token) {
+		int tokenIndex = parsed.indexOf(token);
+		int paraIndex = tokenIndex - 1;
+		String prevParameter = parsed.get(paraIndex);
+		
+		if (commands.contains(prevParameter)) {
+			return;
+		}
+		
+		String currParameter = parsed.get(tokenIndex);
+		prevParameter += " " + currParameter;
+		parsed.remove(tokenIndex);
+		parsed.set(paraIndex, prevParameter);
 	}
 
 	private void removeOriginalCommand(String token) {

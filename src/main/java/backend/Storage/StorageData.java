@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.UUID;
 
 import org.json.JSONException;
@@ -204,12 +205,14 @@ public class StorageData extends Storage {
 		
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public ArrayList<String> getCategories() {
 		
 		ArrayList<String> categories = new ArrayList<String> ();
-	
+		
+		for(String name : allCategories.keySet()) {
+			categories.add(name);
+		}
 		
 		return categories;
 	}

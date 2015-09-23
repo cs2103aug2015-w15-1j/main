@@ -320,52 +320,56 @@ public class GUI extends Application{
 	
 	private static void userInputEvents(){
 		System.out.println("top task:");
-		System.out.println(getTasks.get(currentPosition));
-		userInput.setOnKeyPressed(new EventHandler<KeyEvent>()
-		{
-			@Override
-			public void handle(KeyEvent ke)
-			{	
-				if (ke.getCode().equals(KeyCode.ENTER))
-				{
-					try {
+		if(getTasks == null || getTasks.isEmpty()){
+			System.out.println(MESSAGE_EMPTY);
+		} else {
+			System.out.println(getTasks.get(currentPosition));
+
+			userInput.setOnKeyPressed(new EventHandler<KeyEvent>()
+			{
+				@Override
+				public void handle(KeyEvent ke)
+				{	
+					if (ke.getCode().equals(KeyCode.ENTER))
+					{
 						try {
-							userInputCommads();
-						} catch (ParseException e) {
+							try {
+								userInputCommads();
+							} catch (ParseException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						} catch (JsonParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (JsonMappingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (JSONException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-					} catch (JsonParseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (JsonMappingException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-	
-				}
-				if (ke.getCode().equals(KeyCode.DOWN))
-				{	
-					eventDown();
-				}
-				if (ke.getCode().equals(KeyCode.UP)){
-					eventUp();
-				}
-				if (ke.getCode().equals(KeyCode.LEFT)){
-					eventLeft();
-				}
-				if (ke.getCode().equals(KeyCode.RIGHT)){
-					eventRight();
-				}
-			}
-		});
 
+					}
+					if (ke.getCode().equals(KeyCode.DOWN))
+					{	
+						eventDown();
+					}
+					if (ke.getCode().equals(KeyCode.UP)){
+						eventUp();
+					}
+					if (ke.getCode().equals(KeyCode.LEFT)){
+						eventLeft();
+					}
+					if (ke.getCode().equals(KeyCode.RIGHT)){
+						eventRight();
+					}
+				}
+			});
+		}
 	}
 	private static void userInputCommads() throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException{
 			userCommands = userInput.getText();

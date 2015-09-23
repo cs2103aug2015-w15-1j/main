@@ -93,7 +93,7 @@ public class GUI extends Application{
 		thestage = primaryStage;
 		
 		setUpMainScene();
-		setUpFocusScene();
+	//	setUpFocusScene();
 		
 		primaryStage.setScene(mainScene);
 		primaryStage.show();
@@ -287,7 +287,7 @@ public class GUI extends Application{
 	}
 	private static void redirectOutput(PrintStream stream){
 		System.setOut(stream);
-		//System.setErr(stream);
+		System.setErr(stream);
 	}
 	
 	private static ListView<Task> getList(ArrayList<Task> list){
@@ -324,7 +324,7 @@ public class GUI extends Application{
 			System.out.println(MESSAGE_EMPTY);
 		} else {
 			System.out.println(getTasks.get(currentPosition));
-
+		}
 			userInput.setOnKeyPressed(new EventHandler<KeyEvent>()
 			{
 				@Override
@@ -369,13 +369,13 @@ public class GUI extends Application{
 					}
 				}
 			});
-		}
 	}
 	private static void userInputCommads() throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException{
-			userCommands = userInput.getText();
+		System.out.println("command found");	
+		userCommands = userInput.getText();
 			userInput.clear();
 			System.out.println(userCommands);
-			if (userCommands.equals("change view")){
+			/*if (userCommands.equals("change view")){
 				if (currentScene == SCENE_MAIN){
 					thestage.setScene(focusScene);
 					currentScene = SCENE_FOCUS;
@@ -383,11 +383,11 @@ public class GUI extends Application{
 					thestage.setScene(mainScene);
 					currentScene = SCENE_MAIN;
 				}
-			} else {
+			} else {*/
 				String display = logicComponent.executeCommand(userCommands);
 				refresh();
 				displayStringToScreen(display);
-			}
+			//}
 
 	}
 	private static void eventDown(){

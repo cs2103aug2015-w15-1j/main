@@ -46,12 +46,6 @@ public class ParserTest {
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-	    parsed = parser.parseInput("done Project Proposal");
-	    expected = new ArrayList<String>( Arrays.asList("done", "Project Proposal") );
-	    System.out.println("Expected: " + expected.toString());
-	    System.out.println("Actual:   " + parsed.toString());
-	    assertEquals(expected, parsed);
-	    
 	    parsed = parser.parseInput("return");
 	    expected = new ArrayList<String>( Arrays.asList("return") );
 	    System.out.println("Expected: " + expected.toString());
@@ -178,6 +172,47 @@ public class ParserTest {
 	    
 	    parsed = parser.parseInput("add add food to the fridge priority 2");
 	    expected = new ArrayList<String>( Arrays.asList("add", "add food to the fridge", "priority", "2") );
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	}
+	
+	@Test
+	public void DeleteAndDone(){
+		System.out.println("\n-----------------Result for DeleteAndDone-----------------");
+		
+		parsed = parser.parseInput("done Project Proposal");
+	    expected = new ArrayList<String>( Arrays.asList("done", "Project Proposal") );
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
+	    parsed = parser.parseInput("Project Proposal delete");
+	    expected = new ArrayList<String>( Arrays.asList("Project Proposal", "delete") );
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
+	    parsed = parser.parseInput("delete project Proposal priority 100");
+	    expected = new ArrayList<String>( Arrays.asList("delete", "project Proposal priority 100") );
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
+	    parsed = parser.parseInput("Project Proposal done bla bla bla bla");
+	    expected = new ArrayList<String>( Arrays.asList("Project Proposal", "done") );
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
+	    parsed = parser.parseInput("Project Proposal deadline 30 Oct priority 1 done bla bla bla bla");
+	    expected = new ArrayList<String>( Arrays.asList("Project Proposal deadline 30 Oct priority 1", "done") );
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
+	    parsed = parser.parseInput("Add Project Proposal done");
+	    expected = new ArrayList<String>( Arrays.asList("add", "Project Proposal done") );
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);

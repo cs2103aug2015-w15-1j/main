@@ -6,25 +6,28 @@ import java.util.Arrays;
 public class Parser {
 	
 	//List of commands accepted by the program
-	private final ArrayList<String> commands = new ArrayList<String>( 
+	private final ArrayList<String> COMMANDS = new ArrayList<String>( 
 											   Arrays.asList("add", "deadline", "description", 
 											   "delete", "done", "event", "priority", "reminder", 
 											   "return", "undo") );
 	
-	private final ArrayList<String> commandsWithoutParameter 
+	private final ArrayList<String> COMMANDS_WITHOUT_PARAMETER 
 									= new ArrayList<String>( Arrays.asList("return", "undo") );
 	
-	private final ArrayList<String> commandsWithWordParameter
+	private final ArrayList<String> COMMANDS_WITH_WORD_PARAMETER
 									= new ArrayList<String>( Arrays.asList("add", "description") );
 	
+	private final ArrayList<String> COMMANDS_SOLO_EFFECT
+									= new ArrayList<String>( Arrays.asList("delete", "done") );
+	
 	//The result that will be passed back to logic
-	private ArrayList<String> parsed = new ArrayList<String>();
+	private ArrayList<String> parsedList = new ArrayList<String>();
 	
 	//Temporary holder for the next parameter of result
 	private String parameter = "";
 	
 	//List of commands that have appeared in the current input
-	private final ArrayList<String> seenCommands = new ArrayList<String>();
+	private final ArrayList<String> COMMANDS_SEEN = new ArrayList<String>();
 	
 	/**
 	 * This method parses the user input and returns it as an arraylist
@@ -32,107 +35,97 @@ public class Parser {
 	public ArrayList<String> parseInput(String input){
 		ArrayList<String> result;
 		String[] inputTokens = input.split(" ");
-		
+
 		String firstWord = inputTokens[0];
-		if (commandsWithoutParameter.contains(firstWord)) {
+		if (COMMANDS_WITHOUT_PARAMETER.contains(firstWord)) {
 			result = new ArrayList<String>( Arrays.asList(firstWord) );
+		} else if (COMMANDS_SOLO_EFFECT.contains(firstWord)) {
+			parsedList.add(firstWord);
+			for (int i = 1; i < inputTokens.length; i++) {
+				String token = inputTokens[i];
+				parameter += token + " ";
+			}
+			pushParameter();
+			result = new ArrayList<String>(parsedList);
+			parsedList.clear();
 		
 		} else {
-			for (String token: inputTokens) {	
-				if (commands.contains(token.toLowerCase())) {
+			for (String token: inputTokens) {
+				String tokenOriginal = token;
+				token = token.toLowerCase();
+				
+				if (COMMANDS.contains(token)) {
 					pushParameter();
-					if (seenCommands.contains(token)) {
-						if (parsed.indexOf(token) == 0) { //if original command is first word of input
-							if (commandsWithWordParameter.contains(token)) {
-								parameter += token + " ";
+					
+					if (COMMANDS_SOLO_EFFECT.contains(token)) {
+						parsedList.add(token);
+						COMMANDS_SEEN.add(token);
+						int startIndex; 
+						int endIndex;
+						if (!parsedList.get(0).equals("add")) {
+							startIndex = 0;
+							endIndex = COMMANDS_SEEN.size() - 1;
+						} else {
+							startIndex = 1;
+							endIndex = COMMANDS_SEEN.size();
+						}
+						for (int i = startIndex; i < endIndex; i++) {
+							String cmd = COMMANDS_SEEN.get(i);
+							String merged = mergeWithParameter(cmd);
+							appendToPrevToken(merged);
+						}
+						break;
+						
+					} else if (COMMANDS_SEEN.contains(token)) {
+						if (parsedList.indexOf(token) == 0) { //if original command is first word of input
+							if (COMMANDS_WITH_WORD_PARAMETER.contains(token)) {
+								parameter += tokenOriginal + " ";
 							} else {
-								removeOriginalCommand(token);
-								parsed.add(token.toLowerCase());
+								removeOriginal(token);
+								parsedList.add(token);
+								COMMANDS_SEEN.add(token);
 							}
 						} else {
-							if (seenCommands.indexOf(token) == 0) { //if original command is first command that appeared
+							if (COMMANDS_SEEN.indexOf(token) == 0) { //if original command is first command that appeared
 								String merged = mergeWithParameter(token);
-								appendToPrevParameter(merged);
+								appendToPrevToken(merged);
 							} else {
-								String prevCommand = seenCommands.get( seenCommands.indexOf(token)-1 );
-								if (commandsWithWordParameter.contains(prevCommand)) {
+								String prevCommand = COMMANDS_SEEN.get( COMMANDS_SEEN.indexOf(token)-1 );
+								if (COMMANDS_WITH_WORD_PARAMETER.contains(prevCommand)) {
 									String merged = mergeWithParameter(token);
-									appendToPrevParameter(merged);
+									appendToPrevToken(merged);
 								} else {
-									removeOriginalCommand(token);
+									removeOriginal(token);
 								}
 							}
-							parsed.add(token.toLowerCase());
+							parsedList.add(token);
+							COMMANDS_SEEN.add(token);
 						}
 
 					} else {
-						seenCommands.add(token);
-						parsed.add(token.toLowerCase());
+						parsedList.add(token);
+						COMMANDS_SEEN.add(token);
 					}
 					
 				} else {
-					parameter += token + " ";
+					parameter += tokenOriginal + " ";
 				}
 			}
 			pushParameter();
-	
-			result = new ArrayList<String>(parsed);
-			parsed.clear();
-			seenCommands.clear();
-		}
-		
+			result = new ArrayList<String>(parsedList);
+			parsedList.clear();
+			COMMANDS_SEEN.clear();
+		}	
 		return result;
 	}
 
-	private String mergeWithParameter(String token) {
-		int cmdIndex = parsed.indexOf(token);
-		int paraIndex = cmdIndex + 1;
-		String parameter = parsed.get(paraIndex);
-		while (!commands.contains(parameter)) {	
-			token += " " + parameter;
-			parsed.remove(paraIndex);
-			if (parsed.size() <= paraIndex) {
-				break;
-			}
-			parameter = parsed.get(paraIndex);
-		}
-		parsed.set(cmdIndex, token);
-		return token;
-	}
-
-	private void appendToPrevParameter(String token) {
-		int tokenIndex = parsed.indexOf(token);
-		int paraIndex = tokenIndex - 1;
-		String prevParameter = parsed.get(paraIndex);
-		
-		if (commands.contains(prevParameter)) {
-			return;
-		}
-		
-		String currParameter = parsed.get(tokenIndex);
-		prevParameter += " " + currParameter;
-		parsed.remove(tokenIndex);
-		parsed.set(paraIndex, prevParameter);
-	}
-
-	private void removeOriginalCommand(String token) {
-		int commandIndex = parsed.indexOf(token);
-		parsed.remove(commandIndex);
-		while (parsed.size() > commandIndex){
-			if (commands.contains( parsed.get(commandIndex) )) {
-				break;
-			}
-			parsed.remove(commandIndex);
-		}
-	}
-	
 	/**
-	 * This method adds parameter to result and resets parameter (if it is not empty)
+	 * This method adds parameter to parsedInput (if it is not empty) and resets parameter 
 	 */
 	private void pushParameter() {
 		if (!parameter.isEmpty()) {
 			parameter = removeEndSpace(parameter);
-			parsed.add(parameter);
+			parsedList.add(parameter);
 			parameter = "";
 		}
 	}
@@ -140,4 +133,65 @@ public class Parser {
 	private String removeEndSpace(String token) {
 		return token.substring(0, token.length()-1);
 	}
+	
+	/**
+	 * This method merges a command with its parameter, and puts it back into parsedInput
+	 * @param command
+	 * @return the merged command & parameter
+	 */
+	private String mergeWithParameter(String command) {
+		int cmdIndex = parsedList.indexOf(command.toLowerCase());
+		int paraIndex = cmdIndex + 1;
+		if (paraIndex >= parsedList.size()) {
+			return command;
+		} else {
+			String parameter = parsedList.get(paraIndex);
+			while (!COMMANDS.contains(parameter)) {	
+				command += " " + parameter;
+				parsedList.remove(paraIndex);
+				if (parsedList.size() <= paraIndex) {
+					break;
+				}
+				parameter = parsedList.get(paraIndex);
+			}
+			parsedList.set(cmdIndex, command);
+			return command;
+		}
+	}
+
+	/**
+	 * This method appends a token to the previous token (if that token is not a command)
+	 * @param token
+	 */
+	private void appendToPrevToken(String token) {
+		int tokenIndex = parsedList.indexOf(token);
+		int prevIndex = tokenIndex - 1;
+		String prevToken = parsedList.get(prevIndex);
+		
+		//if previous token is a command, don't append
+		if (COMMANDS.contains(prevToken)) {
+			return;
+		} else {
+			String currParameter = parsedList.get(tokenIndex);
+			prevToken += " " + currParameter;
+			parsedList.remove(tokenIndex);
+			parsedList.set(prevIndex, prevToken);
+		}
+	}
+
+	/**
+	 * This method removes the original command and its parameter
+	 * @param command
+	 */
+	private void removeOriginal(String command) {
+		int commandIndex = parsedList.indexOf(command.toLowerCase());
+		parsedList.remove(commandIndex);
+		while (parsedList.size() > commandIndex){
+			if (COMMANDS.contains( parsedList.get(commandIndex) )) {
+				break;
+			}
+			parsedList.remove(commandIndex);
+		}
+	}
+
 }

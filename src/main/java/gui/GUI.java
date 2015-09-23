@@ -1,6 +1,13 @@
 package main.java.gui;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+
+import org.json.JSONException;
+import org.json.simple.parser.ParseException;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -61,12 +68,12 @@ public class GUI extends Application{
 	static ListView<Task> listEvents;
 	
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException, JSONException, ParseException {
 		initGUI();
 		launch(args);
 
 	}
-	public static void initGUI(){
+	public static void initGUI() throws IOException, JSONException, ParseException{
 		logicComponent = new Logic(DEFAULT_FILENAME);
 		consoleText = new TextArea();
 		console = new Console(consoleText);
@@ -93,7 +100,7 @@ public class GUI extends Application{
 		userInputEvents();
 
 	}
-	private void setUpMainScene(){
+	private void setUpMainScene() throws IOException, JSONException, ParseException{
 		//setting up general info on grid
 		setUpGrid();
 
@@ -190,7 +197,7 @@ public class GUI extends Application{
 		gridPane.getChildren().addAll(overDue,categories, tasks, events);
 	}
 	
-	private static void setUpContents() {
+	private static void setUpContents() throws IOException, JSONException, ParseException {
 
 		//OverDue List
 		getOverdue= logicComponent.getOverdueTasks();
@@ -305,7 +312,7 @@ public class GUI extends Application{
 		System.out.println(getProcessedInput);
 	}
 
-	private static void refresh(){
+	private static void refresh() throws IOException, JSONException, ParseException{
 		//System.out.println("refreshing");
 		gridPane.getChildren().removeAll(listOverdue,listCate,listFloats,listTasks,listEvents);
 		setUpContents();
@@ -321,7 +328,26 @@ public class GUI extends Application{
 			{	
 				if (ke.getCode().equals(KeyCode.ENTER))
 				{
-					userInputCommads();
+					try {
+						try {
+							userInputCommads();
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					} catch (JsonParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (JsonMappingException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 	
 				}
 				if (ke.getCode().equals(KeyCode.DOWN))
@@ -341,7 +367,7 @@ public class GUI extends Application{
 		});
 
 	}
-	private static void userInputCommads(){
+	private static void userInputCommads() throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException{
 			userCommands = userInput.getText();
 			userInput.clear();
 			System.out.println(userCommands);

@@ -6,7 +6,7 @@ import main.java.backend.History.History;
 import main.java.backend.Parser.ParserStub;
 import main.java.backend.Search.Search;
 import main.java.backend.Sorter.Sorter;
-import main.java.backend.Storage.StorageStub;
+import main.java.backend.Storage.StorageData;
 import main.java.backend.Storage.Task.Task;
 
 public class Logic {
@@ -59,7 +59,7 @@ public class Logic {
 	private static final String COMMAND_SHOW_EVENT = "showE";
 	private static History historyComponent;
 	private static ParserStub parserComponent;
-	private static StorageStub storageComponent;
+	private static StorageData storageComponent;
 	private static Sorter sortComponent;
 	private static Search searchComponent;
 	private static String getFeedbackAfterCommandExecution;
@@ -74,7 +74,7 @@ public class Logic {
 	void initLogic(String filename) {
 		historyComponent = new History();
 		parserComponent = new ParserStub();
-		storageComponent = new StorageStub(filename);
+		storageComponent = new StorageData(filename);
 		searchComponent = new Search();
 	}
 

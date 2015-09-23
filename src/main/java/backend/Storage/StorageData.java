@@ -17,7 +17,7 @@ import main.java.backend.Storage.Task.CategoryWrapper;
 import main.java.backend.Storage.Task.SubTask;
 import main.java.backend.Storage.Task.Task;
 
-public class StorageStub extends Storage {
+public class StorageData extends Storage {
 
 	private static final String TYPE_TASK = "task";
 	private static final String TYPE_FLOAT = "floatTask";
@@ -27,12 +27,12 @@ public class StorageStub extends Storage {
 	
 	private StorageJson storageJson;
 	
-	public StorageStub() throws FileNotFoundException, IOException  { 
+	public StorageData() throws FileNotFoundException, IOException  { 
 		storageJson = new StorageJson();
 		allCategories = storageJson.getAllDataFromFile();
 	}
 
-	public StorageStub(String fileName) throws FileNotFoundException, IOException  { 
+	public StorageData(String fileName) throws FileNotFoundException, IOException  { 
 		storageJson = new StorageJson(fileName);
 		allCategories = storageJson.getAllDataFromFile();
 	}

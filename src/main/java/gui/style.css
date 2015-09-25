@@ -19,3 +19,6 @@
 .list-cell{
 	-fx-background-color: #E5E4E2;
 }
+.custom {
+  -fx-control-inner-background: #E5E4E2;
+}

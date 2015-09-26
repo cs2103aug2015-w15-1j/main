@@ -2,7 +2,10 @@ package main.java.backend.Logic;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import org.json.JSONException;
 import org.json.simple.parser.ParseException;
@@ -67,6 +70,9 @@ public class Logic {
 	private static final String COMMAND_SHOW_TASK = "showT";
 	private static final String COMMAND_SHOW_FLOATING_TASK = "showFT";
 	private static final String COMMAND_SHOW_EVENT = "showE";
+	private static final SimpleDateFormat formatterForDateTime = 
+			new SimpleDateFormat("dd/MM/yyyy, hh:mma");
+	private static Calendar calendar = Calendar.getInstance();
 	private static History historyComponent;
 	private static Parser parserComponent;
 	private static StorageData storageComponent;
@@ -187,12 +193,12 @@ public class Logic {
 		return EXECUTION_SHOW_TASKS_SUCCESSFUL;
 	}
 
-	private String delete(ArrayList<String> getParsedInput) {
-		String taskId = getParsedInput.get(1);
-		storageComponent.deleteTask(taskId);
+	private String delete(ArrayList<String> getParsedInput) throws IOException {
+		String taskName = getParsedInput.get(1);
+		storageComponent.deleteTask(taskName);
 		updateCurrentState();
 		updateHistoryStack();
-		return String.format(EXECUTION_DELETE_SUCCESSFUL, taskId);
+		return String.format(EXECUTION_DELETE_SUCCESSFUL, taskName);
 	}
 
 	private String search(ArrayList<String> getParsedInput) {
@@ -228,12 +234,12 @@ public class Logic {
 	}
 
 	private String setCategory(ArrayList<String> getParsedInput) {
-		String taskId = getParsedInput.get(1);
+		String taskName = getParsedInput.get(1);
 		String categoryName = getParsedInput.get(2);
-		storageComponent.setCategory(taskId,categoryName);
+		storageComponent.setCategory(taskName,categoryName);
 		updateCurrentState();
 		updateHistoryStack();
-		return String.format(EXECUTION_SET_CATEGORY_SUCCESSFUL, taskId, categoryName);
+		return String.format(EXECUTION_SET_CATEGORY_SUCCESSFUL, taskName, categoryName);
 	}
 
 	private String addCategory(ArrayList<String> getParsedInput) throws JsonParseException, JsonMappingException, IOException {
@@ -244,12 +250,12 @@ public class Logic {
 
 	private String addSubTask(ArrayList<String> getParsedInput) throws JsonParseException, JsonMappingException, IOException {
 		arrayChecker(getParsedInput);
-		String taskId = getParsedInput.get(1);
+		String taskName = getParsedInput.get(1);
 		String subTaskDescription = getParsedInput.get(2);
-		storageComponent.addSubTask(taskId,subTaskDescription);
+		storageComponent.addSubTask(taskName,subTaskDescription);
 		updateCurrentState();
 		updateHistoryStack();
-		return String.format(EXECUTION_ADD_SUBTASK_SUCCESSFUL, subTaskDescription,taskId);
+		return String.format(EXECUTION_ADD_SUBTASK_SUCCESSFUL, subTaskDescription,taskName);
 	}
 
 	private String sort(String field,ArrayList<Category> currentState2) {
@@ -265,42 +271,46 @@ public class Logic {
 		return EXECUTION_UNDO_COMMAND_SUCCESSFUL;
 	}
 
-	private String setUndone(ArrayList<String> getParsedInput) throws JsonParseException, JsonMappingException, JSONException, IOException {
-		String taskId = getParsedInput.get(1);
-		storageComponent.setUndone(taskId);
+	private String setUndone(ArrayList<String> getParsedInput) 
+			throws JsonParseException, JsonMappingException, JSONException, IOException {
+		String taskName = getParsedInput.get(1);
+		storageComponent.setUndone(taskName);
 		updateCurrentState();
 		updateHistoryStack();
-		return String.format(EXECUTION_DONE_COMMAND_SUCCESSFUL, taskId);
+		return String.format(EXECUTION_DONE_COMMAND_SUCCESSFUL, taskName);
 	}
 
-	private String setDone(ArrayList<String> getParsedInput) throws JsonParseException, JsonMappingException, IOException {
-		String taskId = getParsedInput.get(1);
-		storageComponent.setDone(taskId);
+	private String setDone(ArrayList<String> getParsedInput) 
+			throws JsonParseException, JsonMappingException, IOException {
+		String taskName = getParsedInput.get(1);
+		storageComponent.setDone(taskName);
 		updateCurrentState();
 		updateHistoryStack();
-		return String.format(EXECUTION_UNDONE_COMMAND_SUCCESSFUL, taskId);
+		return String.format(EXECUTION_UNDONE_COMMAND_SUCCESSFUL, taskName);
 	}
 
 	private String returnToHomeScreen(ArrayList<Task> currentState2) {
 		return EXECUTION_RETURN_COMMAND_SUCCESSFUL;
 	}
 
-	private String setReminder(ArrayList<String> getParsedInput) throws JsonParseException, JsonMappingException, IOException {
-		String taskId = getParsedInput.get(1);
-		long reminder = Long.parseLong(getParsedInput.get(2));
-		storageComponent.setReminder(taskId,reminder);
+	private String setReminder(ArrayList<String> getParsedInput) 
+			throws JsonParseException, JsonMappingException, IOException {
+		String taskName = getParsedInput.get(1);
+		long reminder = stringToMillisecond(getParsedInput.get(2));
+		storageComponent.setReminder(taskName,reminder);
 		updateCurrentState();
 		updateHistoryStack();
-		return String.format(EXECUTION_SET_REMINDER_SUCCESSFUL,taskId,reminder);
+		return String.format(EXECUTION_SET_REMINDER_SUCCESSFUL,taskName,reminder);
 	}
 
-	private String setDescription(ArrayList<String> getParsedInput) throws JsonParseException, JsonMappingException, IOException {
-		String taskId = getParsedInput.get(1);
+	private String setDescription(ArrayList<String> getParsedInput) 
+			throws JsonParseException, JsonMappingException, IOException {
+		String taskName = getParsedInput.get(1);
 		String description = getParsedInput.get(2);
-		storageComponent.setDescription(taskId,description);
+		storageComponent.setDescription(taskName,description);
 		updateCurrentState();
 		updateHistoryStack();
-		return String.format(EXECUTION_SET_DESCRIPTION_SUCCESSFUL, taskId);
+		return String.format(EXECUTION_SET_DESCRIPTION_SUCCESSFUL, taskName);
 	}
 
 	private String setEventStartAndEndTime(ArrayList<String> getParsedInput) {
@@ -312,14 +322,44 @@ public class Logic {
 		return String.format(EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL, eventId,startTime,endTime);
 	}
 
-	private String setDeadline(ArrayList<String> getParsedInput) throws JsonParseException, JsonMappingException, IOException {
-		String taskId = getParsedInput.get(1);
-		long deadline = Long.parseLong(getParsedInput.get(2));
-		storageComponent.setDeadline(taskId,deadline);
+	private String setDeadline(ArrayList<String> getParsedInput) 
+			throws JsonParseException, JsonMappingException, IOException {
+		String taskName = getParsedInput.get(1);
+		long deadline = stringToMillisecond(getParsedInput.get(2));
+		storageComponent.setDeadline(taskName,deadline);
 		updateCurrentState();
 		updateHistoryStack();
-		return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskId,deadline);
+		return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskName,deadline);
 	}
+	
+	private long stringToMillisecond(String dateTime) {
+        try {
+            Date tempDateTime = formatterForDateTime.parse(dateTime);
+            long dateTimeMillisecond = tempDateTime.getTime();
+            return (dateTimeMillisecond);
+        } catch (java.text.ParseException e) {
+			e.printStackTrace();
+		}
+
+        //Should not reach here
+        return -1;
+    }
+	
+    private static String getDate(long milliSeconds, String dateFormat) {
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+
+        calendar.clear();
+        calendar.setTimeInMillis(milliSeconds);
+
+        return formatter.format(calendar.getTime());
+    }
+
+    private static String getDate(long milliSeconds) {
+        calendar.clear();
+        calendar.setTimeInMillis(milliSeconds);
+
+        return formatterForDateTime.format(calendar.getTime());
+    }
 
 	private String addFloatingTask(ArrayList<String> getParsedInput) throws JsonParseException, JsonMappingException, IOException, JSONException {
 		String taskName = getParsedInput.get(1);
@@ -328,7 +368,7 @@ public class Logic {
 //		System.out.println("task Description: "+taskDescription);
 		int priority = Integer.parseInt(getParsedInput.get(3));
 //		System.out.println("priority: "+priority);
-		long reminder = Long.parseLong(getParsedInput.get(4));
+		long reminder = stringToMillisecond(getParsedInput.get(4));
 //		System.out.println("reminder: "+reminder);
 		String category = getParsedInput.get(5);
 //		System.out.println("category: "+category);
@@ -343,10 +383,10 @@ public class Logic {
 		String eventDescription = getParsedInput.get(2);
 		String startDate = getParsedInput.get(3);
 		String endDate = getParsedInput.get(4);
-		long startTime = Long.parseLong(startDate);
-		long endTime = Long.parseLong(endDate);
+		long startTime = stringToMillisecond(startDate);
+		long endTime = stringToMillisecond(endDate);
 		int priority = Integer.parseInt(getParsedInput.get(7));
-		long reminder = Long.parseLong(getParsedInput.get(8));
+		long reminder = stringToMillisecond(getParsedInput.get(8));
 		String category = getParsedInput.get(9);
 		storageComponent.addEvent(eventName,eventDescription,startDate,endDate,startTime,endTime,priority,reminder,category);
 		updateCurrentState();
@@ -358,9 +398,9 @@ public class Logic {
 		String taskName = getParsedInput.get(1);
 		String taskDescription = getParsedInput.get(2);
 		String deadline = getParsedInput.get(3);
-		long endTime = Long.parseLong(deadline);
+		long endTime = stringToMillisecond(deadline);
 		int priority = Integer.parseInt(getParsedInput.get(4));
-		long reminder = Long.parseLong(getParsedInput.get(5));
+		long reminder = stringToMillisecond(getParsedInput.get(5));
 		String category = getParsedInput.get(6);
 		storageComponent.addTask(taskName,taskDescription,deadline,endTime,priority,reminder,category);
 		updateCurrentState();

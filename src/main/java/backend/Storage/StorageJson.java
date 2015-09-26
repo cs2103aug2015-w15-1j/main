@@ -15,6 +15,15 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import main.java.backend.Storage.Task.CategoryWrapper;
 
+/**
+ * This class parse all texts in the file from JSON format to Java object 
+ * to retrieve user's data and parse Java object back to JSON format to 
+ * be saved in the file as text when there is any update in the data.
+ * 
+ * @author A0126258A
+ * 
+ */
+
 public class StorageJson {
 	
 	public StorageJson() {
@@ -37,8 +46,7 @@ public class StorageJson {
 		return allTasks;
 	}
 	
-	public String setAllDataToString
-			(HashMap<String, CategoryWrapper> categoryWrapper) 
+	public String setAllDataToString (HashMap<String, CategoryWrapper> categoryWrapper) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
 		ObjectMapper mapper = new ObjectMapper();

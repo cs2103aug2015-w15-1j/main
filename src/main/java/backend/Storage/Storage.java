@@ -86,7 +86,7 @@ public abstract class Storage {
 	public abstract void setCategoryColour(String categoryName, String colourId) 
 			throws JsonParseException, JsonMappingException, IOException;
 	
-	// TODO: TO BE COMPLETED
+	// TODO
 	public abstract void setCategory(String taskName, String categoryName);
 
 	public abstract void setUndone(String taskName) throws JsonParseException, 
@@ -120,18 +120,15 @@ public abstract class Storage {
 	/****************************************************************************
 	 * 									DELETE
 	 ***************************************************************************/
-
 	
 	public abstract void deleteAll() throws IOException;
 
 	public abstract void deleteCategory(String categoryName) throws IOException;
 
-	
 	public abstract void deleteTaskTypeFromCategory(String categoryName, 
 			String taskType) throws IOException;
 
-	// TODO
-	public abstract void deleteTask(String taskName);
+	public abstract void deleteTask(String taskName) throws IOException;
 
 	// TODO
 	public abstract void deleteSubTask(String taskName, String subtaskDescription);

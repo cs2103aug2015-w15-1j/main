@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import org.json.JSONException;
 import org.json.simple.parser.ParseException;
@@ -37,14 +38,14 @@ public class StorageData extends Storage {
 		allCategories = storageFile.getAllDataFromFile();
 	}
 	
+	/****************************************************************************
+	 * 								HELPER METHODS
+	 ***************************************************************************/
 	
 	private void addDefaultCategory() throws IOException {
 		CategoryWrapper categoryWrapper;
-		
-		if(storageFile.isFileEmpty()) {
-			categoryWrapper = new CategoryWrapper(new Category(), CATEGORY_DEFAULT);
-			allCategories.put(CATEGORY_DEFAULT, categoryWrapper);
-		}
+		categoryWrapper = new CategoryWrapper(new Category(), CATEGORY_DEFAULT);
+		allCategories.put(CATEGORY_DEFAULT, categoryWrapper);
 	}
 	
 	private HashMap<String, Task> addNewTask(String categoryName, String taskType, Task newTask) 
@@ -188,9 +189,10 @@ public class StorageData extends Storage {
 			throws JsonParseException, JsonMappingException, IOException {
 		
 		CategoryWrapper categoryWrapper = allCategories.get(categoryName);
-		addDefaultCategory();
 		
-		if(!isCategoryExist(categoryWrapper)) {
+		if(categoryName == null || allCategories.isEmpty()) {
+			addDefaultCategory();
+		} if(!isCategoryExist(categoryWrapper)) {
 			categoryWrapper = new CategoryWrapper(new Category(), categoryName);
 			allCategories.put(categoryName, categoryWrapper);
 			storageFile.setAllDataToFile(allCategories);
@@ -439,18 +441,45 @@ public class StorageData extends Storage {
 				allCategories.get(categoryName).getCategory().setTasks(resetData);
 				break;
 			case TYPE_FLOAT:
-				allCategories.get(categoryName).getCategory().setTasks(resetData);
+				allCategories.get(categoryName).getCategory().setFloatTasks(resetData);
 				break;
 			case TYPE_EVENT:
-				allCategories.get(categoryName).getCategory().setTasks(resetData);
+				allCategories.get(categoryName).getCategory().setEvents(resetData);
 				break;
 		}
 		storageFile.setAllDataToFile(allCategories);
 	}
 
 	@Override
-	public void deleteTask(String taskName) {
-		
+	public void deleteTask(String taskName) throws IOException {
+		for(String categoryName : allCategories.keySet()) {
+			Category category = allCategories.get(categoryName).getCategory();
+			HashMap<String, Task> tasks = category.getTasks();
+			HashMap<String, Task> floatTasks = category.getFloatTasks();
+			HashMap<String, Task> events = category.getEvents();
+			
+			for(String targetTaskName : tasks.keySet()) {
+				if(targetTaskName.equals(taskName)) {
+					tasks.remove(taskName);
+					break;
+				}
+			}
+			
+			for(String targetTaskName : floatTasks.keySet()) {
+				if(targetTaskName.equals(taskName)) {
+					floatTasks.remove(taskName);
+					break;
+				}
+			}
+			
+			for(String targetTaskName : events.keySet()) {
+				if(targetTaskName.equals(taskName)) {
+					events.remove(taskName);
+					break;
+				}
+			}
+		}
+		storageFile.setAllDataToFile(allCategories);
 	}
 	
 	@Override

@@ -11,6 +11,15 @@ import java.util.HashMap;
 
 import main.java.backend.Storage.Task.CategoryWrapper;
 
+
+/**
+ * This class creates new text file to read user's data from the 
+ * file and write the user's data in JSON text format to the file. 
+ * 
+ * @author A0126258A
+ *
+ */
+
 public class StorageFile {
 
 	public static String INPUT_FILE_NAME;
@@ -93,7 +102,7 @@ public class StorageFile {
 		closeWriter();
 	}
 	
-	public boolean isFileEmpty() throws IOException {    
+	private boolean isFileEmpty() throws IOException {    
 		initializeFile();
 		initializeReader(textFile);
 		

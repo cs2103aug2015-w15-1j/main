@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 
 import org.junit.Before;
+import org.junit.Test;
 
 public class StorageTest {
 	
@@ -35,9 +36,14 @@ public class StorageTest {
 	StorageFile storageFile;
 	
 	@Before
-	private void initialize() throws IOException {
+	public void initialize() throws IOException {
 		storage = new StorageData();
 		storageFile = new StorageFile(TEST_FILE_NAME);
+	}
+	
+	@Test
+	public void testAddCategories() throws IOException {
+		
 	}
 
 }

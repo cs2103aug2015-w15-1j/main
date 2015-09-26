@@ -131,41 +131,34 @@ public class StorageData extends Storage {
 		return allTasks;
 	}
 	
-	private ArrayList<Task> getCategoryTaskTypes(String categoryName, String taskType) 
-			throws ParseException, IOException, JSONException {
-		
-		Category category = allCategories.get(categoryName).getCategory();
-		return getTasks(getTargetTaskList(category, taskType));
-	}
-	
 	private ArrayList<Task> getTargetTasks(String taskType) 
 			throws ParseException, IOException, JSONException {
 		
 		ArrayList<Task> allTypeTasks = new ArrayList<Task> ();
-		int size = allCategories.size();
-		
-		for(int i = 0; i < size; i++) {
-			allTypeTasks.addAll(getTypeTaskArray(allCategories.get(i).getCategory(), taskType));	
+
+		for(String category : allCategories.keySet()) {
+			allTypeTasks.addAll(getTypeTaskArray(allCategories.get(category).getCategory(), taskType));
 		}
 
 		return allTypeTasks;
 	}
 	
 	private ArrayList<Task> getTypeTaskArray(Category category, String taskType) {
+		ArrayList<Task> typeTask = new ArrayList<Task> ();
 		
 		switch(taskType) {
 			case TYPE_TASK:
-				return getTasks(category.getTasks());
+				return getTasksInArray(category.getTasks());
 			case TYPE_FLOAT:
-				return getTasks(category.getFloatTasks());
+				return getTasksInArray(category.getFloatTasks());
 			case TYPE_EVENT:
-				return getTasks(category.getEvents());
+				return getTasksInArray(category.getEvents());
 		}
 		
-		return new ArrayList<Task> ();
+		return typeTask;
 	}
 	
-	private ArrayList<Task> getTasks(HashMap<String, Task> tasks) {
+	private ArrayList<Task> getTasksInArray(HashMap<String, Task> tasks) {
 		
 		ArrayList<Task> allTasks = new ArrayList<Task> ();
 		
@@ -286,9 +279,9 @@ public class StorageData extends Storage {
 		ArrayList<Task> allCategoryTasks = new ArrayList<Task> ();
 		Category category = allCategories.get(categoryName).getCategory();
 		
-		allCategoryTasks.addAll(getTasks(category.getTasks()));
-		allCategoryTasks.addAll(getTasks(category.getFloatTasks()));
-		allCategoryTasks.addAll(getTasks(category.getEvents()));
+		allCategoryTasks.addAll(getTasksInArray(category.getTasks()));
+		allCategoryTasks.addAll(getTasksInArray(category.getFloatTasks()));
+		allCategoryTasks.addAll(getTasksInArray(category.getEvents()));
 
 		return allCategoryTasks;
 	}
@@ -297,21 +290,24 @@ public class StorageData extends Storage {
 	public ArrayList<Task> getCategoryTasks(String categoryName) 
 			throws IOException, JSONException, ParseException {
 
-		return getCategoryTaskTypes(categoryName, TYPE_TASK);
+		Category category = allCategories.get(categoryName).getCategory();
+		return getTasksInArray(getTargetTaskList(category, TYPE_TASK));
 	}
 	
 	@Override
 	public ArrayList<Task> getCategoryFloatingTasks(String categoryName) 
 			throws IOException, JSONException, ParseException {
 
-		return getCategoryTaskTypes(categoryName, TYPE_FLOAT);
+		Category category = allCategories.get(categoryName).getCategory();
+		return getTasksInArray(getTargetTaskList(category, TYPE_FLOAT));
 	}
 	
 	@Override
 	public ArrayList<Task> getCategoryEvents(String categoryName) 
 			throws IOException, JSONException, ParseException {
 
-		return getCategoryTaskTypes(categoryName, TYPE_EVENT);
+		Category category = allCategories.get(categoryName).getCategory();
+		return getTasksInArray(getTargetTaskList(category, TYPE_EVENT));
 	}
 	
 	@Override
@@ -333,6 +329,34 @@ public class StorageData extends Storage {
 			throws IOException, JSONException, ParseException {
 		
 		return getTargetTasks(TYPE_EVENT);
+	}
+	
+	@Override
+	public ArrayList<Task> getCompletedTasks() {
+		ArrayList<Task> allTasks = getTasksInArray(getAllTasks());
+		ArrayList<Task> completedTasks = new ArrayList<Task> ();
+		
+		for(Task task : allTasks) {
+			if(task.getDone()) {
+				completedTasks.add(task);
+			}
+		}
+		
+		return completedTasks;
+	}
+
+	@Override
+	public ArrayList<Task> getOverdueTasks() {
+		ArrayList<Task> allTasks = getTasksInArray(getAllTasks());
+		ArrayList<Task> overdueTasks = new ArrayList<Task> ();
+		
+		for(Task task : allTasks) {
+			if(task.getEndTime() < System.currentTimeMillis()) {
+				overdueTasks.add(task);
+			}
+		}
+		
+		return overdueTasks;
 	}
 	
 	/****************************************************************************

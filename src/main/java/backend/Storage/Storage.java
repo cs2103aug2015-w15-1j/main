@@ -76,7 +76,10 @@ public abstract class Storage {
 	public abstract ArrayList<Task> getEvents() 
 			throws IOException, JSONException, ParseException;
 	
+	public abstract ArrayList<Task> getCompletedTasks();
 
+	public abstract ArrayList<Task> getOverdueTasks();
+	
 	/****************************************************************************
 	 * 									UPDATE
 	 ***************************************************************************/

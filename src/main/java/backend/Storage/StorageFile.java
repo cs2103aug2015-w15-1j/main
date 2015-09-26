@@ -7,21 +7,23 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.HashMap;
+
+import main.java.backend.Storage.Task.CategoryWrapper;
 
 public class StorageFile {
 
+	public static String INPUT_FILE_NAME;
 	private static final String DEFAULT_FILE_NAME = "mytasklist.txt";
-	private String INPUT_FILE_NAME;
 	
-	protected File textFile;
-	protected BufferedReader bufferedReader;
-	protected BufferedWriter bufferedWriter;
+	private File textFile;
+	private BufferedReader bufferedReader;
+	private BufferedWriter bufferedWriter;
 	
 	private FileReader textFileReader;
 	private FileWriter textFileWriter;
+	
+	private StorageJson storageJson;
 	
 	public StorageFile() throws FileNotFoundException, IOException { 
 		this(DEFAULT_FILE_NAME);
@@ -29,25 +31,26 @@ public class StorageFile {
 	
 	public StorageFile(String fileName) 
 			throws FileNotFoundException, IOException {
+		storageJson = new StorageJson();
 		setFileName(fileName);
 		initializeFile();
 	}
 	
-	protected void initializeFile() 
+	private void initializeFile() 
 			throws IOException, FileNotFoundException {
 		
 		textFile = new File(INPUT_FILE_NAME);
 		createFile(textFile);
 	}
 
-	protected void initializeReader(File inputTextFile) 
+	private void initializeReader(File inputTextFile) 
 			throws IOException, FileNotFoundException {
 		
 		textFileReader = new FileReader(inputTextFile);
 		bufferedReader = new BufferedReader(textFileReader);
 	}
 	
-	protected void createFile(File file) throws IOException {
+	private void createFile(File file) throws IOException {
 		if(!file.exists()) {
 			file.createNewFile();
 			initializeReader(textFile);
@@ -55,42 +58,42 @@ public class StorageFile {
 		}
 	}
 
-	protected void initializeWriter(File inputTextFile) 
+	private void initializeWriter(File inputTextFile) 
 			throws IOException, FileNotFoundException {
 		
 		textFileWriter = new FileWriter(inputTextFile);
 		bufferedWriter = new BufferedWriter(textFileWriter);
 	}
 
-	protected void closeReader() throws IOException {
+	private void closeReader() throws IOException {
 		textFileReader.close();
 		bufferedReader.close();
 	}
 
-	protected void closeWriter() throws IOException {
+	private void closeWriter() throws IOException {
 		bufferedWriter.flush();
 		textFileWriter.close();
 		bufferedWriter.close();
 	}
 	
-	protected String getFileName() {
+	public String getFileName() {
 		return INPUT_FILE_NAME;
 	}
 	
-	protected void setFileName(String fileName) {
+	public void setFileName(String fileName) {
 		this.INPUT_FILE_NAME = fileName;
 	}
 	
-	protected void clearTextFromFile() throws IOException {
+	public void clearTextFromFile() throws IOException {
 		initializeWriter(textFile);
 	}
 	
-	protected void exitProgram() throws IOException {
+	public void exitProgram() throws IOException {
 		closeReader();
 		closeWriter();
 	}
 	
-	protected boolean isFileEmpty() throws IOException {    
+	private boolean isFileEmpty() throws IOException {    
 		initializeFile();
 		initializeReader(textFile);
 		
@@ -101,8 +104,24 @@ public class StorageFile {
 		return false;
 	}
 	
-	protected String getAllTextsFromFile() throws IOException {
-		return new String(Files.readAllBytes
-				(Paths.get(getFileName())), StandardCharsets.UTF_8);
+	public HashMap<String, CategoryWrapper> getAllDataFromFile() 
+			throws IOException {
+		
+		if(isFileEmpty()) {
+			return new HashMap<String, CategoryWrapper>();
+		} else {
+			return storageJson.getAllDataFromFile();
+		}
+	}
+	
+	public HashMap<String, CategoryWrapper> setAllDataToFile
+			(HashMap<String, CategoryWrapper> categoryWrapper) 
+			throws IOException {
+		
+		clearTextFromFile();
+		bufferedWriter.write(storageJson.setAllDataToString(categoryWrapper));
+		bufferedWriter.flush();
+		
+		return categoryWrapper;
 	}
 }

@@ -14,6 +14,11 @@ import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.CategoryWrapper;
 import main.java.backend.Storage.Task.Task;
 
+// Change taskID to taskName
+// Do all CRUD
+// Test
+// Logic - convert string to long for date
+
 public abstract class Storage {
 	
 	public abstract void addFloatingTask(String taskName, String taskDescription, 
@@ -28,7 +33,7 @@ public abstract class Storage {
 			String endDate, long startDateMilliseconds, long endDateMilliseconds, int priority, 
 			long reminder, String category) throws IOException, JSONException;
 	
-	public abstract void addSubTask(String taskId, String subtaskDescription) 
+	public abstract void addSubTask(String taskName, String subtaskDescription) 
 			throws JsonParseException, JsonMappingException, IOException;
 
 	public abstract CategoryWrapper addCategory(String categoryName) 
@@ -38,38 +43,38 @@ public abstract class Storage {
 			throws JsonParseException, JsonMappingException, IOException;
 
 	// TODO: Not completed - note: set a default category if category is null
-	public abstract void setCategory(String taskId, String categoryName);
+	public abstract void setCategory(String taskName, String categoryName);
 
-	public abstract void setUndone(String taskId) 
+	public abstract void setUndone(String taskName) 
 			throws JsonParseException, JsonMappingException, JSONException, IOException;
 
-	public abstract void setDone(String taskId) 
+	public abstract void setDone(String taskName) 
 			throws JsonParseException, JsonMappingException, IOException;
 
 	// long reminder should be string
-	public abstract void setReminder(String taskId, long reminder) 
+	public abstract void setReminder(String taskName, long reminder) 
 			throws JsonParseException, JsonMappingException, IOException;
 
-	public abstract void setDescription(String taskId, String description) 
+	public abstract void setDescription(String taskName, String description) 
 			throws JsonParseException, JsonMappingException, IOException;
 
-	public abstract void setDeadline(String taskId, long deadline) 
+	public abstract void setDeadline(String taskName, long deadline) 
 			throws JsonParseException, JsonMappingException, IOException;
 	
 	// TODO: Not completed
-	public abstract void setSubTaskUndone(String taskId) 
+	public abstract void setSubTaskUndone(String taskName) 
 			throws JsonParseException, JsonMappingException, JSONException, IOException;
 
 	// TODO: Not completed
-	public abstract void setSubTaskDone(String taskId) 
+	public abstract void setSubTaskDone(String taskName) 
 			throws JsonParseException, JsonMappingException, IOException;
 	
 	// TODO: Not completed
-	public abstract void setSubtaskDescription(String taskId, String description) 
+	public abstract void setSubtaskDescription(String taskName, String description) 
 			throws JsonParseException, JsonMappingException, IOException;
 	
 	// TODO: Not completed
-	public abstract void deleteSubTask(String subTaskId, String subtaskDescription);
+	public abstract void deleteSubTask(String subtaskName, String subtaskDescription);
 
 	public abstract void deleteAll() throws IOException;
 
@@ -80,10 +85,10 @@ public abstract class Storage {
 	public abstract void deleteTaskTypeFromCategory(String categoryName, String taskType);
 	
 	// TODO: Not completed
-	public abstract void deleteTaskFromCategory(String categoryName, String taskId);
+	public abstract void deleteTaskFromCategory(String categoryName, String taskName);
 
 	// TODO: Not completed
-	public abstract void deleteTask(String taskId);
+	public abstract void deleteTask(String taskName);
 	
 	public abstract ArrayList<String> getCategories();
 

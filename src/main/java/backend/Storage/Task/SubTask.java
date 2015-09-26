@@ -2,7 +2,6 @@ package main.java.backend.Storage.Task;
 
 public class SubTask {
 	
-	private String subTaskId;
 	private String description;
 	private boolean isDone;
 	
@@ -10,18 +9,9 @@ public class SubTask {
 		
 	}
 	
-	public SubTask(String subTaskId, String description, boolean isDone) {
-		setSubTaskId(subTaskId);
+	public SubTask(String description, boolean isDone) {
 		setDescription(description);
 		setDone(isDone);
-	}
-	
-	public String getSubTaskId() {
-		return subTaskId;
-	}
-	
-	public void setSubTaskId(String subTaskId) {
-		this.subTaskId = subTaskId;
 	}
 	
 	public String getDescription() {

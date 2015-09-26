@@ -1,6 +1,5 @@
 package main.java.backend.Storage;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -16,44 +15,34 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import main.java.backend.Storage.Task.CategoryWrapper;
 
-public class StorageJson extends StorageFile {
+public class StorageJson {
 	
-	public StorageJson() throws FileNotFoundException, IOException {
-		super();
+	public StorageJson() {
+		
 	}
-	
-	public StorageJson(String fileName) throws FileNotFoundException, IOException {
-		super(fileName);
+
+	public String getAllTextsFromFile() throws IOException {
+		return new String(Files.readAllBytes
+				(Paths.get(StorageFile.INPUT_FILE_NAME)), StandardCharsets.UTF_8);
 	}
 
 	public HashMap<String, CategoryWrapper> getAllDataFromFile() 
 			throws JsonParseException, JsonMappingException, IOException {
-		
-		if(isFileEmpty()) {
-			return new HashMap<String, CategoryWrapper>();
-		} else {
-			ObjectMapper mapper = new ObjectMapper();
-			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-			HashMap<String, CategoryWrapper> allTasks = 
-					mapper.readValue(getAllTextsFromFile(), 
-							new TypeReference<HashMap<String, CategoryWrapper>>() {});
-			return allTasks;
-		}
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		HashMap<String, CategoryWrapper> allTasks = 
+				mapper.readValue(getAllTextsFromFile(), 
+						new TypeReference<HashMap<String, CategoryWrapper>>() {});
+		return allTasks;
 	}
 	
-	public HashMap<String, CategoryWrapper> setAllDataToFile
+	public String setAllDataToString
 			(HashMap<String, CategoryWrapper> categoryWrapper) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
-		clearTextFromFile();
-		
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
-		mapper.writeValue(textFile, categoryWrapper);
-		bufferedWriter.write(mapper.writeValueAsString(categoryWrapper));
-		bufferedWriter.flush();
-		
-		return categoryWrapper;
+		return mapper.writeValueAsString(categoryWrapper);
 	}
-
 }

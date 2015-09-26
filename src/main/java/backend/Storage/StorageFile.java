@@ -93,7 +93,7 @@ public class StorageFile {
 		closeWriter();
 	}
 	
-	private boolean isFileEmpty() throws IOException {    
+	public boolean isFileEmpty() throws IOException {    
 		initializeFile();
 		initializeReader(textFile);
 		

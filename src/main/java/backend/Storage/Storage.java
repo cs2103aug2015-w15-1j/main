@@ -14,9 +14,7 @@ import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.CategoryWrapper;
 import main.java.backend.Storage.Task.Task;
 
-// Do all CRUD
 // Test
-// Logic - convert string to long for date
 
 public abstract class Storage {
 

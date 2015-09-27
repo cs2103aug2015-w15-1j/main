@@ -39,6 +39,9 @@ public class GUI extends Application{
 	private static final String LIST_EVENTS = "Upcoming Events:";
 	private static final String LIST_FLOATING = "Floating Tasks:";
 	private static final String MESSAGE_HELP = "Change view by typing \"changeview\"";
+	private static final String MESSAGE_SAMPLE_ADDTASK = "to insert a task: \"add [taskname] deadline [date & time] priority [1 to 5] category [name] reminder [date]\"";
+	private static final String MESSAGE_SAMPLE_ADDEVENT = "to insert an event: \"add [taskname] event [starting date & time] [ending date & time] priority [1 to 5] category [name] reminder [date]\"";
+	private static final String MESSAGE_SAMPLE_ADDFLOAT= "to insert a floating task: \"add [taskname] priority [1 to 5] category [name] reminder [date]\"";
 	private static final int SCENE_MAIN = 1;
 	private static final int SCENE_FOCUS = 2;
 	private static int currentList = 2;
@@ -51,7 +54,6 @@ public class GUI extends Application{
 	private static TextArea consoleText;
 	private static PrintStream ps;
 	private static ArrayList<Task> getOverdue;
-	private static ArrayList<Task> getFloating;
 	private static ArrayList<Task> getTasks;
 	private static ArrayList<Task> getEvents;
 	private static ArrayList<Task> getFocusList;
@@ -86,8 +88,10 @@ public class GUI extends Application{
 		redirectOutput(ps);
 		displayStringToScreen(MESSAGE_WELCOME);
 		displayStringToScreen(MESSAGE_HELP);
+		displayStringToScreen(MESSAGE_SAMPLE_ADDTASK);
+		displayStringToScreen(MESSAGE_SAMPLE_ADDEVENT);
+		displayStringToScreen(MESSAGE_SAMPLE_ADDFLOAT);
 		getOverdue= logicComponent.getOverdueTasks();
-		getFloating = logicComponent.getFloatingTasks();
 		getTasks = logicComponent.getTasks();
 		getEvents = logicComponent.getEvents();
 		

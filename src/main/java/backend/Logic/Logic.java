@@ -202,6 +202,9 @@ public class Logic {
 	private String setPriority(ArrayList<String> getParsedInput) throws IOException {
 		String taskName = getParsedInput.get(1);
 		int priority = Integer.parseInt(getParsedInput.get(2));
+		if (priorityChecker(priority) != null) {
+			return priorityChecker(priority);
+		}
 		storageComponent.setPriority(taskName, priority);
 		updateCurrentState();
 		updateHistoryStack();
@@ -217,6 +220,9 @@ public class Logic {
 		}
 		if (!getParsedInput.get(3).equals("")) {
 			int priority = Integer.parseInt(getParsedInput.get(3));
+			if (priorityChecker(priority) != null) {
+				return priorityChecker(priority);
+			}
 			storageComponent.setPriority(taskName,priority);
 		}
 		if (!getParsedInput.get(4).equals("")) {
@@ -305,6 +311,8 @@ public class Logic {
 	private String addCategory(ArrayList<String> getParsedInput) throws JsonParseException, JsonMappingException, IOException {
 		String categoryName = getParsedInput.get(1);
 		storageComponent.addCategory(categoryName);
+		updateCurrentState();
+		updateHistoryStack();
 		return String.format(EXECUTION_ADD_CATEGORY_SUCCESSFUL, categoryName);
 	}
 
@@ -432,6 +440,9 @@ public class Logic {
 		int priority = -1;
 		if (!getParsedInput.get(3).equals("")) {
 			priority = Integer.parseInt(getParsedInput.get(3));
+			if (priorityChecker(priority) != null) {
+				return priorityChecker(priority);
+			}
 		}
 		long reminder = -1L;
 		if (!getParsedInput.get(4).equals("")) {
@@ -467,6 +478,9 @@ public class Logic {
 		}
 		if (!getParsedInput.get(5).equals("")) {
 			priority = Integer.parseInt(getParsedInput.get(5));
+			if (priorityChecker(priority) != null) {
+				return priorityChecker(priority);
+			}
 		}
 		if (!getParsedInput.get(6).equals("")){
 			reminder = stringToMillisecond(getParsedInput.get(8));
@@ -487,6 +501,9 @@ public class Logic {
 		long endTime = stringToMillisecond(deadline);
 		if (!getParsedInput.get(4).equals("")) {
 			priority = Integer.parseInt(getParsedInput.get(4));
+			if (priorityChecker(priority) != null) {
+				return priorityChecker(priority);
+			}
 		}
 		if (!getParsedInput.get(5).equals("")) {
 			reminder = stringToMillisecond(getParsedInput.get(5));
@@ -496,6 +513,13 @@ public class Logic {
 		updateCurrentState();
 		updateHistoryStack();
 		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, getParsedInput.get(1));
+	}
+
+	private String priorityChecker(int priority) {
+		if (priority > 5 || priority < 1) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
+		return null;
 	}
 
 	public ArrayList<String> getCategories() {

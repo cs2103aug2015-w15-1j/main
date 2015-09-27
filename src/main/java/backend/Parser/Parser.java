@@ -13,18 +13,18 @@ import com.joestelmach.natty.*;
 
 public class Parser {
 	//List of commands accepted by the program
-	private final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList("add", "category", "deadline", "description", 
-											   "delete", "done", "event", "priority", "reminder", "return", "showe", "showf", "showt", 
-											   "sortd", "sortp", "undo", "undone") );
+	private final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList("add", "addcat", "category", "deadline", "description", 
+											   "delete", "done", "event", "exit", "priority", "reminder", "return", "setcol", "showcat", "showe", 
+											   "showf", "showt", "sortd", "sortp", "undo", "undone") );
 	
-	private final ArrayList<String> COMMANDS_NO_PARAMETER = new ArrayList<String>( Arrays.asList("showe", "showf", "showt", 
+	private final ArrayList<String> COMMANDS_NO_PARAMETER = new ArrayList<String>( Arrays.asList("exit", "showcat", "showe", "showf", "showt", 
 			   																"sortd", "sortp", "return", "undo") );
 	
-	private final ArrayList<String> COMMANDS_DOMINATING = new ArrayList<String>( Arrays.asList("delete", "done", 
-														  "return", "search", "undo", "undone") );
+	private final ArrayList<String> COMMANDS_DOMINATING = new ArrayList<String>( Arrays.asList("addcat", "delete", "done", 
+															"exit", "return", "search", "setcol", "showcat", "undo", "undone") );
 	
 	private final ArrayList<String> COMMANDS_READ_TASKNAME = new ArrayList<String>( Arrays.asList(
-			   														  "add", "delete", "done", "undone") );
+			   														  "add", "addcat", "delete", "done", "setcol", "showcat", "undone") );
 	
 	//The default list of fields and the order in which their parameters are put into result
 	private final ArrayList<String> FIELDS_DEFAULT = new ArrayList<String>( Arrays.asList(
@@ -58,11 +58,16 @@ public class Parser {
 		if (isDominatingCommand(firstWord)) {
 			result.add(firstWord);
 			
+			if (firstWord.equals("setcol")) {
+				String catName = mergeTokens(inputTokens, 1, inputTokens.length-1);
+				result.add(catName);
+				String colour = inputTokens[inputTokens.length-1];
+				result.add(colour);
 			//if first word is "delete", "done" or "search"
-			if (!hasNoParameter(firstWord)) {
+			} else if (!hasNoParameter(firstWord)) {
 				String parameter = mergeTokens(inputTokens, 1, inputTokens.length);
 				result.add(parameter);
-			}
+			}  
 
 		} else {
 			for (String token: inputTokens) {

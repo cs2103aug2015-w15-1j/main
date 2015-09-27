@@ -19,6 +19,7 @@ import main.java.backend.Storage.Task.Task;
 
 public class StorageData extends Storage {
 
+	private static final String TASK_EXIST = "Task already exist! Please enter a new task name.";
 	private static final String CATEGORY_DEFAULT = "default";
 	private static final String TYPE_TASK = "task";
 	private static final String TYPE_FLOAT = "floatTask";
@@ -48,20 +49,20 @@ public class StorageData extends Storage {
 		categoryWrapper = new CategoryWrapper(new Category(), CATEGORY_DEFAULT);
 		allCategories.put(CATEGORY_DEFAULT, categoryWrapper);
 	}
-	
+
 	private HashMap<String, Task> addNewTask(String categoryName, String taskType, Task newTask) 
 			throws JsonParseException, JsonMappingException, IOException, JSONException {
 
 		CategoryWrapper categoryWrapper = addCategory(categoryName);
 		Category category = categoryWrapper.getCategory();
 		HashMap<String, Task> allTasks = getTargetTaskList(category, taskType);
-		
+
 		allTasks.put(newTask.getName(), newTask);
 		categoryWrapper.setCategory(setTaskToCategory(category, allTasks, taskType));
 		allCategories.put(categoryName, categoryWrapper);
 
 		storageFile.setAllDataToFile(allCategories);
-		
+
 		return allTasks;
 	}
 	
@@ -170,6 +171,19 @@ public class StorageData extends Storage {
 		return allTasks;
 	}
 	
+	private boolean isTaskExist(String taskName) {
+		ArrayList<Task> taskNames = getTaskList();
+		int size = taskNames.size();
+		
+		for(int i = 0; i < size; i++) {
+			if(taskName.equals(taskNames.get(i).getName())) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	private boolean isCategoryExist(CategoryWrapper categoryWrapper) {
 		return categoryWrapper!= null && categoryWrapper.getCategory() != null;
 	}
@@ -196,32 +210,55 @@ public class StorageData extends Storage {
 	}
 	
 	@Override
-	public void addFloatingTask(String taskName, String taskDescription, int priority, 
-			long reminder, String category) throws JsonParseException, 
+	public String addFloatingTask(String taskName, String taskDescription, int priority, 
+			String reminderDate, long reminder, String category) throws JsonParseException, 
 			JsonMappingException, IOException, JSONException {
 		
-		Task newFloatingTask = new Task(taskName, taskDescription, priority, reminder, false);
-		addNewTask(category, TYPE_FLOAT, newFloatingTask);
+		Task newFloatingTask = new Task(taskName, taskDescription, 
+				priority, reminderDate, reminder, false);
+		
+		if(!isTaskExist(newFloatingTask.getName())) {
+			addNewTask(category, TYPE_FLOAT, newFloatingTask);
+		} else {
+			return TASK_EXIST;
+		}
+		
+		return "";
 	}
 	
 	@Override
-	public void addTask(String taskName, String taskDescription, String deadline, 
-			long endTime, int priority, long reminder, String category) 
+	public String addTask(String taskName, String taskDescription, String deadline, 
+			long endTime, int priority, String reminderDate, long reminder, String category) 
 					throws IOException, JSONException {	
 		
 		Task newTask = new Task(taskName, taskDescription, deadline, endTime, 
-				priority, reminder, false);
-		addNewTask(category, TYPE_TASK, newTask);
+				priority, reminderDate, reminder, false);
+		
+		if(!isTaskExist(newTask.getName())) {
+			addNewTask(category, TYPE_TASK, newTask);
+		} else {
+			return TASK_EXIST;
+		}
+		
+		return "";
 	}
 
 	@Override
-	public void addEvent(String eventName, String eventDescription, String startDate, 
+	public String addEvent(String eventName, String eventDescription, String startDate, 
 			String endDate, long startDateMilliseconds, long endDateMilliseconds, int priority, 
-			long reminder, String category) throws IOException, JSONException {
+			String reminderDate, long reminder, String category) throws IOException, JSONException {
 		
 		Task newEvent = new Task(eventName, eventDescription, startDate, endDate, 
-				startDateMilliseconds, endDateMilliseconds, priority, reminder, category);
-		addNewTask(category, TYPE_EVENT, newEvent);
+				startDateMilliseconds, endDateMilliseconds, priority, 
+				reminderDate, reminder, category);
+		
+		if(!isTaskExist(newEvent.getName())) {
+			addNewTask(category, TYPE_EVENT, newEvent);
+		} else {
+			return TASK_EXIST;
+		}
+		
+		return "";
 	}
 	
 	@Override
@@ -395,11 +432,11 @@ public class StorageData extends Storage {
 	}
 	
 	@Override
-	public void setReminder(String taskName, long reminder) 
+	public void setReminder(String taskName, String reminder) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
 		HashMap<String, Task> targetTask = getAllTasks();
-		targetTask.get(taskName).setReminder(reminder);
+		targetTask.get(taskName).setReminderDate(reminder);
 		storageFile.setAllDataToFile(allCategories);
 	}
 	

@@ -26,20 +26,20 @@ public abstract class Storage {
 			throws JsonParseException, JsonMappingException, IOException;
 
 	
-	public abstract void addFloatingTask(String taskName, String taskDescription, int priority, 
-			long reminder, String category) throws JsonParseException, 
+	public abstract String addFloatingTask(String taskName, String taskDescription, int priority, 
+			String reminderDate, long reminder, String category) throws JsonParseException, 
 			JsonMappingException, IOException, JSONException;
 
 	
-	public abstract void addTask(String taskName, String taskDescription, String deadline, 
-			long endTime, int priority, long reminder, String category) 
+	public abstract String addTask(String taskName, String taskDescription, String deadline, 
+			long endTime, int priority, String reminderDate, long reminder, String category) 
 					throws IOException, JSONException;
 
 	
-	public abstract void addEvent(String eventName, String eventDescription, String startDate, 
+	public abstract String addEvent(String eventName, String eventDescription, String startDate, 
 			String endDate, long startDateMilliseconds, long endDateMilliseconds, int priority, 
-			long reminder, String category) throws IOException, JSONException;
-
+			String reminderDate, long reminder, String category) throws IOException, JSONException;
+	
 	
 	public abstract void addSubTask(String taskName, String subtaskDescription) 
 			throws JsonParseException, JsonMappingException, IOException;
@@ -96,7 +96,7 @@ public abstract class Storage {
 	public abstract void setDone(String taskName) 
 			throws JsonParseException, JsonMappingException, IOException;
 
-	public abstract void setReminder(String taskName, long reminder) 
+	public abstract void setReminder(String taskName, String reminder) 
 			throws JsonParseException, JsonMappingException, IOException;
 	
 	public abstract void setPriority(String taskName, int priority) throws IOException;

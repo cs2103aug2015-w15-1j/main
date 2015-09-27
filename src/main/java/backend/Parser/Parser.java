@@ -1,11 +1,14 @@
 package main.java.backend.Parser;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 
+import com.joestelmach.natty.*;
+
 public class Parser {
-	
 	//List of commands accepted by the program
 	private final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList("add", "category", "deadline", "description", 
 											   "delete", "done", "event", "priority", "reminder", "return", "undo") );
@@ -25,10 +28,7 @@ public class Parser {
 	private final ArrayList<String> FIELDS_DEFAULT = new ArrayList<String>( Arrays.asList(
 			"command", "task", "description", "deadline", "eventStart", "eventEnd", "priority", "reminder", "category") );
 	
-	//Stores the components of the parsed input
-	//private ArrayList<String> parsedList = new ArrayList<String>();
-	
-	//Temporary holder for the current parameter before it's being pushed to result
+	//Temporary holder for the current parameter before it's being stored
 	private String currParameter = "";
 	
 	//List of commands that have appeared in the current input
@@ -43,9 +43,10 @@ public class Parser {
         put("command",""); put("task", ""); put("description", ""); put("deadline", ""); put("event", ""); 
         put("priority",""); put("reminder", ""); put("category", "");
     }};
-	
+    
+    
 	/**
-	 * This method parses the user input and returns it as an arraylist
+	 * This method parses the user input and returns its components as an arraylist
 	 */
 	public ArrayList<String> parseInput(String input){
 		ArrayList<String> result = new ArrayList<String>();
@@ -100,19 +101,21 @@ public class Parser {
 			}
 			
 		}	
-		//parsedList.clear();
 		seenCommands.clear();
 		fields = new ArrayList<String>(FIELDS_DEFAULT);
 		parameters.replaceAll((field,parameter) -> "");
 		return result;
 	}
-
+	
 	private void appendToParameter(String token) {
 		currParameter += token + " ";
 	}
 	
+	/**
+	 * This method marks the command as seen and stores it as the main command (if there isn't one) 
+	 * @param token
+	 */
 	private void putCommand(String token) {
-		//System.out.println("Putting cmd: " + token);
 		String command = parameters.get("command");
 		seenCommands.add(token);
 	
@@ -124,11 +127,11 @@ public class Parser {
 	}
 	
 	/**
-	 * This method adds parameter to parsedList (if it is not empty) and resets parameter 
+	 * This method stores the current parameter under its rightful field or appends it to an existing parameter
 	 */
 	private void putParameter() {
 		if (!currParameter.isEmpty()) {
-			currParameter = removeEndSpace(currParameter);
+			currParameter = removeEndSpaces(currParameter);
 			String lastCommand = getLast(seenCommands);
 			String field;
 			
@@ -138,9 +141,11 @@ public class Parser {
 				field = lastCommand;
 			}
 			
+			/*if (lastCommand.equals("deadline") || lastCommand.equals("reminder")) {
+				currParameter = parseDate(currParameter);
+			}*/
 			String parameter = parameters.get(field);
 			String command = parameters.get("command");
-			//System.out.println("para " + parameter + "lc " + lastCommand + " cp " + currParameter);
 			if (parameter.isEmpty()) {
 				parameters.put(field, currParameter);
 			} else if (!command.isEmpty() && !isReadingTaskName(lastCommand) && !isDominatingCommand(currParameter)) {
@@ -149,13 +154,13 @@ public class Parser {
 				parameters.put(field, parameter + " " + currParameter);
 			}
 			
-			/*else if (lastCommand.equals("add")) {
-			parameters.put("task", task + " " + currParameter);
-			}*/
 			currParameter = "";
 		}
 	}
 
+	/**
+	 * This method creates a short arrayList for a result that contains 3 or less components
+	 */
 	private ArrayList<String> makeShortResult(ArrayList<String> result) {
 		String command = parameters.get("command");
 		String task = parameters.get("task");
@@ -163,6 +168,9 @@ public class Parser {
 		if (newField == null) {
 			result.addAll( Arrays.asList(command, task) );
 		} else {
+			if (command.equals("deadline") || command.equals("reminder")) {
+				newField = parseDate(newField);
+			}
 			if (command.equals("event")) {
 				String[] eventStartEnd = getStartAndEnd(newField);
 				String eventStart = eventStartEnd[0];
@@ -175,23 +183,27 @@ public class Parser {
 		return result;
 	}
 
+	/**
+	 * This method creates a long arrayList for a result that contains more than 3 components
+	 */
 	private ArrayList<String> makeLongResult(ArrayList<String> result) {
 		String command = parameters.get("command");
 		String deadline = parameters.get("deadline");
 		String event = parameters.get("event");
+		String reminder = parameters.get("reminder");
 		
+		if (!reminder.isEmpty()) {
+			parameters.put("reminder", parseDate(reminder));
+		}
 		if (!deadline.isEmpty()) {
 			command += "T";
 			fields.remove("eventStart");
 			fields.remove("eventEnd");
+			parameters.put("deadline", parseDate(deadline));
 		} else if (!event.isEmpty()) {
 			command += "E";
 			fields.remove("deadline");
-			String[] eventStartEnd = getStartAndEnd(event);
-			String eventStart = eventStartEnd[0];
-			String eventEnd = eventStartEnd[1];
-			parameters.put("eventStart", eventStart);
-			parameters.put("eventEnd", eventEnd);
+			getStartAndEnd(event);
 		} else {
 			if (command.equals("add")) {
 				command += "F";
@@ -209,38 +221,118 @@ public class Parser {
 		return result;
 	}
 
+	/**
+	 * This method gets the individual start and end date/time of an event and put them into separate fields
+	 * @return the start and end date/time in an array
+	 */
 	private String[] getStartAndEnd(String event) {
-		String[] eventTokens = event.split("-", 2);
+		//String currYear = getCurrentYear();
+		
+		String[] eventTokens = event.split(" to ", 2);
 		String eventStart = eventTokens[0];
 		String eventEnd = "";
 		if (eventTokens.length > 1) {
-			eventEnd = removeEndSpace(eventTokens[1]);
+			eventEnd = removeEndSpaces(eventTokens[1]);
 		}
 		
 		if (!eventEnd.contains(" ") && !eventEnd.isEmpty()) {
-			String[] startTokens = eventStart.split(" ", 2);
-			String startDate = startTokens[0];
+			String startDate = "";
+			String[] startTokens = eventStart.split(" ");
+			for (int i = 0; i < startTokens.length-1; i++) {
+				startDate += startTokens[i];
+				if (startTokens[0].contains("/")) {
+					startDate += "/";
+				} else if (startTokens[0].contains("-")){
+					startDate += "-";
+				} else {
+					startDate += " ";
+				}
+			}
+			/*if (!(startDate.contains(currYear) || startDate.contains(currDecade))) {
+				startDate += currYear + " ";
+			}*/
+			String startTime = startTokens[startTokens.length-1];
+			eventStart = startDate + " " + startTime;
+			System.out.println(eventStart);
 			String[] endTokens = eventEnd.split(" ", 2);
 			String endDate = startDate;
 			String endTime = endTokens[0];
 			eventEnd = endDate + " " + endTime;
-		}
+		} 
+		eventStart = parseDate(removeEndSpaces(eventStart));
+		eventEnd = parseDate(removeEndSpaces(eventEnd));
+		parameters.put("eventStart", eventStart);
+		parameters.put("eventEnd", eventEnd);
 		
 		String[] result = new String[2];
-		result[0] = removeEndSpace(eventStart);
-		result[1] = removeEndSpace(eventEnd);
+		result[0] = eventStart;
+		result[1] = eventEnd;
 		return result;
 	}
 
+	private String parseDate(String date) {
+		//System.out.println(date);
+		if (date.isEmpty()) {
+			return date;
+		}
+		String[] dateTokens = date.split(" ");
+		date = "";
+		for (String token: dateTokens) {
+			String[] ddmmyy = null;
+			if (token.contains("/")){
+				ddmmyy = token.split("/");
+			} else if (token.contains("-")) {
+				ddmmyy = token.split("-");
+			}
+			
+			if (ddmmyy != null && ddmmyy.length >= 2) {
+				String day = ddmmyy[0];
+				String month = ddmmyy[1];
+				String year = "";
+				date += month + "/" + day;
+				if (ddmmyy.length == 3) {
+					year = ddmmyy[2];
+					date += "/" + year;
+				} 
+				date += " ";
+			} else {
+				date += token + " ";
+			}
+		}
+		date = removeEndSpaces(date);
+		
+		com.joestelmach.natty.Parser dateParser = new com.joestelmach.natty.Parser();
+		DateGroup group = dateParser.parse(date).get(0);
+		List<Date> dates = group.getDates();
+		String dateString = dates.toString();
+		dateString = dateString.substring(1, dateString.length()-1);
+		return dateString;
+	}
+
+	/*private String getCurrentYear() {
+		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy");
+	    Date now = new Date();
+	    String strDate = sdfDate.format(now);
+		return strDate;
+	}*/
+	
+	/**
+	 * This method merges all the tokens between the startIndex (including) and endIndex (excluding)
+	 * @return the merged tokens as a string
+	 */
 	private String mergeTokens(String[] inputTokens, int startIndex, int endIndex) {
 		String parameter = "";
 		for (int i = startIndex; i < endIndex; i++) {
 			String token = inputTokens[i];
 			parameter += token + " ";
 		}
-		return removeEndSpace(parameter);
+		return removeEndSpaces(parameter);
 	}
 
+	/**
+	 * This method takes in an old command and merges the command and its parameter to the previous parameter
+	 * @param oldCommand
+	 */
 	private void mergeToPrevParameter(String oldCommand) {
 		String prevField;
 		if (isFirst(seenCommands, oldCommand)) {
@@ -270,13 +362,19 @@ public class Parser {
 		}
 	}
 
+	/**
+	 * This method moves a token to the back of its arrayList
+	 */
 	private void moveToBack(ArrayList<String> arrayList, String token) {
 		int index = arrayList.indexOf(token);
 		arrayList.remove(index);
 		arrayList.add(token);
 	}
 
-	private String removeEndSpace(String token) {
+	/**
+	 * This method removes any spaces that are in front or at the back of the token
+	 */
+	private String removeEndSpaces(String token) {
 		if (token.startsWith(" ")) {
 			token =  token.substring(1, token.length());
 		} 	

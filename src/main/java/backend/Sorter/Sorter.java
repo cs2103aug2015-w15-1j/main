@@ -1,14 +1,15 @@
 package main.java.backend.Sorter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
 public class Sorter {
 
-	public ArrayList<Category> sort(String field, ArrayList<Category> currentState2) {
-		ArrayList<Category> sortedCurrentState = null;
+	public ArrayList<Task> sort(String field, ArrayList<Task> currentState2) {
+		ArrayList<Task> sortedCurrentState = null;
 		switch (field) {
 			case "sortP":
 				sortedCurrentState = sortPriority(currentState2);
@@ -20,13 +21,13 @@ public class Sorter {
 		return sortedCurrentState;
 	}
 
-	private ArrayList<Category> sortDate(ArrayList<Category> currentState2) {
-		// TODO Auto-generated method stub
+	private ArrayList<Task> sortDate(ArrayList<Task> currentState2) {
+		Collections.sort(currentState2, Task.sortPriority);
 		return currentState2;
 	}
 
-	private ArrayList<Category> sortPriority(ArrayList<Category> currentState2) {
-		// TODO Auto-generated method stub
+	private ArrayList<Task> sortPriority(ArrayList<Task> currentState2) {
+		Collections.sort(currentState2, Task.sortDeadline);
 		return currentState2;
 	}
 

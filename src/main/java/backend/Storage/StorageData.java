@@ -249,9 +249,10 @@ public class StorageData extends Storage {
 	}
 	
 	@Override
-	public ArrayList<Category> getCategoryList() {
+	public ArrayList<Category> getCategoryList() throws IOException {
 		
 		ArrayList<Category> categoryList = new ArrayList<Category> ();
+		allCategories = storageFile.getAllDataFromFile();
 		
 		for(String categoryName : allCategories.keySet()) {
 			categoryList.add(allCategories.get(categoryName).getCategory());
@@ -403,6 +404,13 @@ public class StorageData extends Storage {
 	}
 	
 	@Override
+	public void setPriority(String taskName, int priority) throws IOException {
+		HashMap<String, Task> targetTask = getAllTasks();
+		targetTask.get(taskName).setPriority(priority);;
+		storageFile.setAllDataToFile(allCategories);	
+	}
+	
+	@Override
 	public void setDescription(String taskName, String description) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
@@ -512,9 +520,24 @@ public class StorageData extends Storage {
 		// TODO Auto-generated method stub
 		
 	}
+	
 
-	public void setPriority(String taskName, int priority) {
-		// TODO Auto-generated method stub
+	@Override
+	public void updateFile(ArrayList<Category> categories) throws IOException {
 		
+		storageFile.clearTextFromFile();
+		
+		for(Category category : categories) {
+			CategoryWrapper categoryWrapper = addCategory(category.getCategoryName());
+			categoryWrapper.setCategory(category);
+			allCategories.put(category.getCategoryName(), categoryWrapper);
+		}
+		
+		storageFile.setAllDataToFile(allCategories);
+	}
+
+	@Override
+	public void exitProgram() throws IOException {
+		storageFile.exitProgram();
 	}
 }

@@ -141,6 +141,16 @@ public class Task {
     public String toString() {
     	StringBuilder sb = new StringBuilder();
     	sb.append(name + System.getProperty("line.separator"));
+    	sb.append(startDate + System.getProperty("line.separator"));
+    	sb.append(endDate + System.getProperty("line.separator"));
+    	sb.append(startTime + System.getProperty("line.separator"));
+    	sb.append(endTime + System.getProperty("line.separator"));
+    	sb.append(priority + System.getProperty("line.separator"));
+    	return sb.toString();
+    }
+    public String printFull() {
+    	StringBuilder sb = new StringBuilder();
+    	sb.append(name + System.getProperty("line.separator"));
     	sb.append(description + System.getProperty("line.separator"));
     	sb.append(startDate + System.getProperty("line.separator"));
     	sb.append(endDate + System.getProperty("line.separator"));

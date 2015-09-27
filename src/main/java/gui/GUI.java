@@ -33,7 +33,7 @@ public class GUI extends Application{
 	//Possible messages
 	private static final String MESSAGE_WELCOME = "Welcome to TankTask!";
 	private static final String MESSAGE_EMPTY = "List is empty";
-	private static final String DEFAULT_FILENAME="filename";
+	private static final String DEFAULT_FILENAME="filename.txt";
 	private static final String LIST_OVERDUE = "Overdue Tasks:";
 	private static final String LIST_TASKS = "Upcoming Tasks:";
 	private static final String LIST_EVENTS = "Upcoming Events:";
@@ -47,7 +47,7 @@ public class GUI extends Application{
 
 	private static Logic logicComponent;
 	private static String userCommands;
-	private static  Console console;
+	private static Console console;
 	private static TextArea consoleText;
 	private static PrintStream ps;
 	private static ArrayList<Task> getOverdue;
@@ -76,7 +76,7 @@ public class GUI extends Application{
 		launch(args);
 
 	}
-	public static void initGUI() throws IOException, JSONException, ParseException{
+	private static void initGUI() throws IOException, JSONException, ParseException{
 		logicComponent = new Logic(DEFAULT_FILENAME);
 		
 		consoleText = new TextArea();
@@ -262,7 +262,7 @@ public class GUI extends Application{
 	
 	private static void redirectOutput(PrintStream stream){
 		System.setOut(stream);
-		System.setErr(stream);
+		//System.setErr(stream);
 	}
 	
 	private static ListView<Task> getList(ArrayList<Task> list){
@@ -368,7 +368,7 @@ public class GUI extends Application{
 				refresh();
 				displayStringToScreen(display);
 			}
-
+			
 	}
 	private static void eventDown(){
 		currentPosition++;
@@ -381,19 +381,9 @@ public class GUI extends Application{
 			if (currentPosition>=getOverdue.size()){
 				currentPosition = getOverdue.size()-1;  
 				}
-			detailField.setText(getOverdue.get(currentPosition).toString());
+			detailField.setText(getOverdue.get(currentPosition).printFull());
 		}
-		else if (currentList == 4){
-			focusHeading.setText(LIST_FLOATING);
-			if (getFloating==null||getFloating.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY);
-				return;
-			}
-			if (currentPosition>=getFloating.size()){
-				currentPosition = getFloating.size()-1;  
-			}
-			detailField.setText(getFloating.get(currentPosition).toString());
-		}
+		
 		else if (currentList == 2){
 			focusHeading.setText(LIST_TASKS);
 			if (getTasks==null||getTasks.isEmpty()){
@@ -403,7 +393,7 @@ public class GUI extends Application{
 			if (currentPosition>=getTasks.size()){
 				currentPosition = getTasks.size()-1;  
 			}
-			detailField.setText(getTasks.get(currentPosition).toString());
+			detailField.setText(getTasks.get(currentPosition).printFull());
 		}
 		else if (currentList == 3){
 			focusHeading.setText(LIST_EVENTS);
@@ -414,22 +404,7 @@ public class GUI extends Application{
 			if (currentPosition>=getEvents.size()){
 				currentPosition = getEvents.size()-1;  
 			}
-			detailField.setText(getEvents.get(currentPosition).toString());
-		}
-	}
-	
-	private static void eventUp(){
-		currentPosition--;
-		if (currentList == 1){
-			focusHeading.setText(LIST_OVERDUE);
-			if (getOverdue==null||getOverdue.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY);
-				return;
-			}
-			if (currentPosition<0){
-				currentPosition = 0;  
-				}
-			detailField.setText(getOverdue.get(currentPosition).toString());
+			detailField.setText(getEvents.get(currentPosition).printFull());
 		}
 		else if (currentList == 4){
 			focusHeading.setText(LIST_FLOATING);
@@ -437,21 +412,34 @@ public class GUI extends Application{
 				detailField.setText(MESSAGE_EMPTY);
 				return;
 			}
-			if (currentPosition<0){
-				currentPosition = 0;  
+			if (currentPosition>=getFloating.size()){
+				currentPosition = getFloating.size()-1;  
 			}
-			detailField.setText(getFloating.get(currentPosition).toString());
+			detailField.setText(getFloating.get(currentPosition).printFull());
 		}
+	}
+	
+	private static void eventUp(){
+		currentPosition--;
+		if (currentPosition<0){
+			currentPosition = 0;  
+		}
+		if (currentList == 1){
+			focusHeading.setText(LIST_OVERDUE);
+			if (getOverdue==null||getOverdue.isEmpty()){
+				detailField.setText(MESSAGE_EMPTY);
+				return;
+			}
+			detailField.setText(getOverdue.get(currentPosition).printFull());
+		}
+		
 		else if (currentList == 2){
 			focusHeading.setText(LIST_TASKS);
 			if (getTasks==null||getTasks.isEmpty()){
 				detailField.setText(MESSAGE_EMPTY+" YEAH");
 				return;
 			}
-			if (currentPosition<0){
-				currentPosition = 0;  
-			}
-			detailField.setText(getTasks.get(currentPosition).toString());
+			detailField.setText(getTasks.get(currentPosition).printFull());
 		}
 		else if (currentList == 3){
 			focusHeading.setText(LIST_EVENTS);
@@ -459,10 +447,15 @@ public class GUI extends Application{
 				detailField.setText(MESSAGE_EMPTY);
 				return;
 			}
-			if (currentPosition<0){
-				currentPosition = 0;  
+			detailField.setText(getEvents.get(currentPosition).printFull());
+		}
+		else if (currentList == 4){
+			focusHeading.setText(LIST_FLOATING);
+			if (getFloating==null||getFloating.isEmpty()){
+				detailField.setText(MESSAGE_EMPTY);
+				return;
 			}
-			detailField.setText(getEvents.get(currentPosition).toString());
+			detailField.setText(getFloating.get(currentPosition).printFull());
 		}
 	}
 	
@@ -470,7 +463,7 @@ public class GUI extends Application{
 		currentList--;
 		currentPosition=0;
 		if(currentList<0){
-			currentList=0;
+			currentList=1;
 		}
 		changeList(currentList);
 		if (currentList == 1){
@@ -480,23 +473,16 @@ public class GUI extends Application{
 				return;
 			}
 			
-			detailField.setText(getOverdue.get(currentPosition).toString());
+			detailField.setText(getOverdue.get(currentPosition).printFull());
 		}
-		else if (currentList == 4){
-			focusHeading.setText(LIST_FLOATING);
-			if (getFloating==null||getFloating.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY);
-				return;
-			}
-			detailField.setText(getFloating.get(currentPosition).toString());
-		}
+		
 		else if (currentList == 2){
 			focusHeading.setText(LIST_TASKS);
 			if (getTasks==null||getTasks.isEmpty()){
 				detailField.setText(MESSAGE_EMPTY);
 				return;
 			}
-			System.out.println(getTasks.get(currentPosition));
+			detailField.setText(getTasks.get(currentPosition).printFull());
 		}
 		else if (currentList == 3){
 			focusHeading.setText(LIST_EVENTS);
@@ -504,7 +490,15 @@ public class GUI extends Application{
 				detailField.setText(MESSAGE_EMPTY);
 				return;
 			}
-			detailField.setText(getEvents.get(currentPosition).toString());
+			detailField.setText(getEvents.get(currentPosition).printFull());
+		}
+		else if (currentList == 4){
+			focusHeading.setText(LIST_FLOATING);
+			if (getFloating==null||getFloating.isEmpty()){
+				detailField.setText(MESSAGE_EMPTY);
+				return;
+			}
+			detailField.setText(getFloating.get(currentPosition).printFull());
 		}
 	}
 	
@@ -521,23 +515,16 @@ public class GUI extends Application{
 				detailField.setText(MESSAGE_EMPTY);
 				return;
 			}
-			detailField.setText(getOverdue.get(currentPosition).toString());
+			detailField.setText(getOverdue.get(currentPosition).printFull());
 		}
-		else if (currentList == 4){
-			focusHeading.setText(LIST_FLOATING);
-			if (getFloating==null||getFloating.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY);
-				return;
-			}
-			detailField.setText(getFloating.get(currentPosition).toString());
-		}
+		
 		else if (currentList == 2){
 			focusHeading.setText(LIST_TASKS);
 			if (getTasks == null|| getTasks.isEmpty()){
 				detailField.setText(MESSAGE_EMPTY);
 				return;
 			}
-			detailField.setText(getTasks.get(currentPosition).toString());
+			detailField.setText(getTasks.get(currentPosition).printFull());
 		}
 		else if (currentList == 3){
 			focusHeading.setText(LIST_EVENTS);
@@ -545,7 +532,15 @@ public class GUI extends Application{
 				detailField.setText(MESSAGE_EMPTY);
 				return;
 			}
-			detailField.setText(getEvents.get(currentPosition).toString());
+			detailField.setText(getEvents.get(currentPosition).printFull());
+		}
+		else if (currentList == 4){
+			focusHeading.setText(LIST_FLOATING);
+			if (getFloating==null||getFloating.isEmpty()){
+				detailField.setText(MESSAGE_EMPTY);
+				return;
+			}
+			detailField.setText(getFloating.get(currentPosition).printFull());
 		}
 	}
 	private static void changeList(int listNum) throws IOException, JSONException, ParseException{
@@ -557,7 +552,7 @@ public class GUI extends Application{
 			getFocusList = logicComponent.getTasks();
 		} else if(listNum==3){
 			getFocusList = logicComponent.getEvents();
-		} else {
+		} else if (listNum==4){
 			getFocusList = logicComponent.getFloatingTasks();
 		}
 		listFocus = getList(getFocusList);
@@ -565,5 +560,20 @@ public class GUI extends Application{
 		GridPane.setRowSpan(listFocus, 3);
 		GridPane.setConstraints(listFocus, 0, 1);
 		gridPane.getChildren().add(listFocus);	
+	}
+	private static void subTaskView(){
+		if (currentScene == SCENE_MAIN){
+			gridPane.getChildren().remove(listEvents);
+			events.setText("SubTasks: ");
+			//to-do
+		}
+		else {
+			gridPane.getChildren().remove(detailField);
+			detailsHeading.setText("SubTask List");
+			//to-do
+			//notes: either get logic to return the arraylist straight
+			//without saying which specific task. 
+			//or get the name of specific task and call logic again (waste time)
+		}
 	}
 }

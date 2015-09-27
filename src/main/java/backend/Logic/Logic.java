@@ -72,7 +72,7 @@ public class Logic {
 	private static final String COMMAND_SHOW_FLOATING_TASK = "showFT";
 	private static final String COMMAND_SHOW_EVENT = "showE";
 	private static final SimpleDateFormat formatterForDateTime = 
-			new SimpleDateFormat("dd/MM/yyyy, hh:mma");
+			new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
 	private static Calendar calendar = Calendar.getInstance();
 	private static History historyComponent;
 	private static Parser parserComponent;

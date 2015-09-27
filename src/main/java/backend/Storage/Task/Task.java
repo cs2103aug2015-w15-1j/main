@@ -140,29 +140,57 @@ public class Task {
     
     public String toString() {
     	StringBuilder sb = new StringBuilder();
+    	if(name!=""){
     	sb.append(name + System.getProperty("line.separator"));
+    	}
+    	if (startDate!=""){
     	sb.append(startDate + System.getProperty("line.separator"));
+    	}
+    	if(endDate!=""){
     	sb.append(endDate + System.getProperty("line.separator"));
+    	}
+    	if(startTime!=-1){
     	sb.append(startTime + System.getProperty("line.separator"));
+    	}
+    	if (endTime !=-1){
     	sb.append(endTime + System.getProperty("line.separator"));
+    	}
+    	if(priority !=-1){
     	sb.append(priority + System.getProperty("line.separator"));
+    	}
     	return sb.toString();
     }
     public String printFull() {
     	StringBuilder sb = new StringBuilder();
-    	sb.append(name + System.getProperty("line.separator"));
-    	sb.append(description + System.getProperty("line.separator"));
-    	sb.append(startDate + System.getProperty("line.separator"));
-    	sb.append(endDate + System.getProperty("line.separator"));
-    	sb.append(startTime + System.getProperty("line.separator"));
-    	sb.append(endTime + System.getProperty("line.separator"));
-    	sb.append(reminder + System.getProperty("line.separator"));
-    	sb.append(priority + System.getProperty("line.separator"));
+    	if(name!=""){
+    		sb.append(name + System.getProperty("line.separator"));
+    	}
+    	if (description!=""){
+    		sb.append(description + System.getProperty("line.separator"));
+    	}
+    	if(startDate !=""){
+    		sb.append(startDate + System.getProperty("line.separator"));
+    	}
+    	if (endDate!=""){
+    		sb.append(endDate + System.getProperty("line.separator"));
+    	}
+    	if (startTime !=-1){
+    		sb.append(startTime + System.getProperty("line.separator"));
+    	}
+    	if (endTime !=-1){
+    		sb.append(endTime + System.getProperty("line.separator"));
+    	}
+    	if (reminder!=-1){
+    		sb.append(reminder + System.getProperty("line.separator"));
+    	}
+    	if (priority!=-1){
+    		sb.append(priority + System.getProperty("line.separator"));
+    	}
     	sb.append(isDone + System.getProperty("line.separator"));
     	return sb.toString();
     }
 
-	public HashMap<String, SubTask> getSubTask() {
+    public HashMap<String, SubTask> getSubTask() {
 		return subTask;
 	}
 

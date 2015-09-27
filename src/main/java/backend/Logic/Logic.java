@@ -22,6 +22,8 @@ import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
 public class Logic {
+	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
+	private static final String EXECUTION_SET_PRIORITY_SUCCESSFUL = "Task %1$s has been set to priority %2$s";
 	private static final String EXECUTION_SET_SUCCESSFUL = "Fields have been updated";
 	private static final String EXECUTION_DELETE_SUCCESSFUL = "Task %1$s has been deleted";
 	private static final String COMMAND_DELETE = "delete";
@@ -65,12 +67,14 @@ public class Logic {
 	private static final String COMMAND_SET_DESCRIPTION = "description";
 	private static final String COMMAND_SET_START_AND_END_TIME = "event";
 	private static final String COMMAND_SET_DEADLINE = "deadline";
+	private static final String COMMAND_SET_PRIORITY = "priority";
 	private static final String COMMAND_ADD_FLOATING_TASK = "addF";
 	private static final String COMMAND_ADD_EVENT = "addE";
 	private static final String COMMAND_ADD_TASK = "addT";
 	private static final String COMMAND_SHOW_TASK = "showT";
 	private static final String COMMAND_SHOW_FLOATING_TASK = "showFT";
 	private static final String COMMAND_SHOW_EVENT = "showE";
+	private static final String COMMAND_EXIT = "exit";
 	private static final SimpleDateFormat formatterForDateTime = 
 			new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
 	private static Calendar calendar = Calendar.getInstance();
@@ -156,6 +160,9 @@ public class Logic {
 			case COMMAND_SET_CATEGORY_COLOUR:
 				getFeedbackAfterCommandExecution = setColour(getParsedInput);
 				break;
+			case COMMAND_SET_PRIORITY:
+				getFeedbackAfterCommandExecution = setPriority(getParsedInput);
+				break;
 			case COMMAND_SEARCH:
 				getFeedbackAfterCommandExecution = search(getParsedInput);
 				break;
@@ -173,9 +180,32 @@ public class Logic {
 				break;
 			case COMMAND_SET:
 				getFeedbackAfterCommandExecution = setMultipleFields(getParsedInput);
+				break;
+			case COMMAND_EXIT:
+				exitProgram();
+			default:
+				getFeedbackAfterCommandExecution = errorCommand();
 		}
 		return getFeedbackAfterCommandExecution;
 		
+	}
+
+	private void exitProgram() throws IOException {
+		storageComponent.exitProgram();
+		System.exit(0);
+	}
+
+	private String errorCommand() {
+		return EXECUTION_COMMAND_UNSUCCESSFUL;
+	}
+
+	private String setPriority(ArrayList<String> getParsedInput) throws IOException {
+		String taskName = getParsedInput.get(1);
+		int priority = Integer.parseInt(getParsedInput.get(2));
+		storageComponent.setPriority(taskName, priority);
+		updateCurrentState();
+		updateHistoryStack();
+		return String.format(EXECUTION_SET_PRIORITY_SUCCESSFUL, taskName,priority);
 	}
 
 	private String setMultipleFields(ArrayList<String> getParsedInput) throws JsonParseException, JsonMappingException, IOException, JSONException {

@@ -1,5 +1,8 @@
 package main.java.backend.Parser;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,23 +12,19 @@ import java.util.HashMap;
 import com.joestelmach.natty.*;
 
 public class Parser {
-	public Parser() {
-		System.out.println("Parser component initialised successfully");
-	}
 	//List of commands accepted by the program
 	private final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList("add", "category", "deadline", "description", 
-											   "delete", "done", "event", "priority", "reminder", "return", "undo") );
+											   "delete", "done", "event", "priority", "reminder", "return", "showe", "showf", "showt", 
+											   "sortd", "sortp", "undo", "undone") );
 	
-	private final ArrayList<String> COMMANDS_NO_PARAMETER = new ArrayList<String>( Arrays.asList("return", "undo") );
+	private final ArrayList<String> COMMANDS_NO_PARAMETER = new ArrayList<String>( Arrays.asList("showe", "showf", "showt", 
+			   																"sortd", "sortp", "return", "undo") );
 	
 	private final ArrayList<String> COMMANDS_DOMINATING = new ArrayList<String>( Arrays.asList("delete", "done", 
-														  "return", "search", "undo") );
-	
-	/*private final ArrayList<String> COMMANDS_WITH_TEXT_PARAMETER = new ArrayList<String>( Arrays.asList(
-																   "add", "description") );*/
+														  "return", "search", "undo", "undone") );
 	
 	private final ArrayList<String> COMMANDS_READ_TASKNAME = new ArrayList<String>( Arrays.asList(
-			   														  "add", "delete", "done") );
+			   														  "add", "delete", "done", "undone") );
 	
 	//The default list of fields and the order in which their parameters are put into result
 	private final ArrayList<String> FIELDS_DEFAULT = new ArrayList<String>( Arrays.asList(
@@ -229,8 +228,6 @@ public class Parser {
 	 * @return the start and end date/time in an array
 	 */
 	private String[] getStartAndEnd(String event) {
-		//String currYear = getCurrentYear();
-		
 		String[] eventTokens = event.split(" to ", 2);
 		String eventStart = eventTokens[0];
 		String eventEnd = "";
@@ -238,25 +235,17 @@ public class Parser {
 			eventEnd = removeEndSpaces(eventTokens[1]);
 		}
 		
+		//If eventEnd has no date, set its date as eventStart date
 		if (!eventEnd.contains(" ") && !eventEnd.isEmpty()) {
 			String startDate = "";
 			String[] startTokens = eventStart.split(" ");
 			for (int i = 0; i < startTokens.length-1; i++) {
-				startDate += startTokens[i];
-				if (startTokens[0].contains("/")) {
-					startDate += "/";
-				} else if (startTokens[0].contains("-")){
-					startDate += "-";
-				} else {
-					startDate += " ";
-				}
+				startDate += startTokens[i] + " ";
 			}
-			/*if (!(startDate.contains(currYear) || startDate.contains(currDecade))) {
-				startDate += currYear + " ";
-			}*/
 			String startTime = startTokens[startTokens.length-1];
 			eventStart = startDate + " " + startTime;
-			System.out.println(eventStart);
+			//System.out.println(eventStart);
+			
 			String[] endTokens = eventEnd.split(" ", 2);
 			String endDate = startDate;
 			String endTime = endTokens[0];
@@ -274,10 +263,26 @@ public class Parser {
 	}
 
 	private String parseDate(String date) {
-		//System.out.println(date);
 		if (date.isEmpty()) {
 			return date;
 		}
+		date = swapDayAndMonth(date);
+		
+		com.joestelmach.natty.Parser dateParser = new com.joestelmach.natty.Parser();
+		DateGroup group = dateParser.parse(date).get(0);
+		List<Date> dates = group.getDates();
+		String dateString = dates.toString();
+		dateString = dateString.substring(1, dateString.length()-1);
+		
+		dateString = confirmDate(dateString);
+		
+		return dateString;
+	}
+
+	/**
+	 * This method swaps the position of day and month (so that it will work for natty)
+	 */
+	private String swapDayAndMonth(String date) {
 		String[] dateTokens = date.split(" ");
 		date = "";
 		for (String token: dateTokens) {
@@ -303,21 +308,108 @@ public class Parser {
 			}
 		}
 		date = removeEndSpaces(date);
+		return date;
+	}
+
+	/**
+	 * This method confirms that the date set by the parser is in the future
+	 * If it's not, either add one day to the date or add one year
+	 */
+	private String confirmDate(String dateString) {
+		SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy"); 
+		long dateMilli = -1;
+		long nowMilli = getCurrentDateLong();
+		Date date = new Date();
+		try {
+			date = formatter.parse(dateString);
+			dateMilli = date.getTime();
+		} catch (ParseException e) {
+			System.out.println("parseError");
+		}
 		
-		com.joestelmach.natty.Parser dateParser = new com.joestelmach.natty.Parser();
-		DateGroup group = dateParser.parse(date).get(0);
-		List<Date> dates = group.getDates();
-		String dateString = dates.toString();
-		dateString = dateString.substring(1, dateString.length()-1);
+		if (dateMilli != -1 && dateMilli < nowMilli) {
+			System.out.println(dateString);
+			String[] dateStringTokens = dateString.split(" ");
+			long dayMonth = getDateLong(dateStringTokens[1] + " " + dateStringTokens[2]);
+			int year = Integer.parseInt(getLast(dateStringTokens));
+			int currYear = getCurrentYear();
+			
+			if (year < currYear) {
+				year = currYear;
+				dateString = "";
+				for (int i = 0; i < dateStringTokens.length-1; i++) {
+					dateString += dateStringTokens[i] += " ";
+				}
+				dateString += year;
+			}
+			//System.out.println(dateString);
+			
+			try {
+				dateMilli = formatter.parse(dateString).getTime();
+			} catch (ParseException e) {
+				System.out.println("parseError");
+			}
+			if (year == currYear) {
+				if (dayMonth < nowMilli) {
+					dateMilli = plusOneDay(dateMilli);
+					//System.out.println(formatter.format(dateMilli));
+					if (dateMilli < nowMilli){
+						date = plusOneYear(date);
+						dateString = date.toString();
+					} else {
+						dateString = formatter.format(dateMilli);
+					}
+				}
+			}
+			//System.out.println(dateString);
+		}
 		return dateString;
 	}
 
-	/*private String getCurrentYear() {
-		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy");
+	private Date plusOneYear(Date date) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		c.add(Calendar.YEAR, 1);
+		date = c.getTime();
+		return date;
+	}
+
+	private long plusOneDay(long dateMilli) {
+		dateMilli += (1000 * 60 * 60 * 24);
+		return dateMilli;
+	}
+
+	private long getDateLong(String date){
+		SimpleDateFormat sdfDate = new SimpleDateFormat("MMM dd");
+	    Date parseDate;
+		try {
+			parseDate = sdfDate.parse(date);
+			return parseDate.getTime();
+		} catch (ParseException e) {
+			System.out.println("parseError");
+		}
+		return 0;
+	}
+	
+	private long getCurrentDateLong() {
+		Date now = new Date();
+		long milli = now.getTime();
+		return milli;
+	}
+	
+	/*private String getCurrentDate() {
+		SimpleDateFormat sdfDate = new SimpleDateFormat("MMM dd");
 	    Date now = new Date();
 	    String strDate = sdfDate.format(now);
 		return strDate;
 	}*/
+	
+	private int getCurrentYear() {
+		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy");
+	    Date now = new Date();
+	    String strDate = sdfDate.format(now);
+		return Integer.parseInt(strDate);
+	}
 	
 	/**
 	 * This method merges all the tokens between the startIndex (including) and endIndex (excluding)

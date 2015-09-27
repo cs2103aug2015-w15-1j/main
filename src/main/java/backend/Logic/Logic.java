@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import main.java.backend.History.History;
 import main.java.backend.Parser.Parser;
-import main.java.backend.Parser.ParserStub;
 import main.java.backend.Search.Search;
 import main.java.backend.Sorter.Sorter;
 import main.java.backend.Storage.StorageData;
@@ -83,6 +82,7 @@ public class Logic {
 	private static String getFeedbackAfterCommandExecution;
 	private static ArrayList<Category> currentState;
 	private static ArrayList<Category> searchResults;
+	private static ArrayList<Task> taskList;
 	private static ArrayList<String> categoryList;
 
 	public Logic(String filename) throws FileNotFoundException, IOException {
@@ -253,8 +253,9 @@ public class Logic {
 		historyComponent.push(currentState);
 	}
 
-	private void updateCurrentState() {
+	private void updateCurrentState() throws IOException {
 		currentState = storageComponent.getCategoryList();
+		taskList = storageComponent.getTaskList();
 	}
 
 	private String showCategory(ArrayList<String> getParsedInput) {
@@ -262,7 +263,7 @@ public class Logic {
 		return EXECUTION_SHOW_CATEGORY_SUCCESSFUL;
 	}
 
-	private String setCategory(ArrayList<String> getParsedInput) {
+	private String setCategory(ArrayList<String> getParsedInput) throws IOException {
 		String taskName = getParsedInput.get(1);
 		String categoryName = getParsedInput.get(2);
 		storageComponent.setCategory(taskName,categoryName);
@@ -289,7 +290,7 @@ public class Logic {
 
 	private String sort(String field,ArrayList<Category> currentState2) {
 		System.out.println(currentState2);
-		currentState2 = sortComponent.sort(field,currentState2);
+		taskList = sortComponent.sort(field,taskList);
 //		storageComponent.updateState(currentState2);
 		updateHistoryStack();
 		return String.format(EXECUTION_SORT_COMMAND_SUCCESSFUL, field);
@@ -343,7 +344,7 @@ public class Logic {
 		return String.format(EXECUTION_SET_DESCRIPTION_SUCCESSFUL, taskName);
 	}
 
-	private String setEventStartAndEndTime(ArrayList<String> getParsedInput) {
+	private String setEventStartAndEndTime(ArrayList<String> getParsedInput) throws IOException {
 		String eventId = getParsedInput.get(1);
 		String startTime = getParsedInput.get(2);
 		String endTime = getParsedInput.get(3);
@@ -420,11 +421,14 @@ public class Logic {
 		String eventName = getParsedInput.get(1);
 		String eventDescription = getParsedInput.get(2);
 		String startDate = getParsedInput.get(3);
-		String endDate = getParsedInput.get(4);
+		String endDate = "";
 		long startTime = -1L;
 		long endTime = -1L;
 		int priority = -1;
 		long reminder = -1L;
+		if (!getParsedInput.get(4).equals("")) {
+			endDate = getParsedInput.get(4);
+		}
 		if (!startDate.equals("")){
 			startTime = stringToMillisecond(startDate);
 		}

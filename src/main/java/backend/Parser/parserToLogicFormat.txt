@@ -1,0 +1,80 @@
+Add Float:
+("addF", Task Name, Description, Priority, Reminder, Category)
+
+Add To-Do:
+("addT", Task Name, Description, Deadline, Priority, Reminder, Category)
+
+Add Event:
+("addE", Task Name, Description, Start Date/Time, End Date/Time, Priority, Reminder, Category)
+
+Set:
+("set", Task Name, Description, Priority, Reminder, Category)
+
+Set To-Do:
+("setT", Task Name, Description, Deadline, Priority, Reminder, Category)
+
+Set Event:
+("setE", Task Name, Description, Start Date/Time, End Date/Time, Priority, Reminder, Category)
+
+SetDeadline:
+("deadline", Task Name, Task Deadline)
+
+Set Start and End Time:
+("event", Task Name, Start Date/Time, End Date/Time)
+
+Set Description:
+("description", Task Name, Description)
+
+Set Reminder:
+("reminder", Task Name, Reminder)
+
+Return To Home Screen:
+("return")
+
+Set Done:
+("done", Task Name)
+
+Set Undone:
+("undone", Task Name)
+
+Undo:
+("undo")
+
+Sort Priority:
+("sortp")
+
+Sort Date:
+("sortd")
+
+Setting a Task to be subtasked(So that it can be subtasked)
+("subtask", Task Name)
+
+Adding a Subtask:
+("adds", Task Name, Description)
+
+Adding a Category:
+("addcat", Category Name)
+
+Setting a task/event to the specified Category:
+("setcat", Task Name, Category Name)
+
+Show specific category:
+("showcat", Category Name)
+
+Setting a colour to a category:
+("setcol", Category Name, ColourID)
+
+Search:
+("search", keywords)
+
+Delete:
+("delete", Task Name)
+
+Show Floats:
+("showf")
+
+Show To-Dos:
+("showt")
+
+Show Events:
+("showe")

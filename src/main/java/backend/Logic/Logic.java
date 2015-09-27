@@ -23,6 +23,7 @@ import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
 public class Logic {
+	private static final String EXECUTION_SET_SUCCESSFUL = "Fields have been updated";
 	private static final String EXECUTION_DELETE_SUCCESSFUL = "Task %1$s has been deleted";
 	private static final String COMMAND_DELETE = "delete";
 	private static final String EXECUTION_SET_DEADLINE_SUCCESSFUL = "Task %1$s deadline has been set to %2$s";
@@ -60,11 +61,12 @@ public class Logic {
 	private static final String COMMAND_UNDONE = "undone";
 	private static final String COMMAND_DONE = "done";
 	private static final String COMMAND_RETURN = "return";
+	private static final String COMMAND_SET = "set";
 	private static final String COMMAND_SET_REMINDER = "reminder";
 	private static final String COMMAND_SET_DESCRIPTION = "description";
 	private static final String COMMAND_SET_START_AND_END_TIME = "event";
 	private static final String COMMAND_SET_DEADLINE = "deadline";
-	private static final String COMMAND_ADD_FLOATING_TASK = "addFT";
+	private static final String COMMAND_ADD_FLOATING_TASK = "addF";
 	private static final String COMMAND_ADD_EVENT = "addE";
 	private static final String COMMAND_ADD_TASK = "addT";
 	private static final String COMMAND_SHOW_TASK = "showT";
@@ -85,6 +87,7 @@ public class Logic {
 
 	public Logic(String filename) throws FileNotFoundException, IOException {
 		initLogic(filename);
+		System.out.println("Logic component initialised successfully");
 	}
 
 	void initLogic(String filename) throws FileNotFoundException, IOException {
@@ -97,8 +100,8 @@ public class Logic {
 	public String executeCommand(String userInput) throws JsonParseException, JsonMappingException, IOException, JSONException {
 		ArrayList<String> getParsedInput = parserComponent.parseInput(userInput);
 //		arrayChecker(getParsedInput);
-//		System.out.println("Array got");
-//		System.out.println(getParsedInput);
+		System.out.println("Array got");
+		System.out.println(getParsedInput);
 		String commandType = getParsedInput.get(0);
 //		System.out.println("Command type: "+commandType);
 		switch (commandType) {
@@ -168,9 +171,35 @@ public class Logic {
 			case COMMAND_SHOW_EVENT:
 				getFeedbackAfterCommandExecution = showEvent();
 				break;
+			case COMMAND_SET:
+				getFeedbackAfterCommandExecution = setMultipleFields(getParsedInput);
 		}
 		return getFeedbackAfterCommandExecution;
 		
+	}
+
+	private String setMultipleFields(ArrayList<String> getParsedInput) throws JsonParseException, JsonMappingException, IOException, JSONException {
+		String taskName = getParsedInput.get(1);
+//		System.out.println("taskName: "+ taskName);
+		if (!getParsedInput.get(2).equals("")) {
+			String taskDescription = getParsedInput.get(2);
+			storageComponent.setDescription(taskName, taskDescription);
+		}
+		if (!getParsedInput.get(3).equals("")) {
+			int priority = Integer.parseInt(getParsedInput.get(3));
+			storageComponent.setPriority(taskName,priority);
+		}
+		if (!getParsedInput.get(4).equals("")) {
+			long reminder = stringToMillisecond(getParsedInput.get(4));
+			storageComponent.setReminder(taskName, reminder);
+		}
+		if(!getParsedInput.get(5).equals("")) {
+			String category = getParsedInput.get(5);
+			storageComponent.setCategory(taskName, category);
+		}
+		updateCurrentState();
+		updateHistoryStack();
+		return EXECUTION_SET_SUCCESSFUL;
 	}
 
 	private void arrayChecker(ArrayList<String> getParsedInput) {
@@ -289,6 +318,7 @@ public class Logic {
 		return String.format(EXECUTION_UNDONE_COMMAND_SUCCESSFUL, taskName);
 	}
 
+	@SuppressWarnings("unused")
 	private String returnToHomeScreen(ArrayList<Task> currentState2) {
 		return EXECUTION_RETURN_COMMAND_SUCCESSFUL;
 	}
@@ -345,7 +375,8 @@ public class Logic {
         return -1;
     }
 	
-    private static String getDate(long milliSeconds, String dateFormat) {
+    @SuppressWarnings("unused")
+	private static String getDate(long milliSeconds, String dateFormat) {
         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
 
         calendar.clear();
@@ -354,7 +385,8 @@ public class Logic {
         return formatter.format(calendar.getTime());
     }
 
-    private static String getDate(long milliSeconds) {
+    @SuppressWarnings("unused")
+	private static String getDate(long milliSeconds) {
         calendar.clear();
         calendar.setTimeInMillis(milliSeconds);
 

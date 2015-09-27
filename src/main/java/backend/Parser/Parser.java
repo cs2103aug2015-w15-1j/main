@@ -9,6 +9,9 @@ import java.util.HashMap;
 import com.joestelmach.natty.*;
 
 public class Parser {
+	public Parser() {
+		System.out.println("Parser component initialised successfully");
+	}
 	//List of commands accepted by the program
 	private final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList("add", "category", "deadline", "description", 
 											   "delete", "done", "event", "priority", "reminder", "return", "undo") );

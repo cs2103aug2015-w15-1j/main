@@ -74,7 +74,7 @@ public class GUI extends Application{
 	public static void main(String[] args) throws IOException, JSONException, ParseException {
 		initGUI();
 		launch(args);
-
+		System.out.println("GUI component initialised successfully");
 	}
 	private static void initGUI() throws IOException, JSONException, ParseException{
 		logicComponent = new Logic(DEFAULT_FILENAME);

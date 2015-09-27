@@ -36,6 +36,7 @@ public class StorageData extends Storage {
 	public StorageData(String fileName) throws FileNotFoundException, IOException  { 
 		storageFile = new StorageFile(fileName);
 		allCategories = storageFile.getAllDataFromFile();
+		System.out.println("Storage component initialised successfully");
 	}
 	
 	/****************************************************************************
@@ -508,6 +509,11 @@ public class StorageData extends Storage {
 	
 	@Override
 	public void deleteSubTask(String taskName, String subtaskDescription) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setPriority(String taskName, int priority) {
 		// TODO Auto-generated method stub
 		
 	}

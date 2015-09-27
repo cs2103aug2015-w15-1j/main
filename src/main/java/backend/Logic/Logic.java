@@ -398,9 +398,15 @@ public class Logic {
 //		System.out.println("taskName: "+ taskName);
 		String taskDescription = getParsedInput.get(2);
 //		System.out.println("task Description: "+taskDescription);
-		int priority = Integer.parseInt(getParsedInput.get(3));
+		int priority = -1;
+		if (!getParsedInput.get(3).equals("")) {
+			priority = Integer.parseInt(getParsedInput.get(3));
+		}
+		long reminder = -1L;
+		if (!getParsedInput.get(4).equals("")) {
+			reminder = stringToMillisecond(getParsedInput.get(4));
+		}
 //		System.out.println("priority: "+priority);
-		long reminder = stringToMillisecond(getParsedInput.get(4));
 //		System.out.println("reminder: "+reminder);
 		String category = getParsedInput.get(5);
 //		System.out.println("category: "+category);
@@ -415,10 +421,22 @@ public class Logic {
 		String eventDescription = getParsedInput.get(2);
 		String startDate = getParsedInput.get(3);
 		String endDate = getParsedInput.get(4);
-		long startTime = stringToMillisecond(startDate);
-		long endTime = stringToMillisecond(endDate);
-		int priority = Integer.parseInt(getParsedInput.get(7));
-		long reminder = stringToMillisecond(getParsedInput.get(8));
+		long startTime = -1L;
+		long endTime = -1L;
+		int priority = -1;
+		long reminder = -1L;
+		if (!startDate.equals("")){
+			startTime = stringToMillisecond(startDate);
+		}
+		if (!endDate.equals("")) {
+			endTime = stringToMillisecond(endDate);
+		}
+		if (!getParsedInput.get(7).equals("")) {
+			priority = Integer.parseInt(getParsedInput.get(7));
+		}
+		if (!getParsedInput.get(8).equals("")){
+			reminder = stringToMillisecond(getParsedInput.get(8));
+		}
 		String category = getParsedInput.get(9);
 		storageComponent.addEvent(eventName,eventDescription,startDate,endDate,startTime,endTime,priority,reminder,category);
 		updateCurrentState();
@@ -430,9 +448,15 @@ public class Logic {
 		String taskName = getParsedInput.get(1);
 		String taskDescription = getParsedInput.get(2);
 		String deadline = getParsedInput.get(3);
+		int priority = -1;
+		long reminder = -1L;
 		long endTime = stringToMillisecond(deadline);
-		int priority = Integer.parseInt(getParsedInput.get(4));
-		long reminder = stringToMillisecond(getParsedInput.get(5));
+		if (!getParsedInput.get(4).equals("")) {
+			priority = Integer.parseInt(getParsedInput.get(4));
+		}
+		if (!getParsedInput.get(5).equals("")) {
+			reminder = stringToMillisecond(getParsedInput.get(5));
+		}
 		String category = getParsedInput.get(6);
 		storageComponent.addTask(taskName,taskDescription,deadline,endTime,priority,reminder,category);
 		updateCurrentState();

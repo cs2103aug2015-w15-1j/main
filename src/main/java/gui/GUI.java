@@ -54,6 +54,7 @@ public class GUI extends Application{
 	private static ArrayList<Task> getFloating;
 	private static ArrayList<Task> getTasks;
 	private static ArrayList<Task> getEvents;
+	private static ArrayList<Task> getFocusList;
 	private static Scene mainScene;
 	private static GridPane gridPane;
 	private static Label overDue;
@@ -89,6 +90,7 @@ public class GUI extends Application{
 		getFloating = logicComponent.getFloatingTasks();
 		getTasks = logicComponent.getTasks();
 		getEvents = logicComponent.getEvents();
+		
 		
 	}
 
@@ -294,212 +296,119 @@ public class GUI extends Application{
 			setUpContents();
 		}
 		else{
-			gridPane.getChildren().removeAll(focusHeading, detailsHeading, listFocus, detailField);
-			setUpFocus();
+			refreshingFocus(currentList);
 		}
 	}
 	
 	private static void userInputEvents(){
-			userInput.setOnKeyPressed(new EventHandler<KeyEvent>()
-			{
-				@Override
-				public void handle(KeyEvent ke)
-				{	
-					if (ke.getCode().equals(KeyCode.ENTER))
-					{
-						try {
-							try {
-								userInputCommads();
-							} catch (ParseException e) {
-								e.printStackTrace();
-							}
-						} catch (JsonParseException e) {
-							e.printStackTrace();
-						} catch (JsonMappingException e) {
-							e.printStackTrace();
-						} catch (IOException e) {
-							e.printStackTrace();
-						} catch (JSONException e) {
-							e.printStackTrace();
-						}
-
+		userInput.setOnKeyPressed(new EventHandler<KeyEvent>()
+		{
+			@Override
+			public void handle(KeyEvent ke)
+			{	
+				if (ke.getCode().equals(KeyCode.ENTER))
+				{
+					try {
+						userInputCommads();
+					} catch (IOException | JSONException | ParseException e) {
+						e.printStackTrace();
 					}
-					if (currentScene == SCENE_FOCUS){
-						if (ke.getCode().equals(KeyCode.DOWN))
-						{	
+
+				}
+				if (currentScene == SCENE_FOCUS){
+					try {
+						changeList(currentList);
+					} catch (IOException | JSONException | ParseException e2) {
+						e2.printStackTrace();
+					}
+					changeListDetails(currentList);
+
+
+					try {
+						refresh();
+					} catch (IOException | JSONException | ParseException e1) {
+						e1.printStackTrace();
+					}
+					if (ke.getCode().equals(KeyCode.DOWN))
+					{	
+						try {
 							eventDown();
+						} catch (IOException | JSONException | ParseException e) {
+							e.printStackTrace();
 						}
-						if (ke.getCode().equals(KeyCode.UP)){
+					}
+					if (ke.getCode().equals(KeyCode.UP)){
+						try {
 							eventUp();
+						} catch (IOException | JSONException | ParseException e) {
+							e.printStackTrace();
 						}
-						if (ke.getCode().equals(KeyCode.LEFT)){
-							try {
-								eventLeft();
-							} catch (IOException | JSONException | ParseException e) {
-								e.printStackTrace();
-							}
+					}
+					if (ke.getCode().equals(KeyCode.LEFT)){
+						try {
+							eventLeft();
+						} catch (IOException | JSONException | ParseException e) {
+							e.printStackTrace();
 						}
-						if (ke.getCode().equals(KeyCode.RIGHT)){
-							try {
-								eventRight();
-							} catch (IOException | JSONException | ParseException e) {
-								e.printStackTrace();
-							}
+					}
+					if (ke.getCode().equals(KeyCode.RIGHT)){
+						try {
+							eventRight();
+						} catch (IOException | JSONException | ParseException e) {
+							e.printStackTrace();
 						}
 					}
 				}
-			});
+
+			}
+		});
 	}
 	private static void userInputCommads() throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException{	
 		userCommands = userInput.getText();
-			userInput.clear();
-			System.out.println("Command: "+ userCommands);
-			if (userCommands.toLowerCase().equals("changeview")){
-				if (currentScene == SCENE_MAIN){
+		userInput.clear();
+		System.out.println("Command: "+ userCommands);
+		if (userCommands.toLowerCase().equals("changeview")){
+			if (currentScene == SCENE_MAIN){
 				setUpFocus();
 				currentScene = SCENE_FOCUS;
-					
-				} else {
-					setUpMain();
-					currentScene = SCENE_MAIN;
-				}
+
 			} else {
-				String display = logicComponent.executeCommand(userCommands);
-				refresh();
-				displayStringToScreen(display);
+				setUpMain();
+				currentScene = SCENE_MAIN;
 			}
-			
+		} else {
+			String display = logicComponent.executeCommand(userCommands);
+			refresh();
+			displayStringToScreen(display);
+		}
+
 	}
-	private static void eventDown(){
+	private static void eventDown() throws IOException, JSONException, ParseException{
 		currentPosition++;
-		if (currentList == 1){
-			focusHeading.setText(LIST_OVERDUE);
-			if (getOverdue==null||getOverdue.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY);
-				return;
-			}
-			if (currentPosition>=getOverdue.size()){
-				currentPosition = getOverdue.size()-1;  
-				}
-			detailField.setText(getOverdue.get(currentPosition).printFull());
-		}
+		changeList(currentList);
 		
-		else if (currentList == 2){
-			focusHeading.setText(LIST_TASKS);
-			if (getTasks==null||getTasks.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY+" nope");
-				return;
-			}
-			if (currentPosition>=getTasks.size()){
-				currentPosition = getTasks.size()-1;  
-			}
-			detailField.setText(getTasks.get(currentPosition).printFull());
+		if (currentPosition>=getFocusList.size()){
+			currentPosition = getFocusList.size()-1;  
 		}
-		else if (currentList == 3){
-			focusHeading.setText(LIST_EVENTS);
-			if (getEvents==null||getEvents.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY);
-				return;
-			}
-			if (currentPosition>=getEvents.size()){
-				currentPosition = getEvents.size()-1;  
-			}
-			detailField.setText(getEvents.get(currentPosition).printFull());
-		}
-		else if (currentList == 4){
-			focusHeading.setText(LIST_FLOATING);
-			if (getFloating==null||getFloating.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY);
-				return;
-			}
-			if (currentPosition>=getFloating.size()){
-				currentPosition = getFloating.size()-1;  
-			}
-			detailField.setText(getFloating.get(currentPosition).printFull());
-		}
+		changeListDetails(currentList);
+		
 	}
 	
-	private static void eventUp(){
+	private static void eventUp() throws IOException, JSONException, ParseException{
 		currentPosition--;
 		if (currentPosition<0){
 			currentPosition = 0;  
 		}
-		if (currentList == 1){
-			focusHeading.setText(LIST_OVERDUE);
-			if (getOverdue==null||getOverdue.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY);
-				return;
-			}
-			detailField.setText(getOverdue.get(currentPosition).printFull());
-		}
-		
-		else if (currentList == 2){
-			focusHeading.setText(LIST_TASKS);
-			if (getTasks==null||getTasks.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY+" YEAH");
-				return;
-			}
-			detailField.setText(getTasks.get(currentPosition).printFull());
-		}
-		else if (currentList == 3){
-			focusHeading.setText(LIST_EVENTS);
-			if (getEvents == null || getEvents.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY);
-				return;
-			}
-			detailField.setText(getEvents.get(currentPosition).printFull());
-		}
-		else if (currentList == 4){
-			focusHeading.setText(LIST_FLOATING);
-			if (getFloating==null||getFloating.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY);
-				return;
-			}
-			detailField.setText(getFloating.get(currentPosition).printFull());
-		}
+		refreshingFocus(currentList);
 	}
 	
 	private static void eventLeft() throws IOException, JSONException, ParseException{
 		currentList--;
 		currentPosition=0;
-		if(currentList<0){
+		if(currentList<=0){
 			currentList=1;
 		}
-		changeList(currentList);
-		if (currentList == 1){
-			focusHeading.setText(LIST_OVERDUE);
-			if (getOverdue==null||getOverdue.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY);
-				return;
-			}
-			
-			detailField.setText(getOverdue.get(currentPosition).printFull());
-		}
-		
-		else if (currentList == 2){
-			focusHeading.setText(LIST_TASKS);
-			if (getTasks==null||getTasks.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY);
-				return;
-			}
-			detailField.setText(getTasks.get(currentPosition).printFull());
-		}
-		else if (currentList == 3){
-			focusHeading.setText(LIST_EVENTS);
-			if (getEvents==null||getEvents.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY);
-				return;
-			}
-			detailField.setText(getEvents.get(currentPosition).printFull());
-		}
-		else if (currentList == 4){
-			focusHeading.setText(LIST_FLOATING);
-			if (getFloating==null||getFloating.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY);
-				return;
-			}
-			detailField.setText(getFloating.get(currentPosition).printFull());
-		}
+		refreshingFocus(currentList);
 	}
 	
 	private static void eventRight() throws IOException, JSONException, ParseException{
@@ -508,58 +417,53 @@ public class GUI extends Application{
 		if(currentList>4){
 			currentList=4;
 		}
-		changeList(currentList);
-		if (currentList == 1){
-			focusHeading.setText(LIST_OVERDUE);
-			if (getOverdue==null||getOverdue.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY);
-				return;
-			}
-			detailField.setText(getOverdue.get(currentPosition).printFull());
-		}
-		
-		else if (currentList == 2){
-			focusHeading.setText(LIST_TASKS);
-			if (getTasks == null|| getTasks.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY);
-				return;
-			}
-			detailField.setText(getTasks.get(currentPosition).printFull());
-		}
-		else if (currentList == 3){
-			focusHeading.setText(LIST_EVENTS);
-			if (getEvents==null||getEvents.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY);
-				return;
-			}
-			detailField.setText(getEvents.get(currentPosition).printFull());
-		}
-		else if (currentList == 4){
-			focusHeading.setText(LIST_FLOATING);
-			if (getFloating==null||getFloating.isEmpty()){
-				detailField.setText(MESSAGE_EMPTY);
-				return;
-			}
-			detailField.setText(getFloating.get(currentPosition).printFull());
-		}
+		refreshingFocus(currentList);
 	}
-	private static void changeList(int listNum) throws IOException, JSONException, ParseException{
-		gridPane.getChildren().remove(listFocus);
-		ArrayList<Task> getFocusList = new ArrayList<Task>();
-		if(listNum==1){
+	
+	private static void refreshingFocus(int currentListNum) throws IOException, JSONException, ParseException{
+		getFocusList = new ArrayList<Task>();
+		if(currentListNum==1){
 			getFocusList = logicComponent.getOverdueTasks();
-		} else if(listNum==2){
+		} else if(currentListNum==2){
 			getFocusList = logicComponent.getTasks();
-		} else if(listNum==3){
+		} else if(currentListNum==3){
 			getFocusList = logicComponent.getEvents();
-		} else if (listNum==4){
+		} else if (currentListNum==4){
 			getFocusList = logicComponent.getFloatingTasks();
 		}
+		changeList(currentListNum);
+		changeListDetails(currentListNum);
+
+	}
+	private static void changeList(int listNum) throws IOException, JSONException, ParseException{
+		gridPane.getChildren().remove(listFocus);	
 		listFocus = getList(getFocusList);
 		listFocus.setFocusTraversable(false);
 		GridPane.setRowSpan(listFocus, 3);
 		GridPane.setConstraints(listFocus, 0, 1);
 		gridPane.getChildren().add(listFocus);	
+	}
+	
+	private static void changeListDetails(int headNum){
+		
+		if (headNum == 1){
+			focusHeading.setText(LIST_OVERDUE);
+		}
+		else if (currentList == 2){
+			focusHeading.setText(LIST_TASKS);
+		}
+		else if (currentList == 3){
+			focusHeading.setText(LIST_EVENTS);
+		}
+		else if (currentList == 4){
+			focusHeading.setText(LIST_FLOATING);
+		}
+		
+		if(getFocusList==null||getFocusList.isEmpty()){
+			detailField.setText(MESSAGE_EMPTY);
+			return;
+		}
+		detailField.setText(getFocusList.get(currentPosition).printFull());
 	}
 	private static void subTaskView(){
 		if (currentScene == SCENE_MAIN){

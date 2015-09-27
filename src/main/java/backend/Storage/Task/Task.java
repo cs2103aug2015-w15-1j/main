@@ -9,9 +9,10 @@ public class Task {
 	private String description;
 	private String startDate;
 	private String endDate;
+	private String reminderDate;
 	private long startTime;
 	private long endTime;
-	private long reminder;
+	private long reminderTime;
 	private int priority;
 	private boolean isDone;
 
@@ -23,29 +24,31 @@ public class Task {
 
 	// Floating task
 	public Task(String taskName, String taskDescription, int priority, 
-			long reminder, boolean isDone) {
+			String reminderDate, long reminderTime, boolean isDone) {
 		setName(taskName);
 		setDescription(taskDescription);
 		setStartDate("");
 		setEndDate("");
+		setReminderDate(reminderDate);
 		setStartTime(-1);
 		setEndTime(-1);
 		setPriority(priority);
-		setReminder(reminder);
+		setReminder(reminderTime);
 		setDone(isDone);
 		setSubTask(new HashMap<String, SubTask> ());
 	}
 
 	// Task
 	public Task(String taskName, String taskDescription, String deadline, long endTime, 
-			int priority, long reminder, boolean isDone) {
+			int priority, String reminderDate, long reminder, boolean isDone) {
 		setName(taskName);
 		setDescription(taskDescription);
 		setStartDate("");
 		setEndDate(deadline);
 		setStartTime(-1);
-		setEndTime(-1);
+		setEndTime(endTime);
 		setPriority(priority);
+		setReminderDate(reminderDate);
 		setReminder(reminder);
 		setDone(isDone);
 		setSubTask(new HashMap<String, SubTask> ());
@@ -54,7 +57,7 @@ public class Task {
 	// Event
 	public Task(String eventName, String eventDescription, String startDate, 
 			String endDate, long startTime, long endTime, int priority, 
-			long reminder, String categoryName) {
+			String reminderDate, long reminder, String categoryName) {
 		setName(eventName);
 		setDescription(eventDescription);
 		setStartDate(startDate);
@@ -62,6 +65,7 @@ public class Task {
 		setStartTime(startTime);
 		setEndTime(endTime);
 		setPriority(priority);
+		setReminderDate(reminderDate);
 		setReminder(reminder);
 		setSubTask(new HashMap<String, SubTask> ());
 	}
@@ -110,6 +114,14 @@ public class Task {
 		return endDate;
 	}
 
+	public void setReminderDate(String reminderDate) {
+		this.reminderDate = reminderDate;
+	}
+	
+	public String getReminderDate() {
+		return reminderDate;
+	}
+
 	public void setEndDate(String endDate) {
 		this.endDate = endDate;
 	}
@@ -131,80 +143,65 @@ public class Task {
 	}
 
 	public long getReminder() {
-		return reminder;
+		return reminderTime;
 	}
 
-	public void setReminder(long reminder) {
-		this.reminder = reminder;
+	public void setReminder(long reminderTime) {
+		this.reminderTime = reminderTime;
 	}
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		if(name!="") {
-			sb.append(name + " ");
+		if(name!=""){
+			sb.append(name + System.getProperty("line.separator"));
 		}
-		if (priority!=-1) {
-			
-			for (int i=0;i<priority;i++){
-				sb.append("*");
-			}
-			sb.append(System.getProperty("line.separator"));
-		}
-		if (startDate!="") {
+		if (startDate!=""){
 			sb.append(startDate + System.getProperty("line.separator"));
 		}
-		if(endDate!="") {
+		if(endDate!=""){
 			sb.append(endDate + System.getProperty("line.separator"));
 		}
-		if(startTime!=-1) {
+		if(startTime!=-1){
 			sb.append(startTime + System.getProperty("line.separator"));
 		}
-		if (endTime !=-1) {
+		if (endTime !=-1){
 			sb.append(endTime + System.getProperty("line.separator"));
 		}
-		if(priority !=-1) {
+		if(priority !=-1){
 			sb.append(priority + System.getProperty("line.separator"));
 		}
 		return sb.toString();
 	}
-	
 	public String printFull() {
 		StringBuilder sb = new StringBuilder();
 		if(name!=""){
-			sb.append(name + " ");
+			sb.append(name + System.getProperty("line.separator"));
 		}
-		if (priority!=-1) {
-			
-			for (int i=0;i<priority;i++){
-				sb.append("*");
-			}
-			sb.append(System.getProperty("line.separator"));
-		}
-		
-		if (description!="") {
+		if (description!=""){
 			sb.append(description + System.getProperty("line.separator"));
 		}
-		if(startDate !="") {
+		if(startDate !=""){
 			sb.append(startDate + System.getProperty("line.separator"));
 		}
-		if (endDate!="") {
+		if (endDate!=""){
 			sb.append(endDate + System.getProperty("line.separator"));
 		}
-		if (startTime !=-1) {
+		if (reminderDate!=""){
+			sb.append(reminderDate + System.getProperty("line.separator"));
+		}
+		if (startTime !=-1){
 			sb.append(startTime + System.getProperty("line.separator"));
 		}
-		if (endTime !=-1) {
+		if (endTime !=-1){
 			sb.append(endTime + System.getProperty("line.separator"));
 		}
-		if (reminder!=-1) {
-			sb.append(reminder + System.getProperty("line.separator"));
+		if (reminderTime!=-1){
+			sb.append(reminderTime + System.getProperty("line.separator"));
 		}
-		
-		if(isDone) {
-			sb.append("Task is completed" + System.getProperty("line.separator"));
-		} else {
-			sb.append("Task is not completed" + System.getProperty("line.separator"));
+		if (priority!=-1){
+			sb.append(priority + System.getProperty("line.separator"));
 		}
+		sb.append(isDone + System.getProperty("line.separator"));
 		return sb.toString();
 	}
 
@@ -215,7 +212,7 @@ public class Task {
 	public void setSubTask(HashMap<String, SubTask> subTask) {
 		this.subTask = subTask;
 	}
-	
+
 	public static Comparator<Task> sortPriority = new Comparator<Task> () {
 		public int compare(Task left, Task right) {
 			if(left.getPriority() < right.getPriority()) {

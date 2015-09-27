@@ -12,12 +12,21 @@ public class Category {
 	private HashMap<String, Task> floatTasks;
 	private HashMap<String, Task> events;
 	
+	private String categoryName;
 	private String categoryColour;
 	
 	public Category() {
 		setTasks(new HashMap<String, Task>());
 		setFloatTasks(new HashMap<String, Task>());
 		setEvents(new HashMap<String, Task>());
+	}
+	
+	public String getCategoryName() {
+		return categoryName;
+	}
+
+	public void setCategoryName(String categoryName) {
+		this.categoryName = categoryName;
 	}
 
 	public String getCategoryColour() {

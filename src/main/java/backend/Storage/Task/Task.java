@@ -1,5 +1,6 @@
 package main.java.backend.Storage.Task;
 
+import java.util.Comparator;
 import java.util.HashMap;
 
 public class Task {
@@ -196,4 +197,28 @@ public class Task {
 	public void setSubTask(HashMap<String, SubTask> subTask) {
 		this.subTask = subTask;
 	}
+	
+	public static Comparator<Task> sortPriority = new Comparator<Task> () {
+		public int compare(Task left, Task right) {
+			if(left.getPriority() < right.getPriority()) {
+				return -1;
+			} else if(left.getPriority() > right.getPriority()) {
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+	};
+	
+	public static Comparator<Task> sortDeadline = new Comparator<Task> () {
+		public int compare(Task left, Task right) {
+			if(left.getEndTime() < right.getEndTime()) {
+				return -1;
+			} else if(left.getEndTime() > right.getEndTime()) {
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+	};
 }

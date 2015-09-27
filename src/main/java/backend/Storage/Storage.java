@@ -51,7 +51,7 @@ public abstract class Storage {
 
 	public abstract ArrayList<String> getCategories();
 
-	public abstract ArrayList<Category> getCategoryList();
+	public abstract ArrayList<Category> getCategoryList() throws IOException;
 
 	public abstract ArrayList<Task> getTaskList();
 
@@ -98,6 +98,8 @@ public abstract class Storage {
 
 	public abstract void setReminder(String taskName, long reminder) 
 			throws JsonParseException, JsonMappingException, IOException;
+	
+	public abstract void setPriority(String taskName, int priority) throws IOException;
 
 	public abstract void setDescription(String taskName, String description) 
 			throws JsonParseException, JsonMappingException, IOException;
@@ -133,4 +135,12 @@ public abstract class Storage {
 
 	// TODO
 	public abstract void deleteSubTask(String taskName, String subtaskDescription);
+	
+	/****************************************************************************
+	 * 								GOOD METHODS
+	 ***************************************************************************/
+	
+	public abstract void updateFile(ArrayList<Category> categories) throws IOException;
+	
+	public abstract void exitProgram() throws IOException;
 }

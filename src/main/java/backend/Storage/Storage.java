@@ -99,6 +99,9 @@ public abstract class Storage {
 	public abstract void setReminder(String taskName, String reminder) 
 			throws JsonParseException, JsonMappingException, IOException;
 	
+	public abstract void setReminder(String taskName, long reminder) 
+			throws JsonParseException, JsonMappingException, IOException;
+	
 	public abstract void setPriority(String taskName, int priority) throws IOException;
 
 	public abstract void setDescription(String taskName, String description) 

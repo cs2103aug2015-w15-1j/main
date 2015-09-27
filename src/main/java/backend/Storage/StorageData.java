@@ -441,6 +441,15 @@ public class StorageData extends Storage {
 	}
 	
 	@Override
+	public void setReminder(String taskName, long reminder) 
+			throws JsonParseException, JsonMappingException, IOException {
+		
+		HashMap<String, Task> targetTask = getAllTasks();
+		targetTask.get(taskName).setReminder(reminder);
+		storageFile.setAllDataToFile(allCategories);
+	}
+	
+	@Override
 	public void setPriority(String taskName, int priority) throws IOException {
 		HashMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskName).setPriority(priority);;

@@ -226,7 +226,7 @@ public class Logic {
 			storageComponent.setPriority(taskName,priority);
 		}
 		if (!getParsedInput.get(4).equals("")) {
-			long reminder = stringToMillisecond(getParsedInput.get(4));
+			String reminder = getParsedInput.get(4);
 			storageComponent.setReminder(taskName, reminder);
 		}
 		if(!getParsedInput.get(5).equals("")) {
@@ -365,8 +365,10 @@ public class Logic {
 	private String setReminder(ArrayList<String> getParsedInput) 
 			throws JsonParseException, JsonMappingException, IOException {
 		String taskName = getParsedInput.get(1);
+		String reminderDate = getParsedInput.get(2);
 		long reminder = stringToMillisecond(getParsedInput.get(2));
 		storageComponent.setReminder(taskName,reminder);
+		storageComponent.setReminder(taskName,reminderDate);
 		updateCurrentState();
 		updateHistoryStack();
 		return String.format(EXECUTION_SET_REMINDER_SUCCESSFUL,taskName,reminder);
@@ -444,15 +446,17 @@ public class Logic {
 				return priorityChecker(priority);
 			}
 		}
+		String reminderDate = "";
 		long reminder = -1L;
 		if (!getParsedInput.get(4).equals("")) {
+			reminderDate = getParsedInput.get(4);
 			reminder = stringToMillisecond(getParsedInput.get(4));
 		}
 //		System.out.println("priority: "+priority);
 //		System.out.println("reminder: "+reminder);
 		String category = getParsedInput.get(5);
 //		System.out.println("category: "+category);
-		storageComponent.addFloatingTask(taskName,taskDescription,priority,reminder,category);
+		storageComponent.addFloatingTask(taskName,taskDescription,priority,reminderDate, reminder,category);
 		updateCurrentState();
 		updateHistoryStack();
 		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, getParsedInput.get(1));
@@ -466,7 +470,9 @@ public class Logic {
 		long startTime = -1L;
 		long endTime = -1L;
 		int priority = -1;
+		String reminderDate = "";
 		long reminder = -1L;
+		
 		if (!getParsedInput.get(4).equals("")) {
 			endDate = getParsedInput.get(4);
 		}
@@ -482,11 +488,12 @@ public class Logic {
 				return priorityChecker(priority);
 			}
 		}
-		if (!getParsedInput.get(6).equals("")){
-			reminder = stringToMillisecond(getParsedInput.get(8));
+		if (!getParsedInput.get(6).equals("")) {
+			reminderDate = getParsedInput.get(4);
+			reminder = stringToMillisecond(getParsedInput.get(4));
 		}
 		String category = getParsedInput.get(7);
-		storageComponent.addEvent(eventName,eventDescription,startDate,endDate,startTime,endTime,priority,reminder,category);
+		storageComponent.addEvent(eventName,eventDescription,startDate,endDate,startTime,endTime,priority,reminderDate, reminder,category);
 		updateCurrentState();
 		updateHistoryStack();
 		return String.format(EXECUTION_ADD_EVENT_SUCCESSFUL, getParsedInput.get(1));
@@ -497,7 +504,9 @@ public class Logic {
 		String taskDescription = getParsedInput.get(2);
 		String deadline = getParsedInput.get(3);
 		int priority = -1;
+		String reminderDate = "";
 		long reminder = -1L;
+		
 		long endTime = stringToMillisecond(deadline);
 		if (!getParsedInput.get(4).equals("")) {
 			priority = Integer.parseInt(getParsedInput.get(4));
@@ -506,10 +515,11 @@ public class Logic {
 			}
 		}
 		if (!getParsedInput.get(5).equals("")) {
-			reminder = stringToMillisecond(getParsedInput.get(5));
+			reminderDate = getParsedInput.get(4);
+			reminder = stringToMillisecond(getParsedInput.get(4));
 		}
 		String category = getParsedInput.get(6);
-		storageComponent.addTask(taskName,taskDescription,deadline,endTime,priority,reminder,category);
+		storageComponent.addTask(taskName,taskDescription,deadline,endTime,priority,reminderDate,reminder,category);
 		updateCurrentState();
 		updateHistoryStack();
 		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, getParsedInput.get(1));

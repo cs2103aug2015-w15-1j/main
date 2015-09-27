@@ -435,13 +435,13 @@ public class Logic {
 		if (!endDate.equals("")) {
 			endTime = stringToMillisecond(endDate);
 		}
-		if (!getParsedInput.get(7).equals("")) {
-			priority = Integer.parseInt(getParsedInput.get(7));
+		if (!getParsedInput.get(5).equals("")) {
+			priority = Integer.parseInt(getParsedInput.get(5));
 		}
-		if (!getParsedInput.get(8).equals("")){
+		if (!getParsedInput.get(6).equals("")){
 			reminder = stringToMillisecond(getParsedInput.get(8));
 		}
-		String category = getParsedInput.get(9);
+		String category = getParsedInput.get(7);
 		storageComponent.addEvent(eventName,eventDescription,startDate,endDate,startTime,endTime,priority,reminder,category);
 		updateCurrentState();
 		updateHistoryStack();

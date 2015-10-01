@@ -153,7 +153,13 @@ public class Task {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		if(name!=""){
-			sb.append(name + System.getProperty("line.separator"));
+			sb.append(name + " ");
+		}
+		if(priority !=-1){
+			for (int i=0;i<priority;i++){
+			sb.append("*");
+			}
+			sb.append(System.getProperty("line.separator"));
 		}
 		if (startDate!=""){
 			sb.append(startDate + System.getProperty("line.separator"));
@@ -167,15 +173,19 @@ public class Task {
 		if (endTime !=-1){
 			sb.append(endTime + System.getProperty("line.separator"));
 		}
-		if(priority !=-1){
-			sb.append(priority + System.getProperty("line.separator"));
-		}
 		return sb.toString();
 	}
+	
 	public String printFull() {
 		StringBuilder sb = new StringBuilder();
 		if(name!=""){
-			sb.append(name + System.getProperty("line.separator"));
+			sb.append(name + " ");
+		}
+		if(priority !=-1){
+			for (int i=0;i<priority;i++){
+			sb.append("*");
+			}
+			sb.append(System.getProperty("line.separator"));
 		}
 		if (description!=""){
 			sb.append(description + System.getProperty("line.separator"));
@@ -198,10 +208,7 @@ public class Task {
 		if (reminderTime!=-1){
 			sb.append(reminderTime + System.getProperty("line.separator"));
 		}
-		if (priority!=-1){
-			sb.append(priority + System.getProperty("line.separator"));
-		}
-		sb.append(isDone + System.getProperty("line.separator"));
+		sb.append("is it completed?: "+isDone + System.getProperty("line.separator"));
 		return sb.toString();
 	}
 

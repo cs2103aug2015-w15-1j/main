@@ -16,8 +16,15 @@
 	-fx-background-color: #E5E4E2;
 }
 
+.list-cell:empty {
+	-fx-background-color:white;
+}
+
 .list-cell{
 	-fx-background-color: #E5E4E2;
+}
+.list-cell:odd{
+	-fx-background-color: white;
 }
 .custom {
   -fx-control-inner-background: #E5E4E2;

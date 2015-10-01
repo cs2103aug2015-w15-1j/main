@@ -135,7 +135,7 @@ public class GUI extends Application{
 	private void setUpGrid() {
 		gridPane = new GridPane();
 		gridPane.setFocusTraversable(false);
-		gridPane.setGridLinesVisible(false); //checking
+		gridPane.setGridLinesVisible(true); //checking
 		gridPane.setVgap(4);
 		gridPane.setHgap(10);
 		gridPane.setPadding(new Insets(20,20,20,20));

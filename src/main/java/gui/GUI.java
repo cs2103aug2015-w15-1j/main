@@ -21,6 +21,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -40,7 +42,7 @@ public class GUI extends Application{
 	private static final String LIST_TASKS = "Upcoming Tasks:";
 	private static final String LIST_EVENTS = "Upcoming Events:";
 	private static final String LIST_FLOATING = "Floating Tasks:";
-	private static final String MESSAGE_HELP = "Change view by typing \"change\"";
+	private static final String MESSAGE_HELP = "Change view by typing \"change\" or pressing 'tab'";
 	private static final String MESSAGE_SAMPLE_ADDTASK = "to insert a task: \"add [taskname] deadline [date & time] priority [1 to 5] category [name] reminder [date]\"";
 	private static final String MESSAGE_SAMPLE_ADDEVENT = "to insert an event: \"add [taskname] event [starting date & time] [ending date & time] priority [1 to 5] category [name] reminder [date]\"";
 	private static final String MESSAGE_SAMPLE_ADDFLOAT= "to insert a floating task: \"add [taskname] priority [1 to 5] category [name] reminder [date]\"";
@@ -368,6 +370,13 @@ public class GUI extends Application{
 					}
 
 				}
+				else if(ke.getCode().equals(KeyCode.TAB)){
+					try {
+						changeScene();
+					} catch (IOException | JSONException | ParseException e) {
+						e.printStackTrace();
+					}
+				}
 				if (currentScene == SCENE_FOCUS){
 					try {
 						changeList(currentList);
@@ -416,20 +425,23 @@ public class GUI extends Application{
 			}
 		});
 	}
+	private static void changeScene() throws IOException, JSONException, ParseException{
+		if (currentScene == SCENE_MAIN){
+			setUpFocus();
+			refreshingFocus(currentList);
+			currentScene = SCENE_FOCUS;
+
+		} else {
+			setUpMain();
+			currentScene = SCENE_MAIN;
+		}
+	}
 	private static void userInputCommads() throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException{	
 		userCommands = userInput.getText();
 		userInput.clear();
 		System.out.println("Command: "+ userCommands);
 		if (userCommands.toLowerCase().equals("change")){
-			if (currentScene == SCENE_MAIN){
-				setUpFocus();
-				refreshingFocus(currentList);
-				currentScene = SCENE_FOCUS;
-
-			} else {
-				setUpMain();
-				currentScene = SCENE_MAIN;
-			}
+			changeScene();
 		}
 		else if(userCommands.toLowerCase().contains("show overdue")){
 			currentList = NUM_OVERDUE;

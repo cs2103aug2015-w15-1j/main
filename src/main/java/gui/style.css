@@ -1,6 +1,7 @@
 
 .root{
-	-fx-background-color: black;
+	-fx-background-color: #003366;
+	-fx-text-inner-color: black;
 }
 
 .label{
@@ -13,19 +14,31 @@
 .list-view{
 	-fx-font-weight:bold;
 	-fx-font-family: "Courier New";
-	-fx-background-color: #E5E4E2;
+	-fx-background-color: #336699;
 }
 
-.list-cell:empty {
-	-fx-background-color:white;
+.list-cell:empty { /* must match with list-cell:odd */
+	-fx-background-color:#336699;
 }
 
 .list-cell{
-	-fx-background-color: #E5E4E2;
+	-fx-background-color: #FFFFFF;
 }
 .list-cell:odd{
-	-fx-background-color: white;
+	-fx-background-color: #336699;
+	-fx-text-fill: #FFFFFF;
 }
 .custom {
-  -fx-control-inner-background: #E5E4E2;
+  -fx-control-inner-background: #FFFFFF;
+}
+.txtarea:disabled{  
+  -fx-opacity: 1.0;
+  -fx-text-inner-color: black;
+  -fx-text-fill: #000000;
+}
+.txtarea .scroll-pane:disabled{
+  -fx-opacity: 1.0;
+}
+.text-area .scroll-bar:vertical:disabled {
+    -fx-opacity: 0;
 }

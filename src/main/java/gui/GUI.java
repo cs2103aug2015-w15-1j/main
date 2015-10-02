@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -27,6 +28,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
 
 import main.java.backend.Logic.Logic;
+import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
 public class GUI extends Application{
@@ -38,12 +40,16 @@ public class GUI extends Application{
 	private static final String LIST_TASKS = "Upcoming Tasks:";
 	private static final String LIST_EVENTS = "Upcoming Events:";
 	private static final String LIST_FLOATING = "Floating Tasks:";
-	private static final String MESSAGE_HELP = "Change view by typing \"changeview\"";
+	private static final String MESSAGE_HELP = "Change view by typing \"change\"";
 	private static final String MESSAGE_SAMPLE_ADDTASK = "to insert a task: \"add [taskname] deadline [date & time] priority [1 to 5] category [name] reminder [date]\"";
 	private static final String MESSAGE_SAMPLE_ADDEVENT = "to insert an event: \"add [taskname] event [starting date & time] [ending date & time] priority [1 to 5] category [name] reminder [date]\"";
 	private static final String MESSAGE_SAMPLE_ADDFLOAT= "to insert a floating task: \"add [taskname] priority [1 to 5] category [name] reminder [date]\"";
 	private static final int SCENE_MAIN = 1;
 	private static final int SCENE_FOCUS = 2;
+	private static final int NUM_OVERDUE = 1;
+	private static final int NUM_TASKS = 2;
+	private static final int NUM_EVENTS = 3;
+	private static final int NUM_FLOAT = 4;
 	private static int currentList = 2;
 	private static int currentPosition = 0;
 	private static int currentScene = 1;
@@ -53,18 +59,18 @@ public class GUI extends Application{
 	private static Console console;
 	private static TextArea consoleText;
 	private static PrintStream ps;
-	private static ArrayList<Task> getOverdue;
+	private static ArrayList<Task> getFloat;
 	private static ArrayList<Task> getTasks;
 	private static ArrayList<Task> getEvents;
 	private static ArrayList<Task> getFocusList;
 	private static Scene mainScene;
 	private static GridPane gridPane;
-	private static Label overDue;
 	private static Label categories;
 	private static Label tasks;
 	private static Label events;
+	private static Label floating;
 	private static TextField userInput;
-	private static ListView<Task> listOverdue;
+	private static ListView<Task> listFloat;
 	private static ListView<String> listCate;
 	private static ListView<Task> listTasks;
 	private static ListView<Task> listEvents;
@@ -77,11 +83,11 @@ public class GUI extends Application{
 	public static void main(String[] args) throws IOException, JSONException, ParseException {
 		initGUI();
 		launch(args);
-		System.out.println("GUI component initialised successfully");
+	
 	}
 	private static void initGUI() throws IOException, JSONException, ParseException{
 		logicComponent = new Logic(DEFAULT_FILENAME);
-		
+		System.out.println("GUI component initialised successfully");
 		consoleText = new TextArea();
 		console = new Console(consoleText);
 		ps = new PrintStream(console, true);
@@ -91,11 +97,10 @@ public class GUI extends Application{
 		displayStringToScreen(MESSAGE_SAMPLE_ADDTASK);
 		displayStringToScreen(MESSAGE_SAMPLE_ADDEVENT);
 		displayStringToScreen(MESSAGE_SAMPLE_ADDFLOAT);
-		getOverdue= logicComponent.getOverdueTasks();
+		getFloat= logicComponent.getFloatingTasks();
 		getTasks = logicComponent.getTasks();
 		getEvents = logicComponent.getEvents();
-		
-		
+
 	}
 
 	@Override
@@ -125,8 +130,8 @@ public class GUI extends Application{
 		
 	}
 	private static void setUpFocus() throws IOException, JSONException, ParseException {
-		gridPane.getChildren().removeAll(overDue,categories, tasks, events,
-										listOverdue,listCate,listTasks,listEvents);
+		gridPane.getChildren().removeAll(floating, tasks, events,
+										listFloat,listTasks,listEvents);
 		setUpFocusHeadings();	
 		setUpFocusContents();
 		
@@ -135,7 +140,7 @@ public class GUI extends Application{
 	private void setUpGrid() {
 		gridPane = new GridPane();
 		gridPane.setFocusTraversable(false);
-		gridPane.setGridLinesVisible(true); //checking
+		gridPane.setGridLinesVisible(false); //checking
 		gridPane.setVgap(4);
 		gridPane.setHgap(10);
 		gridPane.setPadding(new Insets(20,20,20,20));
@@ -155,23 +160,23 @@ public class GUI extends Application{
 		RowConstraints row1 = new RowConstraints();
 		row1.setPercentHeight(5);
 		RowConstraints row2 = new RowConstraints();
-		row2.setPercentHeight(20);
+		row2.setPercentHeight(63);
 		RowConstraints row3 = new RowConstraints();
-		row3.setPercentHeight(5);
-		RowConstraints row4 = new RowConstraints();
-		row4.setPercentHeight(38);
-		RowConstraints row5 = new RowConstraints();
-		row5.setPercentHeight(27);
-		gridPane.getRowConstraints().addAll(row1,row2,row3,row4,row5);
+		row3.setPercentHeight(27);
+		gridPane.getRowConstraints().addAll(row1,row2,row3);
 	}
 
 	private static void setUpConsole() {
 		
 		consoleText.setEditable(false);
+		consoleText.setDisable(true);
 		consoleText.setFocusTraversable(false);
 		consoleText.setStyle("-fx-focus-color: transparent;");
+		consoleText.getStyleClass().add("txtarea");
+		consoleText.getStyleClass().add("txtarea .scroll-pane");
+		consoleText.setWrapText(true);
 		GridPane.setColumnSpan(consoleText, 3);
-		GridPane.setConstraints(consoleText, 0, 4);
+		GridPane.setConstraints(consoleText, 0, 2);
 		gridPane.getChildren().add(consoleText);
 	}
 	
@@ -181,18 +186,14 @@ public class GUI extends Application{
 		userInput.setStyle("-fx-focus-color: transparent;");
 		
 		GridPane.setColumnSpan(userInput, 3);
-		GridPane.setConstraints(userInput, 0, 5);
+		GridPane.setConstraints(userInput, 0, 3);
 		gridPane.getChildren().add(userInput);
 	}
 	
 	private static void setUpHeadings(){
-		//OverDue heading
-		overDue = new Label("Overdue Task:");
-		GridPane.setConstraints(overDue, 0, 2);
-		
 		//Categories Heading
-		categories = new Label("Categories:");
-		GridPane.setConstraints(categories, 0, 0);
+		floating = new Label("Floating:");
+		GridPane.setConstraints(floating, 0, 0);
 		//Task Heading
 		tasks = new Label("Upcoming Tasks:");
 		GridPane.setConstraints(tasks, 1, 0);
@@ -200,42 +201,34 @@ public class GUI extends Application{
 		events = new Label("Upcoming Events:");
 		GridPane.setConstraints(events, 2, 0);
 		
-		gridPane.getChildren().addAll(overDue,categories, tasks, events);
+		gridPane.getChildren().addAll(floating, tasks, events);
 	}
 	
 	private static void setUpContents() throws IOException, JSONException, ParseException {
-	
-		//OverDue List
-		getOverdue= logicComponent.getOverdueTasks();
-		listOverdue = getList(getOverdue);
-		listOverdue.setFocusTraversable( false );
-		GridPane.setConstraints(listOverdue, 0, 3);
 		
-		//Categories
-		ArrayList<String> getCate = logicComponent.getCategories();	
-		listCate = getStringList(getCate);
-		listCate.setFocusTraversable( false );
-		GridPane.setConstraints(listCate, 0, 1);
-		
+		//floating
+		ArrayList<Task> getFloating = logicComponent.getFloatingTasks();	
+		listFloat = getList(getFloating);
+		listFloat.setFocusTraversable( false );
+		GridPane.setConstraints(listFloat, 0, 1);
 	
 		//tasks
 		getTasks = logicComponent.getTasks();		
 		listTasks = getList(getTasks);
 		listTasks.setFocusTraversable( false );
 		GridPane.setConstraints(listTasks, 1, 1);
-		GridPane.setRowSpan(listTasks, 3);
 	
 		//Events
 		getEvents = logicComponent.getEvents();
 		listEvents = getList(getEvents);
 		listEvents.setFocusTraversable( false );
 		GridPane.setConstraints(listEvents, 2, 1);
-		GridPane.setRowSpan(listEvents, 3);
 	
 	
-		gridPane.getChildren().addAll(listOverdue,listCate,listTasks,listEvents);
+		gridPane.getChildren().addAll(listFloat,listTasks,listEvents);
 	}
 	private static void setUpFocusHeadings(){
+		gridPane.getChildren().removeAll(focusHeading, detailsHeading);
 		focusHeading = new Label(LIST_TASKS);
 		GridPane.setConstraints(focusHeading, 0, 0);
 		detailsHeading = new Label("Details");
@@ -245,19 +238,23 @@ public class GUI extends Application{
 	}
 	
 	private static void setUpFocusContents() throws IOException, JSONException, ParseException {
+		gridPane.getChildren().removeAll(listFocus, detailField);
 		ArrayList<Task> getFocusList = logicComponent.getTasks();
 		listFocus = getList(getFocusList);
 		listFocus.setFocusTraversable(false);
-		GridPane.setRowSpan(listFocus, 3);
 		GridPane.setConstraints(listFocus, 0, 1);
 		gridPane.getChildren().add(listFocus);	
 
 		detailField = new TextArea();
 		detailField.setEditable(false);
+		detailField.setDisable(true);
 		detailField.getStyleClass().add("custom");
+		detailField.getStyleClass().add("txtarea");
+		detailField.getStyleClass().add("txtarea .scroll-pane");
+		detailField.getStyleClass().add("text-area .scroll-bar");
+		detailField.setWrapText(true);
 		GridPane.setConstraints(detailField, 1, 1);
 		GridPane.setColumnSpan(detailField, 2);
-		GridPane.setRowSpan(detailField, 3);
 		if (getFocusList==null||getFocusList.isEmpty()){
 			detailField.setText(MESSAGE_EMPTY);
 		} else{
@@ -289,6 +286,15 @@ public class GUI extends Application{
 		return listString;
 	}
 	
+	private static ListView<Category> getCateList(ArrayList<Category> list){
+		if (list == null){
+			list = new ArrayList<Category>();
+		}
+		ObservableList<Category> tasks = FXCollections.observableArrayList(list);
+		ListView<Category> listString = new ListView<Category>(tasks);
+		return listString;
+	}
+	
 	private static void displayStringToScreen(String getProcessedInput) {
 		System.out.println(getProcessedInput);
 	}
@@ -296,7 +302,7 @@ public class GUI extends Application{
 	private static void refresh() throws IOException, JSONException, ParseException{
 		//System.out.println("refreshing");
 		if (currentScene == SCENE_MAIN){
-			gridPane.getChildren().removeAll(listOverdue,listCate,listTasks,listEvents);
+			gridPane.getChildren().removeAll(listFloat,listTasks,listEvents);
 			setUpContents();
 		}
 		else{
@@ -304,6 +310,49 @@ public class GUI extends Application{
 		}
 	}
 	
+	private static void refreshingFocus(int currentListNum) throws IOException, JSONException, ParseException{
+		getFocusList = new ArrayList<Task>();
+		if(currentListNum==NUM_OVERDUE){
+			getFocusList = logicComponent.getOverdueTasks();
+		} else if(currentListNum==NUM_TASKS){
+			getFocusList = logicComponent.getTasks();
+		} else if(currentListNum==NUM_EVENTS){
+			getFocusList = logicComponent.getEvents();
+		} else if (currentListNum==NUM_FLOAT){
+			getFocusList = logicComponent.getFloatingTasks();
+		}
+		changeList(currentListNum);
+		changeListDetails(currentListNum);
+	
+	}
+	private static void changeList(int listNum) throws IOException, JSONException, ParseException{
+		gridPane.getChildren().remove(listFocus);	
+		listFocus = getList(getFocusList);
+		listFocus.setFocusTraversable(false);
+		GridPane.setConstraints(listFocus, 0, 1);
+		gridPane.getChildren().add(listFocus);	
+	}
+	private static void changeListDetails(int headNum){
+		
+		if (headNum == NUM_OVERDUE){
+			focusHeading.setText(LIST_OVERDUE);
+		}
+		else if (currentList == NUM_TASKS){
+			focusHeading.setText(LIST_TASKS);
+		}
+		else if (currentList == NUM_EVENTS){
+			focusHeading.setText(LIST_EVENTS);
+		}
+		else if (currentList == NUM_FLOAT){
+			focusHeading.setText(LIST_FLOATING);
+		}
+		
+		if(getFocusList==null||getFocusList.isEmpty()){
+			detailField.setText(MESSAGE_EMPTY);
+			return;
+		}
+		detailField.setText(getFocusList.get(currentPosition).printFull());
+	}
 	private static void userInputEvents(){
 		userInput.setOnKeyPressed(new EventHandler<KeyEvent>()
 		{
@@ -371,18 +420,45 @@ public class GUI extends Application{
 		userCommands = userInput.getText();
 		userInput.clear();
 		System.out.println("Command: "+ userCommands);
-		if (userCommands.toLowerCase().equals("changeview")){
+		if (userCommands.toLowerCase().equals("change")){
 			if (currentScene == SCENE_MAIN){
 				setUpFocus();
+				refreshingFocus(currentList);
 				currentScene = SCENE_FOCUS;
 
 			} else {
 				setUpMain();
 				currentScene = SCENE_MAIN;
 			}
-		} else {
+		}
+		else if(userCommands.toLowerCase().contains("show overdue")){
+			currentList = NUM_OVERDUE;
+			setUpFocus();
+			refreshingFocus(currentList);
+			currentScene = SCENE_FOCUS;
+		}
+		else if(userCommands.toLowerCase().contains("show task")){
+			currentList = NUM_TASKS;
+			setUpFocus();
+			refreshingFocus(currentList);
+			currentScene = SCENE_FOCUS;
+		}else if(userCommands.toLowerCase().contains("show events")){
+			currentList = NUM_EVENTS;
+			setUpFocus();
+			refreshingFocus(currentList);
+			currentScene = SCENE_FOCUS;
+		}else if(userCommands.toLowerCase().contains("show float")){
+			currentList = NUM_FLOAT;
+			setUpFocus();
+			refreshingFocus(currentList);
+			currentScene = SCENE_FOCUS;
+		}
+		else {
 			String display = logicComponent.executeCommand(userCommands);
 			refresh();
+			if (display.equals("exit")){
+				Platform.exit();
+			}
 			displayStringToScreen(display);
 		}
 
@@ -424,51 +500,6 @@ public class GUI extends Application{
 		refreshingFocus(currentList);
 	}
 	
-	private static void refreshingFocus(int currentListNum) throws IOException, JSONException, ParseException{
-		getFocusList = new ArrayList<Task>();
-		if(currentListNum==1){
-			getFocusList = logicComponent.getOverdueTasks();
-		} else if(currentListNum==2){
-			getFocusList = logicComponent.getTasks();
-		} else if(currentListNum==3){
-			getFocusList = logicComponent.getEvents();
-		} else if (currentListNum==4){
-			getFocusList = logicComponent.getFloatingTasks();
-		}
-		changeList(currentListNum);
-		changeListDetails(currentListNum);
-
-	}
-	private static void changeList(int listNum) throws IOException, JSONException, ParseException{
-		gridPane.getChildren().remove(listFocus);	
-		listFocus = getList(getFocusList);
-		listFocus.setFocusTraversable(false);
-		GridPane.setRowSpan(listFocus, 3);
-		GridPane.setConstraints(listFocus, 0, 1);
-		gridPane.getChildren().add(listFocus);	
-	}
-	
-	private static void changeListDetails(int headNum){
-		
-		if (headNum == 1){
-			focusHeading.setText(LIST_OVERDUE);
-		}
-		else if (currentList == 2){
-			focusHeading.setText(LIST_TASKS);
-		}
-		else if (currentList == 3){
-			focusHeading.setText(LIST_EVENTS);
-		}
-		else if (currentList == 4){
-			focusHeading.setText(LIST_FLOATING);
-		}
-		
-		if(getFocusList==null||getFocusList.isEmpty()){
-			detailField.setText(MESSAGE_EMPTY);
-			return;
-		}
-		detailField.setText(getFocusList.get(currentPosition).printFull());
-	}
 	private static void subTaskView(){
 		if (currentScene == SCENE_MAIN){
 			gridPane.getChildren().remove(listEvents);

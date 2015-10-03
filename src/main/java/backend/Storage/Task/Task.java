@@ -4,7 +4,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 public class Task {
-
+	
+	private int indexForPrinting;
 	private String name;
 	private String description;
 	private String startDate;
@@ -152,6 +153,7 @@ public class Task {
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
+		sb.append(indexForPrinting+". ");
 		if(name!=""){
 			sb.append(name + " ");
 		}
@@ -178,6 +180,7 @@ public class Task {
 	
 	public String printFull() {
 		StringBuilder sb = new StringBuilder();
+		sb.append(indexForPrinting+". ");
 		if(name!=""){
 			sb.append(name + " ");
 		}
@@ -243,4 +246,8 @@ public class Task {
 			}
 		}
 	};
+	
+	public void setIndex(int index){
+		indexForPrinting = index;
+	}
 }

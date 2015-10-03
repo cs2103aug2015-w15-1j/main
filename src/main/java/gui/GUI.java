@@ -275,6 +275,9 @@ public class GUI extends Application{
 			list = new ArrayList<Task>();
 		}
 		ObservableList<Task> tasks = FXCollections.observableArrayList(list);
+		for (int i=0;i<tasks.size();i++){
+			tasks.get(i).setIndex(i+1);
+		}
 		ListView<Task> listTask = new ListView<Task>(tasks);
 		return listTask;
 	}

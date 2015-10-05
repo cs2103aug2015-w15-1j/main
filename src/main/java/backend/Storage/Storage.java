@@ -20,7 +20,6 @@ import main.java.backend.Storage.Task.Task;
 
 public class Storage {
 
-	private static final String TASK_EXIST = "Task already exist! Please enter a new task name.";
 	private static final String CATEGORY_DEFAULT = "default";
 	private static final String TYPE_TASK = "task";
 	private static final String TYPE_FLOAT = "floatTask";
@@ -84,7 +83,8 @@ public class Storage {
 		storageFile.setAllDataToFile(allCategories);
 	}
 	
-	private Category setTaskToCategory(Category category, HashMap<String, Task> allTasks, String taskType) {
+	private Category setTaskToCategory(Category category, HashMap<String, 
+			Task> allTasks, String taskType) {
 		switch(taskType) {
 		case TYPE_TASK:
 			category.setTasks(allTasks);
@@ -172,17 +172,8 @@ public class Storage {
 		return allTasks;
 	}
 	
-	private boolean isTaskExist(String taskName) {
-		ArrayList<Task> taskNames = getTaskList();
-		int size = taskNames.size();
-		
-		for(int i = 0; i < size; i++) {
-			if(taskName.equals(taskNames.get(i).getName())) {
-				return true;
-			}
-		}
-		
-		return false;
+	private int getId() {
+		return getAllTasks().size();
 	}
 	
 	private boolean isCategoryExist(CategoryWrapper categoryWrapper) {
@@ -191,7 +182,7 @@ public class Storage {
 	
 	private String standardDate(String date) {
 		SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE MMM dd HH:mma");
+		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM HH:mma");
 		
 		try {
             Date tempDate = formatter.parse(date);
@@ -230,14 +221,9 @@ public class Storage {
 			String reminderDate, long reminder, String category) throws JsonParseException, 
 			JsonMappingException, IOException, JSONException {
 		
-		Task newFloatingTask = new Task(taskName, taskDescription, 
+		Task newFloatingTask = new Task(getId(), taskName, taskDescription, 
 				priority, standardDate(reminderDate), reminder, false);
-		
-		if(!isTaskExist(newFloatingTask.getName())) {
-			addNewTask(category, TYPE_FLOAT, newFloatingTask);
-		} else {
-			return TASK_EXIST;
-		}
+		addNewTask(category, TYPE_FLOAT, newFloatingTask);
 		
 		return "";
 	}
@@ -247,14 +233,9 @@ public class Storage {
 			long endTime, int priority, String reminderDate, long reminder, String category) 
 					throws IOException, JSONException {	
 		
-		Task newTask = new Task(taskName, taskDescription, standardDate(deadline), endTime, 
-				priority, standardDate(reminderDate), reminder, false);
-		
-		if(!isTaskExist(newTask.getName())) {
-			addNewTask(category, TYPE_TASK, newTask);
-		} else {
-			return TASK_EXIST;
-		}
+		Task newTask = new Task(getId(), taskName, taskDescription, standardDate(deadline), 
+				endTime, priority, standardDate(reminderDate), reminder, false);
+		addNewTask(category, TYPE_TASK, newTask);
 		
 		return "";
 	}
@@ -264,15 +245,10 @@ public class Storage {
 			String endDate, long startDateMilliseconds, long endDateMilliseconds, int priority, 
 			String reminderDate, long reminder, String category) throws IOException, JSONException {
 		
-		Task newEvent = new Task(eventName, eventDescription, standardDate(startDate), 
+		Task newEvent = new Task(getId(), eventName, eventDescription, standardDate(startDate), 
 				standardDate(endDate), startDateMilliseconds, endDateMilliseconds, priority, 
 				standardDate(reminderDate), reminder, category);
-		
-		if(!isTaskExist(newEvent.getName())) {
-			addNewTask(category, TYPE_EVENT, newEvent);
-		} else {
-			return TASK_EXIST;
-		}
+		addNewTask(category, TYPE_EVENT, newEvent);
 		
 		return "";
 	}

@@ -258,12 +258,13 @@ public class Logic {
 		return EXECUTION_SHOW_TASKS_SUCCESSFUL;
 	}
 
+	// TODO
 	private String delete(ArrayList<String> getParsedInput) throws IOException {
-		String taskName = getParsedInput.get(1);
-		storageComponent.deleteTask(taskName);
+		long taskId = Long.parseLong(getParsedInput.get(1)) - 1;
+		storageComponent.deleteTask(taskId);
 		updateCurrentState();
 		updateHistoryStack();
-		return String.format(EXECUTION_DELETE_SUCCESSFUL, taskName);
+		return String.format(EXECUTION_DELETE_SUCCESSFUL, taskId);
 	}
 
 	private String search(ArrayList<String> getParsedInput) {

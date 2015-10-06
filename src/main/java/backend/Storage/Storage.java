@@ -203,6 +203,7 @@ public class Storage {
 	
 	private String getTaskId(String taskType, int taskId) 
 			throws IOException, JSONException, ParseException {
+		
 		switch(taskType) {
 			case TYPE_TASK:
 				return getTasks().get(taskId).getTaskId();
@@ -400,15 +401,15 @@ public class Storage {
 	public ArrayList<Task> getUpcomingEvents() 
 			throws IOException, JSONException, ParseException {
 		ArrayList<Task> allTasks = getEvents();
-		ArrayList<Task> upcomingTasks = new ArrayList<Task> ();
+		ArrayList<Task> upcomingEvents = new ArrayList<Task> ();
 		
 		for(Task task : allTasks) {
-			if(task.getEndTime() >= getCurrentTime()) {
-				upcomingTasks.add(task);
+			if(task.getStartTime() >= getCurrentTime()) {
+				upcomingEvents.add(task);
 			}
 		}
 		
-		return upcomingTasks;
+		return upcomingEvents;
 	}
 	
 	public ArrayList<Task> getCompletedTasks() 
@@ -595,25 +596,33 @@ public class Storage {
 			HashMap<String, Task> floatTasks = category.getFloatTasks();
 			HashMap<String, Task> events = category.getEvents();
 			
-			for(String targetTaskId : tasks.keySet()) {
-				if(targetTaskId.equals(taskId)) {
-					tasks.remove(taskId);
-					break;
+			switch(taskType) {
+				case TYPE_TASK:
+				for(String targetTaskId : tasks.keySet()) {
+					if(targetTaskId.equals(taskId)) {
+						tasks.remove(taskId);
+						break;
+					}
 				}
-			}
-			
-			for(String targetTaskId : floatTasks.keySet()) {
-				if(targetTaskId.equals(taskId)) {
-					floatTasks.remove(taskId);
-					break;
+				break;
+				
+				case TYPE_FLOAT:
+				for(String targetTaskId : floatTasks.keySet()) {
+					if(targetTaskId.equals(taskId)) {
+						floatTasks.remove(taskId);
+						break;
+					}
 				}
-			}
-			
-			for(String targetTaskId : events.keySet()) {
-				if(targetTaskId.equals(taskId)) {
-					events.remove(taskId);
-					break;
+				break;
+				
+				case TYPE_EVENT:
+				for(String targetTaskId : events.keySet()) {
+					if(targetTaskId.equals(taskId)) {
+						events.remove(taskId);
+						break;
+					}
 				}
+				break;
 			}
 		}
 		storageFile.setAllDataToFile(allCategories);

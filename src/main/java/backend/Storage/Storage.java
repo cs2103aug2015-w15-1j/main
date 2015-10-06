@@ -21,7 +21,6 @@ import main.java.backend.Storage.Task.Task;
 
 public class Storage {
 
-	private static final String CATEGORY_DEFAULT = "default";
 	private static final String TYPE_TASK = "task";
 	private static final String TYPE_FLOAT = "floatTask";
 	private static final String TYPE_EVENT = "event";
@@ -44,19 +43,13 @@ public class Storage {
 	/****************************************************************************
 	 * 								HELPER METHODS
 	 ***************************************************************************/
-	
-	private void addDefaultCategory() throws IOException {
-		CategoryWrapper categoryWrapper;
-		categoryWrapper = new CategoryWrapper(new Category(), CATEGORY_DEFAULT);
-		allCategories.put(CATEGORY_DEFAULT, categoryWrapper);
-	}
 
-	private HashMap<Long, Task> addNewTask(String categoryName, String taskType, Task newTask) 
+	private HashMap<String, Task> addNewTask(String categoryName, String taskType, Task newTask) 
 			throws JsonParseException, JsonMappingException, IOException, JSONException {
 
 		CategoryWrapper categoryWrapper = addCategory(categoryName);
 		Category category = categoryWrapper.getCategory();
-		HashMap<Long, Task> allTasks = getTargetTaskList(category, taskType);
+		HashMap<String, Task> allTasks = getTargetTaskList(category, taskType);
 
 		allTasks.put(newTask.getTaskId(), newTask);
 		categoryWrapper.setCategory(setTaskToCategory(category, allTasks, taskType));
@@ -79,12 +72,12 @@ public class Storage {
 	private void setDone(String taskName, boolean isDone) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
-		HashMap<Long, Task> targetTask = getAllTasks();
+		HashMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskName).setDone(isDone);
 		storageFile.setAllDataToFile(allCategories);
 	}
 	
-	private Category setTaskToCategory(Category category, HashMap<Long, 
+	private Category setTaskToCategory(Category category, HashMap<String, 
 			Task> allTasks, String taskType) {
 		switch(taskType) {
 		case TYPE_TASK:
@@ -100,7 +93,7 @@ public class Storage {
 		return new Category();
 	}
 	
-	private HashMap<Long, Task> getTargetTaskList(Category category, String taskType) {
+	private HashMap<String, Task> getTargetTaskList(Category category, String taskType) {
 		switch(taskType) {
 			case TYPE_TASK:
 				return category.getTasks();
@@ -109,24 +102,24 @@ public class Storage {
 			case TYPE_EVENT:
 				return category.getEvents();
 		}
-		return new HashMap<Long, Task> ();
+		return new HashMap<String, Task> ();
 	}
 	
-	private HashMap<Long, Task> getAllTasks() {
-		HashMap<Long, Task> allTasks = new HashMap<Long, Task> ();
+	private HashMap<String, Task> getAllTasks() {
+		HashMap<String, Task> allTasks = new HashMap<String, Task> ();
 		
 		for(String categoryName : allCategories.keySet()) {
 			Category category = allCategories.get(categoryName).getCategory();
 			
-			for(long taskId : category.getTasks().keySet()) {
+			for(String taskId : category.getTasks().keySet()) {
 				allTasks.put(taskId, category.getTasks().get(taskId));
 			}
 			
-			for(long taskId : category.getFloatTasks().keySet()) {
+			for(String taskId : category.getFloatTasks().keySet()) {
 				allTasks.put(taskId, category.getFloatTasks().get(taskId));
 			}
 			
-			for(long taskId : category.getEvents().keySet()) {
+			for(String taskId : category.getEvents().keySet()) {
 				allTasks.put(taskId, category.getEvents().get(taskId));
 			}
 			
@@ -162,11 +155,11 @@ public class Storage {
 		return typeTask;
 	}
 	
-	private ArrayList<Task> getTasksInArray(HashMap<Long, Task> tasks) {
+	private ArrayList<Task> getTasksInArray(HashMap<String, Task> tasks) {
 		
 		ArrayList<Task> allTasks = new ArrayList<Task> ();
 		
-		for(long taskId : tasks.keySet()) {
+		for(String taskId : tasks.keySet()) {
 			allTasks.add(tasks.get(taskId));
 		}
 		
@@ -175,6 +168,10 @@ public class Storage {
 	
 	private boolean isCategoryExist(CategoryWrapper categoryWrapper) {
 		return categoryWrapper!= null && categoryWrapper.getCategory() != null;
+	}
+	
+	private String getTaskId(int taskId) throws IOException, JSONException, ParseException {
+		return getFloatingTasks().get(taskId).getTaskId();
 	}
 	
 	private String standardDate(String date) {
@@ -196,15 +193,13 @@ public class Storage {
 	 * 									CREATE
 	 ***************************************************************************/
 	
-	
+
 	public CategoryWrapper addCategory(String categoryName) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
 		CategoryWrapper categoryWrapper = allCategories.get(categoryName);
 		
-		if(categoryName == null || allCategories.isEmpty()) {
-			addDefaultCategory();
-		} if(!isCategoryExist(categoryWrapper)) {
+		if(!isCategoryExist(categoryWrapper)) {
 			categoryWrapper = new CategoryWrapper(new Category(), categoryName);
 			allCategories.put(categoryName, categoryWrapper);
 			storageFile.setAllDataToFile(allCategories);
@@ -218,7 +213,7 @@ public class Storage {
 			String reminderDate, long reminder, String category) throws JsonParseException, 
 			JsonMappingException, IOException, JSONException {
 		
-		Task newFloatingTask = new Task(CategoryWrapper.getIndex(), taskName, taskDescription, 
+		Task newFloatingTask = new Task(UUID.randomUUID().toString(), taskName, taskDescription, 
 				priority, standardDate(reminderDate), reminder, false);
 		addNewTask(category, TYPE_FLOAT, newFloatingTask);
 		
@@ -230,7 +225,7 @@ public class Storage {
 			long endTime, int priority, String reminderDate, long reminder, String category) 
 					throws IOException, JSONException {	
 		
-		Task newTask = new Task(CategoryWrapper.getIndex(), taskName, taskDescription, standardDate(deadline), 
+		Task newTask = new Task(UUID.randomUUID().toString(), taskName, taskDescription, standardDate(deadline), 
 				endTime, priority, standardDate(reminderDate), reminder, false);
 		addNewTask(category, TYPE_TASK, newTask);
 		
@@ -242,7 +237,7 @@ public class Storage {
 			String endDate, long startDateMilliseconds, long endDateMilliseconds, int priority, 
 			String reminderDate, long reminder, String category) throws IOException, JSONException {
 		
-		Task newEvent = new Task(CategoryWrapper.getIndex(), eventName, eventDescription, standardDate(startDate), 
+		Task newEvent = new Task(UUID.randomUUID().toString(), eventName, eventDescription, standardDate(startDate), 
 				standardDate(endDate), startDateMilliseconds, endDateMilliseconds, priority, 
 				standardDate(reminderDate), reminder, category);
 		addNewTask(category, TYPE_EVENT, newEvent);
@@ -268,7 +263,9 @@ public class Storage {
 		ArrayList<String> categories = new ArrayList<String> ();
 		
 		for(String name : allCategories.keySet()) {
-			categories.add(name);
+			if(!name.isEmpty()) {
+				categories.add(name);
+			}
 		}
 		
 		return categories;
@@ -291,9 +288,9 @@ public class Storage {
 	public ArrayList<Task> getTaskList() {
 
 		ArrayList<Task> taskList = new ArrayList<Task> ();
-		HashMap<Long, Task> allTasks = getAllTasks();
+		HashMap<String, Task> allTasks = getAllTasks();
 
-		for(long taskId : allTasks.keySet()) {
+		for(String taskId : allTasks.keySet()) {
 			taskList.add(allTasks.get(taskId));
 		}
 
@@ -424,7 +421,7 @@ public class Storage {
 	public void setReminder(String taskName, String reminder) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
-		HashMap<Long, Task> targetTask = getAllTasks();
+		HashMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskName).setReminderDate(reminder);
 		storageFile.setAllDataToFile(allCategories);
 	}
@@ -433,14 +430,14 @@ public class Storage {
 	public void setReminder(String taskName, long reminder) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
-		HashMap<Long, Task> targetTask = getAllTasks();
+		HashMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskName).setReminder(reminder);
 		storageFile.setAllDataToFile(allCategories);
 	}
 	
 	
 	public void setPriority(String taskName, int priority) throws IOException {
-		HashMap<Long, Task> targetTask = getAllTasks();
+		HashMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskName).setPriority(priority);;
 		storageFile.setAllDataToFile(allCategories);	
 	}
@@ -449,7 +446,7 @@ public class Storage {
 	public void setDescription(String taskName, String description) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
-		HashMap<Long, Task> targetTask = getAllTasks();
+		HashMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskName).setDescription(description);
 		storageFile.setAllDataToFile(allCategories);
 	}
@@ -458,7 +455,7 @@ public class Storage {
 	public void setDeadline(String taskName, long deadline) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
-		HashMap<Long, Task> targetTask = getAllTasks();
+		HashMap<String, Task> targetTask = getAllTasks();
 		// TODO: When updating enddate, update endtime as well
 		targetTask.get(taskName).setEndTime(deadline);
 		storageFile.setAllDataToFile(allCategories);
@@ -503,7 +500,7 @@ public class Storage {
 	
 	
 	public void deleteTaskTypeFromCategory(String categoryName, String taskType) throws IOException {
-		HashMap<Long, Task> resetData = new HashMap<Long, Task>();
+		HashMap<String, Task> resetData = new HashMap<String, Task>();
 		switch(taskType) {
 			case TYPE_TASK:
 				allCategories.get(categoryName).getCategory().setTasks(resetData);
@@ -519,29 +516,32 @@ public class Storage {
 	}
 
 	
-	public void deleteTask(long taskId) throws IOException {
+	public void deleteTask(int taskIndex) throws IOException, JSONException, ParseException {
+		
+		String taskId = getTaskId(taskIndex);
+		
 		for(String categoryName : allCategories.keySet()) {
 			Category category = allCategories.get(categoryName).getCategory();
-			HashMap<Long, Task> tasks = category.getTasks();
-			HashMap<Long, Task> floatTasks = category.getFloatTasks();
-			HashMap<Long, Task> events = category.getEvents();
+			HashMap<String, Task> tasks = category.getTasks();
+			HashMap<String, Task> floatTasks = category.getFloatTasks();
+			HashMap<String, Task> events = category.getEvents();
 			
-			for(long targetTaskId : tasks.keySet()) {
-				if(targetTaskId == taskId) {
+			for(String targetTaskId : tasks.keySet()) {
+				if(targetTaskId.equals(taskId)) {
 					tasks.remove(taskId);
 					break;
 				}
 			}
 			
-			for(long targetTaskId : floatTasks.keySet()) {
-				if(targetTaskId == taskId) {
+			for(String targetTaskId : floatTasks.keySet()) {
+				if(targetTaskId.equals(taskId)) {
 					floatTasks.remove(taskId);
 					break;
 				}
 			}
 			
-			for(long targetTaskId : events.keySet()) {
-				if(targetTaskId == taskId) {
+			for(String targetTaskId : events.keySet()) {
+				if(targetTaskId.equals(taskId)) {
 					events.remove(taskId);
 					break;
 				}

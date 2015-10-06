@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 public class Task {
 	
-	private long taskId;
+	private String taskId;
 	private int indexForPrinting;
 	private String name;
 	private String description;
@@ -25,7 +25,7 @@ public class Task {
 	}
 
 	// Floating task
-	public Task(long taskId, String taskName, String taskDescription, int priority, 
+	public Task(String taskId, String taskName, String taskDescription, int priority, 
 			String reminderDate, long reminderTime, boolean isDone) {
 		setTaskId(taskId);
 		setName(taskName);
@@ -42,7 +42,7 @@ public class Task {
 	}
 
 	// Task
-	public Task(long taskId, String taskName, String taskDescription, String deadline, long endTime, 
+	public Task(String taskId, String taskName, String taskDescription, String deadline, long endTime, 
 			int priority, String reminderDate, long reminder, boolean isDone) {
 		setTaskId(taskId);
 		setName(taskName);
@@ -59,7 +59,7 @@ public class Task {
 	}
 
 	// Event
-	public Task(long taskId, String eventName, String eventDescription, String startDate, 
+	public Task(String taskId, String eventName, String eventDescription, String startDate, 
 			String endDate, long startTime, long endTime, int priority, 
 			String reminderDate, long reminder, String categoryName) {
 		setTaskId(taskId);
@@ -75,11 +75,11 @@ public class Task {
 		setSubTask(new HashMap<String, SubTask> ());
 	}
 
-	public long getTaskId() {
+	public String getTaskId() {
 		return taskId;
 	}
 
-	public void setTaskId(long taskId) {
+	public void setTaskId(String taskId) {
 		this.taskId = taskId;
 	}
 	
@@ -197,11 +197,8 @@ public class Task {
 		if(endDate!=""){
 			sb.append(endDate + System.getProperty("line.separator"));
 		}
-		if(startTime!=-1){
-			sb.append(startTime + System.getProperty("line.separator"));
-		}
-		if (endTime !=-1){
-			sb.append(endTime + System.getProperty("line.separator"));
+		if(reminderDate!=""){
+			sb.append(reminderDate + System.getProperty("line.separator"));
 		}
 		return sb.toString();
 	}
@@ -229,15 +226,6 @@ public class Task {
 		}
 		if (reminderDate!=""){
 			sb.append(reminderDate + System.getProperty("line.separator"));
-		}
-		if (startTime !=-1){
-			sb.append(startTime + System.getProperty("line.separator"));
-		}
-		if (endTime !=-1){
-			sb.append(endTime + System.getProperty("line.separator"));
-		}
-		if (reminderTime!=-1){
-			sb.append(reminderTime + System.getProperty("line.separator"));
 		}
 		sb.append("is it completed? "+isDone + System.getProperty("line.separator"));
 		return sb.toString();

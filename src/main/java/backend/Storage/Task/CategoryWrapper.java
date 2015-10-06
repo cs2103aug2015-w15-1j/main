@@ -4,7 +4,6 @@ public class CategoryWrapper {
 	
 	private Category category;
 	private String categoryName;
-	private static long index = 0;
 	
 	public CategoryWrapper() {
 		
@@ -29,9 +28,5 @@ public class CategoryWrapper {
 
 	public void setCategoryName(String categoryName) {
 		this.categoryName = categoryName;
-	}
-
-	public static long getIndex() {
-		return ++index;
 	}
 }

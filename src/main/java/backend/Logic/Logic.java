@@ -101,7 +101,7 @@ public class Logic {
 		searchComponent = new Search();
 	}
 
-	public String executeCommand(String userInput) throws JsonParseException, JsonMappingException, IOException, JSONException {
+	public String executeCommand(String userInput) throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException {
 		ArrayList<String> getParsedInput = parserComponent.parseInput(userInput);
 //		arrayChecker(getParsedInput);
 		System.out.println("Array got");
@@ -259,8 +259,8 @@ public class Logic {
 	}
 
 	// TODO
-	private String delete(ArrayList<String> getParsedInput) throws IOException {
-		long taskId = Long.parseLong(getParsedInput.get(1)) - 1;
+	private String delete(ArrayList<String> getParsedInput) throws IOException, JSONException, ParseException {
+		int taskId = Integer.parseInt(getParsedInput.get(1)) - 1;
 		storageComponent.deleteTask(taskId);
 		updateCurrentState();
 		updateHistoryStack();

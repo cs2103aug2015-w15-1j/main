@@ -104,8 +104,8 @@ public class Logic {
 	public String executeCommand(String userInput) throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException {
 		ArrayList<String> getParsedInput = parserComponent.parseInput(userInput);
 //		arrayChecker(getParsedInput);
-		System.out.println("Array got");
-		System.out.println(getParsedInput);
+//		System.out.println("Array got");
+//		System.out.println(getParsedInput);
 		String commandType = getParsedInput.get(0);
 //		System.out.println("Command type: "+commandType);
 		switch (commandType) {
@@ -200,6 +200,7 @@ public class Logic {
 	}
 
 	private String setPriority(ArrayList<String> getParsedInput) throws IOException, JSONException, ParseException {
+		System.out.println("PRIORITY");
 		String taskNamept1 = getParsedInput.get(1);
 		String taskNamept2 = getParsedInput.get(2);
 		int priority = Integer.parseInt(getParsedInput.get(3));
@@ -262,7 +263,7 @@ public class Logic {
 	// TODO
 	private String delete(ArrayList<String> getParsedInput) throws IOException, JSONException, ParseException {
 		String taskIdpt1 = getParsedInput.get(1);
-		int taskId = Integer.parseInt(getParsedInput.get(2)) - 1;
+		int taskId = Integer.parseInt(getParsedInput.get(2));
 		storageComponent.deleteTask(taskIdpt1, taskId);
 		updateCurrentState();
 		updateHistoryStack();
@@ -579,5 +580,12 @@ public class Logic {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	public void setindex(ArrayList<Task> list, int i, String index) {
+		// TODO Auto-generated method stub
+		storageComponent.setIndex(list.get(i),index+(i+1));
+	}
+	
+	
 	
 }

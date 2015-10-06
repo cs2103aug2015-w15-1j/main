@@ -284,11 +284,12 @@ public class GUI extends Application{
 	private static ListView<Task> getList(ArrayList<Task> list, String index){
 		if (list == null){
 			list = new ArrayList<Task>();
+		}	for (int i=0;i<list.size();i++){
+			
+		logicComponent.setindex(list,i,index);
 		}
 		ObservableList<Task> tasks = FXCollections.observableArrayList(list);
-		for (int i=0;i<tasks.size();i++){
-			tasks.get(i).setIndex(index+(i+1));
-		}
+		
 		ListView<Task> listTask = new ListView<Task>(tasks);
 		return listTask;
 	}

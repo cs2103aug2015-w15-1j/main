@@ -206,11 +206,11 @@ public class Storage {
 		
 		switch(taskType) {
 			case TYPE_TASK:
-				return getTasks().get(taskId).getTaskId();
+				return getTasks().get(taskId - 1).getTaskId();
 			case TYPE_FLOAT:
-				return getFloatingTasks().get(taskId).getTaskId();
+				return getFloatingTasks().get(taskId - 1).getTaskId();
 			case TYPE_EVENT:
-				return getEvents().get(taskId).getTaskId();
+				return getEvents().get(taskId - 1).getTaskId();
 		}
 		
 		// Should not reach here
@@ -505,8 +505,9 @@ public class Storage {
 			throws IOException, JSONException, ParseException {
 		
 		String taskId = getTaskId(taskType, taskIndex);
+		System.out.println("IDIDID" + taskId);
 		HashMap<String, Task> targetTask = getAllTasks();
-		targetTask.get(taskId).setPriority(priority);;
+		targetTask.get(taskId).setPriority(priority);
 		storageFile.setAllDataToFile(allCategories);	
 	}
 	
@@ -652,5 +653,10 @@ public class Storage {
 	
 	public void exitProgram() throws IOException {
 		storageFile.exitProgram();
+	}
+
+	public void setIndex(Task task, String index) {
+		// TODO Auto-generated method stub
+		task.setIndex(index);
 	}
 }

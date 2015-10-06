@@ -34,6 +34,8 @@ public class StorageFile {
 	
 	private StorageJson storageJson;
 	
+	private boolean isInit = false;
+	
 	public StorageFile() throws FileNotFoundException, IOException { 
 		this(DEFAULT_FILE_NAME);
 	}
@@ -72,6 +74,7 @@ public class StorageFile {
 		
 		textFileWriter = new FileWriter(inputTextFile);
 		bufferedWriter = new BufferedWriter(textFileWriter);
+		isInit = true;
 	}
 
 	private void closeReader() throws IOException {
@@ -98,8 +101,11 @@ public class StorageFile {
 	}
 	
 	public void exitProgram() throws IOException {
-		closeReader();
-		closeWriter();
+		if(isInit) {
+			closeReader();
+			closeWriter();
+		}
+		System.exit(0);
 	}
 	
 	private boolean isFileEmpty() throws IOException {    

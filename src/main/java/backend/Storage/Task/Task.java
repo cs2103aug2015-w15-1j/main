@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 public class Task {
 	
+	private long taskId;
 	private int indexForPrinting;
 	private String name;
 	private String description;
@@ -24,8 +25,9 @@ public class Task {
 	}
 
 	// Floating task
-	public Task(String taskName, String taskDescription, int priority, 
+	public Task(long taskId, String taskName, String taskDescription, int priority, 
 			String reminderDate, long reminderTime, boolean isDone) {
+		setTaskId(taskId);
 		setName(taskName);
 		setDescription(taskDescription);
 		setStartDate("");
@@ -40,8 +42,9 @@ public class Task {
 	}
 
 	// Task
-	public Task(String taskName, String taskDescription, String deadline, long endTime, 
+	public Task(long taskId, String taskName, String taskDescription, String deadline, long endTime, 
 			int priority, String reminderDate, long reminder, boolean isDone) {
+		setTaskId(taskId);
 		setName(taskName);
 		setDescription(taskDescription);
 		setStartDate("");
@@ -56,9 +59,10 @@ public class Task {
 	}
 
 	// Event
-	public Task(String eventName, String eventDescription, String startDate, 
+	public Task(long taskId, String eventName, String eventDescription, String startDate, 
 			String endDate, long startTime, long endTime, int priority, 
 			String reminderDate, long reminder, String categoryName) {
+		setTaskId(taskId);
 		setName(eventName);
 		setDescription(eventDescription);
 		setStartDate(startDate);
@@ -69,6 +73,22 @@ public class Task {
 		setReminderDate(reminderDate);
 		setReminder(reminder);
 		setSubTask(new HashMap<String, SubTask> ());
+	}
+
+	public long getTaskId() {
+		return taskId;
+	}
+
+	public void setTaskId(long taskId) {
+		this.taskId = taskId;
+	}
+	
+	public int getIndex() {
+		return indexForPrinting;
+	}
+	
+	public void setIndex(int index){
+		indexForPrinting = index;
 	}
 
 	public int getPriority() {
@@ -150,6 +170,14 @@ public class Task {
 	public void setReminder(long reminderTime) {
 		this.reminderTime = reminderTime;
 	}
+	
+	public HashMap<String, SubTask> getSubTask() {
+		return subTask;
+	}
+
+	public void setSubTask(HashMap<String, SubTask> subTask) {
+		this.subTask = subTask;
+	}
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -215,14 +243,6 @@ public class Task {
 		return sb.toString();
 	}
 
-	public HashMap<String, SubTask> getSubTask() {
-		return subTask;
-	}
-
-	public void setSubTask(HashMap<String, SubTask> subTask) {
-		this.subTask = subTask;
-	}
-
 	public static Comparator<Task> sortPriority = new Comparator<Task> () {
 		public int compare(Task left, Task right) {
 			if(left.getPriority() < right.getPriority()) {
@@ -246,8 +266,4 @@ public class Task {
 			}
 		}
 	};
-	
-	public void setIndex(int index){
-		indexForPrinting = index;
-	}
 }

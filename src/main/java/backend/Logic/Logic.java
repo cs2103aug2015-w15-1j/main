@@ -17,7 +17,7 @@ import main.java.backend.History.History;
 import main.java.backend.Parser.Parser;
 import main.java.backend.Search.Search;
 import main.java.backend.Sorter.Sorter;
-import main.java.backend.Storage.StorageData;
+import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
@@ -80,7 +80,7 @@ public class Logic {
 	private static Calendar calendar = Calendar.getInstance();
 	private static History historyComponent;
 	private static Parser parserComponent;
-	private static StorageData storageComponent;
+	private static Storage storageComponent;
 	private static Sorter sortComponent;
 	private static Search searchComponent;
 	private static String getFeedbackAfterCommandExecution;
@@ -97,7 +97,7 @@ public class Logic {
 	void initLogic(String filename) throws FileNotFoundException, IOException {
 		historyComponent = new History();
 		parserComponent = new Parser();
-		storageComponent = new StorageData(filename);
+		storageComponent = new Storage(filename);
 		searchComponent = new Search();
 	}
 
@@ -258,12 +258,13 @@ public class Logic {
 		return EXECUTION_SHOW_TASKS_SUCCESSFUL;
 	}
 
+	// TODO
 	private String delete(ArrayList<String> getParsedInput) throws IOException {
-		String taskName = getParsedInput.get(1);
-		storageComponent.deleteTask(taskName);
+		long taskId = Long.parseLong(getParsedInput.get(1)) - 1;
+		storageComponent.deleteTask(taskId);
 		updateCurrentState();
 		updateHistoryStack();
-		return String.format(EXECUTION_DELETE_SUCCESSFUL, taskName);
+		return String.format(EXECUTION_DELETE_SUCCESSFUL, taskId);
 	}
 
 	private String search(ArrayList<String> getParsedInput) {

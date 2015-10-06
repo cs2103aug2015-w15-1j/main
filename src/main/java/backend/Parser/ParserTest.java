@@ -375,18 +375,18 @@ public class ParserTest {
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-		input = "add Project Proposal deadline coming soon deadline 30 Sep 23:59";
+		input = "add Project Proposal deadline coming soon deadline 30 Nov 23:59";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("addT", "Project Proposal deadline coming soon", "", "Wed Sep 30 23:59:00 SGT 2015", 
+	    expected = new ArrayList<String>( Arrays.asList("addT", "Project Proposal deadline coming soon", "", "Mon Nov 30 23:59:00 SGT 2015", 
 														"", "", "") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-		input = "add deadline is coming! priority 5 deadline 30 Sep 23:59";
+		input = "add deadline is coming! priority 5 deadline 30 Nov 23:59";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("addT", "deadline is coming!", "", "Wed Sep 30 23:59:00 SGT 2015", 
+	    expected = new ArrayList<String>( Arrays.asList("addT", "deadline is coming!", "", "Mon Nov 30 23:59:00 SGT 2015", 
 														"5", "", "") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
@@ -402,9 +402,9 @@ public class ParserTest {
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-		input = "Project Proposal description deadline is coming soon deadline 30 Sep 23:59";
+		input = "Project Proposal description deadline is coming soon deadline 30 Nov 23:59";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("setT", "Project Proposal", "deadline is coming soon", "Wed Sep 30 23:59:00 SGT 2015", 
+	    expected = new ArrayList<String>( Arrays.asList("setT", "Project Proposal", "deadline is coming soon", "Mon Nov 30 23:59:00 SGT 2015", 
 														"", "", "") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());

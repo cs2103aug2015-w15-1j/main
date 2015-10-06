@@ -3,10 +3,10 @@ package main.java.backend.Storage.Task;
 import java.util.Comparator;
 import java.util.HashMap;
 
-public class Task {
+public class Task implements Comparable<Task> {
 	
 	private String taskId;
-	private int indexForPrinting;
+	private String indexForPrinting;
 	private String name;
 	private String description;
 	private String startDate;
@@ -83,11 +83,11 @@ public class Task {
 		this.taskId = taskId;
 	}
 	
-	public int getIndex() {
+	public String getIndex() {
 		return indexForPrinting;
 	}
 	
-	public void setIndex(int index){
+	public void setIndex(String index){
 		indexForPrinting = index;
 	}
 
@@ -254,4 +254,16 @@ public class Task {
 			}
 		}
 	};
+	
+	@Override
+	public int compareTo(Task o) {
+		
+		if(this.name.compareTo(o.name) < 0) {
+			return -1;
+		} else if(this.name.compareTo(o.name) > 0) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
 }

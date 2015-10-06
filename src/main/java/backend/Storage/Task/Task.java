@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 public class Task {
 	
-	private String taskId;
+	private long taskId;
 	private int indexForPrinting;
 	private String name;
 	private String description;
@@ -25,7 +25,7 @@ public class Task {
 	}
 
 	// Floating task
-	public Task(String taskId, String taskName, String taskDescription, int priority, 
+	public Task(long taskId, String taskName, String taskDescription, int priority, 
 			String reminderDate, long reminderTime, boolean isDone) {
 		setTaskId(taskId);
 		setName(taskName);
@@ -42,7 +42,7 @@ public class Task {
 	}
 
 	// Task
-	public Task(String taskId, String taskName, String taskDescription, String deadline, long endTime, 
+	public Task(long taskId, String taskName, String taskDescription, String deadline, long endTime, 
 			int priority, String reminderDate, long reminder, boolean isDone) {
 		setTaskId(taskId);
 		setName(taskName);
@@ -59,7 +59,7 @@ public class Task {
 	}
 
 	// Event
-	public Task(String taskId, String eventName, String eventDescription, String startDate, 
+	public Task(long taskId, String eventName, String eventDescription, String startDate, 
 			String endDate, long startTime, long endTime, int priority, 
 			String reminderDate, long reminder, String categoryName) {
 		setTaskId(taskId);
@@ -75,11 +75,11 @@ public class Task {
 		setSubTask(new HashMap<String, SubTask> ());
 	}
 
-	public String getTaskId() {
+	public long getTaskId() {
 		return taskId;
 	}
 
-	public void setTaskId(String taskId) {
+	public void setTaskId(long taskId) {
 		this.taskId = taskId;
 	}
 	

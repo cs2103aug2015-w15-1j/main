@@ -8,17 +8,17 @@ public class Category {
 	 * where hash map key represents the category name
 	 * and value represents tasks under each category.
 	 */
-	private HashMap<String, Task> tasks;
-	private HashMap<String, Task> floatTasks;
-	private HashMap<String, Task> events;
+	private HashMap<Long, Task> tasks;
+	private HashMap<Long, Task> floatTasks;
+	private HashMap<Long, Task> events;
 	
 	private String categoryName;
 	private String categoryColour;
 	
 	public Category() {
-		setTasks(new HashMap<String, Task>());
-		setFloatTasks(new HashMap<String, Task>());
-		setEvents(new HashMap<String, Task>());
+		setTasks(new HashMap<Long, Task>());
+		setFloatTasks(new HashMap<Long, Task>());
+		setEvents(new HashMap<Long, Task>());
 	}
 	
 	public String getCategoryName() {
@@ -37,27 +37,27 @@ public class Category {
 		this.categoryColour = categoryColour;
 	}
 
-	public HashMap<String, Task> getTasks() {
+	public HashMap<Long, Task> getTasks() {
 		return tasks;
 	}
 
-	public void setTasks(HashMap<String, Task> tasks) {
+	public void setTasks(HashMap<Long, Task> tasks) {
 		this.tasks = tasks;
 	}
 
-	public HashMap<String, Task> getFloatTasks() {
+	public HashMap<Long, Task> getFloatTasks() {
 		return floatTasks;
 	}
 
-	public void setFloatTasks(HashMap<String, Task> floatTasks) {
+	public void setFloatTasks(HashMap<Long, Task> floatTasks) {
 		this.floatTasks = floatTasks;
 	}
 
-	public HashMap<String, Task> getEvents() {
+	public HashMap<Long, Task> getEvents() {
 		return events;
 	}
 
-	public void setEvents(HashMap<String, Task> events) {
+	public void setEvents(HashMap<Long, Task> events) {
 		this.events = events;
 	}
 }

@@ -121,6 +121,22 @@ public class ParserTest {
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
+	    input = "E5 priority 2";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("priority", "E", "5", "2") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
+	    input = "delete D7";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("delete", "D", "7") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
 	    /*String v = parser.command_variants.get(0);
 	    System.out.println(v);
 	    assertEquals("adds", v);
@@ -299,6 +315,15 @@ public class ParserTest {
 	    parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("setT", "Project Proposal", "must be done", "Fri, 30 Oct 11:59PM", 
 	    												"", "", "") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
+	    input = "F2 deadline 19 Nov 3pm category important";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("setT", "F", "2", "", "Thu, 19 Nov 03:00PM", 
+													"", "", "important") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());

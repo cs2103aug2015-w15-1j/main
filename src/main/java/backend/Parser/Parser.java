@@ -62,6 +62,8 @@ public class Parser {
     	return allCommands;
     }
     
+    private final ArrayList<String> INDEX_LETTERS = new ArrayList<String>( Arrays.asList("C", "D", "E", "F", "O"));
+    
 	/**
 	 * This method parses the user input and returns its components as an arraylist
 	 */
@@ -82,6 +84,7 @@ public class Parser {
 			} else if (!hasNoParameter(firstWord)) {
 				String parameter = mergeTokens(inputTokens, 1, inputTokens.length);
 				result.add(parameter);
+				result = convertNameToIndex(result);
 			}  
 
 		} else {
@@ -210,7 +213,10 @@ public class Parser {
 			} else {
 				result.addAll( Arrays.asList(command, task, newField) );
 			}
-		}
+		}	
+		
+		result = convertNameToIndex(result);
+		
 		return result;
 	}
 
@@ -248,6 +254,32 @@ public class Parser {
 		for (String field: fields) {
 			String para = parameters.get(field);
 			result.add(para);
+		}
+		
+		result = convertNameToIndex(result);
+		
+		return result;
+	}
+
+	private ArrayList<String> convertNameToIndex(ArrayList<String> result) {
+		String command = result.get(0);
+		String task = result.get(1);
+		if (!(command.equals("add") || task.isEmpty())) {
+			String firstChar = task.substring(0, 1);
+			if (INDEX_LETTERS.contains(firstChar) ) {
+				String stringIndex = task.substring(1, task.length());
+				Integer index = null;
+				try {
+					index = Integer.parseInt(stringIndex);
+				} catch (Exception e) {
+					System.out.println("parseIntError");
+				}
+				if (index != null) {
+					result.remove(1);
+					result.add(1, firstChar);
+					result.add(2, stringIndex);
+				}
+			}
 		}
 		return result;
 	}

@@ -390,7 +390,6 @@ public class Storage {
 		ArrayList<Task> upcomingTasks = new ArrayList<Task> ();
 		
 		for(Task task : allTasks) {
-			System.out.println(task.getDone());
 			if(task.getEndTime() >= getCurrentTime() && !task.getDone()) {
 				upcomingTasks.add(task);
 			}

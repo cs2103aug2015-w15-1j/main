@@ -589,8 +589,6 @@ public class Storage {
 		
 		String taskId = getTaskId(taskType, taskIndex);
 		
-		System.out.println("IDIDID: " + taskId);
-		
 		for(String categoryName : allCategories.keySet()) {
 			Category category = allCategories.get(categoryName).getCategory();
 			HashMap<String, Task> tasks = category.getTasks();

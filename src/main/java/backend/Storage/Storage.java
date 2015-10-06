@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
@@ -27,6 +28,9 @@ public class Storage {
 	private static final String TYPE_EVENT = "event";
 
 	private HashMap<String, CategoryWrapper> allCategories;
+	
+	private static final SimpleDateFormat formatterForDateTime = 
+			new SimpleDateFormat("EEE, dd MMM hh:mma");
 	
 	private StorageFile storageFile;
 	
@@ -175,15 +179,37 @@ public class Storage {
 		return categoryWrapper!= null && categoryWrapper.getCategory() != null;
 	}
 	
+	private long stringToMillisecond(String dateTime) {
+        try {
+            Date tempDateTime = formatterForDateTime.parse(dateTime);
+            long dateTimeMillisecond = tempDateTime.getTime();
+            return (dateTimeMillisecond);
+        } catch (java.text.ParseException e) {
+			e.printStackTrace();
+		}
+
+        //Should not reach here
+        return -1;
+    }
+	
+	private long getCurrentTime() {
+		
+		long currentMilliseconds = System.currentTimeMillis();
+		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM hh:mma yyyy");
+		Date resultdate = new Date(currentMilliseconds);
+		
+		return stringToMillisecond(standardFormat.format(resultdate));
+    }
+	
 	private String getTaskId(String taskType, int taskId) 
 			throws IOException, JSONException, ParseException {
 		switch(taskType) {
 			case TYPE_TASK:
-				return getTasks().get(taskId - 1).getTaskId();
+				return getTasks().get(taskId).getTaskId();
 			case TYPE_FLOAT:
-				return getFloatingTasks().get(taskId - 1).getTaskId();
+				return getFloatingTasks().get(taskId).getTaskId();
 			case TYPE_EVENT:
-				return getEvents().get(taskId - 1).getTaskId();
+				return getEvents().get(taskId).getTaskId();
 		}
 		
 		// Should not reach here
@@ -363,7 +389,7 @@ public class Storage {
 		ArrayList<Task> upcomingTasks = new ArrayList<Task> ();
 		
 		for(Task task : allTasks) {
-			if(task.getStartTime() >= System.currentTimeMillis()) {
+			if(task.getEndTime() >= getCurrentTime()) {
 				upcomingTasks.add(task);
 			}
 		}
@@ -377,7 +403,7 @@ public class Storage {
 		ArrayList<Task> upcomingTasks = new ArrayList<Task> ();
 		
 		for(Task task : allTasks) {
-			if(task.getStartTime() >= System.currentTimeMillis()) {
+			if(task.getEndTime() >= getCurrentTime()) {
 				upcomingTasks.add(task);
 			}
 		}
@@ -562,6 +588,8 @@ public class Storage {
 	public void deleteTask(String taskType, int taskIndex) throws IOException, JSONException, ParseException {
 		
 		String taskId = getTaskId(taskType, taskIndex);
+		
+		System.out.println("IDIDID: " + taskId);
 		
 		for(String categoryName : allCategories.keySet()) {
 			Category category = allCategories.get(categoryName).getCategory();

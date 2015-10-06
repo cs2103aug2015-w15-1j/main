@@ -76,7 +76,7 @@ public class Logic {
 	private static final String COMMAND_SHOW_EVENT = "showE";
 	private static final String COMMAND_EXIT = "exit";
 	private static final SimpleDateFormat formatterForDateTime = 
-			new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+			new SimpleDateFormat("EEE, dd MMM hh:mma");
 	private static Calendar calendar = Calendar.getInstance();
 	private static History historyComponent;
 	private static Parser parserComponent;

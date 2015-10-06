@@ -227,7 +227,7 @@ public class Logic {
 		}
 		if (!getParsedInput.get(4).equals("")) {
 			String reminder = getParsedInput.get(4);
-			storageComponent.setReminder(taskName, reminder);
+			storageComponent.setReminderDate(taskName, reminder);
 		}
 		if(!getParsedInput.get(5).equals("")) {
 			String category = getParsedInput.get(5);
@@ -368,8 +368,8 @@ public class Logic {
 		String taskName = getParsedInput.get(1);
 		String reminderDate = getParsedInput.get(2);
 		long reminder = stringToMillisecond(getParsedInput.get(2));
-		storageComponent.setReminder(taskName,reminder);
-		storageComponent.setReminder(taskName,reminderDate);
+		storageComponent.setReminderTime(taskName,reminder);
+		storageComponent.setReminderDate(taskName,reminderDate);
 		updateCurrentState();
 		updateHistoryStack();
 		return String.format(EXECUTION_SET_REMINDER_SUCCESSFUL,taskName,reminder);

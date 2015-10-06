@@ -21,6 +21,7 @@ import main.java.backend.Storage.Task.Task;
 
 public class Storage {
 
+	private static final String CATEGORY_DEFAULT = "default"; 
 	private static final String TYPE_TASK = "task";
 	private static final String TYPE_FLOAT = "floatTask";
 	private static final String TYPE_EVENT = "event";
@@ -47,6 +48,10 @@ public class Storage {
 	private HashMap<String, Task> addNewTask(String categoryName, String taskType, Task newTask) 
 			throws JsonParseException, JsonMappingException, IOException, JSONException {
 
+		if(categoryName.isEmpty()) {
+			categoryName = CATEGORY_DEFAULT;
+		}
+		
 		CategoryWrapper categoryWrapper = addCategory(categoryName);
 		Category category = categoryWrapper.getCategory();
 		HashMap<String, Task> allTasks = getTargetTaskList(category, taskType);
@@ -418,7 +423,7 @@ public class Storage {
 	}
 	
 	
-	public void setReminder(String taskName, String reminder) 
+	public void setReminderDate(String taskName, String reminder) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
 		HashMap<String, Task> targetTask = getAllTasks();
@@ -427,7 +432,7 @@ public class Storage {
 	}
 	
 	
-	public void setReminder(String taskName, long reminder) 
+	public void setReminderTime(String taskName, long reminder) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
 		HashMap<String, Task> targetTask = getAllTasks();

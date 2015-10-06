@@ -2,7 +2,7 @@ package main.java.backend.Storage.Task;
 
 import java.util.HashMap;
 
-public class Category {
+public class Category implements Comparable<Category> {
 	
 	/* The following represents the list of task types 
 	 * where hash map key represents the category name
@@ -59,5 +59,17 @@ public class Category {
 
 	public void setEvents(HashMap<String, Task> events) {
 		this.events = events;
+	}
+
+	@Override
+	public int compareTo(Category o) {
+		
+		if(this.categoryName.compareTo(o.categoryName) < 0) {
+			return -1;
+		} else if(this.categoryName.compareTo(o.categoryName) > 0) {
+			return 1;
+		} else {
+			return 0;
+		}
 	}
 }

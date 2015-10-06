@@ -123,7 +123,7 @@ public class ParserTest {
 	    
 	    input = "E5 priority 2";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("priority", "E", "5", "2") );
+	    expected = new ArrayList<String>( Arrays.asList("priority", "event", "5", "2") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -131,7 +131,7 @@ public class ParserTest {
 	    
 	    input = "delete D7";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("delete", "D", "7") );
+	    expected = new ArrayList<String>( Arrays.asList("delete", "task", "7") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -322,7 +322,7 @@ public class ParserTest {
 	    
 	    input = "F2 deadline 19 Nov 3pm category important";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("setT", "F", "2", "", "Thu, 19 Nov 03:00PM", 
+	    expected = new ArrayList<String>( Arrays.asList("setT", "floatTask", "2", "", "Thu, 19 Nov 03:00PM", 
 													"", "", "important") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());

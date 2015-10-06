@@ -62,7 +62,12 @@ public class Parser {
     	return allCommands;
     }
     
-    private final ArrayList<String> INDEX_LETTERS = new ArrayList<String>( Arrays.asList("C", "D", "E", "F", "O"));
+    //private final ArrayList<String> INDEX_LETTERS = new ArrayList<String>( Arrays.asList("C", "D", "E", "F", "O"));
+    
+    private HashMap<String, String> INDEX_LETTERS = new HashMap<String, String>(){
+		private static final long serialVersionUID = 1L; {
+        put("D", "task"); put("E", "event"); put("F", "floatTask"); 
+    }};
     
 	/**
 	 * This method parses the user input and returns its components as an arraylist
@@ -266,7 +271,7 @@ public class Parser {
 		String task = result.get(1);
 		if (!(command.equals("add") || task.isEmpty())) {
 			String firstChar = task.substring(0, 1);
-			if (INDEX_LETTERS.contains(firstChar) ) {
+			if (INDEX_LETTERS.keySet().contains(firstChar) ) {
 				String stringIndex = task.substring(1, task.length());
 				Integer index = null;
 				try {
@@ -276,7 +281,7 @@ public class Parser {
 				}
 				if (index != null) {
 					result.remove(1);
-					result.add(1, firstChar);
+					result.add(1, INDEX_LETTERS.get(firstChar));
 					result.add(2, stringIndex);
 				}
 			}

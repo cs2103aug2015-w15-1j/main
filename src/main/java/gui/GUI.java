@@ -211,7 +211,7 @@ public class GUI extends Application{
 		//floating
 		if (toggleCate == false){
 			ArrayList<Task> getFloating = logicComponent.getFloatingTasks();	
-			listFloat = getList(getFloating);
+			listFloat = getList(getFloating, "F");
 			listFloat.setFocusTraversable( false );
 		GridPane.setConstraints(listFloat, 0, 1);
 		gridPane.getChildren().addAll(listFloat);
@@ -226,13 +226,13 @@ public class GUI extends Application{
 		}
 		//tasks
 		getTasks = logicComponent.getTasks();		
-		listTasks = getList(getTasks);
+		listTasks = getList(getTasks,"D");
 		listTasks.setFocusTraversable( false );
 		GridPane.setConstraints(listTasks, 1, 1);
 	
 		//Events
 		getEvents = logicComponent.getEvents();
-		listEvents = getList(getEvents);
+		listEvents = getList(getEvents,"E");
 		listEvents.setFocusTraversable( false );
 		GridPane.setConstraints(listEvents, 2, 1);
 	
@@ -253,7 +253,7 @@ public class GUI extends Application{
 	private static void setUpFocusContents() throws IOException, JSONException, ParseException {
 		gridPane.getChildren().removeAll(listFocus, detailField);
 		ArrayList<Task> getFocusList = logicComponent.getTasks();
-		listFocus = getList(getFocusList);
+		listFocus = getList(getFocusList,"");
 		listFocus.setFocusTraversable(false);
 		GridPane.setConstraints(listFocus, 0, 1);
 		gridPane.getChildren().add(listFocus);	
@@ -281,13 +281,13 @@ public class GUI extends Application{
 		//System.setErr(stream);
 	}
 	
-	private static ListView<Task> getList(ArrayList<Task> list){
+	private static ListView<Task> getList(ArrayList<Task> list, String index){
 		if (list == null){
 			list = new ArrayList<Task>();
 		}
 		ObservableList<Task> tasks = FXCollections.observableArrayList(list);
 		for (int i=0;i<tasks.size();i++){
-			tasks.get(i).setIndex(i+1);
+			tasks.get(i).setIndex(index+(i+1));
 		}
 		ListView<Task> listTask = new ListView<Task>(tasks);
 		return listTask;
@@ -343,8 +343,18 @@ public class GUI extends Application{
 	}
 	
 	private static void changeList(int listNum) throws IOException, JSONException, ParseException{
-		gridPane.getChildren().remove(listFocus);	
-		listFocus = getList(getFocusList);
+		String indexString="";
+		gridPane.getChildren().remove(listFocus);
+		if (listNum == NUM_OVERDUE){
+			indexString = "O";
+		}else if (listNum == NUM_TASKS){
+			indexString = "D";
+		} else if(listNum== NUM_EVENTS){
+			indexString = "E";
+		} else {
+			indexString = "F";
+		}
+		listFocus = getList(getFocusList,indexString);
 		listFocus.setFocusTraversable(false);
 		GridPane.setConstraints(listFocus, 0, 1);
 		gridPane.getChildren().add(listFocus);	
@@ -553,7 +563,7 @@ public class GUI extends Application{
 				toggleCate = false;
 				floating.setText("Floating:");
 				ArrayList<Task> getFloating = logicComponent.getFloatingTasks();	
-				listFloat = getList(getFloating);
+				listFloat = getList(getFloating,"");
 				listFloat.setFocusTraversable( false );
 				GridPane.setConstraints(listFloat, 0, 1);
 				gridPane.getChildren().add(listFloat);

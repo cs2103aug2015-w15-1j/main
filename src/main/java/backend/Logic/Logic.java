@@ -104,8 +104,8 @@ public class Logic {
 	public String executeCommand(String userInput) throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException {
 		ArrayList<String> getParsedInput = parserComponent.parseInput(userInput);
 //		arrayChecker(getParsedInput);
-//		System.out.println("Array got");
-//		System.out.println(getParsedInput);
+		System.out.println("Array got");
+		System.out.println(getParsedInput);
 		String commandType = getParsedInput.get(0);
 //		System.out.println("Command type: "+commandType);
 		switch (commandType) {
@@ -229,7 +229,7 @@ public class Logic {
 		}
 		if (!getParsedInput.get(4).equals("")) {
 			String reminder = getParsedInput.get(4);
-			storageComponent.setReminderDate(taskName, 0, reminder);
+			storageComponent.setReminder(taskName, 0, stringToMillisecond(reminder), reminder);
 		}
 		if(!getParsedInput.get(5).equals("")) {
 			String category = getParsedInput.get(5);
@@ -374,10 +374,9 @@ public class Logic {
 		String taskName = getParsedInput.get(1);
 		int taskNamept2 = Integer.parseInt(getParsedInput.get(2));
 		String reminderDate = getParsedInput.get(3);
-		int reminderDatept2 = Integer.parseInt(getParsedInput.get(4));
-		long reminder = stringToMillisecond(getParsedInput.get(5));
-		storageComponent.setReminderTime(taskName,taskNamept2, reminder);
-		storageComponent.setReminderDate(taskName,reminderDatept2, reminderDate);
+//		int reminderDatept2 = Integer.parseInt(getParsedInput.get(4));
+		long reminder = stringToMillisecond(reminderDate);
+		storageComponent.setReminder(taskName,taskNamept2, reminder, reminderDate);
 		updateCurrentState();
 		updateHistoryStack();
 		return String.format(EXECUTION_SET_REMINDER_SUCCESSFUL,taskName,reminder);
@@ -386,8 +385,8 @@ public class Logic {
 	private String setDescription(ArrayList<String> getParsedInput) 
 			throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException {
 		String taskName = getParsedInput.get(1);
-		String description = getParsedInput.get(2);
-		int descriptionpt2 = Integer.parseInt(getParsedInput.get(3));
+		String description = getParsedInput.get(3);
+		int descriptionpt2 = Integer.parseInt(getParsedInput.get(2));
 		storageComponent.setDescription(taskName,descriptionpt2, description);
 		updateCurrentState();
 		updateHistoryStack();
@@ -407,11 +406,12 @@ public class Logic {
 			throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException {
 		String taskName = getParsedInput.get(1);
 		int taskNamept2 = Integer.parseInt(getParsedInput.get(2));
-		long deadline = stringToMillisecond(getParsedInput.get(3));
-		storageComponent.setDeadline(taskName,taskNamept2, deadline);
+		String deadlineDate = getParsedInput.get(3);
+		long deadlineTime = stringToMillisecond(deadlineDate);
+		storageComponent.setDeadline(taskName,taskNamept2, deadlineTime, deadlineDate);
 		updateCurrentState();
 		updateHistoryStack();
-		return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskName,deadline);
+		return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskName,deadlineDate);
 	}
 	
 	private long stringToMillisecond(String dateTime) {
@@ -576,9 +576,8 @@ public class Logic {
 		return storageComponent.getUpcomingEvents();
 	}
 
-	public ArrayList<Task> getOverdueTasks() {
-		// TODO Auto-generated method stub
-		return null;
+	public ArrayList<Task> getOverdueTasks() throws IOException, JSONException, ParseException {
+		return storageComponent.getOverdueTasks();
 	}
 
 	public void setindex(ArrayList<Task> list, int i, String index) {

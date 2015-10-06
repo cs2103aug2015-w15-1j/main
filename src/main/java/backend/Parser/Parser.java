@@ -335,13 +335,18 @@ public class Parser {
 		date = swapDayAndMonth(date);
 		
 		com.joestelmach.natty.Parser dateParser = new com.joestelmach.natty.Parser();
-		DateGroup group = dateParser.parse(date).get(0);
-		List<Date> dates = group.getDates();
-		String dateString = dates.toString();
-		
-		dateString = dateString.substring(1, dateString.length()-1); //remove brackets
-		dateString = confirmDateIsInFuture(dateString);
-		dateString = changeDateFormat(dateString);
+		String dateString = "";
+		try {
+			DateGroup group = dateParser.parse(date).get(0);
+			List<Date> dates = group.getDates();
+			dateString = dates.toString();
+			
+			dateString = dateString.substring(1, dateString.length()-1); //remove brackets
+			dateString = confirmDateIsInFuture(dateString);
+			dateString = changeDateFormat(dateString);
+		} catch (Exception e){
+			//parseerror
+		}
 		
 		return dateString;
 	}

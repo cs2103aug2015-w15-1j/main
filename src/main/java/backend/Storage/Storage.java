@@ -390,7 +390,8 @@ public class Storage {
 		ArrayList<Task> upcomingTasks = new ArrayList<Task> ();
 		
 		for(Task task : allTasks) {
-			if(task.getEndTime() >= getCurrentTime()) {
+			System.out.println(task.getDone());
+			if(task.getEndTime() >= getCurrentTime() && !task.getDone()) {
 				upcomingTasks.add(task);
 			}
 		}
@@ -404,7 +405,7 @@ public class Storage {
 		ArrayList<Task> upcomingEvents = new ArrayList<Task> ();
 		
 		for(Task task : allTasks) {
-			if(task.getStartTime() >= getCurrentTime()) {
+			if(task.getStartTime() >= getCurrentTime() && !task.getDone()) {
 				upcomingEvents.add(task);
 			}
 		}
@@ -479,24 +480,14 @@ public class Storage {
 	}
 	
 	
-	public void setReminderDate(String taskType, int taskIndex, String reminder) 
+	public void setReminder(String taskType, int taskIndex, long reminderTime, String reminderDate) 
 			throws JsonParseException, JsonMappingException, IOException, 
 				JSONException, ParseException {
 		
 		String taskId = getTaskId(taskType, taskIndex);
 		HashMap<String, Task> targetTask = getAllTasks();
-		targetTask.get(taskId).setReminderDate(reminder);
-		storageFile.setAllDataToFile(allCategories);
-	}
-	
-	
-	public void setReminderTime(String taskType, int taskIndex, long reminder) 
-			throws JsonParseException, JsonMappingException, IOException, 
-				JSONException, ParseException {
-		
-		String taskId = getTaskId(taskType, taskIndex);
-		HashMap<String, Task> targetTask = getAllTasks();
-		targetTask.get(taskId).setReminder(reminder);
+		targetTask.get(taskId).setReminderDate(reminderDate);
+		targetTask.get(taskId).setReminder(reminderTime);
 		storageFile.setAllDataToFile(allCategories);
 	}
 	
@@ -505,7 +496,6 @@ public class Storage {
 			throws IOException, JSONException, ParseException {
 		
 		String taskId = getTaskId(taskType, taskIndex);
-		System.out.println("IDIDID" + taskId);
 		HashMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setPriority(priority);
 		storageFile.setAllDataToFile(allCategories);	
@@ -515,6 +505,7 @@ public class Storage {
 	public void setDescription(String taskType, int taskIndex, String description) 
 			throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException {
 		
+		System.out.println("DDD");
 		String taskId = getTaskId(taskType, taskIndex);
 		HashMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setDescription(description);
@@ -522,13 +513,14 @@ public class Storage {
 	}
 	
 	
-	public void setDeadline(String taskType, int taskIndex, long deadline) 
-			throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException {
+	public void setDeadline(String taskType, int taskIndex, long deadlineTime, String deadlineDate) 
+			throws JsonParseException, JsonMappingException, IOException, 
+				JSONException, ParseException {
 		
 		String taskId = getTaskId(taskType, taskIndex);
 		HashMap<String, Task> targetTask = getAllTasks();
-		// TODO: When updating enddate, update endtime as well
-		targetTask.get(taskId).setEndTime(deadline);
+		targetTask.get(taskId).setEndDate(deadlineDate);
+		targetTask.get(taskId).setEndTime(deadlineTime);
 		storageFile.setAllDataToFile(allCategories);
 	}
 	

@@ -37,7 +37,7 @@ public class StorageTest {
 	
 	@Before
 	public void initialize() throws IOException {
-		storage = new StorageData();
+		storage = new Storage();
 		storageFile = new StorageFile(TEST_FILE_NAME);
 	}
 	

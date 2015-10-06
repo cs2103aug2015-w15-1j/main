@@ -557,6 +557,14 @@ public class Logic {
 	public ArrayList<Task> getEvents() throws IOException, JSONException, ParseException {
 		return storageComponent.getEvents();
 	}
+	
+	public ArrayList<Task> getUpcomingTasks() throws IOException, JSONException, ParseException {
+		return storageComponent.getUpcomingTasks();
+	}
+	
+	public ArrayList<Task> getUpcomingEvents() throws IOException, JSONException, ParseException {
+		return storageComponent.getUpcomingEvents();
+	}
 
 	public ArrayList<Task> getOverdueTasks() {
 		// TODO Auto-generated method stub

@@ -175,24 +175,20 @@ public class Storage {
 		return categoryWrapper!= null && categoryWrapper.getCategory() != null;
 	}
 	
-	private String getTaskId(int taskId) throws IOException, JSONException, ParseException {
-		return getFloatingTasks().get(taskId).getTaskId();
+	private String getTaskId(String taskType, int taskId) 
+			throws IOException, JSONException, ParseException {
+		switch(taskType) {
+			case TYPE_TASK:
+				return getTasks().get(taskId - 1).getTaskId();
+			case TYPE_FLOAT:
+				return getFloatingTasks().get(taskId - 1).getTaskId();
+			case TYPE_EVENT:
+				return getEvents().get(taskId - 1).getTaskId();
+		}
+		
+		// Should not reach here
+		return "";
 	}
-	
-	private String standardDate(String date) {
-		SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM HH:mma");
-		
-		try {
-            Date tempDate = formatter.parse(date);
-            return standardFormat.format(tempDate);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-		
-        //Should not reach here
-        return "";
-    }
 	
 	/****************************************************************************
 	 * 									CREATE
@@ -219,7 +215,7 @@ public class Storage {
 			JsonMappingException, IOException, JSONException {
 		
 		Task newFloatingTask = new Task(UUID.randomUUID().toString(), taskName, taskDescription, 
-				priority, standardDate(reminderDate), reminder, false);
+				priority, reminderDate, reminder, false);
 		addNewTask(category, TYPE_FLOAT, newFloatingTask);
 		
 		return "";
@@ -230,8 +226,8 @@ public class Storage {
 			long endTime, int priority, String reminderDate, long reminder, String category) 
 					throws IOException, JSONException {	
 		
-		Task newTask = new Task(UUID.randomUUID().toString(), taskName, taskDescription, standardDate(deadline), 
-				endTime, priority, standardDate(reminderDate), reminder, false);
+		Task newTask = new Task(UUID.randomUUID().toString(), taskName, taskDescription, deadline, 
+				endTime, priority, reminderDate, reminder, false);
 		addNewTask(category, TYPE_TASK, newTask);
 		
 		return "";
@@ -242,9 +238,9 @@ public class Storage {
 			String endDate, long startDateMilliseconds, long endDateMilliseconds, int priority, 
 			String reminderDate, long reminder, String category) throws IOException, JSONException {
 		
-		Task newEvent = new Task(UUID.randomUUID().toString(), eventName, eventDescription, standardDate(startDate), 
-				standardDate(endDate), startDateMilliseconds, endDateMilliseconds, priority, 
-				standardDate(reminderDate), reminder, category);
+		Task newEvent = new Task(UUID.randomUUID().toString(), eventName, eventDescription, startDate, 
+				endDate, startDateMilliseconds, endDateMilliseconds, priority, 
+				reminderDate, reminder, category);
 		addNewTask(category, TYPE_EVENT, newEvent);
 		
 		return "";
@@ -361,9 +357,37 @@ public class Storage {
 		return getTargetTasks(TYPE_EVENT);
 	}
 	
+	public ArrayList<Task> getUpcomingTasks() 
+			throws IOException, JSONException, ParseException {
+		ArrayList<Task> allTasks = getTasks();
+		ArrayList<Task> upcomingTasks = new ArrayList<Task> ();
+		
+		for(Task task : allTasks) {
+			if(task.getStartTime() >= System.currentTimeMillis()) {
+				upcomingTasks.add(task);
+			}
+		}
+		
+		return upcomingTasks;
+	}
 	
-	public ArrayList<Task> getCompletedTasks() {
-		ArrayList<Task> allTasks = getTasksInArray(getAllTasks());
+	public ArrayList<Task> getUpcomingEvents() 
+			throws IOException, JSONException, ParseException {
+		ArrayList<Task> allTasks = getEvents();
+		ArrayList<Task> upcomingTasks = new ArrayList<Task> ();
+		
+		for(Task task : allTasks) {
+			if(task.getStartTime() >= System.currentTimeMillis()) {
+				upcomingTasks.add(task);
+			}
+		}
+		
+		return upcomingTasks;
+	}
+	
+	public ArrayList<Task> getCompletedTasks() 
+			throws IOException, JSONException, ParseException {
+		ArrayList<Task> allTasks = getTasks();
 		ArrayList<Task> completedTasks = new ArrayList<Task> ();
 		
 		for(Task task : allTasks) {
@@ -376,8 +400,9 @@ public class Storage {
 	}
 
 	
-	public ArrayList<Task> getOverdueTasks() {
-		ArrayList<Task> allTasks = getTasksInArray(getAllTasks());
+	public ArrayList<Task> getOverdueTasks() 
+			throws IOException, JSONException, ParseException {
+		ArrayList<Task> allTasks = getTasks();
 		ArrayList<Task> overdueTasks = new ArrayList<Task> ();
 		
 		for(Task task : allTasks) {
@@ -403,85 +428,98 @@ public class Storage {
 	}
 	
 	
-	public void setCategory(String taskName, String categoryName) {
+	public void setCategory(String taskType, int taskIndex, String categoryName) {
 		// TODO Auto-generated method stub
 		
 	}
 	
 	
-	public void setUndone(String taskName) 
-			throws JsonParseException, JsonMappingException, JSONException, IOException {
+	public void setUndone(String taskType, int taskIndex) 
+			throws JsonParseException, JsonMappingException, JSONException, 
+				IOException, ParseException {
 		
-		setDone(taskName, false);
+		String taskId = getTaskId(taskType, taskIndex);
+		setDone(taskId, false);
 	}
 	
 	
-	public void setDone(String taskName) 
-			throws JsonParseException, JsonMappingException, IOException {
+	public void setDone(String taskType, int taskIndex) 
+			throws JsonParseException, JsonMappingException, IOException, 
+				JSONException, ParseException {
 		
-		setDone(taskName, true);
+		String taskId = getTaskId(taskType, taskIndex);
+		setDone(taskId, true);
 	}
 	
 	
-	public void setReminderDate(String taskName, String reminder) 
-			throws JsonParseException, JsonMappingException, IOException {
+	public void setReminderDate(String taskType, int taskIndex, String reminder) 
+			throws JsonParseException, JsonMappingException, IOException, 
+				JSONException, ParseException {
 		
+		String taskId = getTaskId(taskType, taskIndex);
 		HashMap<String, Task> targetTask = getAllTasks();
-		targetTask.get(taskName).setReminderDate(reminder);
+		targetTask.get(taskId).setReminderDate(reminder);
 		storageFile.setAllDataToFile(allCategories);
 	}
 	
 	
-	public void setReminderTime(String taskName, long reminder) 
-			throws JsonParseException, JsonMappingException, IOException {
+	public void setReminderTime(String taskType, int taskIndex, long reminder) 
+			throws JsonParseException, JsonMappingException, IOException, 
+				JSONException, ParseException {
 		
+		String taskId = getTaskId(taskType, taskIndex);
 		HashMap<String, Task> targetTask = getAllTasks();
-		targetTask.get(taskName).setReminder(reminder);
+		targetTask.get(taskId).setReminder(reminder);
 		storageFile.setAllDataToFile(allCategories);
 	}
 	
 	
-	public void setPriority(String taskName, int priority) throws IOException {
+	public void setPriority(String taskType, int taskIndex, int priority) 
+			throws IOException, JSONException, ParseException {
+		
+		String taskId = getTaskId(taskType, taskIndex);
 		HashMap<String, Task> targetTask = getAllTasks();
-		targetTask.get(taskName).setPriority(priority);;
+		targetTask.get(taskId).setPriority(priority);;
 		storageFile.setAllDataToFile(allCategories);	
 	}
 	
 	
-	public void setDescription(String taskName, String description) 
-			throws JsonParseException, JsonMappingException, IOException {
+	public void setDescription(String taskType, int taskIndex, String description) 
+			throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException {
 		
+		String taskId = getTaskId(taskType, taskIndex);
 		HashMap<String, Task> targetTask = getAllTasks();
-		targetTask.get(taskName).setDescription(description);
+		targetTask.get(taskId).setDescription(description);
 		storageFile.setAllDataToFile(allCategories);
 	}
 	
 	
-	public void setDeadline(String taskName, long deadline) 
-			throws JsonParseException, JsonMappingException, IOException {
+	public void setDeadline(String taskType, int taskIndex, long deadline) 
+			throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException {
 		
+		String taskId = getTaskId(taskType, taskIndex);
 		HashMap<String, Task> targetTask = getAllTasks();
 		// TODO: When updating enddate, update endtime as well
-		targetTask.get(taskName).setEndTime(deadline);
+		targetTask.get(taskId).setEndTime(deadline);
 		storageFile.setAllDataToFile(allCategories);
 	}
 	
 	
-	public void setSubTaskUndone(String taskName) 
+	public void setSubTaskUndone(String taskType, int taskIndex) 
 			throws JsonParseException, JsonMappingException, JSONException, IOException {
 		
 		
 	}
 
 	
-	public void setSubTaskDone(String taskName) 
+	public void setSubTaskDone(String taskType, int taskIndex) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
 		
 	}
 	
 	
-	public void setSubtaskDescription(String taskName, String description) 
+	public void setSubtaskDescription(String taskType, int taskIndex, String description) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
 		
@@ -521,9 +559,9 @@ public class Storage {
 	}
 
 	
-	public void deleteTask(int taskIndex) throws IOException, JSONException, ParseException {
+	public void deleteTask(String taskType, int taskIndex) throws IOException, JSONException, ParseException {
 		
-		String taskId = getTaskId(taskIndex);
+		String taskId = getTaskId(taskType, taskIndex);
 		
 		for(String categoryName : allCategories.keySet()) {
 			Category category = allCategories.get(categoryName).getCategory();

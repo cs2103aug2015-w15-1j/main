@@ -46,6 +46,21 @@ public class Parser {
         put("priority",""); put("reminder", ""); put("category", "");
     }};
     
+    private HashMap<String, ArrayList<String>> command_families = new HashMap<String, ArrayList<String>>(){
+		private static final long serialVersionUID = 1L; {
+        put("add", new ArrayList<String>( Arrays.asList("adds", "newtask")));
+        put("priority", new ArrayList<String>( Arrays.asList("pri"))); 
+    }};
+    
+    public ArrayList<String> command_variants = gatherCommandVariants();
+    
+    private ArrayList<String> gatherCommandVariants(){
+    	ArrayList<String> allCommands = new ArrayList<String>();
+    	for (ArrayList<String> family: command_families.values()) {
+			allCommands.addAll(0, family);
+		}
+    	return allCommands;
+    }
     
 	/**
 	 * This method parses the user input and returns its components as an arraylist
@@ -73,16 +88,16 @@ public class Parser {
 			for (String token: inputTokens) {
 				String originalToken = token;
 				token = token.toLowerCase();
-				
-				if (isCommand(token)) {
+				if (isCommandVariant(token)) {
+					token = getDefaultCommand(token);
+				}
+				if (isDefaultCommand(token)) {
 					putParameter();
-					//Old code 1 goes here
 					
 					if (isSeenCommand(token)) {
 						String oldCommand = token;
 						mergeToPrevParameter(oldCommand);
 						moveToBack(seenCommands, oldCommand);
-						//Old code 3 goes here
 
 					} else {
 						String command = parameters.get("command");
@@ -98,7 +113,6 @@ public class Parser {
 				}
 			}
 			putParameter();
-			//Old code 2 goes here
 			
 			String command = parameters.get("command");
 			if (command.equals("add") || command.equals("set")) {
@@ -114,6 +128,16 @@ public class Parser {
 		return result;
 	}
 	
+	private String getDefaultCommand(String token) {
+    	for (String command: command_families.keySet()) {
+    		ArrayList<String> family = command_families.get(command);
+			if (family.contains(token)) {
+				return command;
+			}
+		}
+    	return null;
+	}
+
 	private void appendToParameter(String token) {
 		currParameter += token + " ";
 	}
@@ -277,9 +301,10 @@ public class Parser {
 		DateGroup group = dateParser.parse(date).get(0);
 		List<Date> dates = group.getDates();
 		String dateString = dates.toString();
-		dateString = dateString.substring(1, dateString.length()-1);
 		
-		dateString = confirmDate(dateString);
+		dateString = dateString.substring(1, dateString.length()-1); //remove brackets
+		dateString = confirmDateIsInFuture(dateString);
+		dateString = changeDateFormat(dateString);
 		
 		return dateString;
 	}
@@ -299,10 +324,10 @@ public class Parser {
 			}
 			
 			if (ddmmyy != null && ddmmyy.length >= 2) {
-				String day = ddmmyy[0];
-				String month = ddmmyy[1];
+				String month = ddmmyy[0];
+				String day = ddmmyy[1];
 				String year = "";
-				date += month + "/" + day;
+				date += day + "/" + month;
 				if (ddmmyy.length == 3) {
 					year = ddmmyy[2];
 					date += "/" + year;
@@ -318,9 +343,9 @@ public class Parser {
 
 	/**
 	 * This method confirms that the date set by the parser is in the future
-	 * If it's not, either add one day to the date or add one year
+	 * If it's not, either add one year to the date
 	 */
-	private String confirmDate(String dateString) {
+	private String confirmDateIsInFuture(String dateString) {
 		SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy"); 
 		long dateMilli = -1;
 		long nowMilli = getCurrentDateLong();
@@ -356,8 +381,7 @@ public class Parser {
 			}
 			if (year == currYear) {
 				if (dayMonth < nowMilli) {
-					dateMilli = plusOneDay(dateMilli);
-					//System.out.println(formatter.format(dateMilli));
+					//dateMilli = plusOneDay(dateMilli);
 					if (dateMilli < nowMilli){
 						date = plusOneYear(date);
 						dateString = date.toString();
@@ -371,6 +395,20 @@ public class Parser {
 		return dateString;
 	}
 
+	private String changeDateFormat(String dateString) {
+		SimpleDateFormat nattyFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM hh:mma yyyy");
+		Date tempDate = null;
+		try {
+			tempDate = nattyFormat.parse(dateString);
+		} catch (Exception e) {
+			System.out.println("parseError");
+		}
+		dateString = standardFormat.format(tempDate);
+		dateString = dateString.substring(0, dateString.length()-5);
+		return dateString;
+	}
+
 	private Date plusOneYear(Date date) {
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
@@ -379,10 +417,10 @@ public class Parser {
 		return date;
 	}
 
-	private long plusOneDay(long dateMilli) {
+	/*private long plusOneDay(long dateMilli) {
 		dateMilli += (1000 * 60 * 60 * 24);
 		return dateMilli;
-	}
+	}*/
 
 	private long getDateLong(String date){
 		SimpleDateFormat sdfDate = new SimpleDateFormat("MMM dd");
@@ -485,8 +523,12 @@ public class Parser {
 		}
 	}
 
-	private boolean isCommand(String token){
+	private boolean isDefaultCommand(String token){
 		return COMMANDS.contains(token);
+	}
+	
+	private boolean isCommandVariant(String token){
+		return command_variants.contains(token);
 	}
 	
 	private boolean isDominatingCommand(String token){

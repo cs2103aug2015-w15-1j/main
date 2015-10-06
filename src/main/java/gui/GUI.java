@@ -103,7 +103,7 @@ public class GUI extends Application{
 		displayStringToScreen(MESSAGE_SAMPLE_ADDFLOAT);
 		getFloat= logicComponent.getFloatingTasks();
 		getTasks = logicComponent.getUpcomingTasks();
-		getEvents = logicComponent.geUpcomingtEvents();
+		getEvents = logicComponent.getUpcomingEvents();
 	}
 
 	@Override

@@ -55,6 +55,7 @@ public class GUI extends Application{
 	private static int currentList = 2;
 	private static int currentPosition = 0;
 	private static int currentScene = 1;
+	private static boolean toggleCate = false;
 
 	private static Logic logicComponent;
 	private static GridPane gridPane;
@@ -86,8 +87,8 @@ public class GUI extends Application{
 	public static void main(String[] args) throws IOException, JSONException, ParseException {
 		initGUI();
 		launch(args);
-	
 	}
+	
 	private static void initGUI() throws IOException, JSONException, ParseException{
 		logicComponent = new Logic(DEFAULT_FILENAME);
 		System.out.println("GUI component initialised successfully");
@@ -103,7 +104,6 @@ public class GUI extends Application{
 		getFloat= logicComponent.getFloatingTasks();
 		getTasks = logicComponent.getTasks();
 		getEvents = logicComponent.getEvents();
-
 	}
 
 	@Override
@@ -116,8 +116,8 @@ public class GUI extends Application{
 		primaryStage.setScene(mainScene);
 		primaryStage.show();
 		userInputEvents();
-
 	}
+	
 	private void setUpMainScene() throws IOException, JSONException, ParseException{
 		setUpGrid(); //general info
 		initGrid(); //setting up individual sizing
@@ -126,18 +126,18 @@ public class GUI extends Application{
 		mainScene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 		
 	}
+	
 	private static void setUpMain() throws IOException, JSONException, ParseException {
 		gridPane.getChildren().removeAll(focusHeading, detailsHeading, listFocus, detailField);
 		setUpHeadings();	
 		setUpContents();
-		
 	}
+	
 	private static void setUpFocus() throws IOException, JSONException, ParseException {
 		gridPane.getChildren().removeAll(floating, tasks, events,
-										listFloat,listTasks,listEvents);
+										listCate, listFloat,listTasks,listEvents);
 		setUpFocusHeadings();	
 		setUpFocusContents();
-		
 	}
 	
 	private void setUpGrid() {
@@ -151,7 +151,6 @@ public class GUI extends Application{
 	}
 
 	private void initGrid() {
-		
 		ColumnConstraints column1 = new ColumnConstraints();
 		column1.setPercentWidth(24);
 		ColumnConstraints column2 = new ColumnConstraints();
@@ -210,11 +209,21 @@ public class GUI extends Application{
 	private static void setUpContents() throws IOException, JSONException, ParseException {
 		
 		//floating
-		ArrayList<Task> getFloating = logicComponent.getFloatingTasks();	
-		listFloat = getList(getFloating);
-		listFloat.setFocusTraversable( false );
+		if (toggleCate == false){
+			ArrayList<Task> getFloating = logicComponent.getFloatingTasks();	
+			listFloat = getList(getFloating);
+			listFloat.setFocusTraversable( false );
 		GridPane.setConstraints(listFloat, 0, 1);
-	
+		gridPane.getChildren().addAll(listFloat);
+		}
+		else{
+			floating.setText("Categories:");
+			ArrayList<String> getCate = logicComponent.getCategories();	
+			listCate = getStringList(getCate);
+			listCate.setFocusTraversable( false );
+			GridPane.setConstraints(listCate, 0, 1);
+			gridPane.getChildren().add(listCate);
+		}
 		//tasks
 		getTasks = logicComponent.getTasks();		
 		listTasks = getList(getTasks);
@@ -228,8 +237,9 @@ public class GUI extends Application{
 		GridPane.setConstraints(listEvents, 2, 1);
 	
 	
-		gridPane.getChildren().addAll(listFloat,listTasks,listEvents);
+		gridPane.getChildren().addAll(listTasks,listEvents);
 	}
+	
 	private static void setUpFocusHeadings(){
 		gridPane.getChildren().removeAll(focusHeading, detailsHeading);
 		focusHeading = new Label(LIST_TASKS);
@@ -331,6 +341,7 @@ public class GUI extends Application{
 		changeListDetails(currentListNum);
 	
 	}
+	
 	private static void changeList(int listNum) throws IOException, JSONException, ParseException{
 		gridPane.getChildren().remove(listFocus);	
 		listFocus = getList(getFocusList);
@@ -338,6 +349,7 @@ public class GUI extends Application{
 		GridPane.setConstraints(listFocus, 0, 1);
 		gridPane.getChildren().add(listFocus);	
 	}
+	
 	private static void changeListDetails(int headNum){
 		
 		if (headNum == NUM_OVERDUE){
@@ -359,6 +371,7 @@ public class GUI extends Application{
 		}
 		detailField.setText(getFocusList.get(currentPosition).printFull());
 	}
+	
 	private static void userInputEvents(){
 		userInput.setOnKeyPressed(new EventHandler<KeyEvent>()
 		{
@@ -379,7 +392,7 @@ public class GUI extends Application{
 					} catch (IOException | JSONException | ParseException e) {
 						e.printStackTrace();
 					}
-				} else if(ke.getCode().equals(KeyCode.SHIFT)){
+				} else if(ke.getCode().equals(KeyCode.F1)){
 					try {
 						toggleCategory();
 					} catch (IOException | JSONException | ParseException e) {
@@ -434,6 +447,7 @@ public class GUI extends Application{
 			}
 		});
 	}
+	
 	private static void changeScene() throws IOException, JSONException, ParseException{
 		if (currentScene == SCENE_MAIN){
 			setUpFocus();
@@ -445,6 +459,7 @@ public class GUI extends Application{
 			currentScene = SCENE_MAIN;
 		}
 	}
+	
 	private static void userInputCommads() throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException{	
 		userCommands = userInput.getText();
 		userInput.clear();
@@ -484,6 +499,7 @@ public class GUI extends Application{
 		}
 
 	}
+	
 	private static void eventDown() throws IOException, JSONException, ParseException{
 		currentPosition++;
 		changeList(currentList);
@@ -520,28 +536,34 @@ public class GUI extends Application{
 		}
 		refreshingFocus(currentList);
 	}
+	
 	private static void toggleCategory() throws IOException, JSONException, ParseException{
 		if (currentScene == SCENE_MAIN){
 			gridPane.getChildren().removeAll(listFloat,listCate);
-			if (floating.getText().equals("Floating:")){
+			if (toggleCate==false){
+				toggleCate=true;
 				floating.setText("Categories:");
 				ArrayList<String> getCate = logicComponent.getCategories();	
 				listCate = getStringList(getCate);
 				listCate.setFocusTraversable( false );
 				GridPane.setConstraints(listCate, 0, 1);
 				gridPane.getChildren().add(listCate);
+				
 			} else{
+				toggleCate = false;
 				floating.setText("Floating:");
 				ArrayList<Task> getFloating = logicComponent.getFloatingTasks();	
 				listFloat = getList(getFloating);
 				listFloat.setFocusTraversable( false );
 				GridPane.setConstraints(listFloat, 0, 1);
 				gridPane.getChildren().add(listFloat);
+				
 			}
 		}else{
 			//to-do
 		}
 	}
+	
 	private static void subTaskView(){
 		if (currentScene == SCENE_MAIN){
 			gridPane.getChildren().remove(listEvents);

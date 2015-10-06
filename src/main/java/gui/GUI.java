@@ -57,21 +57,22 @@ public class GUI extends Application{
 	private static int currentScene = 1;
 
 	private static Logic logicComponent;
+	private static GridPane gridPane;
+	private static Scene mainScene;	
 	private static String userCommands;
 	private static Console console;
 	private static TextArea consoleText;
 	private static PrintStream ps;
+	private static TextField userInput;
 	private static ArrayList<Task> getFloat;
 	private static ArrayList<Task> getTasks;
 	private static ArrayList<Task> getEvents;
 	private static ArrayList<Task> getFocusList;
-	private static Scene mainScene;
-	private static GridPane gridPane;
-	private static Label categories;
+	
 	private static Label tasks;
 	private static Label events;
 	private static Label floating;
-	private static TextField userInput;
+
 	private static ListView<Task> listFloat;
 	private static ListView<String> listCate;
 	private static ListView<Task> listTasks;
@@ -145,7 +146,7 @@ public class GUI extends Application{
 		gridPane.setGridLinesVisible(false); //checking
 		gridPane.setVgap(4);
 		gridPane.setHgap(10);
-		gridPane.setPadding(new Insets(20,20,20,20));
+		gridPane.setPadding(new Insets(15,15,15,15));
 		gridPane.setPrefSize(1000, 600);
 	}
 
@@ -160,11 +161,11 @@ public class GUI extends Application{
 		gridPane.getColumnConstraints().addAll(column1, column2, column3);
 
 		RowConstraints row1 = new RowConstraints();
-		row1.setPercentHeight(5);
+		row1.setPercentHeight(7);
 		RowConstraints row2 = new RowConstraints();
 		row2.setPercentHeight(63);
 		RowConstraints row3 = new RowConstraints();
-		row3.setPercentHeight(27);
+		row3.setPercentHeight(25);
 		gridPane.getRowConstraints().addAll(row1,row2,row3);
 	}
 
@@ -372,10 +373,15 @@ public class GUI extends Application{
 						e.printStackTrace();
 					}
 
-				}
-				else if(ke.getCode().equals(KeyCode.TAB)){
+				} else if(ke.getCode().equals(KeyCode.TAB)){
 					try {
 						changeScene();
+					} catch (IOException | JSONException | ParseException e) {
+						e.printStackTrace();
+					}
+				} else if(ke.getCode().equals(KeyCode.SHIFT)){
+					try {
+						toggleCategory();
 					} catch (IOException | JSONException | ParseException e) {
 						e.printStackTrace();
 					}
@@ -514,7 +520,28 @@ public class GUI extends Application{
 		}
 		refreshingFocus(currentList);
 	}
-	
+	private static void toggleCategory() throws IOException, JSONException, ParseException{
+		if (currentScene == SCENE_MAIN){
+			gridPane.getChildren().removeAll(listFloat,listCate);
+			if (floating.getText().equals("Floating:")){
+				floating.setText("Categories:");
+				ArrayList<String> getCate = logicComponent.getCategories();	
+				listCate = getStringList(getCate);
+				listCate.setFocusTraversable( false );
+				GridPane.setConstraints(listCate, 0, 1);
+				gridPane.getChildren().add(listCate);
+			} else{
+				floating.setText("Floating:");
+				ArrayList<Task> getFloating = logicComponent.getFloatingTasks();	
+				listFloat = getList(getFloating);
+				listFloat.setFocusTraversable( false );
+				GridPane.setConstraints(listFloat, 0, 1);
+				gridPane.getChildren().add(listFloat);
+			}
+		}else{
+			//to-do
+		}
+	}
 	private static void subTaskView(){
 		if (currentScene == SCENE_MAIN){
 			gridPane.getChildren().remove(listEvents);

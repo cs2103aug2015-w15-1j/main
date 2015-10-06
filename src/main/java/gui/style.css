@@ -1,20 +1,27 @@
 
 .root{
-	-fx-background-color: #003366;
+	-fx-background-image:url(background1.png);
 	-fx-text-inner-color: black;
 }
 
 .label{
+	-fx-background-insets: 0,1;
+    -fx-padding: 5px;
+    -fx-background-radius: 3px;
+    -fx-border-radius: 3px;
 	-fx-font-size: 18px;
 	-fx-font-weight: bold;
 	-fx-text-fill: #ffffff;
-	-fx-font-family: "Courier New";
+	-fx-font-family: "";
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.7) , 5, 0.0 , 3, 3 );
+    -fx-background-color: linear-gradient(#c0c0c0, darkgrey);
 }
 
 .list-view{
 	-fx-font-weight:bold;
-	-fx-font-family: "Courier New";
+	-fx-font-family: "arial";
 	-fx-background-color: #336699;
+	-fx-border-color: #336699;
 }
 
 .list-cell:empty { /* must match with list-cell:odd */
@@ -22,14 +29,14 @@
 }
 
 .list-cell{
-	-fx-background-color: #FFFFFF;
+	-fx-background-color: #FFF5EE;
 }
 .list-cell:odd{
 	-fx-background-color: #336699;
 	-fx-text-fill: #FFFFFF;
 }
 .custom {
-  -fx-control-inner-background: #FFFFFF;
+  -fx-control-inner-background: #FFF5EE;
 }
 .txtarea:disabled{  
   -fx-opacity: 1.0;

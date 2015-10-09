@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import main.java.backend.Storage.Task.CategoryWrapper;
+import main.java.backend.Storage.Task.Category;
 
 /**
  * This class parse all texts in the file from JSON format to Java object 
@@ -35,22 +35,22 @@ public class StorageJson {
 				(Paths.get(StorageFile.INPUT_FILE_NAME)), StandardCharsets.UTF_8);
 	}
 
-	public HashMap<String, CategoryWrapper> getAllDataFromFile() 
+	public HashMap<String, Category> getAllDataFromFile() 
 			throws JsonParseException, JsonMappingException, IOException {
 
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		HashMap<String, CategoryWrapper> allTasks = 
+		HashMap<String, Category> allTasks = 
 				mapper.readValue(getAllTextsFromFile(), 
-						new TypeReference<HashMap<String, CategoryWrapper>>() {});
+						new TypeReference<HashMap<String, Category>>() {});
 		return allTasks;
 	}
 	
-	public String setAllDataToString (HashMap<String, CategoryWrapper> categoryWrapper) 
+	public String setAllDataToString (HashMap<String, Category> category) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
-		return mapper.writeValueAsString(categoryWrapper);
+		return mapper.writeValueAsString(category);
 	}
 }

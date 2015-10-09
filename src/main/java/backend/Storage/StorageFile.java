@@ -9,7 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
-import main.java.backend.Storage.Task.CategoryWrapper;
+import main.java.backend.Storage.Task.Category;
 
 
 /**
@@ -119,24 +119,24 @@ public class StorageFile {
 		return false;
 	}
 	
-	public HashMap<String, CategoryWrapper> getAllDataFromFile() 
+	public HashMap<String, Category> getAllDataFromFile() 
 			throws IOException {
 		
 		if(isFileEmpty()) {
-			return new HashMap<String, CategoryWrapper>();
+			return new HashMap<String, Category>();
 		} else {
 			return storageJson.getAllDataFromFile();
 		}
 	}
 	
-	public HashMap<String, CategoryWrapper> setAllDataToFile
-			(HashMap<String, CategoryWrapper> categoryWrapper) 
+	public HashMap<String, Category> setAllDataToFile
+			(HashMap<String, Category> category) 
 			throws IOException {
 		
 		clearTextFromFile();
-		bufferedWriter.write(storageJson.setAllDataToString(categoryWrapper));
+		bufferedWriter.write(storageJson.setAllDataToString(category));
 		bufferedWriter.flush();
 		
-		return categoryWrapper;
+		return category;
 	}
 }

@@ -21,6 +21,21 @@ public class Category implements Comparable<Category> {
 		setEvents(new HashMap<String, Task>());
 	}
 	
+	public Category(String categoryName) {
+		setCategoryName(categoryName);
+		setTasks(new HashMap<String, Task>());
+		setFloatTasks(new HashMap<String, Task>());
+		setEvents(new HashMap<String, Task>());
+	}
+	
+	public Category(String categoryName, String categoryColour) {
+		setCategoryName(categoryName);
+		setCategoryColour(categoryColour);
+		setTasks(new HashMap<String, Task>());
+		setFloatTasks(new HashMap<String, Task>());
+		setEvents(new HashMap<String, Task>());
+	}
+	
 	public String getCategoryName() {
 		return categoryName;
 	}

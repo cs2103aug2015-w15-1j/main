@@ -1,6 +1,5 @@
 package main.java.backend.Storage;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,28 +24,23 @@ public class Storage {
 	private static final String TYPE_FLOAT = "floatTask";
 	private static final String TYPE_EVENT = "event";
 
-	private HashMap<String, Category> allCategories;
+	private HashMap<String, Category> allData;
 	
 	private static final SimpleDateFormat formatterForDateTime = 
 			new SimpleDateFormat("EEE, dd MMM hh:mma");
 	
-	private StorageFile storageFile;
-	
-	public Storage() throws FileNotFoundException, IOException  { 
-		storageFile = new StorageFile();
-		allCategories = storageFile.getAllDataFromFile();
-	}
+	private DataStorage dataStorage;
 
-	public Storage(String fileName) throws FileNotFoundException, IOException  { 
-		storageFile = new StorageFile(fileName);
-		allCategories = storageFile.getAllDataFromFile();
+	public Storage(String fileName) { 
+		dataStorage = new DataStorage(fileName);
+		allData = dataStorage.load();
 		System.out.println("Storage component initialised successfully");
 	}
 	
 	/****************************************************************************
 	 * 								HELPER METHODS
 	 ***************************************************************************/
-
+	
 	private void addNewTask(String categoryName, String taskType, Task newTask) 
 			throws JsonParseException, JsonMappingException, IOException, JSONException {
 
@@ -56,7 +50,7 @@ public class Storage {
 		
 		Category category = addCategory(categoryName);
 		setTargetTaskList(category, taskType, newTask);
-		storageFile.setAllDataToFile(allCategories);
+		dataStorage.save(allData);
 	}
 	
 	private void addSubTask(String taskName, SubTask subTask) 
@@ -65,7 +59,7 @@ public class Storage {
 		Task targetTask = getAllTasks().get(taskName);
 		HashMap<String, SubTask> subTaskList = targetTask.getSubTask();
 		subTaskList.put(subTask.getDescription(), subTask);
-		storageFile.setAllDataToFile(allCategories);
+		dataStorage.save(allData);
 	}
 	
 	private void setDone(String taskName, boolean isDone) 
@@ -73,7 +67,7 @@ public class Storage {
 		
 		HashMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskName).setDone(isDone);
-		storageFile.setAllDataToFile(allCategories);
+		dataStorage.save(allData);
 	}
 	
 	private void setTargetTaskList(Category category, String taskType, Task newTask) {
@@ -95,7 +89,7 @@ public class Storage {
 				break;
 		}
 		
-		allCategories.put(category.getCategoryName(), category);
+		allData.put(category.getCategoryName(), category);
 	}
 	
 	private HashMap<String, Task> getTargetTaskList(Category category, String taskType) {
@@ -113,8 +107,8 @@ public class Storage {
 	private HashMap<String, Task> getAllTasks() {
 		HashMap<String, Task> allTasks = new HashMap<String, Task> ();
 		
-		for(String categoryName : allCategories.keySet()) {
-			Category category = allCategories.get(categoryName);
+		for(String categoryName : allData.keySet()) {
+			Category category = allData.get(categoryName);
 			
 			for(String taskId : category.getTasks().keySet()) {
 				allTasks.put(taskId, category.getTasks().get(taskId));
@@ -138,8 +132,8 @@ public class Storage {
 		
 		ArrayList<Task> allTypeTasks = new ArrayList<Task> ();
 
-		for(String category : allCategories.keySet()) {
-			allTypeTasks.addAll(getTypeTaskArray(allCategories.get(category), taskType));
+		for(String category : allData.keySet()) {
+			allTypeTasks.addAll(getTypeTaskArray(allData.get(category), taskType));
 		}
 
 		return allTypeTasks;
@@ -217,12 +211,12 @@ public class Storage {
 	public Category addCategory(String categoryName) 
 			throws JsonParseException, JsonMappingException, IOException {
 		
-		Category category = allCategories.get(categoryName);
+		Category category = allData.get(categoryName);
 		
-		if(!allCategories.containsKey(categoryName)) {
+		if(!allData.containsKey(categoryName)) {
 			category = new Category(categoryName);
-			allCategories.put(categoryName, category);
-			storageFile.setAllDataToFile(allCategories);
+			allData.put(categoryName, category);
+			dataStorage.save(allData);
 		}
 		
 		return category;
@@ -276,7 +270,7 @@ public class Storage {
 		
 		ArrayList<String> categories = new ArrayList<String> ();
 		
-		for(String name : allCategories.keySet()) {
+		for(String name : allData.keySet()) {
 			if(!name.isEmpty()) {
 				categories.add(name);
 			}
@@ -289,10 +283,10 @@ public class Storage {
 	public ArrayList<Category> getCategoryList() throws IOException {
 		
 		ArrayList<Category> categoryList = new ArrayList<Category> ();
-		allCategories = storageFile.getAllDataFromFile();
+		allData = dataStorage.load();
 		
-		for(String categoryName : allCategories.keySet()) {
-			categoryList.add(allCategories.get(categoryName));
+		for(String categoryName : allData.keySet()) {
+			categoryList.add(allData.get(categoryName));
 		}
 		
 		return categoryList;
@@ -316,7 +310,7 @@ public class Storage {
 			throws ParseException, IOException, JSONException {
 		
 		ArrayList<Task> allCategoryTasks = new ArrayList<Task> ();
-		Category category = allCategories.get(categoryName);
+		Category category = allData.get(categoryName);
 		
 		allCategoryTasks.addAll(getTasksInArray(category.getTasks()));
 		allCategoryTasks.addAll(getTasksInArray(category.getFloatTasks()));
@@ -329,7 +323,7 @@ public class Storage {
 	public ArrayList<Task> getCategoryTasks(String categoryName) 
 			throws IOException, JSONException, ParseException {
 
-		Category category = allCategories.get(categoryName);
+		Category category = allData.get(categoryName);
 		return getTasksInArray(getTargetTaskList(category, TYPE_TASK));
 	}
 	
@@ -337,7 +331,7 @@ public class Storage {
 	public ArrayList<Task> getCategoryFloatingTasks(String categoryName) 
 			throws IOException, JSONException, ParseException {
 
-		Category category = allCategories.get(categoryName);
+		Category category = allData.get(categoryName);
 		return getTasksInArray(getTargetTaskList(category, TYPE_FLOAT));
 	}
 	
@@ -345,7 +339,7 @@ public class Storage {
 	public ArrayList<Task> getCategoryEvents(String categoryName) 
 			throws IOException, JSONException, ParseException {
 
-		Category category = allCategories.get(categoryName);
+		Category category = allData.get(categoryName);
 		return getTasksInArray(getTargetTaskList(category, TYPE_EVENT));
 	}
 	
@@ -419,7 +413,7 @@ public class Storage {
 		ArrayList<Task> overdueTasks = new ArrayList<Task> ();
 		
 		for(Task task : allTasks) {
-			if(task.getEndTime() < System.currentTimeMillis()) {
+			if(task.getEndTime() < getCurrentTime()) {
 				overdueTasks.add(task);
 			}
 		}
@@ -435,9 +429,9 @@ public class Storage {
 	public void setCategoryColour(String categoryName, String colourId) 
 			throws JsonParseException, JsonMappingException, IOException {
 
-		Category category = allCategories.get(categoryName);
+		Category category = allData.get(categoryName);
 		category.setCategoryColour(colourId);
-		storageFile.setAllDataToFile(allCategories);
+		dataStorage.save(allData);
 	}
 	
 	
@@ -473,7 +467,7 @@ public class Storage {
 		HashMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setReminderDate(reminderDate);
 		targetTask.get(taskId).setReminder(reminderTime);
-		storageFile.setAllDataToFile(allCategories);
+		dataStorage.save(allData);
 	}
 	
 	
@@ -483,7 +477,7 @@ public class Storage {
 		String taskId = getTaskId(taskType, taskIndex);
 		HashMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setPriority(priority);
-		storageFile.setAllDataToFile(allCategories);	
+		dataStorage.save(allData);	
 	}
 	
 	
@@ -493,7 +487,7 @@ public class Storage {
 		String taskId = getTaskId(taskType, taskIndex);
 		HashMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setDescription(description);
-		storageFile.setAllDataToFile(allCategories);
+		dataStorage.save(allData);
 	}
 	
 	
@@ -505,7 +499,7 @@ public class Storage {
 		HashMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setEndDate(deadlineDate);
 		targetTask.get(taskId).setEndTime(deadlineTime);
-		storageFile.setAllDataToFile(allCategories);
+		dataStorage.save(allData);
 	}
 	
 	
@@ -535,14 +529,13 @@ public class Storage {
 	
 	
 	public void deleteAll() throws IOException {
-		storageFile.setAllDataToFile(new HashMap<String, Category> ());
-		storageFile.clearTextFromFile();
+		dataStorage.save(new HashMap<String, Category> ());
 	}
 	
 	
 	public void deleteCategory(String categoryName) throws IOException {
-		allCategories.remove(categoryName);
-		storageFile.setAllDataToFile(allCategories);
+		allData.remove(categoryName);
+		dataStorage.save(allData);
 	}
 	
 	
@@ -550,16 +543,16 @@ public class Storage {
 		HashMap<String, Task> resetData = new HashMap<String, Task>();
 		switch(taskType) {
 			case TYPE_TASK:
-				allCategories.get(categoryName).setTasks(resetData);
+				allData.get(categoryName).setTasks(resetData);
 				break;
 			case TYPE_FLOAT:
-				allCategories.get(categoryName).setFloatTasks(resetData);
+				allData.get(categoryName).setFloatTasks(resetData);
 				break;
 			case TYPE_EVENT:
-				allCategories.get(categoryName).setEvents(resetData);
+				allData.get(categoryName).setEvents(resetData);
 				break;
 		}
-		storageFile.setAllDataToFile(allCategories);
+		dataStorage.save(allData);
 	}
 
 	
@@ -567,8 +560,8 @@ public class Storage {
 		
 		String taskId = getTaskId(taskType, taskIndex);
 		
-		for(String categoryName : allCategories.keySet()) {
-			Category category = allCategories.get(categoryName);
+		for(String categoryName : allData.keySet()) {
+			Category category = allData.get(categoryName);
 			HashMap<String, Task> tasks = category.getTasks();
 			HashMap<String, Task> floatTasks = category.getFloatTasks();
 			HashMap<String, Task> events = category.getEvents();
@@ -602,7 +595,7 @@ public class Storage {
 				break;
 			}
 		}
-		storageFile.setAllDataToFile(allCategories);
+		dataStorage.save(allData);
 	}
 	
 	
@@ -620,19 +613,14 @@ public class Storage {
 		for(Category category : categories) {
 			CategoryWrapper categoryWrapper = addCategory(category.getCategoryName());
 			categoryWrapper.setCategory(category);
-			allCategories.put(category.getCategoryName(), categoryWrapper);
+			allData.put(category.getCategoryName(), categoryWrapper);
 		}
 		
-		storageFile.setAllDataToFile(allCategories);
+		storageData.save(allData);
 	}
 	*/
 
-	
-	public void exitProgram() throws IOException {
-		storageFile.exitProgram();
-	}
-
-	public void setIndex(Task task, String index) {
+	public void setIndex(Task task, int index) {
 		task.setIndex(index);
 	}
 }

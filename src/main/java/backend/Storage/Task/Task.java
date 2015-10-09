@@ -6,7 +6,7 @@ import java.util.HashMap;
 public class Task implements Comparable<Task> {
 	
 	private String taskId;
-	private String indexForPrinting;
+	private int indexForPrinting;
 	private String name;
 	private String description;
 	private String startDate;
@@ -83,11 +83,11 @@ public class Task implements Comparable<Task> {
 		this.taskId = taskId;
 	}
 	
-	public String getIndex() {
+	public int getIndex() {
 		return indexForPrinting;
 	}
 	
-	public void setIndex(String index){
+	public void setIndex(int index){
 		indexForPrinting = index;
 	}
 

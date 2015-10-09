@@ -18,25 +18,29 @@
 }
 
 .list-view{
+	-fx-font-size: 14px;
 	-fx-font-weight:bold;
 	-fx-font-family: "arial";
 	-fx-background-color: #336699;
 	-fx-border-color: #336699;
 }
 
+.list-cell:odd{
+	-fx-background-color: #336699;
+	-fx-text-fill: #FFFFFF;
+}
+
 .list-cell:empty { /* must match with list-cell:odd */
-	-fx-background-color:#336699;
+	-fx-background-color:#A0CFEC;
 }
 
 .list-cell{
 	-fx-background-color: #FFF5EE;
 }
-.list-cell:odd{
-	-fx-background-color: #336699;
-	-fx-text-fill: #FFFFFF;
-}
+
 .custom {
   -fx-control-inner-background: #FFF5EE;
+  -fx-font-size: 14px;
 }
 .txtarea:disabled{  
   -fx-opacity: 1.0;

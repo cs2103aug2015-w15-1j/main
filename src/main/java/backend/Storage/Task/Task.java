@@ -1,6 +1,5 @@
 package main.java.backend.Storage.Task;
 
-import java.util.Comparator;
 import java.util.HashMap;
 
 public class Task implements Comparable<Task> {

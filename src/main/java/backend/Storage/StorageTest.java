@@ -33,12 +33,10 @@ public class StorageTest {
 	private static final String TEST_FILE_NAME = "test.txt";
 	
 	Storage storage;
-	StorageFile storageFile;
 	
 	@Before
 	public void initialize() throws IOException {
-		storage = new Storage();
-		storageFile = new StorageFile(TEST_FILE_NAME);
+		storage = new Storage(TEST_FILE_NAME);
 	}
 	
 	@Test

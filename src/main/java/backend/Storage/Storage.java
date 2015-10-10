@@ -185,15 +185,15 @@ public class Storage {
     }
 	
 	@SuppressWarnings("static-access")
-	private int getTaskId(int taskId) {
+	private int getTaskId(int index) {
 		
-		switch(taskType) {
-			case TYPE_TASK:
-				return getTasks().get(taskId - 1).getTaskId();
-			case TYPE_FLOAT:
-				return getFloatingTasks().get(taskId - 1).getTaskId();
-			case TYPE_EVENT:
-				return getEvents().get(taskId - 1).getTaskId();
+		ArrayList<Task> allTasks = getTaskList();
+		int size = allTasks.size();
+		
+		for(int i = 0; i < size; i++) {
+			if(allTasks.get(i).getIndex() == index) {
+				return allTasks.get(i).getTaskId();
+			}
 		}
 		
 		// Should not reach here

@@ -92,7 +92,7 @@ public class LogicController {
 	}
 	
 	public void setindex(ArrayList<Task> list, int i, int index) {
-		storageComponent.setIndex(list.get(i),index+(i+1));
+		storageComponent.setIndex(list.get(i),index);
 	}
 	
 	public ArrayList<String> retrieveStringData(String dataType){

@@ -116,5 +116,24 @@ public class StorageTest {
 		assertEquals(data.get(2).getTasks().get(CATEGORY3_TODO1.getTaskId()).getName(), 
 				storage.getCategoryList().get(2).getTasks().get(CATEGORY3_TODO1.getTaskId()).getName());
 	}
+	
+	@Test
+	public void testAddEvent() {
+		
+		ArrayList<Category> data = storage.getCategoryList();
+		TreeMap<String, Task> eventPersonal = data.get(2).getEvents();
+
+		eventPersonal.put(CATEGORY3_EVENT1.getTaskId(), storage.addFloatingTask(CATEGORY3_EVENT1));
+		eventPersonal.put(CATEGORY3_EVENT2.getTaskId(), storage.addFloatingTask(CATEGORY3_EVENT2));
+		
+		data.get(2).setFloatTasks(eventPersonal);
+
+		assertEquals(data.get(2).getFloatTasks().get(CATEGORY3_EVENT1.getTaskId()).getName(),
+				storage.getCategoryList().get(2).getFloatTasks().get(CATEGORY3_EVENT1.getTaskId()).getName());
+		assertEquals(data.get(2).getFloatTasks().get(CATEGORY3_EVENT2.getTaskId()).getName(),
+				storage.getCategoryList().get(2).getFloatTasks().get(CATEGORY3_EVENT2.getTaskId()).getName());
+	}
+	
+	
 
 }

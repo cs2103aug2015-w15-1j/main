@@ -52,13 +52,21 @@ public class DataSave extends DataExecute {
 	@Override
 	public TreeMap<String, Category> execute(TreeMap<String, Category> category) {
 		
-		try {
-			initializeWriter();
-			ObjectMapper mapper = new ObjectMapper();
-			mapper.enable(SerializationFeature.INDENT_OUTPUT);
-			bufferedWriter.write(mapper.writeValueAsString(category));
-		} catch (IOException e) {
-			e.printStackTrace();
+		if(category == null) {
+			try {
+				initializeWriter();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				initializeWriter();
+				ObjectMapper mapper = new ObjectMapper();
+				mapper.enable(SerializationFeature.INDENT_OUTPUT);
+				bufferedWriter.write(mapper.writeValueAsString(category));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		closeWriter();

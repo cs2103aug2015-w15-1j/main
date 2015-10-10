@@ -161,6 +161,17 @@ public class Storage {
 		return allTasks;
 	}
 	
+	private String checkTaskType(Task task) {
+		
+		if(!task.getStartDate().isEmpty() && !task.getEndDate().isEmpty()) {
+			return TYPE_EVENT;
+		} else if(!task.getEndDate().isEmpty()) {
+			return TYPE_TASK;
+		} else {
+			return TYPE_FLOAT;
+		}
+	}
+	
 	public static long stringToMillisecond(String dateTime) {
         try {
             Date tempDateTime = formatterForDateTime.parse(dateTime);
@@ -233,12 +244,6 @@ public class Storage {
 
 		addNewTask(task.getCategory(), TYPE_EVENT, task);
 		return task;
-	}
-	
-	public void addSubTask(String taskName, String subtaskDescription) {
-
-		SubTask subTask = new SubTask(subtaskDescription, false);
-		addSubTask(taskName, subTask);
 	}
 	
 	/****************************************************************************
@@ -404,8 +409,16 @@ public class Storage {
 	
 	
 	public void setCategory(int taskIndex, String categoryName) {
-		// TODO Auto-generated method stub
 		
+		TreeMap<String, Task> targetTask = getAllTasks();
+		String taskId = getTaskId(taskIndex);
+		Task task = targetTask.get(taskId);
+		String taskType = checkTaskType(task);
+				
+		addNewTask(categoryName, taskType, task);
+		targetTask.remove(taskId);
+		
+		data.save(allData);
 	}
 	
 	public void setName(int taskIndex, String name) {
@@ -466,6 +479,13 @@ public class Storage {
 	}
 	
 	
+	public void setSubTask(String taskIndex, String subtaskDescription) {
+
+		SubTask subTask = new SubTask(subtaskDescription, false);
+		addSubTask(taskIndex, subTask);
+	}
+	
+	
 	public void setSubTaskUndone(int taskIndex) {
 		
 		
@@ -489,7 +509,7 @@ public class Storage {
 	
 	
 	public void deleteAll() {
-		data.save(new TreeMap<String, Category> ());
+		data.save(null);
 	}
 	
 	
@@ -534,6 +554,9 @@ public class Storage {
 		
 	}
 	
+	/****************************************************************************
+	 * 									OTHERS
+	 ***************************************************************************/
 
 	public void saveData(ArrayList<Category> categories) {
 		

@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.TreeMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -15,7 +15,7 @@ import main.java.backend.Storage.Task.Category;
 /**
  * This class parse Java object back to JSON format 
  * to be saved in the file as text when there is any 
- * update in the data.
+ * update in the data by writing data to the text file.
  * 
  * @author A0126258A
  * 
@@ -50,7 +50,7 @@ public class DataSave extends DataExecute {
 	}
 	
 	@Override
-	public HashMap<String, Category> execute(HashMap<String, Category> category) {
+	public TreeMap<String, Category> execute(TreeMap<String, Category> category) {
 		
 		try {
 			initializeWriter();

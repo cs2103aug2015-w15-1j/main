@@ -1,12 +1,12 @@
 package main.java.backend.Storage.Task;
 
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.TreeMap;
 
 public class Task implements Comparable<Task> {
 	
-	private String taskId;
+	private static int taskId = -1;
 	private int indexForPrinting;
+	private String category;
 	private String name;
 	private String description;
 	private String startDate;
@@ -18,16 +18,17 @@ public class Task implements Comparable<Task> {
 	private int priority;
 	private boolean isDone;
 
-	private HashMap<String, SubTask> subTask;
+	private TreeMap<String, SubTask> subTask;
 
 	public Task() {
 
 	}
 
 	// Floating task
-	public Task(String taskId, String taskName, String taskDescription, int priority, 
+	public Task(String category, String taskName, String taskDescription, int priority, 
 			String reminderDate, long reminderTime, boolean isDone) {
-		setTaskId(taskId);
+		taskId++;
+		setCategory(category);
 		setName(taskName);
 		setDescription(taskDescription);
 		setStartDate("");
@@ -38,13 +39,14 @@ public class Task implements Comparable<Task> {
 		setPriority(priority);
 		setReminder(reminderTime);
 		setDone(isDone);
-		setSubTask(new HashMap<String, SubTask> ());
+		setSubTask(new TreeMap<String, SubTask> ());
 	}
 
 	// Task
-	public Task(String taskId, String taskName, String taskDescription, String deadline, long endTime, 
-			int priority, String reminderDate, long reminder, boolean isDone) {
-		setTaskId(taskId);
+	public Task(String category, String taskName, String taskDescription, String deadline, 
+			long endTime, int priority, String reminderDate, long reminder, boolean isDone) {
+		taskId++;
+		setCategory(category);
 		setName(taskName);
 		setDescription(taskDescription);
 		setStartDate("");
@@ -55,14 +57,15 @@ public class Task implements Comparable<Task> {
 		setReminderDate(reminderDate);
 		setReminder(reminder);
 		setDone(isDone);
-		setSubTask(new HashMap<String, SubTask> ());
+		setSubTask(new TreeMap<String, SubTask> ());
 	}
 
 	// Event
-	public Task(String taskId, String eventName, String eventDescription, String startDate, 
+	public Task(String category, String eventName, String eventDescription, String startDate, 
 			String endDate, long startTime, long endTime, int priority, 
-			String reminderDate, long reminder, String categoryName) {
-		setTaskId(taskId);
+			String reminderDate, long reminder) {
+		taskId++;
+		setCategory(category);
 		setName(eventName);
 		setDescription(eventDescription);
 		setStartDate(startDate);
@@ -72,15 +75,11 @@ public class Task implements Comparable<Task> {
 		setPriority(priority);
 		setReminderDate(reminderDate);
 		setReminder(reminder);
-		setSubTask(new HashMap<String, SubTask> ());
+		setSubTask(new TreeMap<String, SubTask> ());
 	}
 
-	public String getTaskId() {
+	public static int getTaskId() {
 		return taskId;
-	}
-
-	public void setTaskId(String taskId) {
-		this.taskId = taskId;
 	}
 	
 	public int getIndex() {
@@ -89,6 +88,14 @@ public class Task implements Comparable<Task> {
 	
 	public void setIndex(int index){
 		indexForPrinting = index;
+	}
+	
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
 	}
 
 	public int getPriority() {
@@ -171,11 +178,11 @@ public class Task implements Comparable<Task> {
 		this.reminderTime = reminderTime;
 	}
 	
-	public HashMap<String, SubTask> getSubTask() {
+	public TreeMap<String, SubTask> getSubTask() {
 		return subTask;
 	}
 
-	public void setSubTask(HashMap<String, SubTask> subTask) {
+	public void setSubTask(TreeMap<String, SubTask> subTask) {
 		this.subTask = subTask;
 	}
 
@@ -230,30 +237,6 @@ public class Task implements Comparable<Task> {
 		sb.append("is it completed? "+isDone + System.getProperty("line.separator"));
 		return sb.toString();
 	}
-
-	public static Comparator<Task> sortPriority = new Comparator<Task> () {
-		public int compare(Task left, Task right) {
-			if(left.getPriority() < right.getPriority()) {
-				return -1;
-			} else if(left.getPriority() > right.getPriority()) {
-				return 1;
-			} else {
-				return 0;
-			}
-		}
-	};
-	
-	public static Comparator<Task> sortDeadline = new Comparator<Task> () {
-		public int compare(Task left, Task right) {
-			if(left.getEndTime() < right.getEndTime()) {
-				return -1;
-			} else if(left.getEndTime() > right.getEndTime()) {
-				return 1;
-			} else {
-				return 0;
-			}
-		}
-	};
 	
 	@Override
 	public int compareTo(Task o) {

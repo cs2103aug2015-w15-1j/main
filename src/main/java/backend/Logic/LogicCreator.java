@@ -1,8 +1,6 @@
 package main.java.backend.Logic;
 
 import java.io.IOException;
-import java.util.UUID;
-
 import org.json.JSONException;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -111,7 +109,7 @@ public class LogicCreator {
 		String category = commandObject.getCategory();
 		Task newEvent = new Task(category, eventName, eventDescription, 
 				startDate, endDate, startTime, endTime, 
-				priority, reminderDate, reminder, category);
+				priority, reminderDate, reminder);
 		storageObject.addTask(newEvent);
 		return String.format(EXECUTION_ADD_EVENT_SUCCESSFUL, eventName);
 	}

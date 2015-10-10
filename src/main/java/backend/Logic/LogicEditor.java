@@ -1,8 +1,6 @@
 package main.java.backend.Logic;
 
 import java.io.IOException;
-import java.util.ArrayList;
-
 import org.json.JSONException;
 import org.json.simple.parser.ParseException;
 
@@ -148,7 +146,7 @@ public class LogicEditor {
 		int taskId = Integer.parseInt(commandObject.getTaskName());
 		String reminderDate = commandObject.getReminder();
 		long reminderTime = GeneralFunctions.stringToMillisecond(reminderDate);
-		storageObject.setReminder(taskId, reminderDate, reminderDate);
+		storageObject.setReminder(taskId, reminderTime, reminderDate);
 		return String.format(EXECUTION_SET_REMINDER_SUCCESSFUL,taskId,reminderDate);
 	}
 

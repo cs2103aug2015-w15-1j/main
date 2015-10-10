@@ -30,8 +30,8 @@ public class LogicController {
 	private static Search searcherComponent;
 	private static History historyComponent;
 	private static ArrayList<Category> currentState;
-	private static ArrayList<Task> taskList;
-
+	private ArrayList<Task> taskList;
+	
 	private LogicController(String filename) {
 		parserComponent = new Parser();
 		storageComponent = new Storage(filename);
@@ -55,6 +55,7 @@ public class LogicController {
 	public String executeCommand(String userInput) throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException {
 		Command commandObject = commandHandlerSubComponent.parseCommand(userInput);
 		String feedbackString = "";
+		System.out.println(commandObject.getType());
 		switch (commandObject.getType()) {
 			case ADD :
 				feedbackString = creatorSubComponent.execute(commandObject);
@@ -69,15 +70,25 @@ public class LogicController {
 				feedbackString = searcherComponent.execute(commandObject);
 				break;
 			case EXIT :
-				System.exit(0);
+				exit();
 				break;
 			case UNDO :
-				feedbackString = historyComponent.execute(commandObject);
+				feedbackString = undo();
 				break;
 		}
 		updateCurrentState();
 		updateHistoryStack();
 		return feedbackString;
+	}
+
+	private String undo() {
+		currentState = historyComponent.pop();
+		storageComponent.saveData(currentState);
+		return "Undo successful";
+	}
+
+	private void exit() {
+		System.exit(0);
 	}
 	
 	public void setindex(ArrayList<Task> list, int i, int index) {

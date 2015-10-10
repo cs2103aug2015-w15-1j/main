@@ -79,10 +79,12 @@ public class LogicEditor {
 
 	private String setPriority(Command commandObject) throws IOException, JSONException, ParseException {
 		int taskId = Integer.parseInt(commandObject.getTaskName());
+		System.out.println("taskId: "+taskId);
 		int priority = Integer.parseInt(commandObject.getPriority());
 		if (priorityChecker(priority) != null) {
 			return priorityChecker(priority);
 		}
+		System.out.println("priority: "+priority);
 		storageObject.setPriority(taskId, priority);
 		return String.format(EXECUTION_SET_PRIORITY_SUCCESSFUL, taskId,priority);
 	}

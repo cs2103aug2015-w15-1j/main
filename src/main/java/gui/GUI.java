@@ -116,7 +116,7 @@ public class GUI extends Application{
 	}
 	
 	private static void retrieveAllData() throws IOException, JSONException, ParseException{	
-		getTasks = logicComponent.retrieveTaskData("upcomingtoDo");
+		getTasks = logicComponent.retrieveTaskData("upcomingToDo");
 		getEvents = logicComponent.retrieveTaskData("upcomingEvents");
 		getOverdue = logicComponent.retrieveTaskData("overdueTasks");
 		getFloat = logicComponent.retrieveTaskData("floating");

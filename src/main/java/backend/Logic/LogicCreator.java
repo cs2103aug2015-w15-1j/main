@@ -33,8 +33,9 @@ public class LogicCreator {
 
 	public String execute(Command commandObject) throws JsonParseException, JsonMappingException, IOException, JSONException {
 		String feedbackString = "";
+//		System.out.println(commandObject.getCommandField());
 		switch (commandObject.getCommandField()) {
-			case ("addFT") :
+			case ("addF") :
 				feedbackString = addFloating(commandObject);
 				break;
 			case ("addT") :
@@ -56,6 +57,7 @@ public class LogicCreator {
 
 	private String addFloating(Command commandObject) throws JsonParseException, JsonMappingException, IOException, JSONException {
 		String taskName = commandObject.getTaskName();
+//		System.out.println("taskName: "+taskName);
 		String taskDescription = commandObject.getDescription();
 		int priority = -1;
 		if (!commandObject.getPriority().equals("")) {
@@ -72,7 +74,8 @@ public class LogicCreator {
 		}
 		String category = commandObject.getCategory();
 		Task newFloat = new Task(category, taskName,taskDescription, priority, reminderDate, reminderTime, false);
-		storageObject.addTask(newFloat);
+//		System.out.println(newFloat.toString());
+		storageObject.addFloatingTask(newFloat);
 		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, taskName);
 	}
 
@@ -110,7 +113,8 @@ public class LogicCreator {
 		Task newEvent = new Task(category, eventName, eventDescription, 
 				startDate, endDate, startTime, endTime, 
 				priority, reminderDate, reminder);
-		storageObject.addTask(newEvent);
+		storageObject.addEvent(newEvent);
+//		System.out.println(newEvent.toString());
 		return String.format(EXECUTION_ADD_EVENT_SUCCESSFUL, eventName);
 	}
 
@@ -136,6 +140,7 @@ public class LogicCreator {
 		String category = commandObject.getCategory();
 		Task newToDo = new Task(category, taskName, taskDescription, deadlineString, 
 				deadlineTime, priority, reminderDate, reminderTime, false);
+//		System.out.println(newToDo.toString());
 		storageObject.addTask(newToDo);
 		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, taskName);
 	}	

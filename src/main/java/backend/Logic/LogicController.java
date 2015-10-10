@@ -64,10 +64,10 @@ public class LogicController {
 				feedbackString = editorSubComponent.execute(commandObject);
 				break;
 			case SORT :
-				feedbackString = sorterComponent.execute(commandObject);
+//				feedbackString = sorterComponent.execute(commandObject);
 				break;
 			case SEARCH : 
-				feedbackString = searcherComponent.execute(commandObject);
+//				feedbackString = searcherComponent.execute(commandObject);
 				break;
 			case EXIT :
 				exit();

@@ -1,4 +1,5 @@
 package main.java.gui;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -32,7 +33,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import main.java.backend.Logic.Logic;
+import main.java.backend.Logic.LogicController;
 import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
@@ -67,7 +68,7 @@ public class GUI extends Application{
 	private static int currentScene = 1;
 	private static boolean toggleCate = false;
 
-	private static Logic logicComponent;
+	private static LogicController logicComponent;
 	private static GridPane gridPane;
 	private static Scene mainScene;	
 	private static String userCommands;
@@ -79,6 +80,7 @@ public class GUI extends Application{
 	private static ArrayList<Task> getTasks;
 	private static ArrayList<Task> getEvents;
 	private static ArrayList<Task> getOverdue;
+	private static ArrayList<String> getCate;
 	private static ArrayList<Task> getFocusList;
 	
 	private static Label tasks;
@@ -102,7 +104,7 @@ public class GUI extends Application{
 	}
 	
 	private static void initGUI() throws FileNotFoundException, IOException, JSONException, ParseException{
-		logicComponent = new Logic(DEFAULT_FILENAME);
+		logicComponent = LogicController.getInstance(DEFAULT_FILENAME);
 		System.out.println("GUI component initialised successfully");
 		consoleText = new TextArea();
 		console = new Console(consoleText);
@@ -114,10 +116,11 @@ public class GUI extends Application{
 	}
 	
 	private static void retrieveAllData() throws IOException, JSONException, ParseException{	
-		getTasks = logicComponent.getUpcomingTasks();
-		getEvents = logicComponent.getUpcomingEvents();
-		getOverdue = logicComponent.getOverdueTasks();
-		getFloat = logicComponent.getFloatingTasks();
+		getTasks = logicComponent.retrieveTaskData("upcomingtoDo");
+		getEvents = logicComponent.retrieveTaskData("upcomingEvents");
+		getOverdue = logicComponent.retrieveTaskData("overdueTasks");
+		getFloat = logicComponent.retrieveTaskData("floating");
+		getCate = logicComponent.retrieveStringData("categories");
 	}
 
 	@Override
@@ -260,7 +263,6 @@ public class GUI extends Application{
 			}
 			else{
 				floating.setText("Categories:");
-				ArrayList<String> getCate = logicComponent.getCategories();	
 				listCate = getStringList(getCate);
 				listCate.setFocusTraversable( false );
 				GridPane.setConstraints(listCate, 3, 1);
@@ -282,7 +284,7 @@ public class GUI extends Application{
 	
 	private static void setUpFocusContents() throws IOException, JSONException, ParseException {
 		gridPane.getChildren().removeAll(listFocus, detailField);
-		ArrayList<Task> getFocusList = logicComponent.getUpcomingTasks();
+		ArrayList<Task> getFocusList = logicComponent.retrieveTaskData("toDo");
 		listFocus = getList(getFocusList,0);
 		listFocus.setFocusTraversable(false);
 		GridPane.setConstraints(listFocus, 0, 1);
@@ -528,7 +530,18 @@ public class GUI extends Application{
 		stageScene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 		pop.setScene(stageScene);
 		pop.show();
-	};
+		comp.setOnKeyPressed(new EventHandler<KeyEvent>(){
+
+			@Override
+			public void handle(KeyEvent event) {
+				if (event.getCode().equals(KeyCode.F1)){
+					pop.close();
+				}
+				
+			}
+			
+		});
+	}
 
 
 	private static void changeScene() throws IOException, JSONException, ParseException{
@@ -628,7 +641,6 @@ public class GUI extends Application{
 			if (toggleCate==false){
 				toggleCate=true;
 				floating.setText("Categories:");
-				ArrayList<String> getCate = logicComponent.getCategories();	
 				listCate = getStringList(getCate);
 				listCate.setFocusTraversable( false );
 				GridPane.setConstraints(listCate, 3, 1);
@@ -637,8 +649,7 @@ public class GUI extends Application{
 			} else{
 				toggleCate = false;
 				floating.setText("Floating:");
-				ArrayList<Task> getFloating = logicComponent.getFloatingTasks();	
-				listFloat = getList(getFloating,getTasks.size()+getEvents.size()+getOverdue.size());
+				listFloat = getList(getFloat,getTasks.size()+getEvents.size()+getOverdue.size());
 				listFloat.setFocusTraversable( false );
 				GridPane.setConstraints(listFloat, 3, 1);
 				gridPane.getChildren().add(listFloat);

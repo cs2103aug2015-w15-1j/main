@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.TreeMap;
 
 import org.junit.Before;
@@ -22,22 +21,22 @@ public class StorageTest {
 	private static final String CATEGORY3 = "Personal";
 
 	/* ======================== CS2102 Tasks ========================= */
-	private Task CATEGORY1_Task1 = new Task("CS2102", "Read up on PHP", "Find out how to code query in PHP", 
+	private Task CATEGORY1_TODO1 = new Task("CS2102", "Read up on PHP", "Find out how to code query in PHP", 
 					"Sat, 3 Oct 8:00am", Storage.stringToMillisecond("Sat, 3 Oct 8:00am"), 5, 
 					"Fri, 2 Oct 6:00pm", Storage.stringToMillisecond("Fri, 2 Oct 6:00pm"),  true);
-	private Task CATEGORY1_Task2 = new Task("CS2102", "Revise SQL queries", "Read up on ALL SQL queries including nested", 
+	private Task CATEGORY1_TODO2 = new Task("CS2102", "Revise SQL queries", "Read up on ALL SQL queries including nested", 
 					"Sat, 10 Oct 9:00am", Storage.stringToMillisecond("Sat, 10 Oct 9:00am"), 5, 
 					"Fri, 9 Oct 6:00pm", Storage.stringToMillisecond("Fri, 9 Oct 6:00pm"), false);
 
 	/* ======================== CS2103 Tasks ========================= */
-	private Task CATEGORY2_Task1 = new Task("CS2103", "Text Buddy CE2", "Change code to OOP style", 
+	private Task CATEGORY2_TODO1 = new Task("CS2103", "Text Buddy CE2", "Change code to OOP style", 
 					"Sat, 19 Oct 8:00am", Storage.stringToMillisecond("Sat, 19 Oct 8:00am"), 5, 
 					"Mon, 21 Oct 10:00am", Storage.stringToMillisecond("Mon, 21 Oct 10:00am"), false);
 	private Task CATEGORY2_FLOAT1 = new Task("CS2103", "Watch webcast", "Watch before November", -1, 
 			 "Tue, 20 Oct 8:00am", Storage.stringToMillisecond("Tue, 20 Oct 8:00am"), false);
 	
 	/* ======================== Personal Tasks ========================= */
-	private Task CATEGORY3_Task1 = new Task("Personal", "Help mum buy groceries", "Every Saturday!", "", -1, 3, "", -1, false);
+	private Task CATEGORY3_TODO1 = new Task("Personal", "Help mum buy groceries", "Every Saturday!", "", -1, 3, "", -1, false);
 	private Task CATEGORY3_FLOAT1 = new Task("Personal", "Cut hair someday", "Cut before December", -1, 
 			 "Wed, 10 Oct 10:00am", Storage.stringToMillisecond("Wed, 10 Oct 10:00am"), false);
 	private Task CATEGORY3_EVENT1 = new Task("Personal", "Cycling @ East Coast", "Meet at bike rental at 3pm", 
@@ -58,7 +57,7 @@ public class StorageTest {
 		storage = new Storage(TEST_FILE_NAME);
 	}
 
-	@Test
+	@Before
 	public void testAddCategories() {
 
 		ArrayList<String> categoryNames = new ArrayList<String> ();
@@ -73,21 +72,49 @@ public class StorageTest {
 	
 	@Test
 	public void testAddFloatingTask() {
-
+		
 		ArrayList<Category> data = storage.getCategoryList();
-		TreeMap<Integer, Task> floatCS2103 = data.get(1).getFloatTasks();
-		TreeMap<Integer, Task> floatPersonal = data.get(2).getFloatTasks();
+		TreeMap<String, Task> floatCS2103 = data.get(1).getFloatTasks();
+		TreeMap<String, Task> floatPersonal = data.get(2).getFloatTasks();
 
-		floatCS2103.put(0, storage.addFloatingTask(CATEGORY2_FLOAT1));
-		floatPersonal.put(1, storage.addFloatingTask(CATEGORY3_FLOAT1));
+		floatCS2103.put(CATEGORY2_FLOAT1.getTaskId(), storage.addFloatingTask(CATEGORY2_FLOAT1));
+		floatPersonal.put(CATEGORY3_FLOAT1.getTaskId(), storage.addFloatingTask(CATEGORY3_FLOAT1));
 
 		data.get(1).setFloatTasks(floatCS2103);
 		data.get(2).setFloatTasks(floatPersonal);
 
-		assertEquals(data.get(1).getFloatTasks().get(0),
-				storage.getCategoryList().get(1).getFloatTasks().get(0));
-		assertEquals(data.get(2).getFloatTasks().get(0), 
-				storage.getCategoryList().get(2).getFloatTasks().get(0));
+		assertEquals(data.get(1).getFloatTasks().get(CATEGORY2_FLOAT1.getTaskId()).getName(),
+				storage.getCategoryList().get(1).getFloatTasks().get(CATEGORY2_FLOAT1.getTaskId()).getName());
+		assertEquals(data.get(2).getFloatTasks().get(CATEGORY3_FLOAT1.getTaskId()).getName(), 
+				storage.getCategoryList().get(2).getFloatTasks().get(CATEGORY3_FLOAT1.getTaskId()).getName());
+	}
+	
+	
+	@Test
+	public void testAddTask() {
+		
+		ArrayList<Category> data = storage.getCategoryList();
+		TreeMap<String, Task> todoCS2102 = data.get(0).getTasks();
+		TreeMap<String, Task> todoCS2103 = data.get(1).getTasks();
+		TreeMap<String, Task> todoPersonal = data.get(2).getTasks();
+
+		todoCS2102.put(CATEGORY1_TODO1.getTaskId(), storage.addTask(CATEGORY1_TODO1));
+		todoCS2102.put(CATEGORY1_TODO2.getTaskId(), storage.addTask(CATEGORY1_TODO2));
+		todoCS2103.put(CATEGORY2_TODO1.getTaskId(), storage.addTask(CATEGORY2_TODO1));
+		todoPersonal.put(CATEGORY3_TODO1.getTaskId(), storage.addTask(CATEGORY3_TODO1));
+
+		data.get(0).setTasks(todoCS2102);
+		data.get(1).setTasks(todoCS2103);
+		data.get(2).setTasks(todoPersonal);
+
+		assertEquals(data.get(0).getTasks().get(CATEGORY1_TODO1.getTaskId()).getName(),
+				storage.getCategoryList().get(0).getTasks().get(CATEGORY1_TODO1.getTaskId()).getName());
+		assertEquals(data.get(0).getTasks().get(CATEGORY1_TODO2.getTaskId()).getName(),
+				storage.getCategoryList().get(0).getTasks().get(CATEGORY1_TODO2.getTaskId()).getName());
+		assertEquals(data.get(1).getTasks().get(CATEGORY2_TODO1.getTaskId()).getName(),
+				storage.getCategoryList().get(1).getTasks().get(CATEGORY2_TODO1.getTaskId()).getName());
+		assertEquals(data.get(2).getTasks().get(CATEGORY3_TODO1.getTaskId()).getName(), 
+				storage.getCategoryList().get(2).getTasks().get(CATEGORY3_TODO1.getTaskId()).getName());
 	}
 
 }

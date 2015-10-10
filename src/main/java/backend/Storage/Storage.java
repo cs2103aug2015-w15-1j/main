@@ -4,11 +4,18 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.UUID;
 
 import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.SubTask;
 import main.java.backend.Storage.Task.Task;
+
+/**
+ * This class performs all CRUD (Create, Read, Update, Delete) 
+ * operations to manipulate the data stored in the text file.
+ * 
+ * @author A0126258A
+ *
+ */
 
 public class Storage {
 
@@ -53,27 +60,28 @@ public class Storage {
 		data.save(allData);
 	}
 	
-	private void setDone(String taskName, boolean isDone) {
+	private void setDone(int taskId, boolean isDone) {
 		
-		HashMap<String, Task> targetTask = getAllTasks();
-		targetTask.get(taskName).setDone(isDone);
+		HashMap<Integer, Task> targetTask = getAllTasks();
+		targetTask.get(taskId).setDone(isDone);
 		data.save(allData);
 	}
 	
+	@SuppressWarnings("static-access")
 	private void setTargetTaskList(Category category, String taskType, Task newTask) {
 		switch(taskType) {
 			case TYPE_TASK:
-				HashMap<String, Task> allTasks = category.getTasks();
+				HashMap<Integer, Task> allTasks = category.getTasks();
 				allTasks.put(newTask.getTaskId(), newTask);
 				category.setTasks(allTasks);
 				break;
 			case TYPE_FLOAT:
-				HashMap<String, Task> allFloatingTasks = category.getFloatTasks();
+				HashMap<Integer, Task> allFloatingTasks = category.getFloatTasks();
 				allFloatingTasks.put(newTask.getTaskId(), newTask);
 				category.setFloatTasks(allFloatingTasks);
 				break;
 			case TYPE_EVENT:
-				HashMap<String, Task> allEvents = category.getEvents();
+				HashMap<Integer, Task> allEvents = category.getEvents();
 				allEvents.put(newTask.getTaskId(), newTask);
 				category.setEvents(allEvents);
 				break;
@@ -82,7 +90,7 @@ public class Storage {
 		allData.put(category.getCategoryName(), category);
 	}
 	
-	private HashMap<String, Task> getTargetTaskList(Category category, String taskType) {
+	private HashMap<Integer, Task> getTargetTaskList(Category category, String taskType) {
 		switch(taskType) {
 			case TYPE_TASK:
 				return category.getTasks();
@@ -91,24 +99,24 @@ public class Storage {
 			case TYPE_EVENT:
 				return category.getEvents();
 		}
-		return new HashMap<String, Task> ();
+		return new HashMap<Integer, Task> ();
 	}
 	
-	private HashMap<String, Task> getAllTasks() {
-		HashMap<String, Task> allTasks = new HashMap<String, Task> ();
+	private HashMap<Integer, Task> getAllTasks() {
+		HashMap<Integer, Task> allTasks = new HashMap<Integer, Task> ();
 		
 		for(String categoryName : allData.keySet()) {
 			Category category = allData.get(categoryName);
 			
-			for(String taskId : category.getTasks().keySet()) {
+			for(int taskId : category.getTasks().keySet()) {
 				allTasks.put(taskId, category.getTasks().get(taskId));
 			}
 			
-			for(String taskId : category.getFloatTasks().keySet()) {
+			for(int taskId : category.getFloatTasks().keySet()) {
 				allTasks.put(taskId, category.getFloatTasks().get(taskId));
 			}
 			
-			for(String taskId : category.getEvents().keySet()) {
+			for(int taskId : category.getEvents().keySet()) {
 				allTasks.put(taskId, category.getEvents().get(taskId));
 			}
 			
@@ -143,11 +151,11 @@ public class Storage {
 		return typeTask;
 	}
 	
-	private ArrayList<Task> getTasksInArray(HashMap<String, Task> tasks) {
+	private ArrayList<Task> getTasksInArray(HashMap<Integer, Task> tasks) {
 		
 		ArrayList<Task> allTasks = new ArrayList<Task> ();
 		
-		for(String taskId : tasks.keySet()) {
+		for(int taskId : tasks.keySet()) {
 			allTasks.add(tasks.get(taskId));
 		}
 		
@@ -176,7 +184,8 @@ public class Storage {
 		return stringToMillisecond(standardFormat.format(resultdate));
     }
 	
-	private String getTaskId(String taskType, int taskId) {
+	@SuppressWarnings("static-access")
+	private int getTaskId(String taskType, int taskId) {
 		
 		switch(taskType) {
 			case TYPE_TASK:
@@ -188,7 +197,7 @@ public class Storage {
 		}
 		
 		// Should not reach here
-		return "";
+		return -1;
 	}
 	
 	/****************************************************************************
@@ -213,7 +222,7 @@ public class Storage {
 	public void addFloatingTask(String taskName, String taskDescription, int priority, 
 			String reminderDate, long reminder, String category) {
 		
-		Task newFloatingTask = new Task(UUID.randomUUID().toString(), taskName, 
+		Task newFloatingTask = new Task(taskName, 
 				taskDescription, priority, reminderDate, reminder, false);
 		addNewTask(category, TYPE_FLOAT, newFloatingTask);
 	}
@@ -222,7 +231,7 @@ public class Storage {
 	public void addTask(String taskName, String taskDescription, String deadline, 
 			long endTime, int priority, String reminderDate, long reminder, String category) {	
 		
-		Task newTask = new Task(UUID.randomUUID().toString(), taskName, taskDescription, 
+		Task newTask = new Task(taskName, taskDescription, 
 				deadline, endTime, priority, reminderDate, reminder, false);
 		addNewTask(category, TYPE_TASK, newTask);
 	}
@@ -232,7 +241,7 @@ public class Storage {
 			String endDate, long startDateMilliseconds, long endDateMilliseconds, int priority, 
 			String reminderDate, long reminder, String category) {
 		
-		Task newEvent = new Task(UUID.randomUUID().toString(), eventName, eventDescription, 
+		Task newEvent = new Task(eventName, eventDescription, 
 				startDate, endDate, startDateMilliseconds, endDateMilliseconds, priority, 
 				reminderDate, reminder, category);
 		addNewTask(category, TYPE_EVENT, newEvent);
@@ -280,9 +289,9 @@ public class Storage {
 	public ArrayList<Task> getTaskList() {
 
 		ArrayList<Task> taskList = new ArrayList<Task> ();
-		HashMap<String, Task> allTasks = getAllTasks();
+		HashMap<Integer, Task> allTasks = getAllTasks();
 
-		for(String taskId : allTasks.keySet()) {
+		for(int taskId : allTasks.keySet()) {
 			taskList.add(allTasks.get(taskId));
 		}
 
@@ -415,22 +424,22 @@ public class Storage {
 	
 	public void setUndone(String taskType, int taskIndex) {
 		
-		String taskId = getTaskId(taskType, taskIndex);
+		int taskId = getTaskId(taskType, taskIndex);
 		setDone(taskId, false);
 	}
 	
 	
 	public void setDone(String taskType, int taskIndex) {
 		
-		String taskId = getTaskId(taskType, taskIndex);
+		int taskId = getTaskId(taskType, taskIndex);
 		setDone(taskId, true);
 	}
 	
 	
 	public void setReminder(String taskType, int taskIndex, long reminderTime, String reminderDate) {
 		
-		String taskId = getTaskId(taskType, taskIndex);
-		HashMap<String, Task> targetTask = getAllTasks();
+		int taskId = getTaskId(taskType, taskIndex);
+		HashMap<Integer, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setReminderDate(reminderDate);
 		targetTask.get(taskId).setReminder(reminderTime);
 		data.save(allData);
@@ -439,8 +448,8 @@ public class Storage {
 	
 	public void setPriority(String taskType, int taskIndex, int priority) {
 		
-		String taskId = getTaskId(taskType, taskIndex);
-		HashMap<String, Task> targetTask = getAllTasks();
+		int taskId = getTaskId(taskType, taskIndex);
+		HashMap<Integer, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setPriority(priority);
 		data.save(allData);	
 	}
@@ -448,8 +457,8 @@ public class Storage {
 	
 	public void setDescription(String taskType, int taskIndex, String description) {
 		
-		String taskId = getTaskId(taskType, taskIndex);
-		HashMap<String, Task> targetTask = getAllTasks();
+		int taskId = getTaskId(taskType, taskIndex);
+		HashMap<Integer, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setDescription(description);
 		data.save(allData);
 	}
@@ -457,8 +466,8 @@ public class Storage {
 	
 	public void setDeadline(String taskType, int taskIndex, long deadlineTime, String deadlineDate) {
 		
-		String taskId = getTaskId(taskType, taskIndex);
-		HashMap<String, Task> targetTask = getAllTasks();
+		int taskId = getTaskId(taskType, taskIndex);
+		HashMap<Integer, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setEndDate(deadlineDate);
 		targetTask.get(taskId).setEndTime(deadlineTime);
 		data.save(allData);
@@ -499,7 +508,7 @@ public class Storage {
 	
 	
 	public void deleteTaskTypeFromCategory(String categoryName, String taskType) {
-		HashMap<String, Task> resetData = new HashMap<String, Task>();
+		HashMap<Integer, Task> resetData = new HashMap<Integer, Task>();
 		switch(taskType) {
 			case TYPE_TASK:
 				allData.get(categoryName).setTasks(resetData);
@@ -517,11 +526,11 @@ public class Storage {
 	
 	public void deleteTask(String taskType, int taskIndex) {
 		
-		String taskId = getTaskId(taskType, taskIndex);
+		int taskId = getTaskId(taskType, taskIndex);
 		
 		for(String categoryName : allData.keySet()) {
 			Category category = allData.get(categoryName);
-			HashMap<String, Task> tasks = getTargetTaskList(category, taskType);
+			HashMap<Integer, Task> tasks = getTargetTaskList(category, taskType);
 			
 			if(tasks.containsKey(taskId)) {
 				tasks.remove(taskId);

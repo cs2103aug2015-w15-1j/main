@@ -4,6 +4,13 @@ import java.util.HashMap;
 
 import main.java.backend.Storage.Task.Category;
 
+/**
+ * This class loads from and saves data to text file.
+ * 
+ * @author A0126258A
+ *
+ */
+
 public class Data {
 
 	private DataLoad load;

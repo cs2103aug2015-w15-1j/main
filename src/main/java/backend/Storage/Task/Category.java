@@ -8,32 +8,32 @@ public class Category implements Comparable<Category> {
 	 * where hash map key represents the category name
 	 * and value represents tasks under each category.
 	 */
-	private HashMap<String, Task> tasks;
-	private HashMap<String, Task> floatTasks;
-	private HashMap<String, Task> events;
+	private HashMap<Integer, Task> tasks;
+	private HashMap<Integer, Task> floatTasks;
+	private HashMap<Integer, Task> events;
 	
 	private String categoryName;
 	private String categoryColour;
 	
 	public Category() {
-		setTasks(new HashMap<String, Task>());
-		setFloatTasks(new HashMap<String, Task>());
-		setEvents(new HashMap<String, Task>());
+		setTasks(new HashMap<Integer, Task>());
+		setFloatTasks(new HashMap<Integer, Task>());
+		setEvents(new HashMap<Integer, Task>());
 	}
 	
 	public Category(String categoryName) {
 		setCategoryName(categoryName);
-		setTasks(new HashMap<String, Task>());
-		setFloatTasks(new HashMap<String, Task>());
-		setEvents(new HashMap<String, Task>());
+		setTasks(new HashMap<Integer, Task>());
+		setFloatTasks(new HashMap<Integer, Task>());
+		setEvents(new HashMap<Integer, Task>());
 	}
 	
 	public Category(String categoryName, String categoryColour) {
 		setCategoryName(categoryName);
 		setCategoryColour(categoryColour);
-		setTasks(new HashMap<String, Task>());
-		setFloatTasks(new HashMap<String, Task>());
-		setEvents(new HashMap<String, Task>());
+		setTasks(new HashMap<Integer, Task>());
+		setFloatTasks(new HashMap<Integer, Task>());
+		setEvents(new HashMap<Integer, Task>());
 	}
 	
 	public String getCategoryName() {
@@ -52,27 +52,27 @@ public class Category implements Comparable<Category> {
 		this.categoryColour = categoryColour;
 	}
 
-	public HashMap<String, Task> getTasks() {
+	public HashMap<Integer, Task> getTasks() {
 		return tasks;
 	}
 
-	public void setTasks(HashMap<String, Task> tasks) {
+	public void setTasks(HashMap<Integer, Task> tasks) {
 		this.tasks = tasks;
 	}
 
-	public HashMap<String, Task> getFloatTasks() {
+	public HashMap<Integer, Task> getFloatTasks() {
 		return floatTasks;
 	}
 
-	public void setFloatTasks(HashMap<String, Task> floatTasks) {
+	public void setFloatTasks(HashMap<Integer, Task> floatTasks) {
 		this.floatTasks = floatTasks;
 	}
 
-	public HashMap<String, Task> getEvents() {
+	public HashMap<Integer, Task> getEvents() {
 		return events;
 	}
 
-	public void setEvents(HashMap<String, Task> events) {
+	public void setEvents(HashMap<Integer, Task> events) {
 		this.events = events;
 	}
 

@@ -15,7 +15,7 @@ import main.java.backend.Storage.Task.Category;
 /**
  * This class parse Java object back to JSON format 
  * to be saved in the file as text when there is any 
- * update in the data.
+ * update in the data by writing data to the text file.
  * 
  * @author A0126258A
  * 

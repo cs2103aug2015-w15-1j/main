@@ -18,7 +18,8 @@ import main.java.backend.Storage.Task.Category;
 
 /**
  * This class parse all texts in the file from JSON 
- * format to Java object to retrieve user's data.
+ * format to Java object to retrieve user's data
+ * by reading data from the text file.
  * 
  * @author A0126258A
  * 

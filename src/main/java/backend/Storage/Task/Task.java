@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 public class Task implements Comparable<Task> {
 	
-	private String taskId;
+	private static int taskId = 0;
 	private int indexForPrinting;
 	private String name;
 	private String description;
@@ -25,9 +25,9 @@ public class Task implements Comparable<Task> {
 	}
 
 	// Floating task
-	public Task(String taskId, String taskName, String taskDescription, int priority, 
+	public Task(String taskName, String taskDescription, int priority, 
 			String reminderDate, long reminderTime, boolean isDone) {
-		setTaskId(taskId);
+		taskId++;
 		setName(taskName);
 		setDescription(taskDescription);
 		setStartDate("");
@@ -42,9 +42,9 @@ public class Task implements Comparable<Task> {
 	}
 
 	// Task
-	public Task(String taskId, String taskName, String taskDescription, String deadline, long endTime, 
+	public Task(String taskName, String taskDescription, String deadline, long endTime, 
 			int priority, String reminderDate, long reminder, boolean isDone) {
-		setTaskId(taskId);
+		taskId++;
 		setName(taskName);
 		setDescription(taskDescription);
 		setStartDate("");
@@ -59,10 +59,10 @@ public class Task implements Comparable<Task> {
 	}
 
 	// Event
-	public Task(String taskId, String eventName, String eventDescription, String startDate, 
+	public Task(String eventName, String eventDescription, String startDate, 
 			String endDate, long startTime, long endTime, int priority, 
 			String reminderDate, long reminder, String categoryName) {
-		setTaskId(taskId);
+		taskId++;
 		setName(eventName);
 		setDescription(eventDescription);
 		setStartDate(startDate);
@@ -75,12 +75,8 @@ public class Task implements Comparable<Task> {
 		setSubTask(new HashMap<String, SubTask> ());
 	}
 
-	public String getTaskId() {
+	public static int getTaskId() {
 		return taskId;
-	}
-
-	public void setTaskId(String taskId) {
-		this.taskId = taskId;
 	}
 	
 	public int getIndex() {
@@ -230,30 +226,6 @@ public class Task implements Comparable<Task> {
 		sb.append("is it completed? "+isDone + System.getProperty("line.separator"));
 		return sb.toString();
 	}
-
-	public static Comparator<Task> sortPriority = new Comparator<Task> () {
-		public int compare(Task left, Task right) {
-			if(left.getPriority() < right.getPriority()) {
-				return -1;
-			} else if(left.getPriority() > right.getPriority()) {
-				return 1;
-			} else {
-				return 0;
-			}
-		}
-	};
-	
-	public static Comparator<Task> sortDeadline = new Comparator<Task> () {
-		public int compare(Task left, Task right) {
-			if(left.getEndTime() < right.getEndTime()) {
-				return -1;
-			} else if(left.getEndTime() > right.getEndTime()) {
-				return 1;
-			} else {
-				return 0;
-			}
-		}
-	};
 	
 	@Override
 	public int compareTo(Task o) {

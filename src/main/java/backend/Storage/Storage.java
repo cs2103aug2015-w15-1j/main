@@ -219,21 +219,18 @@ public class Storage {
 	
 	public Task addFloatingTask(Task task) {
 		
-		System.out.println("HEY1");
 		addNewTask(task.getCategory(), TYPE_FLOAT, task);
 		return task;
 	}
 	
 	public Task addTask(Task task) {
 
-		System.out.println("HEY2");
 		addNewTask(task.getCategory(), TYPE_TASK, task);
 		return task;
 	}
 	
 	public Task addEvent(Task task) {
 
-		System.out.println("HEY3");
 		addNewTask(task.getCategory(), TYPE_EVENT, task);
 		return task;
 	}
@@ -411,6 +408,14 @@ public class Storage {
 		
 	}
 	
+	public void setName(int taskIndex, String name) {
+
+		String taskId = getTaskId(taskIndex);
+		TreeMap<String, Task> targetTask = getAllTasks();
+		targetTask.get(taskId).setName(name);
+		data.save(allData);
+	}
+	
 	public void setDescription(int taskIndex, String description) {
 
 		String taskId = getTaskId(taskIndex);
@@ -432,6 +437,15 @@ public class Storage {
 		setDone(taskId, true);
 	}
 	
+	public void setDeadline(int taskIndex, long deadlineTime, String deadlineDate) {
+
+		String taskId = getTaskId(taskIndex);
+		TreeMap<String, Task> targetTask = getAllTasks();
+		targetTask.get(taskId).setEndDate(deadlineDate);
+		targetTask.get(taskId).setEndTime(deadlineTime);
+		data.save(allData);
+	}
+	
 	
 	public void setReminder(int taskIndex, long reminderTime, String reminderDate) {
 		
@@ -449,17 +463,6 @@ public class Storage {
 		TreeMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setPriority(priority);
 		data.save(allData);	
-	}
-
-	
-	
-	public void setDeadline(int taskIndex, long deadlineTime, String deadlineDate) {
-		
-		String taskId = getTaskId(taskIndex);
-		TreeMap<String, Task> targetTask = getAllTasks();
-		targetTask.get(taskId).setEndDate(deadlineDate);
-		targetTask.get(taskId).setEndTime(deadlineTime);
-		data.save(allData);
 	}
 	
 	

@@ -10,5 +10,5 @@ public abstract class DataExecute {
 	protected String INPUT_FILE_NAME;
 	protected File textFile;
 	
-	abstract TreeMap<String, Category> execute(TreeMap<String, Category> allData);
+	public abstract TreeMap<String, Category> execute(TreeMap<String, Category> allData);
 }

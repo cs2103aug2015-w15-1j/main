@@ -4,8 +4,9 @@ import java.util.TreeMap;
 
 public class Task implements Comparable<Task> {
 	
-	private static int taskId = 0;
+	private static int taskId = -1;
 	private int indexForPrinting;
+	private String category;
 	private String name;
 	private String description;
 	private String startDate;
@@ -24,9 +25,10 @@ public class Task implements Comparable<Task> {
 	}
 
 	// Floating task
-	public Task(String taskName, String taskDescription, int priority, 
+	public Task(String category, String taskName, String taskDescription, int priority, 
 			String reminderDate, long reminderTime, boolean isDone) {
 		taskId++;
+		setCategory(category);
 		setName(taskName);
 		setDescription(taskDescription);
 		setStartDate("");
@@ -41,9 +43,10 @@ public class Task implements Comparable<Task> {
 	}
 
 	// Task
-	public Task(String taskName, String taskDescription, String deadline, long endTime, 
-			int priority, String reminderDate, long reminder, boolean isDone) {
+	public Task(String category, String taskName, String taskDescription, String deadline, 
+			long endTime, int priority, String reminderDate, long reminder, boolean isDone) {
 		taskId++;
+		setCategory(category);
 		setName(taskName);
 		setDescription(taskDescription);
 		setStartDate("");
@@ -58,10 +61,11 @@ public class Task implements Comparable<Task> {
 	}
 
 	// Event
-	public Task(String eventName, String eventDescription, String startDate, 
+	public Task(String category, String eventName, String eventDescription, String startDate, 
 			String endDate, long startTime, long endTime, int priority, 
-			String reminderDate, long reminder, String categoryName) {
+			String reminderDate, long reminder) {
 		taskId++;
+		setCategory(category);
 		setName(eventName);
 		setDescription(eventDescription);
 		setStartDate(startDate);
@@ -84,6 +88,14 @@ public class Task implements Comparable<Task> {
 	
 	public void setIndex(int index){
 		indexForPrinting = index;
+	}
+	
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
 	}
 
 	public int getPriority() {

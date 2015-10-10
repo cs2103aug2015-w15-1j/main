@@ -162,7 +162,7 @@ public class Storage {
 		return allTasks;
 	}
 	
-	private long stringToMillisecond(String dateTime) {
+	public static long stringToMillisecond(String dateTime) {
         try {
             Date tempDateTime = formatterForDateTime.parse(dateTime);
             long dateTimeMillisecond = tempDateTime.getTime();
@@ -185,7 +185,7 @@ public class Storage {
     }
 	
 	@SuppressWarnings("static-access")
-	private int getTaskId(String taskType, int taskId) {
+	private int getTaskId(int taskId) {
 		
 		switch(taskType) {
 			case TYPE_TASK:
@@ -219,34 +219,23 @@ public class Storage {
 	}
 	
 	
-	public void addFloatingTask(String taskName, String taskDescription, int priority, 
-			String reminderDate, long reminder, String category) {
+	public Task addFloatingTask(Task task) {
 		
-		Task newFloatingTask = new Task(taskName, 
-				taskDescription, priority, reminderDate, reminder, false);
-		addNewTask(category, TYPE_FLOAT, newFloatingTask);
+		addNewTask(task.getCategory(), TYPE_FLOAT, task);
+		return task;
 	}
 	
-	
-	public void addTask(String taskName, String taskDescription, String deadline, 
-			long endTime, int priority, String reminderDate, long reminder, String category) {	
-		
-		Task newTask = new Task(taskName, taskDescription, 
-				deadline, endTime, priority, reminderDate, reminder, false);
-		addNewTask(category, TYPE_TASK, newTask);
-	}
+	public Task addTask(Task task) {
 
-	
-	public void addEvent(String eventName, String eventDescription, String startDate, 
-			String endDate, long startDateMilliseconds, long endDateMilliseconds, int priority, 
-			String reminderDate, long reminder, String category) {
-		
-		Task newEvent = new Task(eventName, eventDescription, 
-				startDate, endDate, startDateMilliseconds, endDateMilliseconds, priority, 
-				reminderDate, reminder, category);
-		addNewTask(category, TYPE_EVENT, newEvent);
+		addNewTask(task.getCategory(), TYPE_TASK, task);
+		return task;
 	}
 	
+	public Task addEvent(Task task) {
+
+		addNewTask(task.getCategory(), TYPE_EVENT, task);
+		return task;
+	}
 	
 	public void addSubTask(String taskName, String subtaskDescription) {
 
@@ -416,29 +405,36 @@ public class Storage {
 	}
 	
 	
-	public void setCategory(String taskType, int taskIndex, String categoryName) {
+	public void setCategory(int taskIndex, String categoryName) {
 		// TODO Auto-generated method stub
 		
 	}
 	
+	public void setDescription(int taskIndex, String description) {
+
+		int taskId = getTaskId(taskIndex);
+		TreeMap<Integer, Task> targetTask = getAllTasks();
+		targetTask.get(taskId).setDescription(description);
+		data.save(allData);
+	}
 	
-	public void setUndone(String taskType, int taskIndex) {
+	public void setUndone(int taskIndex) {
 		
-		int taskId = getTaskId(taskType, taskIndex);
+		int taskId = getTaskId(taskIndex);
 		setDone(taskId, false);
 	}
 	
 	
-	public void setDone(String taskType, int taskIndex) {
+	public void setDone(int taskIndex) {
 		
-		int taskId = getTaskId(taskType, taskIndex);
+		int taskId = getTaskId(taskIndex);
 		setDone(taskId, true);
 	}
 	
 	
-	public void setReminder(String taskType, int taskIndex, long reminderTime, String reminderDate) {
+	public void setReminder(int taskIndex, long reminderTime, String reminderDate) {
 		
-		int taskId = getTaskId(taskType, taskIndex);
+		int taskId = getTaskId(taskIndex);
 		TreeMap<Integer, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setReminderDate(reminderDate);
 		targetTask.get(taskId).setReminder(reminderTime);
@@ -446,27 +442,19 @@ public class Storage {
 	}
 	
 	
-	public void setPriority(String taskType, int taskIndex, int priority) {
+	public void setPriority(int taskIndex, int priority) {
 		
-		int taskId = getTaskId(taskType, taskIndex);
+		int taskId = getTaskId(taskIndex);
 		TreeMap<Integer, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setPriority(priority);
 		data.save(allData);	
 	}
+
 	
 	
-	public void setDescription(String taskType, int taskIndex, String description) {
+	public void setDeadline(int taskIndex, long deadlineTime, String deadlineDate) {
 		
-		int taskId = getTaskId(taskType, taskIndex);
-		TreeMap<Integer, Task> targetTask = getAllTasks();
-		targetTask.get(taskId).setDescription(description);
-		data.save(allData);
-	}
-	
-	
-	public void setDeadline(String taskType, int taskIndex, long deadlineTime, String deadlineDate) {
-		
-		int taskId = getTaskId(taskType, taskIndex);
+		int taskId = getTaskId(taskIndex);
 		TreeMap<Integer, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setEndDate(deadlineDate);
 		targetTask.get(taskId).setEndTime(deadlineTime);
@@ -474,19 +462,19 @@ public class Storage {
 	}
 	
 	
-	public void setSubTaskUndone(String taskType, int taskIndex) {
+	public void setSubTaskUndone(int taskIndex) {
 		
 		
 	}
 
 	
-	public void setSubTaskDone(String taskType, int taskIndex) {
+	public void setSubTaskDone(int taskIndex) {
 		
 		
 	}
 	
 	
-	public void setSubtaskDescription(String taskType, int taskIndex, String description) {
+	public void setSubtaskDescription(int taskIndex, String description) {
 		
 		
 	}
@@ -526,7 +514,7 @@ public class Storage {
 	
 	public void deleteTask(String taskType, int taskIndex) {
 		
-		int taskId = getTaskId(taskType, taskIndex);
+		int taskId = getTaskId(taskIndex);
 		
 		for(String categoryName : allData.keySet()) {
 			Category category = allData.get(categoryName);

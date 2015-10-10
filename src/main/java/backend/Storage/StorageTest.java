@@ -151,6 +151,10 @@ public class StorageTest {
 	
 	@Test
 	public void testSetCategoryColour() {
+		
+		storage.addCategory(CATEGORY1);
+		storage.addCategory(CATEGORY2);
+		storage.addCategory(CATEGORY3);
 
 		storage.setCategoryColour(CATEGORY1, COLOUR_BLUE);
 		storage.setCategoryColour(CATEGORY2, COLOUR_GREEN);

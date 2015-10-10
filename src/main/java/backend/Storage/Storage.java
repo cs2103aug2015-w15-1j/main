@@ -512,19 +512,15 @@ public class Storage {
 	}
 
 	
-	public void deleteTask(String taskType, int taskIndex) {
-		
+	public void deleteTask(int taskIndex) {
+
 		int taskId = getTaskId(taskIndex);
-		
-		for(String categoryName : allData.keySet()) {
-			Category category = allData.get(categoryName);
-			TreeMap<Integer, Task> tasks = getTargetTaskList(category, taskType);
-			
-			if(tasks.containsKey(taskId)) {
-				tasks.remove(taskId);
-				break;
-			}
+		TreeMap<Integer, Task> tasks = getAllTasks();
+
+		if(tasks.containsKey(taskId)) {
+			tasks.remove(taskId);
 		}
+		
 		data.save(allData);
 	}
 	

@@ -46,9 +46,6 @@ public class LogicCommandHandler {
 			case COMMAND_SEARCH:
 				commandObject = initSearchCommand(parsedUserInput);
 				break;
-			case COMMAND_VIEW:
-				commandObject = initViewCommand(parsedUserInput);
-				break;
 			case COMMAND_EXIT:
 				commandObject = initExitCommand(parsedUserInput);
 				break;
@@ -89,15 +86,6 @@ public class LogicCommandHandler {
 		Command exitCommandObject = new Command(Command.Type.EXIT);
 		exitCommandObject.setCommandField(parsedUserInput.get(0));
 		return exitCommandObject;
-	}
-
-	private Command initViewCommand(ArrayList<String> parsedUserInput) {
-		Command viewCommandObject = new Command(Command.Type.VIEW);
-		viewCommandObject.setCommandField(parsedUserInput.get(0));
-		if (parsedUserInput.get(0).equals("showcat")) {
-			viewCommandObject.setCategory(parsedUserInput.get(1));
-		}
-		return viewCommandObject;
 	}
 
 	private Command initSearchCommand(ArrayList<String> parsedUserInput) {

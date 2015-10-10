@@ -1,0 +1,9 @@
+GUI to Logic format
+To use getCategories() : call retrieveStringData("categories")
+To use getSearchResultsList() : call retrieveCategoryData("searchResults")
+To use getToDo(): call retrieveTaskData("toDo")
+To use getFloatingTasks(): call retrieveTaskData("floating")
+To use getEvents(): call retrieveTaskData("events")
+To use getUpcomingToDo(): call retrieveTaskData("upcomingtoDo")
+To use getUpcomingEvents(): call retrieveTaskData("upcomingEvents")
+To use getOverdueTasks(): call retrieveTaskData("overdueTasks")

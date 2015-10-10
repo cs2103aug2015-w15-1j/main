@@ -2,21 +2,20 @@ package main.java.backend.Storage;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.TreeMap;
 
 import org.junit.Before;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
 
-import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
 public class StorageTest {
 
 	private static final String TEST_FILE_NAME = "test.txt";
+	
+	private static final String DESCRIPTION_TODO = "Find out how to code query in PHP";
+	private static final String DESCRIPTION_EVENT = "Meet at East Coast Lagoon Food Village at 1pm";
 
 	/* ======================== Category colors ========================= */
 	private static final String COLOUR_BLUE = "#24c6d5";
@@ -29,7 +28,7 @@ public class StorageTest {
 	private static final String CATEGORY4 = "Outings";
 
 	/* ======================== CS2102 Tasks ========================= */
-	private Task CATEGORY1_TODO1 = new Task(CATEGORY1, "Read up on PHP", "Find out how to code query in PHP", 
+	private Task CATEGORY1_TODO1 = new Task(CATEGORY1, "Read up on PHP", "", 
 			"Sat, 3 Oct 8:00am", Storage.stringToMillisecond("Sat, 3 Oct 8:00am"), 5, 
 			"Fri, 2 Oct 6:00pm", Storage.stringToMillisecond("Fri, 2 Oct 6:00pm"),  true);
 	private Task CATEGORY1_TODO2 = new Task(CATEGORY1, "Revise SQL queries", 
@@ -96,8 +95,8 @@ public class StorageTest {
 
 		assertEquals(CATEGORY2_FLOAT1.getTaskId(), storage.getCategoryList().get(1).
 				getFloatTasks().get(CATEGORY2_FLOAT1.getTaskId()).getTaskId());
-		//assertEquals(CATEGORY3_FLOAT1.getTaskId(), storage.getCategoryList().get(2).
-			//	getFloatTasks().get(CATEGORY3_FLOAT1.getTaskId()).getTaskId());
+		assertEquals(CATEGORY3_FLOAT1.getTaskId(), storage.getCategoryList().get(2).
+				getFloatTasks().get(CATEGORY3_FLOAT1.getTaskId()).getTaskId());
 		
 		storage.deleteAll();
 	}
@@ -121,8 +120,8 @@ public class StorageTest {
 				get(CATEGORY1_TODO2.getTaskId()).getName());
 		assertEquals(CATEGORY2_TODO1.getName(), storage.getCategoryList().get(1).getTasks().
 				get(CATEGORY2_TODO1.getTaskId()).getName());
-		//assertEquals(CATEGORY3_TODO1.getName(), storage.getCategoryList().get(2).getTasks().
-			//	get(CATEGORY3_TODO1.getTaskId()).getName());
+		assertEquals(CATEGORY3_TODO1.getName(), storage.getCategoryList().get(2).getTasks().
+				get(CATEGORY3_TODO1.getTaskId()).getName());
 		
 		storage.deleteAll();
 	}
@@ -173,18 +172,41 @@ public class StorageTest {
 		storage.addCategory(CATEGORY3);
 		storage.addCategory(CATEGORY4);
 
-		CATEGORY3_EVENT1.setIndex(6);
-		CATEGORY3_EVENT2.setIndex(7);
+		CATEGORY3_EVENT1.setIndex(5);
+		CATEGORY3_EVENT2.setIndex(6);
 		storage.addEvent(CATEGORY3_EVENT1);
 		storage.addEvent(CATEGORY3_EVENT2);
 		
-		storage.setCategory(6, CATEGORY4);
-		storage.setCategory(7, CATEGORY4);
+		storage.setCategory(CATEGORY3_EVENT1.getIndex(), CATEGORY4);
+		storage.setCategory(CATEGORY3_EVENT2.getIndex(), CATEGORY4);
 		
 		assertEquals(CATEGORY4, storage.getCategoryList().get(2).getEvents().
 				get(CATEGORY3_EVENT1.getTaskId()).getCategory());
 		assertEquals(CATEGORY4, storage.getCategoryList().get(2).getEvents().
 				get(CATEGORY3_EVENT2.getTaskId()).getCategory());
+		
+		storage.deleteAll();
+	}
+	
+	@Test
+	public void testSetDescription() {
+		
+		storage.addCategory(CATEGORY1);
+		storage.addCategory(CATEGORY2);
+		storage.addCategory(CATEGORY3);
+		
+		CATEGORY1_TODO1.setIndex(5);
+		CATEGORY3_EVENT2.setIndex(6);
+		storage.addTask(CATEGORY1_TODO1);
+		storage.addEvent(CATEGORY3_EVENT2);
+		
+		storage.setDescription(CATEGORY1_TODO1.getIndex(), DESCRIPTION_TODO);
+		storage.setDescription(CATEGORY3_EVENT2.getIndex(), DESCRIPTION_EVENT);
+		
+		assertEquals(DESCRIPTION_TODO, storage.getCategoryList().get(0).getTasks().
+				get(CATEGORY1_TODO1.getTaskId()).getDescription());
+		//assertEquals(DESCRIPTION_EVENT, storage.getCategoryList().get(2).getTasks().
+			//	get(CATEGORY3_EVENT2.getTaskId()).getDescription());
 		
 		storage.deleteAll();
 	}

@@ -34,7 +34,7 @@ public class Storage {
 	public Storage(String fileName) { 
 		data = new Data(fileName);
 		allData = data.load();
-		//System.out.println("Storage component initialised successfully");
+		System.out.println("Storage component initialised successfully");
 	}
 	
 	/****************************************************************************

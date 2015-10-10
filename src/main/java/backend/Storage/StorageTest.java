@@ -3,9 +3,14 @@ package main.java.backend.Storage;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import main.java.backend.Storage.Task.Category;
 
 public class StorageTest {
 	
@@ -40,8 +45,16 @@ public class StorageTest {
 	}
 	
 	@Test
-	public void testAddCategories() throws IOException {
+	public void testAddCategories() {
 		
+		ArrayList<String> categoryNames = new ArrayList<String> ();
+		categoryNames.addAll(Arrays.asList(CATEGORY1, CATEGORY2, CATEGORY3));
+
+		storage.addCategory(CATEGORY1);
+		storage.addCategory(CATEGORY2);
+		storage.addCategory(CATEGORY3);
+		
+		assertEquals(categoryNames, storage.getCategories());
 	}
 
 }

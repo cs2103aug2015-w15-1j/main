@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
+import java.util.TreeMap;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -93,16 +93,16 @@ public class DataLoad extends DataExecute {
 	}
 	
 	@Override
-	public HashMap<String, Category> execute(HashMap<String, Category> emptyList) {
+	public TreeMap<String, Category> execute(TreeMap<String, Category> emptyList) {
 
-		HashMap<String, Category> allData = new HashMap<String, Category>();
+		TreeMap<String, Category> allData = new TreeMap<String, Category>();
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		
 		if(!isFileEmpty()) {
 			try {
 				allData = mapper.readValue(getAllTextsFromFile(), 
-						new TypeReference<HashMap<String, Category>>() {});
+						new TypeReference<TreeMap<String, Category>>() {});
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

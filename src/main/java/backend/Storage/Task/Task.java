@@ -1,6 +1,6 @@
 package main.java.backend.Storage.Task;
 
-import java.util.HashMap;
+import java.util.TreeMap;
 
 public class Task implements Comparable<Task> {
 	
@@ -17,7 +17,7 @@ public class Task implements Comparable<Task> {
 	private int priority;
 	private boolean isDone;
 
-	private HashMap<String, SubTask> subTask;
+	private TreeMap<String, SubTask> subTask;
 
 	public Task() {
 
@@ -37,7 +37,7 @@ public class Task implements Comparable<Task> {
 		setPriority(priority);
 		setReminder(reminderTime);
 		setDone(isDone);
-		setSubTask(new HashMap<String, SubTask> ());
+		setSubTask(new TreeMap<String, SubTask> ());
 	}
 
 	// Task
@@ -54,7 +54,7 @@ public class Task implements Comparable<Task> {
 		setReminderDate(reminderDate);
 		setReminder(reminder);
 		setDone(isDone);
-		setSubTask(new HashMap<String, SubTask> ());
+		setSubTask(new TreeMap<String, SubTask> ());
 	}
 
 	// Event
@@ -71,7 +71,7 @@ public class Task implements Comparable<Task> {
 		setPriority(priority);
 		setReminderDate(reminderDate);
 		setReminder(reminder);
-		setSubTask(new HashMap<String, SubTask> ());
+		setSubTask(new TreeMap<String, SubTask> ());
 	}
 
 	public static int getTaskId() {
@@ -166,11 +166,11 @@ public class Task implements Comparable<Task> {
 		this.reminderTime = reminderTime;
 	}
 	
-	public HashMap<String, SubTask> getSubTask() {
+	public TreeMap<String, SubTask> getSubTask() {
 		return subTask;
 	}
 
-	public void setSubTask(HashMap<String, SubTask> subTask) {
+	public void setSubTask(TreeMap<String, SubTask> subTask) {
 		this.subTask = subTask;
 	}
 

@@ -20,8 +20,7 @@ public class StorageTest {
 
 	/* ======================== Category colors ========================= */
 	private static final String COLOUR_BLUE = "#24c6d5";
-	private static final String COLOUR_GREEN = "#24c6d5";
-	private static final String COLOUR_PURPLE = "#24c6d5";
+	private static final String COLOUR_GREEN = "#57dd86";
 
 	/* ======================== Categories =========================== */
 	private static final String CATEGORY1 = "CS2102";
@@ -62,7 +61,7 @@ public class StorageTest {
 	Storage storage;
 
 	@Before
-	public void initialize() throws IOException {
+	public void initialize() {
 		storage = new Storage(TEST_FILE_NAME);
 	}
 
@@ -155,11 +154,9 @@ public class StorageTest {
 
 		storage.setCategoryColour(CATEGORY1, COLOUR_BLUE);
 		storage.setCategoryColour(CATEGORY2, COLOUR_GREEN);
-		storage.setCategoryColour(CATEGORY3, COLOUR_PURPLE);
 
 		assertEquals(COLOUR_BLUE, storage.getCategoryList().get(0).getCategoryColour());
 		assertEquals(COLOUR_GREEN, storage.getCategoryList().get(1).getCategoryColour());
-		//assertEquals(COLOUR_PURPLE, storage.getCategoryList().get(2).getCategoryColour());
 		
 		storage.deleteAll();
 	}
@@ -180,12 +177,12 @@ public class StorageTest {
 		storage.setCategory(6, CATEGORY4);
 		storage.setCategory(7, CATEGORY4);
 		
-		assertEquals(CATEGORY4, storage.getCategoryList().get(0).getEvents().
+		assertEquals(CATEGORY4, storage.getCategoryList().get(2).getEvents().
 				get(CATEGORY3_EVENT1.getTaskId()).getCategory());
-		assertEquals(CATEGORY4, storage.getCategoryList().get(0).getEvents().
+		assertEquals(CATEGORY4, storage.getCategoryList().get(2).getEvents().
 				get(CATEGORY3_EVENT2.getTaskId()).getCategory());
 		
-		//storage.deleteAll();
+		storage.deleteAll();
 	}
 	
 	/****************************************************************************
@@ -195,6 +192,6 @@ public class StorageTest {
 	@Test
 	public void testDeleteTask() {
 		
-		storage.deleteTask(0);
+		//storage.deleteTask(0);
 	}
 }

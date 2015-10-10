@@ -410,13 +410,14 @@ public class Storage {
 	
 	public void setCategory(int taskIndex, String categoryName) {
 		
-		TreeMap<String, Task> targetTask = getAllTasks();
 		String taskId = getTaskId(taskIndex);
-		Task task = targetTask.get(taskId);
+		Task task = getAllTasks().get(taskId);
 		String taskType = checkTaskType(task);
-				
+		
+		deleteTask(taskIndex);
+		
+		task.setCategory(categoryName);
 		addNewTask(categoryName, taskType, task);
-		targetTask.remove(taskId);
 		
 		data.save(allData);
 	}
@@ -539,7 +540,9 @@ public class Storage {
 	public void deleteTask(int taskIndex) {
 
 		String taskId = getTaskId(taskIndex);
-		TreeMap<String, Task> tasks = getAllTasks();
+		Task task = getAllTasks().get(taskId);
+		TreeMap<String, Task> tasks = getTargetTaskList
+				(allData.get(task.getCategory()), checkTaskType(task));
 
 		if(tasks.containsKey(taskId)) {
 			tasks.remove(taskId);

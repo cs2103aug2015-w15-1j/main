@@ -21,7 +21,7 @@ import main.java.backend.Storage.Task.Category;
  * 
  */
 
-public class DataSave extends DataOperation {
+public class DataSave extends DataExecute {
 	
 	private BufferedWriter bufferedWriter;
 	private FileWriter textFileWriter;

@@ -5,11 +5,9 @@ import java.util.HashMap;
 
 import main.java.backend.Storage.Task.Category;
 
-public abstract class DataOperation {
+public abstract class DataExecute {
 	
 	protected String INPUT_FILE_NAME;
-
-	protected HashMap<String, Category> allCategories;
 	protected File textFile;
 	
 	abstract HashMap<String, Category> execute(HashMap<String, Category> allData);

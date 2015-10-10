@@ -24,7 +24,7 @@ import main.java.backend.Storage.Task.Category;
  * 
  */
 
-public class DataLoad extends DataOperation {
+public class DataLoad extends DataExecute {
 	
 	private BufferedReader bufferedReader;
 	private FileReader textFileReader;

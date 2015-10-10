@@ -4,12 +4,12 @@ import java.util.HashMap;
 
 import main.java.backend.Storage.Task.Category;
 
-public class DataStorage {
+public class Data {
 
 	private DataLoad load;
 	private DataSave save;
 	
-	public DataStorage(String fileName) {
+	public Data(String fileName) {
 		load = new DataLoad(fileName);
 		save = new DataSave(fileName);
 	}

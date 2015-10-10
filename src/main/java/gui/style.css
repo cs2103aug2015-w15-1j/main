@@ -21,8 +21,11 @@
 	-fx-font-size: 14px;
 	-fx-font-weight:bold;
 	-fx-font-family: "arial";
-	-fx-background-color: #336699;
-	-fx-border-color: #336699;
+	-fx-background-color: #A0CFEC;
+	-fx-border-color: #000000;
+}
+.list-cell{
+	-fx-background-color: #FFF5EE;
 }
 
 .list-cell:odd{
@@ -30,12 +33,13 @@
 	-fx-text-fill: #FFFFFF;
 }
 
-.list-cell:empty { /* must match with list-cell:odd */
-	-fx-background-color:#A0CFEC;
+.list-cell:even{
+	-fx-background-color: #FFF5EE;
+	-fx-text-fill: #000000;
 }
 
-.list-cell{
-	-fx-background-color: #FFF5EE;
+.list-cell:empty {
+	-fx-background-color:#A0CFEC;
 }
 
 .custom {
@@ -52,4 +56,7 @@
 }
 .text-area .scroll-bar:vertical:disabled {
     -fx-opacity: 0;
+}
+#listOverdue{
+	-fx-background-color: #123456;
 }

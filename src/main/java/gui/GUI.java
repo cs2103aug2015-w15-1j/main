@@ -27,7 +27,9 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import main.java.backend.Logic.Logic;
@@ -44,9 +46,16 @@ public class GUI extends Application{
 	private static final String LIST_EVENTS = "Upcoming Events:";
 	private static final String LIST_FLOATING = "Floating Tasks:";
 	private static final String MESSAGE_HELP = "Change view by typing \"change\" or pressing 'tab'";
+	private static final String MESSAGE_COMMAND_HELP = "Press F1 to see a list of commands";
 	private static final String MESSAGE_SAMPLE_ADDTASK = "to insert a task: \"add [taskname] deadline [date & time] priority [1 to 5] category [name] reminder [date]\"";
 	private static final String MESSAGE_SAMPLE_ADDEVENT = "to insert an event: \"add [taskname] event [starting date & time] [ending date & time] priority [1 to 5] category [name] reminder [date]\"";
 	private static final String MESSAGE_SAMPLE_ADDFLOAT= "to insert a floating task: \"add [taskname] priority [1 to 5] category [name] reminder [date]\"";
+	private static final String COMMAND_SHOW_TASKS = "show tasks";
+	private static final String COMMAND_SHOW_EVENTS = "show events";
+	private static final String COMMAND_SHOW_OVERDUE = "show overdue"; 
+	private static final String COMMAND_SHOW_FLOAT = "show float";
+	private static final String COMMAND_EXIT = "exit";
+	
 	private static final int SCENE_MAIN = 1;
 	private static final int SCENE_FOCUS = 2;
 	private static final int NUM_TASKS = 1;
@@ -100,10 +109,7 @@ public class GUI extends Application{
 		ps = new PrintStream(console, true);
 		redirectOutput(ps);
 		displayStringToScreen(MESSAGE_WELCOME);
-		displayStringToScreen(MESSAGE_HELP);
-		displayStringToScreen(MESSAGE_SAMPLE_ADDTASK);
-		displayStringToScreen(MESSAGE_SAMPLE_ADDEVENT);
-		displayStringToScreen(MESSAGE_SAMPLE_ADDFLOAT);
+		displayStringToScreen(MESSAGE_COMMAND_HELP);
 		retrieveAllData();
 	}
 	
@@ -111,8 +117,7 @@ public class GUI extends Application{
 		getTasks = logicComponent.getUpcomingTasks();
 		getEvents = logicComponent.getUpcomingEvents();
 		getOverdue = logicComponent.getOverdueTasks();
-		getFloat= logicComponent.getFloatingTasks();
-		
+		getFloat = logicComponent.getFloatingTasks();
 	}
 
 	@Override
@@ -124,7 +129,7 @@ public class GUI extends Application{
 		
 		primaryStage.setScene(mainScene);
 		primaryStage.show();
-		userInputEvents();
+		determineEvents();
 	}
 	
 	private void setUpMainScene() throws IOException, JSONException, ParseException{
@@ -239,6 +244,7 @@ public class GUI extends Application{
 			floating.setText("Overdue:");
 			listOverdue = getList(getOverdue, getEvents.size()+getTasks.size());
 			listOverdue.setFocusTraversable(false);
+			listOverdue.setId("listOverdue");
 			GridPane.setConstraints(listOverdue, 3,1);
 			gridPane.getChildren().addAll(listOverdue);
 		}
@@ -420,7 +426,7 @@ public class GUI extends Application{
 		detailField.setText(getFocusList.get(currentPosition).printFull());
 	}
 	
-	private static void userInputEvents(){
+	private void determineEvents(){
 		userInput.setOnKeyPressed(new EventHandler<KeyEvent>()
 		{
 			@Override
@@ -440,9 +446,17 @@ public class GUI extends Application{
 					} catch (IOException | JSONException | ParseException e) {
 						e.printStackTrace();
 					}
-				} else if(ke.getCode().equals(KeyCode.F1)){
+				} else if (ke.getCode().equals(KeyCode.F1)){
+					helpPopUp();
+				} else if(ke.getCode().equals(KeyCode.F2)){
 					try {
 						toggleCategory();
+					} catch (IOException | JSONException | ParseException e) {
+						e.printStackTrace();
+					}
+				} else if (ke.getCode().equals(KeyCode.F12)){
+					try {
+						logicComponent.executeCommand("exit");
 					} catch (IOException | JSONException | ParseException e) {
 						e.printStackTrace();
 					}
@@ -496,6 +510,27 @@ public class GUI extends Application{
 		});
 	}
 	
+	private void helpPopUp() {
+		Stage pop = new Stage();
+		VBox comp = new VBox();
+		pop.setTitle("help");
+		ArrayList<String> help = new ArrayList<String>();
+		help.add(MESSAGE_HELP);
+		help.add(MESSAGE_SAMPLE_ADDTASK);
+		help.add(MESSAGE_SAMPLE_ADDEVENT);
+		help.add(MESSAGE_SAMPLE_ADDFLOAT);
+		ListView<String> helpList = getStringList(help);
+		VBox.setVgrow(helpList, Priority.ALWAYS);
+		comp.getChildren().add(helpList);
+		
+
+		Scene stageScene = new Scene(comp, 500, 500);
+		stageScene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+		pop.setScene(stageScene);
+		pop.show();
+	};
+
+
 	private static void changeScene() throws IOException, JSONException, ParseException{
 		if (currentScene == SCENE_MAIN){
 			setUpFocus();
@@ -512,40 +547,41 @@ public class GUI extends Application{
 		userCommands = userInput.getText();
 		userInput.clear();
 		System.out.println("Command: "+ userCommands);
-		if (userCommands.toLowerCase().equals("change")){
+		String display = logicComponent.executeCommand(userCommands);
+		if (display.equals("change")){
 			changeScene();
 		}
-		else if(userCommands.toLowerCase().contains("show overdue")){
+		else if(display.equals(COMMAND_SHOW_OVERDUE)){
 			currentList = NUM_OVERDUE;
 			setUpFocus();
 			refreshingFocus(currentList);
 			currentScene = SCENE_FOCUS;
 		}
-		else if(userCommands.toLowerCase().contains("show task")){
+		else if(display.equals(COMMAND_SHOW_TASKS)){
 			currentList = NUM_TASKS;
 			setUpFocus();
 			refreshingFocus(currentList);
 			currentScene = SCENE_FOCUS;
-		}else if(userCommands.toLowerCase().contains("show events")){
+		}else if(display.equals(COMMAND_SHOW_EVENTS)){
 			currentList = NUM_EVENTS;
 			setUpFocus();
 			refreshingFocus(currentList);
 			currentScene = SCENE_FOCUS;
-		}else if(userCommands.toLowerCase().contains("show float")){
+		}else if(display.equals(COMMAND_SHOW_FLOAT)){
 			currentList = NUM_FLOAT;
 			setUpFocus();
 			refreshingFocus(currentList);
 			currentScene = SCENE_FOCUS;
-		}
-		else {
-			String display = logicComponent.executeCommand(userCommands);
+		} else if(display.equals(COMMAND_EXIT)){
+			exit();
+		} else {
 			refresh();
-			if (display.equals("exit")){
-				Platform.exit();
-			}
 			displayStringToScreen(display);
 		}
-
+	}
+	
+	private static void exit(){
+		Platform.exit();
 	}
 	
 	private static void eventDown() throws IOException, JSONException, ParseException{

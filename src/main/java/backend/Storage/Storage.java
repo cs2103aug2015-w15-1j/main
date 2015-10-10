@@ -535,7 +535,7 @@ public class Storage {
 	}
 	
 
-	public void updateFile(ArrayList<Category> categories) {
+	public void saveData(ArrayList<Category> categories) {
 		
 		for(Category category : categories) {
 			allData.get(category).setTasks(category.getTasks());

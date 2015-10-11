@@ -33,6 +33,8 @@ public class StorageTest {
 	
 	private static final int PRIORITY_3 = 3;
 	private static final int PRIORITY_5 = 5;
+	private static final int SIZE_0 = 0;
+	private static final int SIZE_1 = 1;
 
 	/* ======================== Category colors ========================= */
 	private static final String COLOUR_BLUE = "#24c6d5";
@@ -352,11 +354,23 @@ public class StorageTest {
 		categoryNames.addAll(Arrays.asList(CATEGORY1, CATEGORY3));
 
 		assertEquals(categoryNames, storage.getCategories());
+		
+		storage.deleteAll();
 	}
 	
 	@Test
 	public void testDeleteTask() {
 		
-		//storage.deleteTask(0);
+		CATEGORY2_TODO1.setIndex(5);
+		CATEGORY3_FLOAT1.setIndex(6);
+		storage.addTask(CATEGORY2_TODO1);
+		storage.addFloatingTask(CATEGORY3_FLOAT1);
+		
+		storage.deleteTask(CATEGORY2_TODO1.getIndex());
+		
+		assertEquals(SIZE_0, storage.getCategoryList().get(1).getTasks().size());
+		assertEquals(SIZE_1, storage.getCategoryList().get(2).getFloatTasks().size());
+		
+		storage.deleteAll();
 	}
 }

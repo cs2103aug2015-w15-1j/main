@@ -26,6 +26,9 @@ public class StorageTest {
 	private static final long DATE_FLOAT_STARTTIME = Storage.stringToMillisecond("Tue, 3 Nov 12:00pm");
 	private static final long DATE_TODO_ENDTIME = Storage.stringToMillisecond("Sat, 3 Oct 8:00am");
 	private static final long DATE_FLOAT_ENDTIME = Storage.stringToMillisecond("Tue, 20 Oct 8:00am");
+	
+	private static final int PRIORITY_3 = 3;
+	private static final int PRIORITY_5 = 5;
 
 	/* ======================== Category colors ========================= */
 	private static final String COLOUR_BLUE = "#24c6d5";
@@ -276,6 +279,29 @@ public class StorageTest {
 				get(CATEGORY1_TODO1.getTaskId()).getEndDate());
 		assertEquals(DATE_FLOAT_END, storage.getCategoryList().get(1).getFloatTasks().
 				get(CATEGORY2_FLOAT1.getTaskId()).getEndDate());
+		
+		storage.deleteAll();
+	}
+	
+	@Test
+	public void testSetPriority() {
+		
+		storage.addCategory(CATEGORY1);
+		storage.addCategory(CATEGORY2);
+		storage.addCategory(CATEGORY3);
+		
+		CATEGORY1_TODO2.setIndex(5);
+		CATEGORY3_FLOAT1.setIndex(6);
+		storage.addTask(CATEGORY1_TODO2);
+		storage.addFloatingTask(CATEGORY3_FLOAT1);
+		
+		storage.setPriority(CATEGORY1_TODO2.getIndex(), PRIORITY_5);
+		storage.setPriority(CATEGORY3_FLOAT1.getIndex(), PRIORITY_3);
+		
+		assertEquals(PRIORITY_5, storage.getCategoryList().get(0).getTasks().
+				get(CATEGORY1_TODO2.getTaskId()).getPriority());
+		assertEquals(PRIORITY_3, storage.getCategoryList().get(2).getFloatTasks().
+				get(CATEGORY3_FLOAT1.getTaskId()).getPriority());
 		
 		storage.deleteAll();
 	}

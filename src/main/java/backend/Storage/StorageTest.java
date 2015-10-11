@@ -14,6 +14,7 @@ import main.java.backend.Storage.Task.Task;
 public class StorageTest {
 
 	private static final String TEST_FILE_NAME = "test.txt";
+	private static final String TYPE_EVENT = "event";
 	
 	private static final String DESCRIPTION_TODO = "Find out how to code query in PHP";
 	private static final String DESCRIPTION_EVENT = "Meet at East Coast Lagoon Food Village at 1pm";
@@ -354,6 +355,26 @@ public class StorageTest {
 		categoryNames.addAll(Arrays.asList(CATEGORY1, CATEGORY3));
 
 		assertEquals(categoryNames, storage.getCategories());
+		
+		storage.deleteAll();
+	}
+	
+	@Test
+	public void testDeleteTaskTypeFromCategory() {
+		
+		CATEGORY2_TODO1.setIndex(5);
+		CATEGORY3_FLOAT1.setIndex(6);
+		storage.addTask(CATEGORY2_TODO1);
+		storage.addFloatingTask(CATEGORY3_FLOAT1);
+		storage.addEvent(CATEGORY3_EVENT1);
+		storage.addEvent(CATEGORY3_EVENT2);
+		
+		storage.deleteTaskTypeFromCategory(CATEGORY3, TYPE_EVENT);
+		
+		assertEquals(SIZE_0, storage.getCategoryList().get(0).getTasks().size());
+		assertEquals(SIZE_1, storage.getCategoryList().get(1).getTasks().size());
+		assertEquals(SIZE_1, storage.getCategoryList().get(2).getFloatTasks().size());
+		assertEquals(SIZE_0, storage.getCategoryList().get(2).getEvents().size());
 		
 		storage.deleteAll();
 	}

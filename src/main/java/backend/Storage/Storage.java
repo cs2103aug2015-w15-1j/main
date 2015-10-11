@@ -479,17 +479,17 @@ public class Storage {
 	}
 	
 	
-	public void setUndone(int taskIndex) {
-		
-		String taskId = getTaskId(taskIndex);
-		setDone(taskId, false);
-	}
-	
-	
 	public void setDone(int taskIndex) {
 		
 		String taskId = getTaskId(taskIndex);
 		setDone(taskId, true);
+	}
+	
+	
+	public void setUndone(int taskIndex) {
+		
+		String taskId = getTaskId(taskIndex);
+		setDone(taskId, false);
 	}
 	
 	

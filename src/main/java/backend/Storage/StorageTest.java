@@ -8,6 +8,7 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
+import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
 public class StorageTest {
@@ -382,6 +383,13 @@ public class StorageTest {
 	 * 									DELETE
 	 ***************************************************************************/
 
+	@Test
+	public void testDeleteAll() {
+		
+		storage.deleteAll();
+		assertEquals(new ArrayList<Category> (), storage.getCategoryList());
+	}
+	
 	@Test
 	public void testDeleteTask() {
 		

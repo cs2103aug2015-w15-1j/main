@@ -58,9 +58,9 @@ public class Storage {
 		data.save(allData);
 	}
 	
-	private void setDone(String taskId, boolean isDone) {
+	private void setDone(int taskId, boolean isDone) {
 		
-		TreeMap<String, Task> targetTask = getAllTasks();
+		TreeMap<Integer, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setDone(isDone);
 		
 		if(isDone) {
@@ -73,17 +73,17 @@ public class Storage {
 	private void setTargetTaskList(Category category, String taskType, Task newTask) {
 		switch(taskType) {
 			case TYPE_TASK:
-				TreeMap<String, Task> allTasks = category.getTasks();
+				TreeMap<Integer, Task> allTasks = category.getTasks();
 				allTasks.put(newTask.getTaskId(), newTask);
 				category.setTasks(allTasks);
 				break;
 			case TYPE_FLOAT:
-				TreeMap<String, Task> allFloatingTasks = category.getFloatTasks();
+				TreeMap<Integer, Task> allFloatingTasks = category.getFloatTasks();
 				allFloatingTasks.put(newTask.getTaskId(), newTask);
 				category.setFloatTasks(allFloatingTasks);
 				break;
 			case TYPE_EVENT:
-				TreeMap<String, Task> allEvents = category.getEvents();
+				TreeMap<Integer, Task> allEvents = category.getEvents();
 				allEvents.put(newTask.getTaskId(), newTask);
 				category.setEvents(allEvents);
 				break;
@@ -92,7 +92,7 @@ public class Storage {
 		allData.put(category.getCategoryName(), category);
 	}
 	
-	private TreeMap<String, Task> getTargetTaskList(Category category, String taskType) {
+	private TreeMap<Integer, Task> getTargetTaskList(Category category, String taskType) {
 		switch(taskType) {
 			case TYPE_TASK:
 				return category.getTasks();
@@ -101,24 +101,24 @@ public class Storage {
 			case TYPE_EVENT:
 				return category.getEvents();
 		}
-		return new TreeMap<String, Task> ();
+		return new TreeMap<Integer, Task> ();
 	}
 	
-	private TreeMap<String, Task> getAllTasks() {
-		TreeMap<String, Task> allTasks = new TreeMap<String, Task> ();
+	private TreeMap<Integer, Task> getAllTasks() {
+		TreeMap<Integer, Task> allTasks = new TreeMap<Integer, Task> ();
 		
 		for(String categoryName : allData.keySet()) {
 			Category category = allData.get(categoryName);
 			
-			for(String taskId : category.getTasks().keySet()) {
+			for(int taskId : category.getTasks().keySet()) {
 				allTasks.put(taskId, category.getTasks().get(taskId));
 			}
 			
-			for(String taskId : category.getFloatTasks().keySet()) {
+			for(int taskId : category.getFloatTasks().keySet()) {
 				allTasks.put(taskId, category.getFloatTasks().get(taskId));
 			}
 			
-			for(String taskId : category.getEvents().keySet()) {
+			for(int taskId : category.getEvents().keySet()) {
 				allTasks.put(taskId, category.getEvents().get(taskId));
 			}
 			
@@ -170,11 +170,11 @@ public class Storage {
 		return typeTask;
 	}
 	
-	private ArrayList<Task> getTasksInArray(TreeMap<String, Task> tasks) {
+	private ArrayList<Task> getTasksInArray(TreeMap<Integer, Task> tasks) {
 		
 		ArrayList<Task> allTasks = new ArrayList<Task> ();
 		
-		for(String taskId : tasks.keySet()) {
+		for(int taskId : tasks.keySet()) {
 			allTasks.add(tasks.get(taskId));
 		}
 		
@@ -212,7 +212,7 @@ public class Storage {
 		}
 	}
 	
-	private String getTaskId(int index) {
+	private int getTaskId(int index) {
 		
 		ArrayList<Task> allTasks = getTaskList();
 		int size = allTasks.size();
@@ -224,7 +224,7 @@ public class Storage {
 		}
 		
 		// Should not reach here
-		return new String();
+		return -1;
 	}
 	
 	/****************************************************************************
@@ -299,9 +299,9 @@ public class Storage {
 	public ArrayList<Task> getTaskList() {
 
 		ArrayList<Task> taskList = new ArrayList<Task> ();
-		TreeMap<String, Task> allTasks = getAllTasks();
+		TreeMap<Integer, Task> allTasks = getAllTasks();
 
-		for(String taskId : allTasks.keySet()) {
+		for(int taskId : allTasks.keySet()) {
 			taskList.add(allTasks.get(taskId));
 		}
 
@@ -429,7 +429,7 @@ public class Storage {
 	
 	public void setCategory(int taskIndex, String categoryName) {
 		
-		String taskId = getTaskId(taskIndex);
+		int taskId = getTaskId(taskIndex);
 		Task task = getAllTasks().get(taskId);
 		String taskType = checkTaskType(task);
 		
@@ -444,8 +444,8 @@ public class Storage {
 	
 	public void setName(int taskIndex, String name) {
 
-		String taskId = getTaskId(taskIndex);
-		TreeMap<String, Task> targetTask = getAllTasks();
+		int taskId = getTaskId(taskIndex);
+		TreeMap<Integer, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setName(name);
 		data.save(allData);
 	}
@@ -453,8 +453,8 @@ public class Storage {
 	
 	public void setDescription(int taskIndex, String description) {
 
-		String taskId = getTaskId(taskIndex);
-		TreeMap<String, Task> targetTask = getAllTasks();
+		int taskId = getTaskId(taskIndex);
+		TreeMap<Integer, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setDescription(description);
 		data.save(allData);
 	}
@@ -462,8 +462,8 @@ public class Storage {
 	
 	public void setStartDate(int taskIndex, long startTime, String startDate) {
 		
-		String taskId = getTaskId(taskIndex);
-		TreeMap<String, Task> targetTask = getAllTasks();
+		int taskId = getTaskId(taskIndex);
+		TreeMap<Integer, Task> targetTask = getAllTasks();
 		Task task = targetTask.get(taskId);
 		
 		deleteTask(taskIndex);
@@ -478,8 +478,8 @@ public class Storage {
 	
 	public void setDeadline(int taskIndex, long deadlineTime, String deadlineDate) {
 		
-		String taskId = getTaskId(taskIndex);
-		TreeMap<String, Task> targetTask = getAllTasks();
+		int taskId = getTaskId(taskIndex);
+		TreeMap<Integer, Task> targetTask = getAllTasks();
 		Task task = targetTask.get(taskId);
 		
 		deleteTask(taskIndex);
@@ -494,8 +494,8 @@ public class Storage {
 	
 	public void setReminder(int taskIndex, long reminderTime, String reminderDate) {
 		
-		String taskId = getTaskId(taskIndex);
-		TreeMap<String, Task> targetTask = getAllTasks();
+		int taskId = getTaskId(taskIndex);
+		TreeMap<Integer, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setReminderDate(reminderDate);
 		targetTask.get(taskId).setReminder(reminderTime);
 		data.save(allData);
@@ -504,8 +504,8 @@ public class Storage {
 	
 	public void setPriority(int taskIndex, int priority) {
 		
-		String taskId = getTaskId(taskIndex);
-		TreeMap<String, Task> targetTask = getAllTasks();
+		int taskId = getTaskId(taskIndex);
+		TreeMap<Integer, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setPriority(priority);
 		data.save(allData);	
 	}
@@ -513,14 +513,14 @@ public class Storage {
 	
 	public void setDone(int taskIndex) {
 		
-		String taskId = getTaskId(taskIndex);
+		int taskId = getTaskId(taskIndex);
 		setDone(taskId, true);
 	}
 	
 	
 	public void setUndone(int taskIndex) {
 		
-		String taskId = getTaskId(taskIndex);
+		int taskId = getTaskId(taskIndex);
 		setDone(taskId, false);
 	}
 	
@@ -566,7 +566,7 @@ public class Storage {
 	
 	
 	public void deleteTaskTypeFromCategory(String categoryName, String taskType) {
-		TreeMap<String, Task> resetData = new TreeMap<String, Task>();
+		TreeMap<Integer, Task> resetData = new TreeMap<Integer, Task>();
 		switch(taskType) {
 			case TYPE_TASK:
 				allData.get(categoryName).setTasks(resetData);
@@ -584,10 +584,10 @@ public class Storage {
 	
 	public void deleteTask(int taskIndex) {
 
-		String taskId = getTaskId(taskIndex);
+		int taskId = getTaskId(taskIndex);
 		Task task = getAllTasks().get(taskId);
 		
-		TreeMap<String, Task> tasks = getTargetTaskList
+		TreeMap<Integer, Task> tasks = getTargetTaskList
 				(allData.get(task.getCategory()), checkTaskType(task));
 
 		if(tasks.containsKey(taskId)) {

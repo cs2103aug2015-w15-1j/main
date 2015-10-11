@@ -382,7 +382,7 @@ public class Storage {
 		ArrayList<Task> upcomingEvents = new ArrayList<Task> ();
 		
 		for(Task task : allTasks) {
-			if(task.getStartTime() >= getCurrentTime() && !task.getDone()) {
+			if(task.getEndTime() >= getCurrentTime() && !task.getDone()) {
 				upcomingEvents.add(task);
 			}
 		}
@@ -610,10 +610,12 @@ public class Storage {
 
 	public void saveData(ArrayList<Category> categories) {
 		
+		System.out.println("SIZE: " + categories.get(0).getFloatTasks().size());
+		
 		for(Category category : categories) {
 			allData.get(category.getCategoryName()).setTasks(category.getTasks());
 			allData.get(category.getCategoryName()).setFloatTasks(category.getFloatTasks());
-			allData.get(category.getCategoryName()).setEvents(category.getFloatTasks());
+			allData.get(category.getCategoryName()).setEvents(category.getEvents());
 			allData.put(category.getCategoryName(), category);
 		}
 		

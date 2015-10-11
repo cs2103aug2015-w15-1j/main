@@ -36,6 +36,7 @@ public class StorageTest {
 	private static final int PRIORITY_5 = 5;
 	private static final int SIZE_0 = 0;
 	private static final int SIZE_1 = 1;
+	private static final int SIZE_2 = 2;
 
 	/* ======================== Category colors ========================= */
 	private static final String COLOUR_BLUE = "#24c6d5";
@@ -391,6 +392,21 @@ public class StorageTest {
 		
 		assertEquals(SIZE_0, storage.getCategoryList().get(1).getTasks().size());
 		assertEquals(SIZE_1, storage.getCategoryList().get(2).getFloatTasks().size());
+		
+		storage.deleteAll();
+	}
+	
+	/****************************************************************************
+	 * 									OTHERS
+	 ***************************************************************************/
+	
+	@Test
+	public void testSaveData() {
+	
+		storage.deleteCategory(CATEGORY1);
+		storage.saveData(storage.getCategoryList());
+		
+		assertEquals(SIZE_2, storage.getCategoryList().size());
 		
 		storage.deleteAll();
 	}

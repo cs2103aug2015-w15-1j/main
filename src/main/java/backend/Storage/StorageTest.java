@@ -284,6 +284,29 @@ public class StorageTest {
 	}
 	
 	@Test
+	public void testSetReminder() {
+		
+		storage.addCategory(CATEGORY1);
+		storage.addCategory(CATEGORY2);
+		storage.addCategory(CATEGORY3);
+		
+		CATEGORY1_TODO1.setIndex(5);
+		CATEGORY2_FLOAT1.setIndex(6);
+		storage.addTask(CATEGORY1_TODO1);
+		storage.addFloatingTask(CATEGORY2_FLOAT1);
+		
+		storage.setReminder(CATEGORY1_TODO1.getIndex(), DATE_TODO_STARTTIME, DATE_TODO_START);
+		storage.setReminder(CATEGORY2_FLOAT1.getIndex(), DATE_FLOAT_STARTTIME, DATE_FLOAT_START);
+		
+		assertEquals(DATE_TODO_START, storage.getCategoryList().get(0).getTasks().
+				get(CATEGORY1_TODO1.getTaskId()).getReminderDate());
+		assertEquals(DATE_FLOAT_START, storage.getCategoryList().get(1).getFloatTasks().
+				get(CATEGORY2_FLOAT1.getTaskId()).getReminderDate());
+		
+		storage.deleteAll();
+	}
+	
+	@Test
 	public void testSetPriority() {
 		
 		storage.addCategory(CATEGORY1);

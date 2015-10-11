@@ -97,7 +97,7 @@ public class StorageTest {
 	 * 									CREATE
 	 ***************************************************************************/
 
-	@Test
+	@Before
 	public void testAddCategories() {
 
 		ArrayList<String> categoryNames = new ArrayList<String> ();
@@ -114,11 +114,7 @@ public class StorageTest {
 
 	@Test
 	public void testAddFloatingTask() {
-		
-		storage.addCategory(CATEGORY1);
-		storage.addCategory(CATEGORY2);
-		storage.addCategory(CATEGORY3);
-		
+
 		storage.addFloatingTask(CATEGORY2_FLOAT1);
 		storage.addFloatingTask(CATEGORY3_FLOAT1);
 
@@ -133,10 +129,6 @@ public class StorageTest {
 
 	@Test
 	public void testAddTask() {
-		
-		storage.addCategory(CATEGORY1);
-		storage.addCategory(CATEGORY2);
-		storage.addCategory(CATEGORY3);
 
 		storage.addTask(CATEGORY1_TODO1);
 		storage.addTask(CATEGORY1_TODO2);
@@ -157,10 +149,6 @@ public class StorageTest {
 
 	@Test
 	public void testAddEvent() {
-		
-		storage.addCategory(CATEGORY1);
-		storage.addCategory(CATEGORY2);
-		storage.addCategory(CATEGORY3);
 
 		storage.addEvent(CATEGORY3_EVENT1);
 		storage.addEvent(CATEGORY3_EVENT2);
@@ -179,10 +167,6 @@ public class StorageTest {
 	
 	@Test
 	public void testSetCategoryColour() {
-		
-		storage.addCategory(CATEGORY1);
-		storage.addCategory(CATEGORY2);
-		storage.addCategory(CATEGORY3);
 
 		storage.setCategoryColour(CATEGORY1, COLOUR_BLUE);
 		storage.setCategoryColour(CATEGORY2, COLOUR_GREEN);
@@ -196,9 +180,6 @@ public class StorageTest {
 	@Test
 	public void testSetCategory() {
 		
-		storage.addCategory(CATEGORY1);
-		storage.addCategory(CATEGORY2);
-		storage.addCategory(CATEGORY3);
 		storage.addCategory(CATEGORY4);
 
 		CATEGORY3_EVENT1.setIndex(5);
@@ -220,10 +201,6 @@ public class StorageTest {
 	@Test
 	public void testSetDescription() {
 		
-		storage.addCategory(CATEGORY1);
-		storage.addCategory(CATEGORY2);
-		storage.addCategory(CATEGORY3);
-		
 		CATEGORY1_TODO1.setIndex(5);
 		CATEGORY3_EVENT2.setIndex(6);
 		storage.addTask(CATEGORY1_TODO1);
@@ -242,10 +219,6 @@ public class StorageTest {
 	
 	@Test
 	public void testSetStartDate() {
-		
-		storage.addCategory(CATEGORY1);
-		storage.addCategory(CATEGORY2);
-		storage.addCategory(CATEGORY3);
 		
 		CATEGORY1_TODO1.setIndex(5);
 		CATEGORY2_FLOAT1.setIndex(6);
@@ -266,10 +239,6 @@ public class StorageTest {
 	@Test
 	public void testSetEndDate() {
 		
-		storage.addCategory(CATEGORY1);
-		storage.addCategory(CATEGORY2);
-		storage.addCategory(CATEGORY3);
-		
 		CATEGORY1_TODO1.setIndex(5);
 		CATEGORY2_FLOAT1.setIndex(6);
 		storage.addTask(CATEGORY1_TODO1);
@@ -289,10 +258,6 @@ public class StorageTest {
 	@Test
 	public void testSetReminder() {
 		
-		storage.addCategory(CATEGORY1);
-		storage.addCategory(CATEGORY2);
-		storage.addCategory(CATEGORY3);
-		
 		CATEGORY1_TODO1.setIndex(5);
 		CATEGORY2_FLOAT1.setIndex(6);
 		storage.addTask(CATEGORY1_TODO1);
@@ -311,10 +276,6 @@ public class StorageTest {
 	
 	@Test
 	public void testSetPriority() {
-		
-		storage.addCategory(CATEGORY1);
-		storage.addCategory(CATEGORY2);
-		storage.addCategory(CATEGORY3);
 		
 		CATEGORY1_TODO2.setIndex(5);
 		CATEGORY3_FLOAT1.setIndex(6);
@@ -336,10 +297,6 @@ public class StorageTest {
 	@Test
 	public void testSetDone() {
 		
-		storage.addCategory(CATEGORY1);
-		storage.addCategory(CATEGORY2);
-		storage.addCategory(CATEGORY3);
-		
 		CATEGORY2_TODO1.setIndex(5);
 		CATEGORY3_FLOAT1.setIndex(6);
 		storage.addTask(CATEGORY2_TODO1);
@@ -358,10 +315,6 @@ public class StorageTest {
 	
 	@Test
 	public void testSetUndone() {
-		
-		storage.addCategory(CATEGORY1);
-		storage.addCategory(CATEGORY2);
-		storage.addCategory(CATEGORY3);
 		
 		CATEGORY1_TODO2.setIndex(5);
 		CATEGORY2_TODO1.setIndex(6);
@@ -388,6 +341,17 @@ public class StorageTest {
 		
 		storage.deleteAll();
 		assertEquals(new ArrayList<Category> (), storage.getCategoryList());
+	}
+	
+	@Test
+	public void testDeleteCategory() {
+		
+		storage.deleteCategory(CATEGORY2);
+		
+		ArrayList<String> categoryNames = new ArrayList<String> ();
+		categoryNames.addAll(Arrays.asList(CATEGORY1, CATEGORY3));
+
+		assertEquals(categoryNames, storage.getCategories());
 	}
 	
 	@Test

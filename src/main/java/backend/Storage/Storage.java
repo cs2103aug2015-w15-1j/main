@@ -185,12 +185,20 @@ public class Storage {
 	
 	private String checkTaskType(Task task) {
 		
-		if(!task.getStartDate().isEmpty() && !task.getEndDate().isEmpty()) {
+		if(!task.getStartDate().isEmpty()) {
 			return TYPE_EVENT;
 		} else if(!task.getEndDate().isEmpty()) {
 			return TYPE_TASK;
 		} else {
 			return TYPE_FLOAT;
+		}
+	}
+	
+	private void changeTaskType(Task task, String newTaskType) {
+		
+		if(checkTaskType(task).equals(TYPE_FLOAT) && newTaskType.equals(TYPE_EVENT)) {
+			deleteTask(task.getIndex());
+			addNewTask(task.getCategory(), newTaskType, task);
 		}
 	}
 	
@@ -469,15 +477,11 @@ public class Storage {
 		TreeMap<String, Task> targetTask = getAllTasks();
 		Task task = targetTask.get(taskId);
 		String taskType = checkTaskType(task);
-		String newTaskType = checkTaskType(task);
 		
 		task.setStartDate(startDate);
 		task.setStartTime(startTime);
 		
-		if(taskType.equals(TYPE_FLOAT) || taskType.equals(TYPE_TASK)) {
-			//changeTypeToEvent
-		}
-		
+		changeTaskType(task, startDate);
 		
 		data.save(allData);
 	}
@@ -610,7 +614,7 @@ public class Storage {
 
 	public void saveData(ArrayList<Category> categories) {
 		
-		System.out.println("SIZE: " + categories.get(0).getFloatTasks().size());
+		//System.out.println("STORAGE FLOAT SIZE: " + categories.get(0).getFloatTasks().size());
 		
 		for(Category category : categories) {
 			allData.get(category.getCategoryName()).setTasks(category.getTasks());

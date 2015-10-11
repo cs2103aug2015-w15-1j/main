@@ -34,6 +34,7 @@ public class LogicController {
 		creatorSubComponent = LogicCreator.getInstance(storageComponent);
 		editorSubComponent = LogicEditor.getInstance(storageComponent);
 		getterSubComponent = LogicGetter.getInstance(storageComponent);
+		updateHistoryStack();
 		System.out.println("Logic component initialised successfully");
 	}
 

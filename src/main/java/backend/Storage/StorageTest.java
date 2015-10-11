@@ -72,10 +72,10 @@ public class StorageTest {
 		CATEGORY1_TODO2 = new Task(CATEGORY1, "Revise SQL queries", 
 				"Read up on ALL SQL queries including nested", 
 				"Sat, 10 Oct 9:00am", Storage.stringToMillisecond("Sat, 10 Oct 9:00am"), 5, 
-				"Fri, 9 Oct 6:00pm", Storage.stringToMillisecond("Fri, 9 Oct 6:00pm"), false);
+				"Fri, 9 Oct 6:00pm", Storage.stringToMillisecond("Fri, 9 Oct 6:00pm"), true);
 		CATEGORY2_TODO1 = new Task(CATEGORY2, "Text Buddy CE2", "Change code to OOP style", 
 				"Sat, 19 Oct 8:00am", Storage.stringToMillisecond("Sat, 19 Oct 8:00am"), 5, 
-				"Mon, 21 Oct 10:00am", Storage.stringToMillisecond("Mon, 21 Oct 10:00am"), false);
+				"Mon, 21 Oct 10:00am", Storage.stringToMillisecond("Mon, 21 Oct 10:00am"), true);
 		CATEGORY2_FLOAT1 = new Task(CATEGORY2, "Watch webcast", "Watch before November", -1, 
 				"Tue, 20 Oct 8:00am", Storage.stringToMillisecond("Tue, 20 Oct 8:00am"), false);
 		CATEGORY3_TODO1 = new Task(CATEGORY3, "Help mum buy groceries", "Every Saturday!", 
@@ -351,6 +351,29 @@ public class StorageTest {
 				get(CATEGORY2_TODO1.getTaskId()).getDone());
 		assertEquals(DONE, storage.getCategoryList().get(2).getFloatTasks().
 				get(CATEGORY3_FLOAT1.getTaskId()).getDone());
+		
+		storage.deleteAll();
+	}
+	
+	@Test
+	public void testSetUndone() {
+		
+		storage.addCategory(CATEGORY1);
+		storage.addCategory(CATEGORY2);
+		storage.addCategory(CATEGORY3);
+		
+		CATEGORY1_TODO2.setIndex(5);
+		CATEGORY2_TODO1.setIndex(6);
+		storage.addTask(CATEGORY1_TODO2);
+		storage.addTask(CATEGORY2_TODO1);
+		
+		storage.setUndone(CATEGORY1_TODO2.getIndex());
+		storage.setUndone(CATEGORY2_TODO1.getIndex());
+		
+		assertEquals(UNDONE, storage.getCategoryList().get(0).getTasks().
+				get(CATEGORY1_TODO2.getTaskId()).getDone());
+		assertEquals(UNDONE, storage.getCategoryList().get(1).getTasks().
+				get(CATEGORY2_TODO1.getTaskId()).getDone());
 		
 		storage.deleteAll();
 	}

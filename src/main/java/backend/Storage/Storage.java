@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.TreeMap;
 
+import main.java.backend.GeneralFunctions.GeneralFunctions;
 import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.SubTask;
 import main.java.backend.Storage.Task.Task;
@@ -25,9 +26,6 @@ public class Storage {
 	private static final String TYPE_EVENT = "event";
 
 	private TreeMap<String, Category> allData;
-	
-	private static final SimpleDateFormat formatterForDateTime = 
-			new SimpleDateFormat("EEE, dd MMM hh:mma");
 	
 	private Data data;
 
@@ -185,35 +183,16 @@ public class Storage {
 	
 	private String checkTaskType(Task task) {
 		
-		if(!task.getStartDate().isEmpty()) {
-			return TYPE_EVENT;
-		} else if(!task.getEndDate().isEmpty()) {
-			return TYPE_TASK;
-		} else {
-			return TYPE_FLOAT;
-		}
-	}
-	
-	private void changeTaskType(Task task, String newTaskType) {
+		String taskType = TYPE_FLOAT;
 		
-		if(checkTaskType(task).equals(TYPE_FLOAT) && newTaskType.equals(TYPE_EVENT)) {
-			deleteTask(task.getIndex());
-			addNewTask(task.getCategory(), newTaskType, task);
-		}
+		if(!task.getStartDate().isEmpty()) {
+			taskType = TYPE_EVENT;
+		} else if(!task.getEndDate().isEmpty()) {
+			taskType = TYPE_TASK;
+		} 
+		
+		return taskType;
 	}
-	
-	public static long stringToMillisecond(String dateTime) {
-        try {
-            Date tempDateTime = formatterForDateTime.parse(dateTime);
-            long dateTimeMillisecond = tempDateTime.getTime();
-            return (dateTimeMillisecond);
-        } catch (java.text.ParseException e) {
-			e.printStackTrace();
-		}
-
-        //Should not reach here
-        return -1;
-    }
 	
 	private long getCurrentTime() {
 		
@@ -221,8 +200,17 @@ public class Storage {
 		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM hh:mma yyyy");
 		Date resultdate = new Date(currentMilliseconds);
 		
-		return stringToMillisecond(standardFormat.format(resultdate));
+		return GeneralFunctions.stringToMillisecond(standardFormat.format(resultdate));
     }
+	
+	private long getTime(Task task) {
+
+		if(task.getEndTime() > 0) {
+			return task.getEndTime();
+		} else {
+			return task.getStartTime();
+		}
+	}
 	
 	private String getTaskId(int index) {
 		
@@ -389,8 +377,8 @@ public class Storage {
 		ArrayList<Task> allTasks = getEvents();
 		ArrayList<Task> upcomingEvents = new ArrayList<Task> ();
 		
-		for(Task task : allTasks) {
-			if(task.getEndTime() >= getCurrentTime() && !task.getDone()) {
+		for(Task task : allTasks) {		
+			if(getTime(task) >= getCurrentTime() && !task.getDone()) {
 				upcomingEvents.add(task);
 			}
 		}
@@ -472,27 +460,32 @@ public class Storage {
 	
 	
 	public void setStartDate(int taskIndex, long startTime, String startDate) {
-
+		
 		String taskId = getTaskId(taskIndex);
 		TreeMap<String, Task> targetTask = getAllTasks();
 		Task task = targetTask.get(taskId);
-		String taskType = checkTaskType(task);
 		
+		deleteTask(taskIndex);
 		task.setStartDate(startDate);
 		task.setStartTime(startTime);
 		
-		changeTaskType(task, startDate);
+		addNewTask(task.getCategory(), checkTaskType(task), task);
 		
 		data.save(allData);
 	}
 	
+	
 	public void setDeadline(int taskIndex, long deadlineTime, String deadlineDate) {
-
+		
 		String taskId = getTaskId(taskIndex);
 		TreeMap<String, Task> targetTask = getAllTasks();
-		targetTask.get(taskId).setEndDate(deadlineDate);
-		targetTask.get(taskId).setEndTime(deadlineTime);
+		Task task = targetTask.get(taskId);
 		
+		deleteTask(taskIndex);
+		task.setEndDate(deadlineDate);
+		task.setEndTime(deadlineTime);
+		
+		addNewTask(task.getCategory(), checkTaskType(task), task);
 		
 		data.save(allData);
 	}
@@ -592,6 +585,7 @@ public class Storage {
 
 		String taskId = getTaskId(taskIndex);
 		Task task = getAllTasks().get(taskId);
+		
 		TreeMap<String, Task> tasks = getTargetTaskList
 				(allData.get(task.getCategory()), checkTaskType(task));
 
@@ -613,8 +607,6 @@ public class Storage {
 	 ***************************************************************************/
 
 	public void saveData(ArrayList<Category> categories) {
-		
-		//System.out.println("STORAGE FLOAT SIZE: " + categories.get(0).getFloatTasks().size());
 		
 		for(Category category : categories) {
 			allData.get(category.getCategoryName()).setTasks(category.getTasks());

@@ -237,9 +237,9 @@ public class StorageTest {
 		storage.setStartDate(CATEGORY1_TODO1.getIndex(), DATE_TODO_STARTTIME, DATE_TODO_START);
 		storage.setStartDate(CATEGORY2_FLOAT1.getIndex(), DATE_FLOAT_STARTTIME, DATE_FLOAT_START);
 		
-		assertEquals(DATE_TODO_START, storage.getCategoryList().get(0).getTasks().
+		assertEquals(DATE_TODO_START, storage.getCategoryList().get(0).getEvents().
 				get(CATEGORY1_TODO1.getTaskId()).getStartDate());
-		assertEquals(DATE_FLOAT_START, storage.getCategoryList().get(1).getFloatTasks().
+		assertEquals(DATE_FLOAT_START, storage.getCategoryList().get(1).getEvents().
 				get(CATEGORY2_FLOAT1.getTaskId()).getStartDate());
 		
 		storage.deleteAll();
@@ -258,7 +258,7 @@ public class StorageTest {
 		
 		assertEquals(DATE_TODO_END, storage.getCategoryList().get(0).getTasks().
 				get(CATEGORY1_TODO1.getTaskId()).getEndDate());
-		assertEquals(DATE_FLOAT_END, storage.getCategoryList().get(1).getFloatTasks().
+		assertEquals(DATE_FLOAT_END, storage.getCategoryList().get(1).getTasks().
 				get(CATEGORY2_FLOAT1.getTaskId()).getEndDate());
 		
 		storage.deleteAll();

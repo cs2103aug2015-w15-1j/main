@@ -2,6 +2,7 @@ package main.java.backend.Logic;
 
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
+import main.java.backend.GeneralFunctions.GeneralFunctions;
 
 public class LogicCreator {
 	

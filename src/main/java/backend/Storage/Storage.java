@@ -438,19 +438,6 @@ public class Storage {
 		data.save(allData);
 	}
 	
-	public void setUndone(int taskIndex) {
-		
-		String taskId = getTaskId(taskIndex);
-		setDone(taskId, false);
-	}
-	
-	
-	public void setDone(int taskIndex) {
-		
-		String taskId = getTaskId(taskIndex);
-		setDone(taskId, true);
-	}
-	
 	public void setDeadline(int taskIndex, long deadlineTime, String deadlineDate) {
 
 		String taskId = getTaskId(taskIndex);
@@ -477,6 +464,20 @@ public class Storage {
 		TreeMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setPriority(priority);
 		data.save(allData);	
+	}
+	
+	
+	public void setUndone(int taskIndex) {
+		
+		String taskId = getTaskId(taskIndex);
+		setDone(taskId, false);
+	}
+	
+	
+	public void setDone(int taskIndex) {
+		
+		String taskId = getTaskId(taskIndex);
+		setDone(taskId, true);
 	}
 	
 	

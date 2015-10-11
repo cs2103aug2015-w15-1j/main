@@ -16,6 +16,10 @@ public class StorageTest {
 	
 	private static final String DESCRIPTION_TODO = "Find out how to code query in PHP";
 	private static final String DESCRIPTION_EVENT = "Meet at East Coast Lagoon Food Village at 1pm";
+	private static final String DATE_TODO = "Mon, 12 Oct 8:00am";
+	private static final String DATE_FLOAT = "Tue, 3 Nov 12:00pm";
+	private static final long DATE_TODO_TIME = Storage.stringToMillisecond("Mon, 12 Oct 8:00am");
+	private static final long DATE_FLOAT_TIME = Storage.stringToMillisecond("Tue, 3 Nov 12:00pm");
 
 	/* ======================== Category colors ========================= */
 	private static final String COLOUR_BLUE = "#24c6d5";
@@ -28,40 +32,53 @@ public class StorageTest {
 	private static final String CATEGORY4 = "Outings";
 
 	/* ======================== CS2102 Tasks ========================= */
-	private Task CATEGORY1_TODO1 = new Task(CATEGORY1, "Read up on PHP", "", 
-			"Sat, 3 Oct 8:00am", Storage.stringToMillisecond("Sat, 3 Oct 8:00am"), 5, 
-			"Fri, 2 Oct 6:00pm", Storage.stringToMillisecond("Fri, 2 Oct 6:00pm"),  true);
-	private Task CATEGORY1_TODO2 = new Task(CATEGORY1, "Revise SQL queries", 
-			"Read up on ALL SQL queries including nested", 
-			"Sat, 10 Oct 9:00am", Storage.stringToMillisecond("Sat, 10 Oct 9:00am"), 5, 
-			"Fri, 9 Oct 6:00pm", Storage.stringToMillisecond("Fri, 9 Oct 6:00pm"), false);
+	private Task CATEGORY1_TODO1;
+	private Task CATEGORY1_TODO2;
 
 	/* ======================== CS2103 Tasks ========================= */
-	private Task CATEGORY2_TODO1 = new Task(CATEGORY2, "Text Buddy CE2", "Change code to OOP style", 
-			"Sat, 19 Oct 8:00am", Storage.stringToMillisecond("Sat, 19 Oct 8:00am"), 5, 
-			"Mon, 21 Oct 10:00am", Storage.stringToMillisecond("Mon, 21 Oct 10:00am"), false);
-	private Task CATEGORY2_FLOAT1 = new Task(CATEGORY2, "Watch webcast", "Watch before November", -1, 
-			"Tue, 20 Oct 8:00am", Storage.stringToMillisecond("Tue, 20 Oct 8:00am"), false);
+	private Task CATEGORY2_TODO1;
+	private Task CATEGORY2_FLOAT1;
 
 	/* ======================== Personal Tasks ========================= */
-	private Task CATEGORY3_TODO1 = new Task(CATEGORY3, "Help mum buy groceries", "Every Saturday!", 
-			"", -1, 3, "", -1, false);
-	private Task CATEGORY3_FLOAT1 = new Task(CATEGORY3, "Cut hair someday", "Cut before December", -1, 
-			"Wed, 10 Oct 10:00am", Storage.stringToMillisecond("Wed, 10 Oct 10:00am"), false);
-	private Task CATEGORY3_EVENT1 = new Task(CATEGORY3, "Cycling @ East Coast", "", 
-			"Sat, 17 Oct 3:00pm", "Sat, 17 Oct 10:00pm", Storage.stringToMillisecond("Sat, 17 Oct 3:00pm"),
-			Storage.stringToMillisecond("Sat, 17 Oct 10:00pm"), -1, "Fri, 16 Oct 10:00am",
-			Storage.stringToMillisecond("Fri, 16 Oct 10:00am"));
-	private Task CATEGORY3_EVENT2 = new Task(CATEGORY3, "3D'09 gathering @ Mr Teo's house", "", 
-			"Sun, 27 Dec 1:00pm", "Sun, 27 Dec 9:00pm", Storage.stringToMillisecond("Sun, 27 Oct 1:00pm"),
-			Storage.stringToMillisecond("Sun, 27 Dec 10:00pm"), -1, "Sat, 27 Oct 10:00am",
-			Storage.stringToMillisecond("Sat, 27 Oct 10:00am"));
+	private Task CATEGORY3_TODO1;
+	private Task CATEGORY3_FLOAT1;
+	private Task CATEGORY3_EVENT1;
+	private Task CATEGORY3_EVENT2;
 
 	Storage storage;
 
 	@Before
 	public void initialize() {
 		storage = new Storage(TEST_FILE_NAME);
+		setUp();
+	}
+	
+	@Before 
+	public void setUp() {
+		CATEGORY1_TODO1 = new Task(CATEGORY1, "Read up on PHP", "", 
+				"Sat, 3 Oct 8:00am", Storage.stringToMillisecond("Sat, 3 Oct 8:00am"), 5, 
+				"Fri, 2 Oct 6:00pm", Storage.stringToMillisecond("Fri, 2 Oct 6:00pm"),  true);
+		CATEGORY1_TODO2 = new Task(CATEGORY1, "Revise SQL queries", 
+				"Read up on ALL SQL queries including nested", 
+				"Sat, 10 Oct 9:00am", Storage.stringToMillisecond("Sat, 10 Oct 9:00am"), 5, 
+				"Fri, 9 Oct 6:00pm", Storage.stringToMillisecond("Fri, 9 Oct 6:00pm"), false);
+		CATEGORY2_TODO1 = new Task(CATEGORY2, "Text Buddy CE2", "Change code to OOP style", 
+				"Sat, 19 Oct 8:00am", Storage.stringToMillisecond("Sat, 19 Oct 8:00am"), 5, 
+				"Mon, 21 Oct 10:00am", Storage.stringToMillisecond("Mon, 21 Oct 10:00am"), false);
+		CATEGORY2_FLOAT1 = new Task(CATEGORY2, "Watch webcast", "Watch before November", -1, 
+				"Tue, 20 Oct 8:00am", Storage.stringToMillisecond("Tue, 20 Oct 8:00am"), false);
+		CATEGORY3_TODO1 = new Task(CATEGORY3, "Help mum buy groceries", "Every Saturday!", 
+				"", -1, 3, "", -1, false);
+		CATEGORY3_FLOAT1 = new Task(CATEGORY3, "Cut hair someday", "Cut before December", -1, 
+				"Wed, 10 Oct 10:00am", Storage.stringToMillisecond("Wed, 10 Oct 10:00am"), false);
+		CATEGORY3_EVENT1 = new Task(CATEGORY3, "Cycling @ East Coast", "", 
+				"Sat, 17 Oct 3:00pm", "Sat, 17 Oct 10:00pm", Storage.stringToMillisecond("Sat, 17 Oct 3:00pm"),
+				Storage.stringToMillisecond("Sat, 17 Oct 10:00pm"), -1, "Fri, 16 Oct 10:00am",
+				Storage.stringToMillisecond("Fri, 16 Oct 10:00am"));
+		CATEGORY3_EVENT2 = new Task(CATEGORY3, "3D'09 gathering @ Mr Teo's house", "", 
+				"Sun, 27 Dec 1:00pm", "Sun, 27 Dec 9:00pm", Storage.stringToMillisecond("Sun, 27 Oct 1:00pm"),
+				Storage.stringToMillisecond("Sun, 27 Dec 10:00pm"), -1, "Sat, 27 Oct 10:00am",
+				Storage.stringToMillisecond("Sat, 27 Oct 10:00am"));
 	}
 
 	/****************************************************************************
@@ -205,8 +222,31 @@ public class StorageTest {
 		
 		assertEquals(DESCRIPTION_TODO, storage.getCategoryList().get(0).getTasks().
 				get(CATEGORY1_TODO1.getTaskId()).getDescription());
-		//assertEquals(DESCRIPTION_EVENT, storage.getCategoryList().get(2).getTasks().
-			//	get(CATEGORY3_EVENT2.getTaskId()).getDescription());
+		assertEquals(DESCRIPTION_EVENT, storage.getCategoryList().get(2).getEvents().
+				get(CATEGORY3_EVENT2.getTaskId()).getDescription());
+		
+		storage.deleteAll();
+	}
+	
+	@Test
+	public void testSetDeadline() {
+		
+		storage.addCategory(CATEGORY1);
+		storage.addCategory(CATEGORY2);
+		storage.addCategory(CATEGORY3);
+		
+		CATEGORY1_TODO1.setIndex(5);
+		CATEGORY2_FLOAT1.setIndex(6);
+		storage.addTask(CATEGORY1_TODO1);
+		storage.addFloatingTask(CATEGORY2_FLOAT1);
+		
+		storage.setDeadline(CATEGORY1_TODO1.getIndex(), DATE_TODO_TIME, DATE_TODO);
+		storage.setDeadline(CATEGORY2_FLOAT1.getIndex(), DATE_FLOAT_TIME, DATE_FLOAT);
+		
+		assertEquals(DATE_TODO, storage.getCategoryList().get(0).getTasks().
+				get(CATEGORY1_TODO1.getTaskId()).getEndDate());
+		assertEquals(DATE_FLOAT, storage.getCategoryList().get(1).getFloatTasks().
+				get(CATEGORY2_FLOAT1.getTaskId()).getEndDate());
 		
 		storage.deleteAll();
 	}

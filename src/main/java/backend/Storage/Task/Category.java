@@ -8,32 +8,32 @@ public class Category implements Comparable<Category> {
 	 * where hash map key represents the category name
 	 * and value represents tasks under each category.
 	 */
-	private TreeMap<Integer, Task> tasks;
-	private TreeMap<Integer, Task> floatTasks;
-	private TreeMap<Integer, Task> events;
+	private TreeMap<String, Task> tasks;
+	private TreeMap<String, Task> floatTasks;
+	private TreeMap<String, Task> events;
 	
 	private String categoryName;
 	private String categoryColour;
 	
 	public Category() {
-		setTasks(new TreeMap<Integer, Task>());
-		setFloatTasks(new TreeMap<Integer, Task>());
-		setEvents(new TreeMap<Integer, Task>());
+		setTasks(new TreeMap<String, Task>());
+		setFloatTasks(new TreeMap<String, Task>());
+		setEvents(new TreeMap<String, Task>());
 	}
 	
 	public Category(String categoryName) {
 		setCategoryName(categoryName);
-		setTasks(new TreeMap<Integer, Task>());
-		setFloatTasks(new TreeMap<Integer, Task>());
-		setEvents(new TreeMap<Integer, Task>());
+		setTasks(new TreeMap<String, Task>());
+		setFloatTasks(new TreeMap<String, Task>());
+		setEvents(new TreeMap<String, Task>());
 	}
 	
 	public Category(String categoryName, String categoryColour) {
 		setCategoryName(categoryName);
 		setCategoryColour(categoryColour);
-		setTasks(new TreeMap<Integer, Task>());
-		setFloatTasks(new TreeMap<Integer, Task>());
-		setEvents(new TreeMap<Integer, Task>());
+		setTasks(new TreeMap<String, Task>());
+		setFloatTasks(new TreeMap<String, Task>());
+		setEvents(new TreeMap<String, Task>());
 	}
 	
 	public String getCategoryName() {
@@ -52,27 +52,27 @@ public class Category implements Comparable<Category> {
 		this.categoryColour = categoryColour;
 	}
 
-	public TreeMap<Integer, Task> getTasks() {
+	public TreeMap<String, Task> getTasks() {
 		return tasks;
 	}
 
-	public void setTasks(TreeMap<Integer, Task> tasks) {
+	public void setTasks(TreeMap<String, Task> tasks) {
 		this.tasks = tasks;
 	}
 
-	public TreeMap<Integer, Task> getFloatTasks() {
+	public TreeMap<String, Task> getFloatTasks() {
 		return floatTasks;
 	}
 
-	public void setFloatTasks(TreeMap<Integer, Task> floatTasks) {
+	public void setFloatTasks(TreeMap<String, Task> floatTasks) {
 		this.floatTasks = floatTasks;
 	}
 
-	public TreeMap<Integer, Task> getEvents() {
+	public TreeMap<String, Task> getEvents() {
 		return events;
 	}
 
-	public void setEvents(TreeMap<Integer, Task> events) {
+	public void setEvents(TreeMap<String, Task> events) {
 		this.events = events;
 	}
 

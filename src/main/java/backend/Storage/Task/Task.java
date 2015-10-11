@@ -5,8 +5,7 @@ import java.util.UUID;
 
 public class Task implements Comparable<Task> {
 	
-	private static int id = 0;
-	private int taskId;
+	private String taskId;
 	private int indexForPrinting;
 	private String category;
 	private String name;
@@ -29,7 +28,7 @@ public class Task implements Comparable<Task> {
 	// Floating task
 	public Task(String category, String taskName, String taskDescription, int priority, 
 			String reminderDate, long reminderTime, boolean isDone) {
-		setTaskId(id++);
+		setTaskId(UUID.randomUUID().toString());
 		setCategory(category);
 		setName(taskName);
 		setDescription(taskDescription);
@@ -47,7 +46,7 @@ public class Task implements Comparable<Task> {
 	// Task
 	public Task(String category, String taskName, String taskDescription, String deadline, 
 			long endTime, int priority, String reminderDate, long reminder, boolean isDone) {
-		setTaskId(id++);
+		setTaskId(UUID.randomUUID().toString());
 		setCategory(category);
 		setName(taskName);
 		setDescription(taskDescription);
@@ -66,7 +65,7 @@ public class Task implements Comparable<Task> {
 	public Task(String category, String eventName, String eventDescription, String startDate, 
 			String endDate, long startTime, long endTime, int priority, 
 			String reminderDate, long reminder) {
-		setTaskId(id++);
+		setTaskId(UUID.randomUUID().toString());
 		setCategory(category);
 		setName(eventName);
 		setDescription(eventDescription);
@@ -79,13 +78,13 @@ public class Task implements Comparable<Task> {
 		setReminder(reminder);
 		setSubTask(new TreeMap<String, SubTask> ());
 	}
-
-	public int getTaskId() {
+	
+	public String getTaskId() {
 		return taskId;
 	}
 	
-	public void setTaskId(int taskId) {
-		this.taskId = taskId;
+	public void setTaskId(String newTaskId) {
+		this.taskId = newTaskId;
 	}
 	
 	public int getIndex() {

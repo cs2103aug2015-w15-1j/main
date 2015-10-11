@@ -27,6 +27,9 @@ public class StorageTest {
 	private static final long DATE_TODO_ENDTIME = Storage.stringToMillisecond("Sat, 3 Oct 8:00am");
 	private static final long DATE_FLOAT_ENDTIME = Storage.stringToMillisecond("Tue, 20 Oct 8:00am");
 	
+	private static final boolean DONE = true;
+	private static final boolean UNDONE = false;
+	
 	private static final int PRIORITY_3 = 3;
 	private static final int PRIORITY_5 = 5;
 
@@ -59,7 +62,6 @@ public class StorageTest {
 	@Before
 	public void initialize() {
 		storage = new Storage(TEST_FILE_NAME);
-		setUp();
 	}
 	
 	@Before 
@@ -325,6 +327,30 @@ public class StorageTest {
 				get(CATEGORY1_TODO2.getTaskId()).getPriority());
 		assertEquals(PRIORITY_3, storage.getCategoryList().get(2).getFloatTasks().
 				get(CATEGORY3_FLOAT1.getTaskId()).getPriority());
+		
+		storage.deleteAll();
+	}
+	
+
+	@Test
+	public void testSetDone() {
+		
+		storage.addCategory(CATEGORY1);
+		storage.addCategory(CATEGORY2);
+		storage.addCategory(CATEGORY3);
+		
+		CATEGORY2_TODO1.setIndex(5);
+		CATEGORY3_FLOAT1.setIndex(6);
+		storage.addTask(CATEGORY2_TODO1);
+		storage.addFloatingTask(CATEGORY3_FLOAT1);
+		
+		storage.setDone(CATEGORY2_TODO1.getIndex());
+		storage.setDone(CATEGORY3_FLOAT1.getIndex());
+		
+		assertEquals(DONE, storage.getCategoryList().get(1).getTasks().
+				get(CATEGORY2_TODO1.getTaskId()).getDone());
+		assertEquals(DONE, storage.getCategoryList().get(2).getFloatTasks().
+				get(CATEGORY3_FLOAT1.getTaskId()).getDone());
 		
 		storage.deleteAll();
 	}

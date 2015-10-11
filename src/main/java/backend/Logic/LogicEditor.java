@@ -32,12 +32,16 @@ public class LogicEditor {
 
 	public String execute(Command commandObject){
 		String feedbackString = "";
+		System.out.println("Get Command Field: "+commandObject.getCommandField());
 		switch(commandObject.getCommandField()) {
 			case ("priority") :
 				feedbackString = setPriority(commandObject);
 				break;
-			case ("set") :
-				feedbackString = setMultipleFields(commandObject);
+			case ("setT") :
+				feedbackString = setMultipleFieldsForTask(commandObject);
+				break;
+			case ("setE") :
+				feedbackString = setMultipleFieldsForEvents(commandObject);
 				break;
 			case ("delete") :
 				feedbackString = delete(commandObject);
@@ -70,6 +74,66 @@ public class LogicEditor {
 		return feedbackString;
 	}
 
+	private String setMultipleFieldsForEvents(Command commandObject) {
+		System.out.println("taskId: "+commandObject.getTaskName());
+		int taskId = Integer.parseInt(commandObject.getTaskName());
+		System.out.println("taskId: "+taskId);
+		if (!commandObject.getDescription().equals("")) {
+			System.out.println("Description: "+ commandObject.getDescription());
+			setDescription(commandObject);
+		}
+		if (!commandObject.getPriority().equals("")) {
+			System.out.println("priority :"+commandObject.getPriority());
+			setPriority(commandObject);
+		}
+		if (!commandObject.getReminder().equals("")) {
+			System.out.println("reminder: "+commandObject.getReminder());
+			setReminder(commandObject);
+		}
+		if(!commandObject.getCategory().equals("")) {
+			System.out.println("category: "+commandObject.getCategory());
+			setCategory(commandObject);
+		}
+		if (!commandObject.getDeadline().equals("")) {
+			setDeadline(commandObject);
+			System.out.println("deadline :"+commandObject.getDeadline());
+		}
+		return EXECUTION_SET_SUCCESSFUL;
+	}
+	
+	private String setMultipleFieldsForTask(Command commandObject) {
+		System.out.println("taskId: "+commandObject.getTaskName());
+		int taskId = Integer.parseInt(commandObject.getTaskName());
+		System.out.println("taskId: "+taskId);
+		if (!commandObject.getDescription().equals("")) {
+			System.out.println("Description: "+ commandObject.getDescription());
+			setDescription(commandObject);
+		}
+		if (!commandObject.getPriority().equals("")) {
+			System.out.println("priority :"+commandObject.getPriority());
+			setPriority(commandObject);
+		}
+		if (!commandObject.getReminder().equals("")) {
+			System.out.println("reminder: "+commandObject.getReminder());
+			setReminder(commandObject);
+		}
+		if(!commandObject.getCategory().equals("")) {
+			System.out.println("category: "+commandObject.getCategory());
+			setCategory(commandObject);
+		}
+		if (!commandObject.getDeadline().equals("")) {
+			setEventStartAndEndTime(commandObject);
+			System.out.println("deadline :"+commandObject.getDeadline());
+		}
+		return EXECUTION_SET_SUCCESSFUL;
+	}
+	
+	private String delete(Command commandObject) {
+		int taskId = Integer.parseInt(commandObject.getTaskName());
+		storageObject.deleteTask(taskId);
+		return String.format(EXECUTION_DELETE_SUCCESSFUL, taskId);
+	}
+	
 	private String setPriority(Command commandObject){
 		int taskId = Integer.parseInt(commandObject.getTaskName());
 		System.out.println("taskId: "+taskId);
@@ -81,42 +145,14 @@ public class LogicEditor {
 		storageObject.setPriority(taskId, priority);
 		return String.format(EXECUTION_SET_PRIORITY_SUCCESSFUL, taskId,priority);
 	}
-
-	private String setMultipleFields(Command commandObject) {
-		int taskId = Integer.parseInt(commandObject.getTaskName());
-		if (!commandObject.getDescription().equals("")) {
-			String taskDescription = commandObject.getDescription();
-			storageObject.setDescription(taskId,taskDescription);
-		}
-		if (!commandObject.getPriority().equals("")) {
-			int priority = Integer.parseInt(commandObject.getPriority());
-			if (priorityChecker(priority) != null) {
-				return priorityChecker(priority);
-			}
-			storageObject.setPriority(taskId,priority);
-		}
-		if (!commandObject.getReminder().equals("")) {
-			String reminder = commandObject.getReminder();
-			long reminderTime = GeneralFunctions.stringToMillisecond(reminder);
-			storageObject.setReminder(taskId,reminderTime, reminder);
-		}
-		if(!commandObject.getCategory().equals("")) {
-			String category = commandObject.getCategory();
-			storageObject.setCategory(taskId,category);
-		}
-		return EXECUTION_SET_SUCCESSFUL;
-	}
-	private String delete(Command commandObject) {
-		int taskId = Integer.parseInt(commandObject.getTaskName());
-		storageObject.deleteTask(taskId);
-		return String.format(EXECUTION_DELETE_SUCCESSFUL, taskId);
-	}
+	
 	private String setColour(Command commandObject) {
 		String categoryName = commandObject.getCategory();
 		String colourId = commandObject.getColour();
 		storageObject.setCategoryColour(categoryName,colourId);
 		return String.format(EXECUTION_SET_COLOUR_SUCCESSFUL, categoryName,colourId);
 	}
+	
 	private String setCategory(Command commandObject) {
 		int taskId = Integer.parseInt(commandObject.getTaskName());
 		String categoryName = commandObject.getCategory();
@@ -131,9 +167,11 @@ public class LogicEditor {
 
 	private String setDone(Command commandObject) {
 		int taskId = Integer.parseInt(commandObject.getTaskName());
+		System.out.println("taskId : "+taskId);
 		storageObject.setDone(taskId);
 		return String.format(EXECUTION_UNDONE_COMMAND_SUCCESSFUL, taskId);
 	}
+	
 	private String setReminder(Command commandObject) {
 		int taskId = Integer.parseInt(commandObject.getTaskName());
 		String reminderDate = commandObject.getReminder();
@@ -144,16 +182,22 @@ public class LogicEditor {
 
 	private String setDescription(Command commandObject) {
 		int taskId = Integer.parseInt(commandObject.getTaskName());
+		System.out.println("taskID: " +taskId);
 		String description = commandObject.getDescription();
+		System.out.println("description: "+description);
 		storageObject.setDescription(taskId, description);
 		return String.format(EXECUTION_SET_DESCRIPTION_SUCCESSFUL, taskId);
 	}
 
 	private String setEventStartAndEndTime(Command commandObject) {
 		int eventId = Integer.parseInt(commandObject.getTaskName());
-		String startTime = commandObject.getStartDateAndTime();
-		String endTime = commandObject.getEndDateAndTime();
-		return String.format(EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL, eventId,startTime,endTime);
+		String startDate = commandObject.getStartDateAndTime();
+		long startTime = GeneralFunctions.stringToMillisecond(startDate);
+		String endDate = commandObject.getEndDateAndTime();
+		long endTime = GeneralFunctions.stringToMillisecond(endDate);
+		storageObject.setStartDate(eventId, startTime, startDate);
+		storageObject.setDeadline(eventId, endTime, endDate);
+		return String.format(EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL, eventId,startDate,endDate);
 	}
 
 	private String setDeadline(Command commandObject) {
@@ -163,6 +207,7 @@ public class LogicEditor {
 		storageObject.setDeadline(taskId, deadlineTime, deadlineDate);
 		return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskId,deadlineDate);
 	}
+	
 	private String priorityChecker(int priority) {
 		if (priority > 5 || priority < 1) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;

@@ -17,7 +17,7 @@ public class LogicCommandHandler {
 			"addE", "adds", "addcat"};
 	private static final String[] editKeywords = new String[] {"set", "setT", 
 			"setE", "deadline", "event", "description", "reminder", "done", "undone",
-			"setCat","setCol","delete", "priority"};
+			"category","setCol","delete", "priority"};
 	private static final String[] sortKeywords = new String[] {"sortp", "sortd"};
 	private static final String[] viewKeywords = new String[] {"showCat", "showf",
 			"showt", "showe"};
@@ -31,9 +31,10 @@ public class LogicCommandHandler {
 	public Command parseCommand(String userInput) {
 		ArrayList<String> parsedUserInput = parserObject.parseInput(userInput);
 		String commandGiven = parsedUserInput.get(0);
-//		System.out.println(commandGiven);
+		System.out.println("CommandGiven "+commandGiven);
 		Command commandObject = new Command();
 		String determinedCommandType = determineCommandType(commandGiven);
+		System.out.println("determinedCommandType: "+determinedCommandType);
 		switch (determinedCommandType) {
 			case COMMAND_ADD:
 				commandObject = initAddCommand(parsedUserInput);

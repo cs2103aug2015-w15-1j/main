@@ -48,13 +48,18 @@ public class LogicController {
 	public String executeCommand(String userInput) {
 		Command commandObject = commandHandlerSubComponent.parseCommand(userInput);
 		String feedbackString = "";
+		assert(commandObject.getType()!=null);
 		System.out.println(commandObject.getType());
 		switch (commandObject.getType()) {
 			case ADD :
 				feedbackString = creatorSubComponent.execute(commandObject);
+				updateCurrentState();
+				updateHistoryStack();
 				break;
 			case EDIT :
 				feedbackString = editorSubComponent.execute(commandObject);
+				updateCurrentState();
+				updateHistoryStack();
 				break;
 			case SORT :
 //				feedbackString = sorterComponent.execute(commandObject);
@@ -69,13 +74,16 @@ public class LogicController {
 				feedbackString = undo();
 				break;
 		}
-		updateCurrentState();
-		updateHistoryStack();
 		return feedbackString;
 	}
 
 	private String undo() {
+		System.out.println("undoing");
 		currentState = historyComponent.pop();
+		if (currentState == null) {
+			return "no more Undos";
+		}
+		System.out.println("received from history stack "+currentState);
 		storageComponent.saveData(currentState);
 		return "Undo successful";
 	}

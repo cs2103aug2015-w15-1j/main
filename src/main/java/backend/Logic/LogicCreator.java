@@ -68,6 +68,9 @@ public class LogicCreator {
 			reminderTime = GeneralFunctions.stringToMillisecond(commandObject.getReminder());
 		}
 		String category = commandObject.getCategory();
+		if(category.equals("")) {
+			category = "default";
+		}
 		Task newFloat = new Task(category, taskName,taskDescription, priority, reminderDate, reminderTime, false);
 //		System.out.println(newFloat.toString());
 		storageObject.addFloatingTask(newFloat);
@@ -105,6 +108,9 @@ public class LogicCreator {
 			reminder = GeneralFunctions.stringToMillisecond(commandObject.getReminder());
 		}
 		String category = commandObject.getCategory();
+		if(category.equals("")) {
+			category = "default";
+		}
 		Task newEvent = new Task(category, eventName, eventDescription, 
 				startDate, endDate, startTime, endTime, 
 				priority, reminderDate, reminder);
@@ -133,6 +139,9 @@ public class LogicCreator {
 			reminderTime = GeneralFunctions.stringToMillisecond(commandObject.getReminder());
 		}
 		String category = commandObject.getCategory();
+		if(category.equals("")) {
+			category = "default";
+		}
 		Task newToDo = new Task(category, taskName, taskDescription, deadlineString, 
 				deadlineTime, priority, reminderDate, reminderTime, false);
 //		System.out.println(newToDo.toString());

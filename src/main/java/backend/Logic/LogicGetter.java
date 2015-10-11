@@ -1,10 +1,6 @@
 package main.java.backend.Logic;
 
-import java.io.IOException;
 import java.util.ArrayList;
-
-import org.json.JSONException;
-import org.json.simple.parser.ParseException;
 
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Category;
@@ -46,7 +42,7 @@ public class LogicGetter {
 		return data;
 	}
 
-	public ArrayList<Task> retrieveTaskData(String dataType) throws IOException, JSONException, ParseException {
+	public ArrayList<Task> retrieveTaskData(String dataType) {
 		ArrayList<Task> data = new ArrayList<Task>();
 		switch(dataType) {
 			case ("toDo") :
@@ -79,27 +75,27 @@ public class LogicGetter {
 		return null;
 	}
 
-	public ArrayList<Task> getToDo() throws IOException, JSONException, ParseException {
+	public ArrayList<Task> getToDo() {
 		return storageObject.getTasks();
 	}
 
-	public ArrayList<Task> getFloatingTasks() throws IOException, JSONException, ParseException {
+	public ArrayList<Task> getFloatingTasks() {
 		return storageObject.getFloatingTasks();
 	}
 
-	public ArrayList<Task> getEvents() throws IOException, JSONException, ParseException {
+	public ArrayList<Task> getEvents() {
 		return storageObject.getEvents();
 	}
 	
-	public ArrayList<Task> getUpcomingToDo() throws IOException, JSONException, ParseException {
+	public ArrayList<Task> getUpcomingToDo() {
 		return storageObject.getUpcomingTasks();
 	}
 	
-	public ArrayList<Task> getUpcomingEvents() throws IOException, JSONException, ParseException {
+	public ArrayList<Task> getUpcomingEvents() {
 		return storageObject.getUpcomingEvents();
 	}
 
-	public ArrayList<Task> getOverdueTasks() throws IOException, JSONException, ParseException {
+	public ArrayList<Task> getOverdueTasks() {
 		return storageObject.getOverdueTasks();
 	}
 

@@ -1,14 +1,6 @@
 package main.java.backend.Logic;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
-
-import org.json.JSONException;
-import org.json.simple.parser.ParseException;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
 import main.java.backend.History.History;
 import main.java.backend.Parser.Parser;
@@ -45,14 +37,14 @@ public class LogicController {
 		System.out.println("Logic component initialised successfully");
 	}
 
-	public static LogicController getInstance(String filename) throws FileNotFoundException, IOException {
+	public static LogicController getInstance(String filename) {
 		if (LogicController.logicObject == null) {
 			LogicController.logicObject = new LogicController(filename);
 		}
 		return LogicController.logicObject;
 	}
 	
-	public String executeCommand(String userInput) throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException {
+	public String executeCommand(String userInput) {
 		Command commandObject = commandHandlerSubComponent.parseCommand(userInput);
 		String feedbackString = "";
 		System.out.println(commandObject.getType());
@@ -103,11 +95,11 @@ public class LogicController {
 		return getterSubComponent.retrieveCategoryData(dataType);
 	}
 	
-	public ArrayList<Task> retrieveTaskData(String dataType) throws IOException, JSONException, ParseException {
+	public ArrayList<Task> retrieveTaskData(String dataType) {
 		return getterSubComponent.retrieveTaskData(dataType);
 	}
 	
-	private void updateCurrentState() throws IOException {
+	private void updateCurrentState() {
 		currentState = storageComponent.getCategoryList();
 		taskList = storageComponent.getTaskList();
 	}

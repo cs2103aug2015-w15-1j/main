@@ -1,11 +1,5 @@
 package main.java.backend.Logic;
 
-import java.io.IOException;
-import org.json.JSONException;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
 
@@ -31,7 +25,7 @@ public class LogicCreator {
 		return logicCreator;
 	}
 
-	public String execute(Command commandObject) throws JsonParseException, JsonMappingException, IOException, JSONException {
+	public String execute(Command commandObject) {
 		String feedbackString = "";
 //		System.out.println(commandObject.getCommandField());
 		switch (commandObject.getCommandField()) {
@@ -55,7 +49,7 @@ public class LogicCreator {
 	}
 	
 
-	private String addFloating(Command commandObject) throws JsonParseException, JsonMappingException, IOException, JSONException {
+	private String addFloating(Command commandObject) {
 		String taskName = commandObject.getTaskName();
 //		System.out.println("taskName: "+taskName);
 		String taskDescription = commandObject.getDescription();
@@ -79,7 +73,7 @@ public class LogicCreator {
 		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, taskName);
 	}
 
-	private String addEvent(Command commandObject) throws IOException, JSONException {
+	private String addEvent(Command commandObject) {
 		String eventName = commandObject.getTaskName();
 		String eventDescription = commandObject.getDescription();
 		String startDate = commandObject.getStartDateAndTime();
@@ -118,7 +112,7 @@ public class LogicCreator {
 		return String.format(EXECUTION_ADD_EVENT_SUCCESSFUL, eventName);
 	}
 
-	private String addToDo(Command commandObject) throws IOException, JSONException {
+	private String addToDo(Command commandObject){
 		String taskName = commandObject.getTaskName();
 		String taskDescription = commandObject.getDescription();
 		String deadlineString = commandObject.getDeadline();
@@ -153,16 +147,16 @@ public class LogicCreator {
 		return null;
 	}
 	
-	private String addCategory(Command commandObject) throws JsonParseException, JsonMappingException, IOException {
+	private String addCategory(Command commandObject) {
 		String categoryName = commandObject.getTaskName();
 		storageObject.addCategory(categoryName);
 		return String.format(EXECUTION_ADD_CATEGORY_SUCCESSFUL, categoryName);
 	}
 
-	private String addSubTask(Command commandObject) throws JsonParseException, JsonMappingException, IOException {
+	private String addSubTask(Command commandObject) {
 		String taskName = commandObject.getTaskName();
 		String subTaskDescription = commandObject.getDescription();
-		storageObject.addSubTask(taskName,subTaskDescription);
+//		storageObject.addSubTask(taskName,subTaskDescription);
 		return String.format(EXECUTION_ADD_SUBTASK_SUCCESSFUL, subTaskDescription,taskName);
 	}
 }

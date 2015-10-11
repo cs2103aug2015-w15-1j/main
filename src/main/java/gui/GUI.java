@@ -457,11 +457,7 @@ public class GUI extends Application{
 						e.printStackTrace();
 					}
 				} else if (ke.getCode().equals(KeyCode.F12)){
-					try {
-						logicComponent.executeCommand("exit");
-					} catch (IOException | JSONException | ParseException e) {
-						e.printStackTrace();
-					}
+					logicComponent.executeCommand("exit");
 				}
 				if (currentScene == SCENE_FOCUS){
 					try {

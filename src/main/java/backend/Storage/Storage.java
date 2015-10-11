@@ -64,6 +64,11 @@ public class Storage {
 		
 		TreeMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setDone(isDone);
+		
+		if(isDone) {
+			targetTask.get(taskId).setIndex(-1);
+		}
+		
 		data.save(allData);
 	}
 	

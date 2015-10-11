@@ -8,6 +8,7 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
+import main.java.backend.GeneralFunctions.GeneralFunctions;
 import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
@@ -24,10 +25,14 @@ public class StorageTest {
 	private static final String DATE_TODO_END = "Sat, 3 Oct 8:00am";
 	private static final String DATE_FLOAT_END = "Tue, 20 Oct 8:00am";
 	
-	private static final long DATE_TODO_STARTTIME = Storage.stringToMillisecond("Mon, 12 Oct 8:00am");
-	private static final long DATE_FLOAT_STARTTIME = Storage.stringToMillisecond("Tue, 3 Nov 12:00pm");
-	private static final long DATE_TODO_ENDTIME = Storage.stringToMillisecond("Sat, 3 Oct 8:00am");
-	private static final long DATE_FLOAT_ENDTIME = Storage.stringToMillisecond("Tue, 20 Oct 8:00am");
+	private static final long DATE_TODO_STARTTIME = 
+			GeneralFunctions.stringToMillisecond("Mon, 12 Oct 8:00am");
+	private static final long DATE_FLOAT_STARTTIME = 
+			GeneralFunctions.stringToMillisecond("Tue, 3 Nov 12:00pm");
+	private static final long DATE_TODO_ENDTIME = 
+			GeneralFunctions.stringToMillisecond("Sat, 3 Oct 8:00am");
+	private static final long DATE_FLOAT_ENDTIME = 
+			GeneralFunctions.stringToMillisecond("Tue, 20 Oct 8:00am");
 	
 	private static final boolean DONE = true;
 	private static final boolean UNDONE = false;
@@ -72,29 +77,29 @@ public class StorageTest {
 	@Before 
 	public void setUp() {
 		CATEGORY1_TODO1 = new Task(CATEGORY1, "Read up on PHP", "", 
-				"Sat, 3 Oct 8:00am", Storage.stringToMillisecond("Sat, 3 Oct 8:00am"), 5, 
-				"Fri, 2 Oct 6:00pm", Storage.stringToMillisecond("Fri, 2 Oct 6:00pm"),  true);
+				"Sat, 3 Oct 8:00am", GeneralFunctions.stringToMillisecond("Sat, 3 Oct 8:00am"), 5, 
+				"Fri, 2 Oct 6:00pm", GeneralFunctions.stringToMillisecond("Fri, 2 Oct 6:00pm"),  true);
 		CATEGORY1_TODO2 = new Task(CATEGORY1, "Revise SQL queries", 
 				"Read up on ALL SQL queries including nested", 
-				"Sat, 10 Oct 9:00am", Storage.stringToMillisecond("Sat, 10 Oct 9:00am"), 5, 
-				"Fri, 9 Oct 6:00pm", Storage.stringToMillisecond("Fri, 9 Oct 6:00pm"), true);
+				"Sat, 10 Oct 9:00am", GeneralFunctions.stringToMillisecond("Sat, 10 Oct 9:00am"), 5, 
+				"Fri, 9 Oct 6:00pm", GeneralFunctions.stringToMillisecond("Fri, 9 Oct 6:00pm"), true);
 		CATEGORY2_TODO1 = new Task(CATEGORY2, "Text Buddy CE2", "Change code to OOP style", 
-				"Sat, 19 Oct 8:00am", Storage.stringToMillisecond("Sat, 19 Oct 8:00am"), 5, 
-				"Mon, 21 Oct 10:00am", Storage.stringToMillisecond("Mon, 21 Oct 10:00am"), true);
+				"Sat, 19 Oct 8:00am", GeneralFunctions.stringToMillisecond("Sat, 19 Oct 8:00am"), 5, 
+				"Mon, 21 Oct 10:00am", GeneralFunctions.stringToMillisecond("Mon, 21 Oct 10:00am"), true);
 		CATEGORY2_FLOAT1 = new Task(CATEGORY2, "Watch webcast", "Watch before November", -1, 
-				"Tue, 20 Oct 8:00am", Storage.stringToMillisecond("Tue, 20 Oct 8:00am"), false);
+				"Tue, 20 Oct 8:00am", GeneralFunctions.stringToMillisecond("Tue, 20 Oct 8:00am"), false);
 		CATEGORY3_TODO1 = new Task(CATEGORY3, "Help mum buy groceries", "Every Saturday!", 
 				"", -1, 3, "", -1, false);
 		CATEGORY3_FLOAT1 = new Task(CATEGORY3, "Cut hair someday", "Cut before December", -1, 
-				"Wed, 10 Oct 10:00am", Storage.stringToMillisecond("Wed, 10 Oct 10:00am"), false);
+				"Wed, 10 Oct 10:00am", GeneralFunctions.stringToMillisecond("Wed, 10 Oct 10:00am"), false);
 		CATEGORY3_EVENT1 = new Task(CATEGORY3, "Cycling @ East Coast", "", 
-				"Sat, 17 Oct 3:00pm", "Sat, 17 Oct 10:00pm", Storage.stringToMillisecond("Sat, 17 Oct 3:00pm"),
-				Storage.stringToMillisecond("Sat, 17 Oct 10:00pm"), -1, "Fri, 16 Oct 10:00am",
-				Storage.stringToMillisecond("Fri, 16 Oct 10:00am"));
+				"Sat, 17 Oct 3:00pm", "Sat, 17 Oct 10:00pm", GeneralFunctions.stringToMillisecond("Sat, 17 Oct 3:00pm"),
+				GeneralFunctions.stringToMillisecond("Sat, 17 Oct 10:00pm"), -1, "Fri, 16 Oct 10:00am",
+				GeneralFunctions.stringToMillisecond("Fri, 16 Oct 10:00am"));
 		CATEGORY3_EVENT2 = new Task(CATEGORY3, "3D'09 gathering @ Mr Teo's house", "", 
-				"Sun, 27 Dec 1:00pm", "Sun, 27 Dec 9:00pm", Storage.stringToMillisecond("Sun, 27 Oct 1:00pm"),
-				Storage.stringToMillisecond("Sun, 27 Dec 10:00pm"), -1, "Sat, 27 Oct 10:00am",
-				Storage.stringToMillisecond("Sat, 27 Oct 10:00am"));
+				"Sun, 27 Dec 1:00pm", "Sun, 27 Dec 9:00pm", GeneralFunctions.stringToMillisecond("Sun, 27 Oct 1:00pm"),
+				GeneralFunctions.stringToMillisecond("Sun, 27 Dec 10:00pm"), -1, "Sat, 27 Oct 10:00am",
+				GeneralFunctions.stringToMillisecond("Sat, 27 Oct 10:00am"));
 	}
 
 	/****************************************************************************

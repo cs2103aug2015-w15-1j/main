@@ -74,7 +74,7 @@ public class LogicEditor {
 		return feedbackString;
 	}
 
-	private String setMultipleFieldsForEvents(Command commandObject) {
+	private String setMultipleFieldsForTask(Command commandObject) {
 		System.out.println("taskId: "+commandObject.getTaskName());
 		int taskId = Integer.parseInt(commandObject.getTaskName());
 		System.out.println("taskId: "+taskId);
@@ -101,8 +101,7 @@ public class LogicEditor {
 		return EXECUTION_SET_SUCCESSFUL;
 	}
 	
-	private String setMultipleFieldsForTask(Command commandObject) {
-		System.out.println("taskId: "+commandObject.getTaskName());
+	private String setMultipleFieldsForEvents(Command commandObject) {
 		int taskId = Integer.parseInt(commandObject.getTaskName());
 		System.out.println("taskId: "+taskId);
 		if (!commandObject.getDescription().equals("")) {
@@ -113,6 +112,7 @@ public class LogicEditor {
 			System.out.println("priority :"+commandObject.getPriority());
 			setPriority(commandObject);
 		}
+		System.out.println("piority setted");
 		if (!commandObject.getReminder().equals("")) {
 			System.out.println("reminder: "+commandObject.getReminder());
 			setReminder(commandObject);
@@ -121,9 +121,10 @@ public class LogicEditor {
 			System.out.println("category: "+commandObject.getCategory());
 			setCategory(commandObject);
 		}
-		if (!commandObject.getDeadline().equals("")) {
+		if (!commandObject.getStartDateAndTime().equals("") && 
+				!commandObject.getEndDateAndTime().equals("")) {
 			setEventStartAndEndTime(commandObject);
-			System.out.println("deadline :"+commandObject.getDeadline());
+			
 		}
 		return EXECUTION_SET_SUCCESSFUL;
 	}
@@ -195,6 +196,8 @@ public class LogicEditor {
 		long startTime = GeneralFunctions.stringToMillisecond(startDate);
 		String endDate = commandObject.getEndDateAndTime();
 		long endTime = GeneralFunctions.stringToMillisecond(endDate);
+		System.out.println("setEventStartAndEndTime: "+ startDate);
+		System.out.println("setEventStartAndEndTime: "+ endDate);
 		storageObject.setStartDate(eventId, startTime, startDate);
 		storageObject.setDeadline(eventId, endTime, endDate);
 		return String.format(EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL, eventId,startDate,endDate);

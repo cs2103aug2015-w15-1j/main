@@ -145,7 +145,9 @@ public class LogicCommandHandler {
 			case ("setE") :
 				editCommandObject.setDescription(parsedUserInput.get(2));
 				editCommandObject.setStartDateAndTime(parsedUserInput.get(3));
+				System.out.println("setE StartTime/Date: "+ parsedUserInput.get(3));
 				editCommandObject.setEndDateAndTime(parsedUserInput.get(4));
+				System.out.println("setE EndTime/Date: "+ parsedUserInput.get(4));
 				editCommandObject.setPriority(parsedUserInput.get(5));
 				editCommandObject.setReminder(parsedUserInput.get(6));
 				editCommandObject.setCategory(parsedUserInput.get(7));

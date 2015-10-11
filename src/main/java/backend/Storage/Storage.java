@@ -135,6 +135,23 @@ public class Storage {
 		return allTypeTasks;
 	}
 	
+	private ArrayList<Task> getTargetTasksDone(String taskType) {
+		
+		ArrayList<Task> tasksDone = new ArrayList<Task> ();
+		ArrayList<Task> allTasks = getTargetTasks(taskType);
+
+		int size = allTasks.size();
+
+		for(int i = 0; i < size; i++) {
+			Task task = allTasks.get(i);
+			if(!task.getDone()) {
+				tasksDone.add(task);
+			}
+		}
+		
+		return tasksDone;
+	}
+	
 	private ArrayList<Task> getTypeTaskArray(Category category, String taskType) {
 		ArrayList<Task> typeTask = new ArrayList<Task> ();
 		
@@ -326,20 +343,20 @@ public class Storage {
 	
 	
 	public ArrayList<Task> getTasks() {
-		
-		return getTargetTasks(TYPE_TASK);
+
+		return getTargetTasksDone(TYPE_TASK);
 	}
 	
 	
 	public ArrayList<Task> getFloatingTasks() {
-		
-		return getTargetTasks(TYPE_FLOAT);
+
+		return getTargetTasksDone(TYPE_FLOAT);
 	}
 	
 	
 	public ArrayList<Task> getEvents() {
 		
-		return getTargetTasks(TYPE_EVENT);
+		return getTargetTasksDone(TYPE_EVENT);
 	}
 	
 	public ArrayList<Task> getUpcomingTasks() {
@@ -445,8 +462,18 @@ public class Storage {
 
 		String taskId = getTaskId(taskIndex);
 		TreeMap<String, Task> targetTask = getAllTasks();
-		targetTask.get(taskId).setStartDate(startDate);
-		targetTask.get(taskId).setStartTime(startTime);
+		Task task = targetTask.get(taskId);
+		String taskType = checkTaskType(task);
+		String newTaskType = checkTaskType(task);
+		
+		task.setStartDate(startDate);
+		task.setStartTime(startTime);
+		
+		if(taskType.equals(TYPE_FLOAT) || taskType.equals(TYPE_TASK)) {
+			//changeTypeToEvent
+		}
+		
+		
 		data.save(allData);
 	}
 	
@@ -456,6 +483,8 @@ public class Storage {
 		TreeMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setEndDate(deadlineDate);
 		targetTask.get(taskId).setEndTime(deadlineTime);
+		
+		
 		data.save(allData);
 	}
 	

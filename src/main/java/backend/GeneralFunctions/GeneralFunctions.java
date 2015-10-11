@@ -1,4 +1,4 @@
-package main.java.backend.Logic;
+package main.java.backend.GeneralFunctions;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

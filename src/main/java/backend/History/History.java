@@ -13,9 +13,12 @@ public class History {
 
 	public void push(ArrayList<Category> currentState) {
 		stateStack.push(currentState);
+		System.out.println("History stack size after push: "+stateStack.size());
 	}
 
 	public ArrayList<Category> pop() {
-		return stateStack.pop();
+		stateStack.pop();
+		System.out.println("History stack size after pop: "+stateStack.size());
+		return stateStack.peek();
 	}
 }

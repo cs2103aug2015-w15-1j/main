@@ -1,12 +1,5 @@
 package main.java.backend.Logic;
 
-import java.io.IOException;
-import org.json.JSONException;
-import org.json.simple.parser.ParseException;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
 import main.java.backend.Storage.Storage;
 
 public class LogicEditor {
@@ -37,7 +30,7 @@ public class LogicEditor {
 		return logicEditorObject;
 	}
 
-	public String execute(Command commandObject) throws IOException, JSONException, ParseException {
+	public String execute(Command commandObject){
 		String feedbackString = "";
 		switch(commandObject.getCommandField()) {
 			case ("priority") :
@@ -77,7 +70,7 @@ public class LogicEditor {
 		return feedbackString;
 	}
 
-	private String setPriority(Command commandObject) throws IOException, JSONException, ParseException {
+	private String setPriority(Command commandObject){
 		int taskId = Integer.parseInt(commandObject.getTaskName());
 		System.out.println("taskId: "+taskId);
 		int priority = Integer.parseInt(commandObject.getPriority());
@@ -89,7 +82,7 @@ public class LogicEditor {
 		return String.format(EXECUTION_SET_PRIORITY_SUCCESSFUL, taskId,priority);
 	}
 
-	private String setMultipleFields(Command commandObject) throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException {
+	private String setMultipleFields(Command commandObject) {
 		int taskId = Integer.parseInt(commandObject.getTaskName());
 		if (!commandObject.getDescription().equals("")) {
 			String taskDescription = commandObject.getDescription();
@@ -113,38 +106,35 @@ public class LogicEditor {
 		}
 		return EXECUTION_SET_SUCCESSFUL;
 	}
-	private String delete(Command commandObject) throws IOException, JSONException, ParseException {
+	private String delete(Command commandObject) {
 		int taskId = Integer.parseInt(commandObject.getTaskName());
 		storageObject.deleteTask(taskId);
 		return String.format(EXECUTION_DELETE_SUCCESSFUL, taskId);
 	}
-	private String setColour(Command commandObject) throws JsonParseException, JsonMappingException, IOException {
+	private String setColour(Command commandObject) {
 		String categoryName = commandObject.getCategory();
 		String colourId = commandObject.getColour();
 		storageObject.setCategoryColour(categoryName,colourId);
 		return String.format(EXECUTION_SET_COLOUR_SUCCESSFUL, categoryName,colourId);
 	}
-	private String setCategory(Command commandObject) throws IOException {
+	private String setCategory(Command commandObject) {
 		int taskId = Integer.parseInt(commandObject.getTaskName());
 		String categoryName = commandObject.getCategory();
 		storageObject.setCategory(taskId, categoryName);
 		return String.format(EXECUTION_SET_CATEGORY_SUCCESSFUL, taskId, categoryName);
 	}
-	private String setUndone(Command commandObject) 
-			throws JsonParseException, JsonMappingException, JSONException, IOException, ParseException {
+	private String setUndone(Command commandObject) {
 		int taskId = Integer.parseInt(commandObject.getTaskName());
 		storageObject.setUndone(taskId);
 		return String.format(EXECUTION_DONE_COMMAND_SUCCESSFUL, taskId);
 	}
 
-	private String setDone(Command commandObject) 
-			throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException {
+	private String setDone(Command commandObject) {
 		int taskId = Integer.parseInt(commandObject.getTaskName());
 		storageObject.setDone(taskId);
 		return String.format(EXECUTION_UNDONE_COMMAND_SUCCESSFUL, taskId);
 	}
-	private String setReminder(Command commandObject) 
-			throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException {
+	private String setReminder(Command commandObject) {
 		int taskId = Integer.parseInt(commandObject.getTaskName());
 		String reminderDate = commandObject.getReminder();
 		long reminderTime = GeneralFunctions.stringToMillisecond(reminderDate);
@@ -152,23 +142,21 @@ public class LogicEditor {
 		return String.format(EXECUTION_SET_REMINDER_SUCCESSFUL,taskId,reminderDate);
 	}
 
-	private String setDescription(Command commandObject) 
-			throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException {
+	private String setDescription(Command commandObject) {
 		int taskId = Integer.parseInt(commandObject.getTaskName());
 		String description = commandObject.getDescription();
 		storageObject.setDescription(taskId, description);
 		return String.format(EXECUTION_SET_DESCRIPTION_SUCCESSFUL, taskId);
 	}
 
-	private String setEventStartAndEndTime(Command commandObject) throws IOException {
+	private String setEventStartAndEndTime(Command commandObject) {
 		int eventId = Integer.parseInt(commandObject.getTaskName());
 		String startTime = commandObject.getStartDateAndTime();
 		String endTime = commandObject.getEndDateAndTime();
 		return String.format(EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL, eventId,startTime,endTime);
 	}
 
-	private String setDeadline(Command commandObject) 
-			throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException {
+	private String setDeadline(Command commandObject) {
 		int taskId = Integer.parseInt(commandObject.getTaskName());
 		String deadlineDate = commandObject.getDeadline();
 		long deadlineTime = GeneralFunctions.stringToMillisecond(deadlineDate);

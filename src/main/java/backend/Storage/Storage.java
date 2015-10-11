@@ -606,9 +606,9 @@ public class Storage {
 	public void saveData(ArrayList<Category> categories) {
 		
 		for(Category category : categories) {
-			allData.get(category).setTasks(category.getTasks());
-			allData.get(category).setFloatTasks(category.getFloatTasks());
-			allData.get(category).setEvents(category.getFloatTasks());
+			allData.get(category.getCategoryName()).setTasks(category.getTasks());
+			allData.get(category.getCategoryName()).setFloatTasks(category.getFloatTasks());
+			allData.get(category.getCategoryName()).setEvents(category.getFloatTasks());
 			allData.put(category.getCategoryName(), category);
 		}
 		

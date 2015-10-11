@@ -377,7 +377,8 @@ public class Storage {
 		ArrayList<Task> allTasks = getEvents();
 		ArrayList<Task> upcomingEvents = new ArrayList<Task> ();
 		
-		for(Task task : allTasks) {		
+		for(Task task : allTasks) {
+			
 			if(getTime(task) >= getCurrentTime() && !task.getDone()) {
 				upcomingEvents.add(task);
 			}

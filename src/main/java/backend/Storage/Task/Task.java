@@ -237,9 +237,13 @@ public class Task implements Comparable<Task> {
 			sb.append(endDate + System.getProperty("line.separator"));
 		}
 		if (reminderDate!=""){
-			sb.append(reminderDate + System.getProperty("line.separator"));
+			sb.append("reminder: "+ reminderDate + System.getProperty("line.separator"));
 		}
-		sb.append("is it completed? "+isDone + System.getProperty("line.separator"));
+		if (isDone){
+		sb.append("It's completed!" + System.getProperty("line.separator"));
+		} else {
+		sb.append("It's not done yet." + System.getProperty("line.separator"));	
+		}
 		return sb.toString();
 	}
 	

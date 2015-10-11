@@ -16,10 +16,16 @@ public class StorageTest {
 	
 	private static final String DESCRIPTION_TODO = "Find out how to code query in PHP";
 	private static final String DESCRIPTION_EVENT = "Meet at East Coast Lagoon Food Village at 1pm";
-	private static final String DATE_TODO = "Mon, 12 Oct 8:00am";
-	private static final String DATE_FLOAT = "Tue, 3 Nov 12:00pm";
-	private static final long DATE_TODO_TIME = Storage.stringToMillisecond("Mon, 12 Oct 8:00am");
-	private static final long DATE_FLOAT_TIME = Storage.stringToMillisecond("Tue, 3 Nov 12:00pm");
+	
+	private static final String DATE_TODO_START = "Mon, 12 Oct 8:00am";
+	private static final String DATE_FLOAT_START = "Tue, 3 Nov 12:00pm";
+	private static final String DATE_TODO_END = "Sat, 3 Oct 8:00am";
+	private static final String DATE_FLOAT_END = "Tue, 20 Oct 8:00am";
+	
+	private static final long DATE_TODO_STARTTIME = Storage.stringToMillisecond("Mon, 12 Oct 8:00am");
+	private static final long DATE_FLOAT_STARTTIME = Storage.stringToMillisecond("Tue, 3 Nov 12:00pm");
+	private static final long DATE_TODO_ENDTIME = Storage.stringToMillisecond("Sat, 3 Oct 8:00am");
+	private static final long DATE_FLOAT_ENDTIME = Storage.stringToMillisecond("Tue, 20 Oct 8:00am");
 
 	/* ======================== Category colors ========================= */
 	private static final String COLOUR_BLUE = "#24c6d5";
@@ -229,7 +235,7 @@ public class StorageTest {
 	}
 	
 	@Test
-	public void testSetDeadline() {
+	public void testSetStartDate() {
 		
 		storage.addCategory(CATEGORY1);
 		storage.addCategory(CATEGORY2);
@@ -240,12 +246,35 @@ public class StorageTest {
 		storage.addTask(CATEGORY1_TODO1);
 		storage.addFloatingTask(CATEGORY2_FLOAT1);
 		
-		storage.setDeadline(CATEGORY1_TODO1.getIndex(), DATE_TODO_TIME, DATE_TODO);
-		storage.setDeadline(CATEGORY2_FLOAT1.getIndex(), DATE_FLOAT_TIME, DATE_FLOAT);
+		storage.setStartDate(CATEGORY1_TODO1.getIndex(), DATE_TODO_STARTTIME, DATE_TODO_START);
+		storage.setStartDate(CATEGORY2_FLOAT1.getIndex(), DATE_FLOAT_STARTTIME, DATE_FLOAT_START);
 		
-		assertEquals(DATE_TODO, storage.getCategoryList().get(0).getTasks().
+		assertEquals(DATE_TODO_START, storage.getCategoryList().get(0).getTasks().
+				get(CATEGORY1_TODO1.getTaskId()).getStartDate());
+		assertEquals(DATE_FLOAT_START, storage.getCategoryList().get(1).getFloatTasks().
+				get(CATEGORY2_FLOAT1.getTaskId()).getStartDate());
+		
+		storage.deleteAll();
+	}
+	
+	@Test
+	public void testSetEndDate() {
+		
+		storage.addCategory(CATEGORY1);
+		storage.addCategory(CATEGORY2);
+		storage.addCategory(CATEGORY3);
+		
+		CATEGORY1_TODO1.setIndex(5);
+		CATEGORY2_FLOAT1.setIndex(6);
+		storage.addTask(CATEGORY1_TODO1);
+		storage.addFloatingTask(CATEGORY2_FLOAT1);
+		
+		storage.setDeadline(CATEGORY1_TODO1.getIndex(), DATE_TODO_ENDTIME, DATE_TODO_END);
+		storage.setDeadline(CATEGORY2_FLOAT1.getIndex(), DATE_FLOAT_ENDTIME, DATE_FLOAT_END);
+		
+		assertEquals(DATE_TODO_END, storage.getCategoryList().get(0).getTasks().
 				get(CATEGORY1_TODO1.getTaskId()).getEndDate());
-		assertEquals(DATE_FLOAT, storage.getCategoryList().get(1).getFloatTasks().
+		assertEquals(DATE_FLOAT_END, storage.getCategoryList().get(1).getFloatTasks().
 				get(CATEGORY2_FLOAT1.getTaskId()).getEndDate());
 		
 		storage.deleteAll();

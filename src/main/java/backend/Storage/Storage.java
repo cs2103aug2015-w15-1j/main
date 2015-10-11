@@ -422,6 +422,7 @@ public class Storage {
 		data.save(allData);
 	}
 	
+	
 	public void setName(int taskIndex, String name) {
 
 		String taskId = getTaskId(taskIndex);
@@ -430,11 +431,22 @@ public class Storage {
 		data.save(allData);
 	}
 	
+	
 	public void setDescription(int taskIndex, String description) {
 
 		String taskId = getTaskId(taskIndex);
 		TreeMap<String, Task> targetTask = getAllTasks();
 		targetTask.get(taskId).setDescription(description);
+		data.save(allData);
+	}
+	
+	
+	public void setStartDate(int taskIndex, long startTime, String startDate) {
+
+		String taskId = getTaskId(taskIndex);
+		TreeMap<String, Task> targetTask = getAllTasks();
+		targetTask.get(taskId).setStartDate(startDate);
+		targetTask.get(taskId).setStartTime(startTime);
 		data.save(allData);
 	}
 	

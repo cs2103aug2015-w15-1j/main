@@ -1,16 +1,19 @@
 package main.java.backend.Logic;
 
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 import main.java.backend.History.History;
 import main.java.backend.Parser.Parser;
 import main.java.backend.Search.Search;
 import main.java.backend.Sorter.Sorter;
 import main.java.backend.Storage.Storage;
+import main.java.backend.Storage.StorageDatabase;
 import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
 public class LogicController {
+	
 	private static LogicController logicObject;
 	private static LogicCommandHandler commandHandlerSubComponent;
 	private static LogicCreator creatorSubComponent;
@@ -21,24 +24,31 @@ public class LogicController {
 	private static Parser parserComponent;
 	private static Search searcherComponent;
 	private static History historyComponent;
-	private static ArrayList<Category> currentState;
+	private LogicHelper logicHelper;
+	
+	private static TreeMap<String, Category> currentState;
 	private ArrayList<Task> taskList;
 	
-	private LogicController(String filename) {
+	private LogicController(String fileName) {
+		
 		parserComponent = new Parser();
-		storageComponent = new Storage(filename);
+		storageComponent = new StorageDatabase();
 		sorterComponent = new Sorter();
 		searcherComponent = new Search();
 		historyComponent = new History();
+		logicHelper = new LogicHelper();
+		storageComponent.init(fileName);
 		commandHandlerSubComponent = new LogicCommandHandler(parserComponent);
 		creatorSubComponent = LogicCreator.getInstance(storageComponent);
 		editorSubComponent = LogicEditor.getInstance(storageComponent);
 		getterSubComponent = LogicGetter.getInstance(storageComponent);
+		updateCurrentState();
 		updateHistoryStack();
 		System.out.println("Logic component initialised successfully");
 	}
 
 	public static LogicController getInstance(String filename) {
+		
 		if (LogicController.logicObject == null) {
 			LogicController.logicObject = new LogicController(filename);
 		}
@@ -46,6 +56,7 @@ public class LogicController {
 	}
 	
 	public String executeCommand(String userInput) {
+		
 		Command commandObject = commandHandlerSubComponent.parseCommand(userInput);
 		String feedbackString = "";
 		assert(commandObject.getType()!=null);
@@ -84,7 +95,7 @@ public class LogicController {
 			return "no more Undos";
 		}
 		System.out.println("received from history stack "+currentState);
-		storageComponent.saveData(currentState);
+		storageComponent.save(currentState);
 		return "Undo successful";
 	}
 
@@ -93,7 +104,13 @@ public class LogicController {
 	}
 	
 	public void setindex(ArrayList<Task> list, int i, int index) {
-		storageComponent.setIndex(list.get(i),index);
+		
+		String taskId = list.get(i).getTaskId();
+		TreeMap<String, Task> targetTask = logicHelper.getAllTasks(currentState);
+		
+		targetTask.get(taskId).setIndex(index);
+		
+		storageComponent.save(currentState);
 	}
 	
 	public ArrayList<String> retrieveStringData(String dataType){
@@ -109,8 +126,8 @@ public class LogicController {
 	}
 	
 	private void updateCurrentState() {
-		currentState = storageComponent.getCategoryList();
-		taskList = storageComponent.getTaskList();
+		currentState = storageComponent.load();
+		taskList = logicHelper.getTaskList(currentState);
 	}
 	
 	private void updateHistoryStack() {

@@ -1,6 +1,7 @@
 package main.java.backend.Logic;
 
 public class Command {
+	
 	public enum Type {
 		ADD, EDIT, SORT, SEARCH, EXIT, UNDO
 	}

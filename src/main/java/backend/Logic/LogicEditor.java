@@ -1,12 +1,15 @@
 package main.java.backend.Logic;
 
 import main.java.backend.Storage.Storage;
+import main.java.backend.Storage.Task.Category;
+import main.java.backend.Storage.Task.Task;
+
+import java.util.TreeMap;
+
 import main.java.backend.GeneralFunctions.GeneralFunctions;
 
 public class LogicEditor {
 	
-	private static LogicEditor logicEditorObject;
-	private static Storage storageObject;
 	private static final String EXECUTION_SET_PRIORITY_SUCCESSFUL = "Task %1$s has been set to priority %2$s";
 	private static final String EXECUTION_SET_SUCCESSFUL = "Fields have been updated";
 	private static final String EXECUTION_DELETE_SUCCESSFUL = "Task %1$s has been deleted";
@@ -20,11 +23,20 @@ public class LogicEditor {
 	private static final String EXECUTION_UNDONE_COMMAND_SUCCESSFUL = "Task %1$s is completed";
 	private static final String EXECUTION_DONE_COMMAND_SUCCESSFUL = "Task %1$s is not completed";
 	
+	private TreeMap<String, Category> allData;
+	
+	private static LogicEditor logicEditorObject;
+	private LogicHelper logicHelper;
+	private Storage storage;
+	
 	private LogicEditor(Storage storageComponent) {
-		storageObject = storageComponent;
+		
+		logicHelper = new LogicHelper();
+		storage = storageComponent;
 	}
 
 	public static LogicEditor getInstance(Storage storageComponent) {
+		
 		if (logicEditorObject == null) {
 			logicEditorObject = new LogicEditor(storageComponent);
 		}
@@ -32,6 +44,7 @@ public class LogicEditor {
 	}
 
 	public String execute(Command commandObject){
+		
 		String feedbackString = "";
 		System.out.println("Get Command Field: "+commandObject.getCommandField());
 		switch(commandObject.getCommandField()) {
@@ -76,6 +89,7 @@ public class LogicEditor {
 	}
 
 	private String setMultipleFieldsForTask(Command commandObject) {
+		
 		System.out.println("taskId: "+commandObject.getTaskName());
 		int taskId = Integer.parseInt(commandObject.getTaskName());
 		System.out.println("taskId: "+taskId);
@@ -103,6 +117,7 @@ public class LogicEditor {
 	}
 	
 	private String setMultipleFieldsForEvents(Command commandObject) {
+		
 		int taskId = Integer.parseInt(commandObject.getTaskName());
 		System.out.println("taskId: "+taskId);
 		if (!commandObject.getDescription().equals("")) {
@@ -113,7 +128,7 @@ public class LogicEditor {
 			System.out.println("priority :"+commandObject.getPriority());
 			setPriority(commandObject);
 		}
-		System.out.println("piority setted");
+		System.out.println("priority setted");
 		if (!commandObject.getReminder().equals("")) {
 			System.out.println("reminder: "+commandObject.getReminder());
 			setReminder(commandObject);
@@ -131,91 +146,192 @@ public class LogicEditor {
 	}
 	
 	private String delete(Command commandObject) {
-		int taskId = Integer.parseInt(commandObject.getTaskName());
-		storageObject.deleteTask(taskId);
-		return String.format(EXECUTION_DELETE_SUCCESSFUL, taskId);
+		
+		allData = storage.load();
+		int taskIndex = Integer.parseInt(commandObject.getTaskName());
+		String taskId = logicHelper.getTaskId(allData, taskIndex);
+		Task task = logicHelper.getAllTasks(allData).get(taskId);
+		
+		TreeMap<String, Task> tasks = logicHelper.getTargetTaskList
+				(allData.get(task.getCategory()), logicHelper.checkTaskType(task));
+
+		if(tasks.containsKey(taskId)) {
+			tasks.remove(taskId);
+		}
+		
+		storage.save(allData);
+		
+		return String.format(EXECUTION_DELETE_SUCCESSFUL, taskIndex);
 	}
 	
 	private String setPriority(Command commandObject){
-		int taskId = Integer.parseInt(commandObject.getTaskName());
-		System.out.println("taskId: "+taskId);
+		
+		allData = storage.load();
+		int taskIndex = Integer.parseInt(commandObject.getTaskName());
 		int priority = Integer.parseInt(commandObject.getPriority());
-		if (priorityChecker(priority) != null) {
-			return priorityChecker(priority);
+		
+		if (logicHelper.priorityChecker(priority) != null) {
+			return logicHelper.priorityChecker(priority);
 		}
-		System.out.println("priority: "+priority);
-		storageObject.setPriority(taskId, priority);
+		
+		String taskId = logicHelper.getTaskId(allData, taskIndex);
+		TreeMap<String, Task> targetTask = logicHelper.getAllTasks(allData);
+		targetTask.get(taskId).setPriority(priority);
+		
+		storage.save(allData);	
+		
 		return String.format(EXECUTION_SET_PRIORITY_SUCCESSFUL, taskId,priority);
 	}
 	
 	private String setColour(Command commandObject) {
+		
+		allData = storage.load();
 		String categoryName = commandObject.getCategory();
 		String colourId = commandObject.getColour();
-		storageObject.setCategoryColour(categoryName,colourId);
+		
+		Category category = allData.get(categoryName);
+		category.setCategoryColour(colourId);
+		storage.save(allData);
+		
 		return String.format(EXECUTION_SET_COLOUR_SUCCESSFUL, categoryName,colourId);
 	}
 	
 	private String setCategory(Command commandObject) {
-		int taskId = Integer.parseInt(commandObject.getTaskName());
+		
+		allData = storage.load();
+		int taskIndex = Integer.parseInt(commandObject.getTaskName());
 		String categoryName = commandObject.getCategory();
-		storageObject.setCategory(taskId, categoryName);
+		
+		String taskId = logicHelper.getTaskId(allData, taskIndex);
+		Task task = logicHelper.getAllTasks(allData).get(taskId);
+		
+		Command command = new Command();
+		command.setTaskName(Integer.toString(taskIndex));
+		delete(command);
+		
+		task.setCategory(categoryName);
+		allData = logicHelper.addNewTask(allData, task.getCategory(), 
+				logicHelper.checkTaskType(task), task);
+		
+		storage.save(allData);
+		
 		return String.format(EXECUTION_SET_CATEGORY_SUCCESSFUL, taskId, categoryName);
 	}
+	
 	private String setUndone(Command commandObject) {
-		int taskId = Integer.parseInt(commandObject.getTaskName());
-		storageObject.setUndone(taskId);
+		
+		allData = storage.load();
+		int taskIndex = Integer.parseInt(commandObject.getTaskName());
+		String taskId = logicHelper.getTaskId(allData, taskIndex);
+		TreeMap<String, Task> targetTask = logicHelper.getAllTasks(allData);
+		
+		targetTask.get(taskId).setDone(false);
+		
+		storage.save(allData);
+		
 		return String.format(EXECUTION_DONE_COMMAND_SUCCESSFUL, taskId);
 	}
 
 	private String setDone(Command commandObject) {
-		int taskId = Integer.parseInt(commandObject.getTaskName());
-		System.out.println("taskId : "+taskId);
-		storageObject.setDone(taskId);
+		
+		allData = storage.load();
+		int taskIndex = Integer.parseInt(commandObject.getTaskName());
+		System.out.println("taskId : "+taskIndex);
+		String taskId = logicHelper.getTaskId(allData, taskIndex);
+		TreeMap<String, Task> targetTask = logicHelper.getAllTasks(allData);
+		
+		targetTask.get(taskId).setDone(true);
+		targetTask.get(taskId).setIndex(-1);
+		
+		storage.save(allData);
+		
 		return String.format(EXECUTION_UNDONE_COMMAND_SUCCESSFUL, taskId);
 	}
 	
 	private String setReminder(Command commandObject) {
-		int taskId = Integer.parseInt(commandObject.getTaskName());
+		
+		allData = storage.load();
+		int taskIndex = Integer.parseInt(commandObject.getTaskName());
 		String reminderDate = commandObject.getReminder();
 		long reminderTime = GeneralFunctions.stringToMillisecond(reminderDate);
-		storageObject.setReminder(taskId, reminderTime, reminderDate);
+		String taskId = logicHelper.getTaskId(allData, taskIndex);
+		TreeMap<String, Task> targetTask = logicHelper.getAllTasks(allData);
+		
+		targetTask.get(taskId).setReminderDate(reminderDate);
+		targetTask.get(taskId).setReminder(reminderTime);
+		
+		storage.save(allData);
+		
 		return String.format(EXECUTION_SET_REMINDER_SUCCESSFUL,taskId,reminderDate);
 	}
 
 	private String setDescription(Command commandObject) {
-		int taskId = Integer.parseInt(commandObject.getTaskName());
-		System.out.println("taskID: " +taskId);
+		
+		allData = storage.load();
+		int taskIndex = Integer.parseInt(commandObject.getTaskName());
+		System.out.println("taskID: " +taskIndex);
 		String description = commandObject.getDescription();
 		System.out.println("description: "+description);
-		storageObject.setDescription(taskId, description);
+		String taskId = logicHelper.getTaskId(allData, taskIndex);
+		
+		TreeMap<String, Task> targetTask = logicHelper.getAllTasks(allData);
+		targetTask.get(taskId).setDescription(description);
+		
+		storage.save(allData);
+		
 		return String.format(EXECUTION_SET_DESCRIPTION_SUCCESSFUL, taskId);
 	}
 
 	private String setEventStartAndEndTime(Command commandObject) {
-		int eventId = Integer.parseInt(commandObject.getTaskName());
+		
+		allData = storage.load();
+		int eventIndex = Integer.parseInt(commandObject.getTaskName());
 		String startDate = commandObject.getStartDateAndTime();
 		long startTime = GeneralFunctions.stringToMillisecond(startDate);
 		String endDate = commandObject.getEndDateAndTime();
 		long endTime = GeneralFunctions.stringToMillisecond(endDate);
 		System.out.println("setEventStartAndEndTime: "+ startDate);
 		System.out.println("setEventStartAndEndTime: "+ endDate);
-		storageObject.setStartDate(eventId, startTime, startDate);
-		storageObject.setDeadline(eventId, endTime, endDate);
-		return String.format(EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL, eventId,startDate,endDate);
+		String taskId = logicHelper.getTaskId(allData, eventIndex);
+		TreeMap<String, Task> targetTask = logicHelper.getAllTasks(allData);
+		Task task = targetTask.get(taskId);
+		
+		Command command = new Command();
+		command.setTaskName(Integer.toString(eventIndex));
+		delete(command);
+		
+		task.setStartDate(startDate);
+		task.setStartTime(startTime);
+		task.setEndDate(endDate);
+		task.setEndTime(endTime);
+		
+		allData = logicHelper.addNewTask(allData, task.getCategory(), logicHelper.checkTaskType(task), task);
+		
+		storage.save(allData);
+		
+		return String.format(EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL, eventIndex,startDate,endDate);
 	}
 
 	private String setDeadline(Command commandObject) {
-		int taskId = Integer.parseInt(commandObject.getTaskName());
+		
+		allData = storage.load();
+		int taskIndex = Integer.parseInt(commandObject.getTaskName());
 		String deadlineDate = commandObject.getDeadline();
 		long deadlineTime = GeneralFunctions.stringToMillisecond(deadlineDate);
-		storageObject.setDeadline(taskId, deadlineTime, deadlineDate);
+		String taskId = logicHelper.getTaskId(allData, taskIndex);
+		TreeMap<String, Task> targetTask = logicHelper.getAllTasks(allData);
+		Task task = targetTask.get(taskId);
+		
+		Command command = new Command();
+		command.setTaskName(Integer.toString(taskIndex));
+		delete(command);
+		
+		task.setEndDate(deadlineDate);
+		task.setEndTime(deadlineTime);
+		
+		allData = logicHelper.addNewTask(allData, task.getCategory(), logicHelper.checkTaskType(task), task);
+		
+		storage.save(allData);
 		return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskId,deadlineDate);
-	}
-	
-	private String priorityChecker(int priority) {
-		if (priority > 5 || priority < 1) {
-			return EXECUTION_COMMAND_UNSUCCESSFUL;
-		}
-		return null;
 	}
 }

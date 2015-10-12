@@ -333,7 +333,7 @@ public class GUI extends Application{
 	 * @param index
 	 */
 	private static void setIndex(ArrayList<Task> list, int index) {
-		for (int i=0;i<list.size();i++){
+		for (int i=0;i<list.size();i++){ 
 		logicComponent.setindex(list,i,(++index));
 		}
 	}
@@ -361,9 +361,10 @@ public class GUI extends Application{
 	}
 
 	private static void refresh() throws IOException, JSONException, ParseException{
-		//System.out.println("refreshing");
+		System.out.println("refreshing");
 		if (currentScene == SCENE_MAIN){
 			gridPane.getChildren().removeAll(listOverdue, listFloat,listTasks,listEvents);
+			setUpContents();
 			setUpContents();
 		}
 		else{
@@ -584,6 +585,7 @@ public class GUI extends Application{
 		} else if(display.equals(COMMAND_EXIT)){
 			exit();
 		} else {
+			System.out.println("im here!");
 			refresh();
 			displayStringToScreen(display);
 		}

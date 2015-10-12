@@ -58,5 +58,7 @@
     -fx-opacity: 0;
 }
 #listOverdue{
+	-fx-text-fill: #E41B17;
 	-fx-background-color: #123456;
+	-fx-font-size: 16px;
 }

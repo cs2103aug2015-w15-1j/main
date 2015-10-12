@@ -14,11 +14,11 @@ public class LogicGetter {
 	private static final String TYPE_EVENT = "event";
 	
 	private static LogicGetter logicGetterObject;
-	private LogicHelper logicHelper;
+	private LogicToStorage logicToStorage;
 	private Storage storage;
 
 	private LogicGetter(Storage storage) {
-		logicHelper = new LogicHelper();
+		logicToStorage = LogicToStorage.getInstance();
 		this.storage = storage;
 	}
 
@@ -91,15 +91,15 @@ public class LogicGetter {
 	}
 
 	public ArrayList<Task> getToDo() {
-		return logicHelper.getTargetTasksDone(storage.load(), TYPE_TODO);	
+		return logicToStorage.getTargetTasksDone(storage.load(), TYPE_TODO);	
 	}
 
 	public ArrayList<Task> getFloatingTasks() {
-		return logicHelper.getTargetTasksDone(storage.load(), TYPE_FLOAT);
+		return logicToStorage.getTargetTasksDone(storage.load(), TYPE_FLOAT);
 	}
 
 	public ArrayList<Task> getEvents() {
-		return logicHelper.getTargetTasksDone(storage.load(), TYPE_EVENT);
+		return logicToStorage.getTargetTasksDone(storage.load(), TYPE_EVENT);
 	}
 	
 	public ArrayList<Task> getUpcomingToDo() {

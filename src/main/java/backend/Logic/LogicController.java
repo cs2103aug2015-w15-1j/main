@@ -24,7 +24,7 @@ public class LogicController {
 	private static Parser parserComponent;
 	private static Search searcherComponent;
 	private static History historyComponent;
-	private LogicHelper logicHelper;
+	private LogicToStorage logicToStorage;
 	
 	private static TreeMap<String, Category> currentState;
 	private ArrayList<Task> taskList;
@@ -36,7 +36,7 @@ public class LogicController {
 		sorterComponent = new Sorter();
 		searcherComponent = new Search();
 		historyComponent = new History();
-		logicHelper = new LogicHelper();
+		logicToStorage = LogicToStorage.getInstance();
 		storageComponent.init(fileName);
 		commandHandlerSubComponent = new LogicCommandHandler(parserComponent);
 		creatorSubComponent = LogicCreator.getInstance(storageComponent);
@@ -103,16 +103,6 @@ public class LogicController {
 		System.exit(0);
 	}
 	
-	public void setindex(ArrayList<Task> list, int i, int index) {
-		
-		String taskId = list.get(i).getTaskId();
-		TreeMap<String, Task> targetTask = logicHelper.getAllTasks(currentState);
-		
-		targetTask.get(taskId).setIndex(index);
-		
-		storageComponent.save(currentState);
-	}
-	
 	public ArrayList<String> retrieveStringData(String dataType){
 		return getterSubComponent.retrieveStringData(dataType);
 	}
@@ -125,9 +115,13 @@ public class LogicController {
 		return getterSubComponent.retrieveTaskData(dataType);
 	}
 	
+	public void updateTaskNumbering(ArrayList<Task> list, int i, int index) {
+		editorSubComponent.setindex(list, i, index, currentState);
+	}
+	
 	private void updateCurrentState() {
 		currentState = storageComponent.load();
-		taskList = logicHelper.getTaskList(currentState);
+		taskList = logicToStorage.getTaskList(currentState);
 	}
 	
 	private void updateHistoryStack() {

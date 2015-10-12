@@ -4,6 +4,7 @@ import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 import main.java.backend.GeneralFunctions.GeneralFunctions;
@@ -26,12 +27,12 @@ public class LogicEditor {
 	private TreeMap<String, Category> allData;
 	
 	private static LogicEditor logicEditorObject;
-	private LogicHelper logicHelper;
+	private LogicToStorage logicToStorage;
 	private Storage storage;
 	
 	private LogicEditor(Storage storageComponent) {
 		
-		logicHelper = new LogicHelper();
+		logicToStorage = LogicToStorage.getInstance();
 		storage = storageComponent;
 	}
 
@@ -149,11 +150,11 @@ public class LogicEditor {
 		
 		allData = storage.load();
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
-		String taskId = logicHelper.getTaskId(allData, taskIndex);
-		Task task = logicHelper.getAllTasks(allData).get(taskId);
+		String taskId = logicToStorage.getTaskId(allData, taskIndex);
+		Task task = logicToStorage.getAllTasks(allData).get(taskId);
 		
-		TreeMap<String, Task> tasks = logicHelper.getTargetTaskList
-				(allData.get(task.getCategory()), logicHelper.checkTaskType(task));
+		TreeMap<String, Task> tasks = logicToStorage.getTargetTaskList
+				(allData.get(task.getCategory()), logicToStorage.checkTaskType(task));
 
 		if(tasks.containsKey(taskId)) {
 			tasks.remove(taskId);
@@ -170,12 +171,12 @@ public class LogicEditor {
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
 		int priority = Integer.parseInt(commandObject.getPriority());
 		
-		if (logicHelper.priorityChecker(priority) != null) {
-			return logicHelper.priorityChecker(priority);
+		if (logicToStorage.priorityChecker(priority) != null) {
+			return logicToStorage.priorityChecker(priority);
 		}
 		
-		String taskId = logicHelper.getTaskId(allData, taskIndex);
-		TreeMap<String, Task> targetTask = logicHelper.getAllTasks(allData);
+		String taskId = logicToStorage.getTaskId(allData, taskIndex);
+		TreeMap<String, Task> targetTask = logicToStorage.getAllTasks(allData);
 		targetTask.get(taskId).setPriority(priority);
 		
 		storage.save(allData);	
@@ -202,16 +203,16 @@ public class LogicEditor {
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
 		String categoryName = commandObject.getCategory();
 		
-		String taskId = logicHelper.getTaskId(allData, taskIndex);
-		Task task = logicHelper.getAllTasks(allData).get(taskId);
+		String taskId = logicToStorage.getTaskId(allData, taskIndex);
+		Task task = logicToStorage.getAllTasks(allData).get(taskId);
 		
 		Command command = new Command();
 		command.setTaskName(Integer.toString(taskIndex));
 		delete(command);
 		
 		task.setCategory(categoryName);
-		allData = logicHelper.addNewTask(allData, task.getCategory(), 
-				logicHelper.checkTaskType(task), task);
+		allData = logicToStorage.addNewTask(allData, task.getCategory(), 
+				logicToStorage.checkTaskType(task), task);
 		
 		storage.save(allData);
 		
@@ -222,8 +223,8 @@ public class LogicEditor {
 		
 		allData = storage.load();
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
-		String taskId = logicHelper.getTaskId(allData, taskIndex);
-		TreeMap<String, Task> targetTask = logicHelper.getAllTasks(allData);
+		String taskId = logicToStorage.getTaskId(allData, taskIndex);
+		TreeMap<String, Task> targetTask = logicToStorage.getAllTasks(allData);
 		
 		targetTask.get(taskId).setDone(false);
 		
@@ -237,8 +238,8 @@ public class LogicEditor {
 		allData = storage.load();
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
 		System.out.println("taskId : "+taskIndex);
-		String taskId = logicHelper.getTaskId(allData, taskIndex);
-		TreeMap<String, Task> targetTask = logicHelper.getAllTasks(allData);
+		String taskId = logicToStorage.getTaskId(allData, taskIndex);
+		TreeMap<String, Task> targetTask = logicToStorage.getAllTasks(allData);
 		
 		targetTask.get(taskId).setDone(true);
 		targetTask.get(taskId).setIndex(-1);
@@ -254,8 +255,8 @@ public class LogicEditor {
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
 		String reminderDate = commandObject.getReminder();
 		long reminderTime = GeneralFunctions.stringToMillisecond(reminderDate);
-		String taskId = logicHelper.getTaskId(allData, taskIndex);
-		TreeMap<String, Task> targetTask = logicHelper.getAllTasks(allData);
+		String taskId = logicToStorage.getTaskId(allData, taskIndex);
+		TreeMap<String, Task> targetTask = logicToStorage.getAllTasks(allData);
 		
 		targetTask.get(taskId).setReminderDate(reminderDate);
 		targetTask.get(taskId).setReminder(reminderTime);
@@ -272,9 +273,9 @@ public class LogicEditor {
 		System.out.println("taskID: " +taskIndex);
 		String description = commandObject.getDescription();
 		System.out.println("description: "+description);
-		String taskId = logicHelper.getTaskId(allData, taskIndex);
+		String taskId = logicToStorage.getTaskId(allData, taskIndex);
 		
-		TreeMap<String, Task> targetTask = logicHelper.getAllTasks(allData);
+		TreeMap<String, Task> targetTask = logicToStorage.getAllTasks(allData);
 		targetTask.get(taskId).setDescription(description);
 		
 		storage.save(allData);
@@ -292,8 +293,8 @@ public class LogicEditor {
 		long endTime = GeneralFunctions.stringToMillisecond(endDate);
 		System.out.println("setEventStartAndEndTime: "+ startDate);
 		System.out.println("setEventStartAndEndTime: "+ endDate);
-		String taskId = logicHelper.getTaskId(allData, eventIndex);
-		TreeMap<String, Task> targetTask = logicHelper.getAllTasks(allData);
+		String taskId = logicToStorage.getTaskId(allData, eventIndex);
+		TreeMap<String, Task> targetTask = logicToStorage.getAllTasks(allData);
 		Task task = targetTask.get(taskId);
 		
 		Command command = new Command();
@@ -305,7 +306,7 @@ public class LogicEditor {
 		task.setEndDate(endDate);
 		task.setEndTime(endTime);
 		
-		allData = logicHelper.addNewTask(allData, task.getCategory(), logicHelper.checkTaskType(task), task);
+		allData = logicToStorage.addNewTask(allData, task.getCategory(), logicToStorage.checkTaskType(task), task);
 		
 		storage.save(allData);
 		
@@ -318,8 +319,8 @@ public class LogicEditor {
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
 		String deadlineDate = commandObject.getDeadline();
 		long deadlineTime = GeneralFunctions.stringToMillisecond(deadlineDate);
-		String taskId = logicHelper.getTaskId(allData, taskIndex);
-		TreeMap<String, Task> targetTask = logicHelper.getAllTasks(allData);
+		String taskId = logicToStorage.getTaskId(allData, taskIndex);
+		TreeMap<String, Task> targetTask = logicToStorage.getAllTasks(allData);
 		Task task = targetTask.get(taskId);
 		
 		Command command = new Command();
@@ -329,9 +330,19 @@ public class LogicEditor {
 		task.setEndDate(deadlineDate);
 		task.setEndTime(deadlineTime);
 		
-		allData = logicHelper.addNewTask(allData, task.getCategory(), logicHelper.checkTaskType(task), task);
+		allData = logicToStorage.addNewTask(allData, task.getCategory(), logicToStorage.checkTaskType(task), task);
 		
 		storage.save(allData);
 		return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskId,deadlineDate);
+	}
+	
+public void setindex(ArrayList<Task> list, int i, int index, TreeMap<String, Category> currentState) {
+		
+		String taskId = list.get(i).getTaskId();
+		TreeMap<String, Task> targetTask = logicToStorage.getAllTasks(currentState);
+		
+		targetTask.get(taskId).setIndex(index);
+		
+		storage.save(currentState);
 	}
 }

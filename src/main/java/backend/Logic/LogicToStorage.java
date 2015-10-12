@@ -6,7 +6,7 @@ import java.util.TreeMap;
 import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
-public class LogicHelper {
+public class LogicToStorage {
 	
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
 	
@@ -14,9 +14,17 @@ public class LogicHelper {
 	private static final String TYPE_TODO = "task";
 	private static final String TYPE_FLOAT = "floatTask";
 	private static final String TYPE_EVENT = "event";
+	private static LogicToStorage logicToStorage;
 	
-	public LogicHelper() {
+	private LogicToStorage() {
 		
+	}
+	
+	public static LogicToStorage getInstance() {
+		if (logicToStorage == null) {
+			logicToStorage = new LogicToStorage();
+		}
+		return logicToStorage;
 	}
 	
 	public TreeMap<String, Category> addNewTask(TreeMap<String, Category> allData, 

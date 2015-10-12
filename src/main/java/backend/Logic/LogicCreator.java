@@ -19,11 +19,11 @@ public class LogicCreator {
 	private TreeMap<String, Category> allData;
 
 	private static LogicCreator logicCreator;
-	private LogicHelper logicHelper;
+	private LogicToStorage logicToStorage;
 	private Storage storage;
 	
 	private LogicCreator(Storage storage) {
-		logicHelper = new LogicHelper();
+		logicToStorage = LogicToStorage.getInstance();
 		this.storage = storage;
 	}
 
@@ -61,7 +61,7 @@ public class LogicCreator {
 		
 		String categoryName = commandObject.getTaskName();
 		TreeMap<String, Category> allData = storage.load();
-		logicHelper.addCategory(allData, categoryName);
+		logicToStorage.addCategory(allData, categoryName);
 		storage.save(allData);
 		
 		return String.format(EXECUTION_ADD_CATEGORY_SUCCESSFUL, categoryName);
@@ -74,8 +74,8 @@ public class LogicCreator {
 		int priority = -1;
 		if (!commandObject.getPriority().equals("")) {
 			priority = Integer.parseInt(commandObject.getPriority());
-			if (logicHelper.priorityChecker(priority) != null) {
-				return logicHelper.priorityChecker(priority);
+			if (logicToStorage.priorityChecker(priority) != null) {
+				return logicToStorage.priorityChecker(priority);
 			}
 		}
 		String reminderDate = "";
@@ -92,7 +92,7 @@ public class LogicCreator {
 		System.out.println(newFloat.getName());
 		
 		allData = storage.load();
-		allData = logicHelper.addCategory(allData, categoryName);
+		allData = logicToStorage.addCategory(allData, categoryName);
 		Category category = allData.get(categoryName);
 		TreeMap<String, Task> allFloatingTasks = category.getFloatTasks();
 		allFloatingTasks.put(newFloat.getTaskId(), newFloat);
@@ -124,8 +124,8 @@ public class LogicCreator {
 		}
 		if (!commandObject.getPriority().equals("")) {
 			priority = Integer.parseInt(commandObject.getPriority());
-			if (logicHelper.priorityChecker(priority) != null) {
-				return logicHelper.priorityChecker(priority);
+			if (logicToStorage.priorityChecker(priority) != null) {
+				return logicToStorage.priorityChecker(priority);
 			}
 		}
 		if (!commandObject.getReminder().equals("")) {
@@ -142,7 +142,7 @@ public class LogicCreator {
 				priority, reminderDate, reminder);
 		
 		allData = storage.load();
-		allData = logicHelper.addCategory(allData, categoryName);
+		allData = logicToStorage.addCategory(allData, categoryName);
 		Category category = allData.get(categoryName);
 		TreeMap<String, Task> allEvents = category.getEvents();
 		allEvents.put(newEvent.getTaskId(), newEvent);
@@ -164,8 +164,8 @@ public class LogicCreator {
 		
 		if (!commandObject.getPriority().equals("")) {
 			priority = Integer.parseInt(commandObject.getPriority());
-			if (logicHelper.priorityChecker(priority) != null) {
-				return logicHelper.priorityChecker(priority);
+			if (logicToStorage.priorityChecker(priority) != null) {
+				return logicToStorage.priorityChecker(priority);
 			}
 		}
 		
@@ -184,7 +184,7 @@ public class LogicCreator {
 //		System.out.println(newToDo.toString());
 		
 		allData = storage.load();
-		allData = logicHelper.addCategory(allData, categoryName);
+		allData = logicToStorage.addCategory(allData, categoryName);
 		Category category = allData.get(categoryName);
 		TreeMap<String, Task> allToDos = category.getTasks();
 		allToDos.put(newToDo.getTaskId(), newToDo);

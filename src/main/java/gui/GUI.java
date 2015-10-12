@@ -342,7 +342,7 @@ public class GUI extends Application{
 	 */
 	private static void setIndex(ArrayList<Task> list, int index) {
 		for (int i=0;i<list.size();i++){ 
-		logicComponent.setindex(list,i,(++index));
+		logicComponent.updateTaskNumbering(list,i,(++index));
 		}
 	}
 	

@@ -4,13 +4,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-
 import org.json.JSONException;
 import org.json.simple.parser.ParseException;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -56,6 +53,7 @@ public class GUI extends Application{
 	private static final String COMMAND_SHOW_OVERDUE = "show overdue"; 
 	private static final String COMMAND_SHOW_FLOAT = "show float";
 	private static final String COMMAND_EXIT = "exit";
+	final KeyCombination kb = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
 	
 	private static final int SCENE_MAIN = 1;
 	private static final int SCENE_FOCUS = 2;
@@ -67,6 +65,7 @@ public class GUI extends Application{
 	private static int currentPosition = 0;
 	private static int currentScene = 1;
 	private static boolean toggleCate = false;
+	private static boolean toggleTodae = false;
 
 	private static LogicController logicComponent;
 	private static GridPane gridPane;
@@ -76,6 +75,7 @@ public class GUI extends Application{
 	private static TextArea consoleText;
 	private static PrintStream ps;
 	private static TextField userInput;
+	
 	private static ArrayList<Task> getFloat;
 	private static ArrayList<Task> getTasks;
 	private static ArrayList<Task> getEvents;
@@ -117,10 +117,18 @@ public class GUI extends Application{
 	
 	private static void retrieveAllData() throws IOException, JSONException, ParseException{	
 		getTasks = logicComponent.retrieveTaskData("upcomingToDo");
+		assert getTasks!=null;
 		getEvents = logicComponent.retrieveTaskData("upcomingEvents");
+		assert getEvents!=null;
 		getOverdue = logicComponent.retrieveTaskData("overdueTasks");
+		assert getOverdue!=null;
 		getFloat = logicComponent.retrieveTaskData("floating");
+		assert getFloat!=null;
 		getCate = logicComponent.retrieveStringData("categories");
+		assert getCate!=null;
+	}
+	private void retrieveToday(){
+		
 	}
 
 	@Override
@@ -138,13 +146,13 @@ public class GUI extends Application{
 	private void setUpMainScene() throws IOException, JSONException, ParseException{
 		setUpGrid(); //general info
 		initGrid(); //setting up individual sizing
-		setUpMain();//setting up contents;
+		setUpGridContents();//setting up contents;
 		mainScene = new Scene(gridPane);
 		mainScene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 		
 	}
 	
-	private static void setUpMain() throws IOException, JSONException, ParseException {
+	private static void setUpGridContents() throws IOException, JSONException, ParseException {
 		gridPane.getChildren().removeAll(focusHeading, detailsHeading, listFocus, detailField);
 		setUpHeadings();	
 		setUpContents();
@@ -300,7 +308,7 @@ public class GUI extends Application{
 		detailField.setWrapText(true);
 		GridPane.setConstraints(detailField, 1, 1);
 		GridPane.setColumnSpan(detailField, 3);
-		if (getFocusList==null||getFocusList.isEmpty()){
+		if (getFocusList.isEmpty()){
 			detailField.setText(MESSAGE_EMPTY);
 		} else{
 			detailField.setText(getFocusList.get(0).toString());
@@ -341,9 +349,11 @@ public class GUI extends Application{
 	 * @param index
 	 */
 	private static void setIndex(ArrayList<Task> list, int index) {
+		assert index >= 0;
 		for (int i=0;i<list.size();i++){ 
 		logicComponent.updateTaskNumbering(list,i,(++index));
 		}
+		
 	}
 	
 	private static ListView<String> getStringList(ArrayList<String> list){
@@ -373,7 +383,6 @@ public class GUI extends Application{
 		if (currentScene == SCENE_MAIN){
 			gridPane.getChildren().removeAll(listOverdue, listFloat,listTasks,listEvents);
 			setUpContents();
-			//setUpContents();
 		}
 		else{
 			refreshingFocus(currentList);
@@ -431,8 +440,9 @@ public class GUI extends Application{
 		else if (currentList == NUM_FLOAT){
 			focusHeading.setText(LIST_FLOATING);
 		}
+		assert getFocusList!=null;
 		
-		if(getFocusList==null||getFocusList.isEmpty()){
+		if(getFocusList.isEmpty()){
 			detailField.setText(MESSAGE_EMPTY);
 			return;
 		}
@@ -459,7 +469,10 @@ public class GUI extends Application{
 					} catch (IOException | JSONException | ParseException e) {
 						e.printStackTrace();
 					}
-				} else if (ke.getCode().equals(KeyCode.F1)){
+				} else if(kb.match(ke)){
+					logicComponent.executeCommand("undo");
+					
+				}				else if (ke.getCode().equals(KeyCode.F1)){
 					helpPopUp();
 				} else if(ke.getCode().equals(KeyCode.F2)){
 					try {
@@ -558,7 +571,7 @@ public class GUI extends Application{
 			currentScene = SCENE_FOCUS;
 
 		} else {
-			setUpMain();
+			setUpGridContents();
 			currentScene = SCENE_MAIN;
 		}
 	}

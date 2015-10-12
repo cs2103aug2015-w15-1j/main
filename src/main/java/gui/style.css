@@ -58,7 +58,10 @@
     -fx-opacity: 0;
 }
 #listOverdue{
+	-fx-font-weight:bold;
+	-fx-font-family: "arial";
+	-fx-border-color: #E41B17;
+	-fx-border-width: 3px;
 	-fx-text-fill: #E41B17;
-	-fx-background-color: #123456;
 	-fx-font-size: 16px;
 }

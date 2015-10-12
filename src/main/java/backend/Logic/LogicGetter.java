@@ -1,6 +1,9 @@
 package main.java.backend.Logic;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 
 import main.java.backend.GeneralFunctions.GeneralFunctions;
 import main.java.backend.Storage.Storage;
@@ -8,6 +11,8 @@ import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
 public class LogicGetter {
+	
+	public static final long DAY_IN_MILLISECOND = 86400000L;
 
 	private static final String TYPE_TODO = "task";
 	private static final String TYPE_FLOAT = "floatTask";
@@ -30,6 +35,20 @@ public class LogicGetter {
 		logicToStorage = LogicToStorage.getInstance();
 		this.storage = storage;
 	}
+	
+	public long getTodayStartTime() {
+
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime midnight = now.toLocalDate().atStartOfDay();
+		Date resultDate = Date.from(midnight.atZone(ZoneId.systemDefault()).toInstant());
+
+		return GeneralFunctions.stringToMillisecond(GeneralFunctions.standardFormat.format(resultDate));
+	}
+
+	public long getTodayEndTime() {
+
+		return getTodayStartTime() + DAY_IN_MILLISECOND;
+	}
 
 	private ArrayList<Task> getUpcoming(ArrayList<Task> allTasks) {
 
@@ -45,7 +64,7 @@ public class LogicGetter {
 		return upcomingTasks;
 	}
 	
-	public ArrayList<Task> getCompleted(ArrayList<Task> allTasks) {
+	private ArrayList<Task> getCompleted(ArrayList<Task> allTasks) {
 		
 		ArrayList<Task> completedTasks = new ArrayList<Task> ();
 		
@@ -120,6 +139,7 @@ public class LogicGetter {
 	}
 
 	public ArrayList<String> getCategories() {
+		
 		ArrayList<String> categories = new ArrayList<String> ();
 
 		for(String name : storage.load().keySet()) {
@@ -146,27 +166,38 @@ public class LogicGetter {
 	public ArrayList<Task> getEvents() {
 		return logicToStorage.getTargetTasksDone(storage.load(), TYPE_EVENT);
 	}
+	
+	public ArrayList<Task> getTodayEvents() {
+		
+		ArrayList<Task> allEvents = getEvents();
+		ArrayList<Task> todayEvents = new ArrayList<Task> ();
 
-	public ArrayList<Task> getUpcomingToDo() {
-
-		return getUpcoming(getToDo());
-	}
-
-	public ArrayList<Task> getUpcomingEvents() {
-
-		return getUpcoming(getEvents());
+		for(Task task : allEvents) {
+			if(task.getStartTime() >= getTodayStartTime()
+					&& task.getStartTime() < getTodayEndTime()) {
+				todayEvents.add(task);
+			}
+		}
+		
+		return todayEvents;
 	}
 	
-	public ArrayList<Task> getCompletedFloat() {
-
-		return getCompleted(getFloatingTasks());
+	public ArrayList<Task> getAllToday() {
+		
+		ArrayList<Task> todayTasks = getUpcomingToDo();
+		todayTasks.addAll(getTodayEvents());
+		
+		return todayTasks;
 	}
+	
+	public ArrayList<Task> getAllOverdue() {
 
-	public ArrayList<Task> getCompletedToDo() {
-
-		return getCompleted(getToDo());
+		ArrayList<Task> overdueTasks = getToDo();
+		overdueTasks.addAll(getEvents());
+		
+		return getOverdue(overdueTasks);
 	}
-
+	
 	public ArrayList<Task> getPastEvents() {
 		
 		ArrayList<Task> pastEvents = new ArrayList<Task> ();
@@ -180,10 +211,24 @@ public class LogicGetter {
 		return pastEvents;
 	}
 	
-	public ArrayList<Task> getAllOverdue() {
+	public ArrayList<Task> getCompletedFloat() {
 
-		ArrayList<Task> overdueTasks = getToDo();
-		overdueTasks.addAll(getEvents());
-		return getOverdue(overdueTasks);
+		return getCompleted(getFloatingTasks());
 	}
+
+	public ArrayList<Task> getCompletedToDo() {
+
+		return getCompleted(getToDo());
+	}
+	
+	public ArrayList<Task> getUpcomingToDo() {
+
+		return getUpcoming(getToDo());
+	}
+
+	public ArrayList<Task> getUpcomingEvents() {
+
+		return getUpcoming(getEvents());
+	}
+	
 }

@@ -21,12 +21,15 @@ import main.java.backend.Storage.Task.Category;
  * 
  */
 
-public class DataSave extends DataExecute {
+public class StorageSave {
+	
+	private String INPUT_FILE_NAME;
+	private File textFile;
 	
 	private BufferedWriter bufferedWriter;
 	private FileWriter textFileWriter;
 	
-	public DataSave(String fileName) {
+	public StorageSave(String fileName) {
 		this.INPUT_FILE_NAME = fileName;
 	}
 
@@ -49,7 +52,6 @@ public class DataSave extends DataExecute {
 		}
 	}
 	
-	@Override
 	public TreeMap<String, Category> execute(TreeMap<String, Category> category) {
 		
 		if(category == null) {

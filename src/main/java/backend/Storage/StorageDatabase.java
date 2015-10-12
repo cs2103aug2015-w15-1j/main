@@ -11,21 +11,22 @@ import main.java.backend.Storage.Task.Category;
  *
  */
 
-public class Data {
+public class StorageDatabase implements Storage {
 
-	private DataLoad load;
-	private DataSave save;
+	private StorageLoad load;
+	private StorageSave save;
 	
-	public Data(String fileName) {
-		load = new DataLoad(fileName);
-		save = new DataSave(fileName);
+	public void init(String fileName) {
+		load = new StorageLoad(fileName);
+		save = new StorageSave(fileName);
 	}
 	
 	public TreeMap<String, Category> load() {
-		return load.execute(null);
+		return load.execute();
 	}
 	
 	public void save(TreeMap<String, Category> allData) {
 		save.execute(allData);
 	}
+	
  }

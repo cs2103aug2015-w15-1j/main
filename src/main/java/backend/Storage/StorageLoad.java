@@ -25,12 +25,15 @@ import main.java.backend.Storage.Task.Category;
  * 
  */
 
-public class DataLoad extends DataExecute {
+public class StorageLoad {
+	
+	private String INPUT_FILE_NAME;
+	private File textFile;
 	
 	private BufferedReader bufferedReader;
 	private FileReader textFileReader;
 	
-	public DataLoad(String fileName) {
+	public StorageLoad(String fileName) {
 
 		this.INPUT_FILE_NAME = fileName;
 		initFile();
@@ -92,8 +95,7 @@ public class DataLoad extends DataExecute {
 				(Paths.get(INPUT_FILE_NAME)), StandardCharsets.UTF_8);
 	}
 	
-	@Override
-	public TreeMap<String, Category> execute(TreeMap<String, Category> emptyList) {
+	public TreeMap<String, Category> execute() {
 
 		TreeMap<String, Category> allData = new TreeMap<String, Category>();
 		ObjectMapper mapper = new ObjectMapper();

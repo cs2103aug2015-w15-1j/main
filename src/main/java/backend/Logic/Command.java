@@ -18,6 +18,7 @@ public class Command {
 	private String deadline = "";
 	private String keywords = "";
 	private String colour = "";
+	private final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     // ================================================================
     // General set command methods
@@ -131,5 +132,22 @@ public class Command {
 	
 	public String getColour() {
 		return this.colour;
+	}
+	
+	public String toString() {
+		StringBuilder format = new StringBuilder();
+		format.append("type: "+ getType() + LINE_SEPARATOR);
+		format.append("commandField: "+ getCommandField() + LINE_SEPARATOR);
+		format.append("taskName: "+ getTaskName() + LINE_SEPARATOR);
+		format.append("description: "+ getDescription() + LINE_SEPARATOR);
+		format.append("priority: "+ getPriority() + LINE_SEPARATOR);
+		format.append("reminder: " + getReminder() + LINE_SEPARATOR);
+		format.append("category: " + getCategory() + LINE_SEPARATOR);
+		format.append("startDateAndTime " + getStartDateAndTime() + LINE_SEPARATOR);
+		format.append("endDateAndTime :" + getEndDateAndTime() + LINE_SEPARATOR);
+		format.append("deadline: " + getDeadline() + LINE_SEPARATOR);
+		format.append("keywords: " + getKeywords() + LINE_SEPARATOR);
+		format.append("colour: "+ getColour() + LINE_SEPARATOR);
+		return format.toString();
 	}
 }

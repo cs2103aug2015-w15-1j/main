@@ -1,7 +1,12 @@
 package main.java.backend.Logic;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeMap;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import main.java.backend.History.History;
 import main.java.backend.Parser.Parser;
@@ -25,9 +30,11 @@ public class LogicController {
 	private static Search searcherComponent;
 	private static History historyComponent;
 	private LogicToStorage logicToStorage;
-	
+	private static Logger logicControllerLogger = Logger.getGlobal();	
 	private static TreeMap<String, Category> currentState;
 	private ArrayList<Task> taskList;
+	private FileHandler logHandler;
+	private final String LINE_SEPARATOR = System.getProperty("line.separator");
 	
 	private LogicController(String fileName) {
 		
@@ -45,6 +52,9 @@ public class LogicController {
 		updateCurrentState();
 		updateHistoryStack();
 		System.out.println("Logic component initialised successfully");
+		initLogger();
+		logicControllerLogger.info("Logic component initialised successfully");
+		
 	}
 
 	public static LogicController getInstance(String filename) {
@@ -55,12 +65,34 @@ public class LogicController {
 		return LogicController.logicObject;
 	}
 	
-	public String executeCommand(String userInput) {
+	private void initLogger() {
+		try {
+			logHandler = new FileHandler("LogicControllerLog.txt",true);
+			logHandler.setFormatter(new SimpleFormatter());
+			logicControllerLogger.addHandler(logHandler);
+			logicControllerLogger.setUseParentHandlers(false);
+		} catch (SecurityException | IOException e) {
+			logicControllerLogger.warning("Logger failed to initialise");
+			e.printStackTrace();
+		}
 		
+		
+	}
+	
+	public String executeCommand(String userInput) {
 		Command commandObject = commandHandlerSubComponent.parseCommand(userInput);
+		assert (commandObject.getType()!= null);
+		logicControllerLogger.info("Command Received: "+ LINE_SEPARATOR +commandObject.getType());
 		String feedbackString = "";
-		assert(commandObject.getType()!=null);
-		System.out.println(commandObject.getType());
+		try {
+			feedbackString = runParsedCommand(commandObject, feedbackString);
+		} catch (NullPointerException e) {
+			logicControllerLogger.info("Error caught" + e.getMessage());
+		}
+		return feedbackString;
+	}
+
+	private String runParsedCommand(Command commandObject, String feedbackString) {
 		switch (commandObject.getType()) {
 			case ADD :
 				feedbackString = creatorSubComponent.execute(commandObject);
@@ -84,6 +116,9 @@ public class LogicController {
 			case UNDO :
 				feedbackString = undo();
 				break;
+			default:
+				System.out.println("Invalid Command. Please try again");
+				logicControllerLogger.warning("Unknown parameters"+commandObject.toString());
 		}
 		return feedbackString;
 	}

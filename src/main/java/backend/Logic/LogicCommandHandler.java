@@ -31,10 +31,10 @@ public class LogicCommandHandler {
 	public Command parseCommand(String userInput) {
 		ArrayList<String> parsedUserInput = parserObject.parseInput(userInput);
 		String commandGiven = parsedUserInput.get(0);
-		System.out.println("CommandGiven "+commandGiven);
+//		System.out.println("CommandGiven "+commandGiven);
 		Command commandObject = new Command();
 		String determinedCommandType = determineCommandType(commandGiven);
-		System.out.println("determinedCommandType: "+determinedCommandType);
+//		System.out.println("determinedCommandType: "+determinedCommandType);
 		switch (determinedCommandType) {
 			case COMMAND_ADD:
 				commandObject = initAddCommand(parsedUserInput);
@@ -145,9 +145,9 @@ public class LogicCommandHandler {
 			case ("setE") :
 				editCommandObject.setDescription(parsedUserInput.get(2));
 				editCommandObject.setStartDateAndTime(parsedUserInput.get(3));
-				System.out.println("setE StartTime/Date: "+ parsedUserInput.get(3));
+//				System.out.println("setE StartTime/Date: "+ parsedUserInput.get(3));
 				editCommandObject.setEndDateAndTime(parsedUserInput.get(4));
-				System.out.println("setE EndTime/Date: "+ parsedUserInput.get(4));
+//				System.out.println("setE EndTime/Date: "+ parsedUserInput.get(4));
 				editCommandObject.setPriority(parsedUserInput.get(5));
 				editCommandObject.setReminder(parsedUserInput.get(6));
 				editCommandObject.setCategory(parsedUserInput.get(7));

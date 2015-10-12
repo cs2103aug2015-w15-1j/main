@@ -47,7 +47,7 @@ public class LogicEditor {
 	public String execute(Command commandObject){
 		
 		String feedbackString = "";
-		System.out.println("Get Command Field: "+commandObject.getCommandField());
+//		System.out.println("Get Command Field: "+commandObject.getCommandField());
 		switch(commandObject.getCommandField()) {
 			case ("priority") :
 				feedbackString = setPriority(commandObject);

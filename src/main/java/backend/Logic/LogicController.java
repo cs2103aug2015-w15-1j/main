@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.logging.FileHandler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
@@ -30,9 +29,10 @@ public class LogicController {
 	private static Search searcherComponent;
 	private static History historyComponent;
 	private LogicToStorage logicToStorage;
-	private static Logger logicControllerLogger = Logger.getGlobal();	
 	private static TreeMap<String, Category> currentState;
+	private static TreeMap<String, Category> receivedFromHistoryState;
 	private ArrayList<Task> taskList;
+	private static Logger logicControllerLogger = Logger.getGlobal();	
 	private FileHandler logHandler;
 	private final String LINE_SEPARATOR = System.getProperty("line.separator");
 	
@@ -42,7 +42,7 @@ public class LogicController {
 		storageComponent = new StorageDatabase();
 		sorterComponent = new Sorter();
 		searcherComponent = new Search();
-		historyComponent = new History();
+		historyComponent = History.getInstance();
 		logicToStorage = LogicToStorage.getInstance();
 		storageComponent.init(fileName);
 		commandHandlerSubComponent = new LogicCommandHandler(parserComponent);
@@ -51,7 +51,6 @@ public class LogicController {
 		getterSubComponent = LogicGetter.getInstance(storageComponent);
 		updateCurrentState();
 		updateHistoryStack();
-		System.out.println("Logic component initialised successfully");
 		initLogger();
 		logicControllerLogger.info("Logic component initialised successfully");
 		
@@ -66,33 +65,36 @@ public class LogicController {
 	}
 	
 	private void initLogger() {
+		
 		try {
 			logHandler = new FileHandler("LogicControllerLog.txt",true);
 			logHandler.setFormatter(new SimpleFormatter());
 			logicControllerLogger.addHandler(logHandler);
 			logicControllerLogger.setUseParentHandlers(false);
+			
 		} catch (SecurityException | IOException e) {
-			logicControllerLogger.warning("Logger failed to initialise");
-			e.printStackTrace();
+			logicControllerLogger.warning("Logger failed to initialise: " + e.getMessage());
 		}
-		
-		
 	}
 	
 	public String executeCommand(String userInput) {
+		
+		assert (userInput!= null);
 		Command commandObject = commandHandlerSubComponent.parseCommand(userInput);
 		assert (commandObject.getType()!= null);
 		logicControllerLogger.info("Command Received: "+ LINE_SEPARATOR +commandObject.getType());
 		String feedbackString = "";
+		
 		try {
 			feedbackString = runParsedCommand(commandObject, feedbackString);
 		} catch (NullPointerException e) {
-			logicControllerLogger.info("Error caught" + e.getMessage());
+			logicControllerLogger.info("Error caught " + e.getMessage());
 		}
 		return feedbackString;
 	}
 
 	private String runParsedCommand(Command commandObject, String feedbackString) {
+		
 		switch (commandObject.getType()) {
 			case ADD :
 				feedbackString = creatorSubComponent.execute(commandObject);
@@ -117,19 +119,25 @@ public class LogicController {
 				feedbackString = undo();
 				break;
 			default:
-				System.out.println("Invalid Command. Please try again");
-				logicControllerLogger.warning("Unknown parameters"+commandObject.toString());
+				feedbackString = "Invalid Command. Please try again";
+				logicControllerLogger.warning("Unknown parameters "+commandObject.toString());
 		}
+		logicControllerLogger.info("Execution successful: " + feedbackString);
 		return feedbackString;
 	}
 
 	private String undo() {
-		System.out.println("undoing");
-		currentState = historyComponent.pop();
-		if (currentState == null) {
-			return "no more Undos";
+		
+		logicControllerLogger.fine("undoing");
+		assert(receivedFromHistoryState != null);
+		receivedFromHistoryState = historyComponent.pop();
+		
+		if (receivedFromHistoryState == null) {
+			return "There are no more Undos";
 		}
-		System.out.println("received from history stack "+currentState);
+		
+		currentState = receivedFromHistoryState;
+		logicControllerLogger.fine("received from history stack "+currentState);
 		storageComponent.save(currentState);
 		return "Undo successful";
 	}

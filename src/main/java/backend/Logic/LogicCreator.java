@@ -23,11 +23,13 @@ public class LogicCreator {
 	private Storage storage;
 	
 	private LogicCreator(Storage storage) {
+		
 		logicToStorage = LogicToStorage.getInstance();
 		this.storage = storage;
 	}
 
 	public static LogicCreator getInstance(Storage storageComponent) {
+		
 		if (logicCreator == null) {
 			logicCreator = new LogicCreator(storageComponent);
 		}
@@ -35,8 +37,9 @@ public class LogicCreator {
 	}
 
 	public String execute(Command commandObject) {
+		
 		String feedbackString = "";
-//		System.out.println(commandObject.getCommandField());
+		
 		switch (commandObject.getCommandField()) {
 			case("addcat") :
 				feedbackString = addCategory(commandObject);
@@ -68,10 +71,11 @@ public class LogicCreator {
 	}
 
 	private String addFloating(Command commandObject) {
+		
 		String taskName = commandObject.getTaskName();
-//		System.out.println("taskName: "+taskName);
 		String taskDescription = commandObject.getDescription();
 		int priority = -1;
+		
 		if (!commandObject.getPriority().equals("")) {
 			priority = Integer.parseInt(commandObject.getPriority());
 			if (logicToStorage.priorityChecker(priority) != null) {
@@ -80,16 +84,18 @@ public class LogicCreator {
 		}
 		String reminderDate = "";
 		long reminderTime = -1L;
+		
 		if (!commandObject.getReminder().equals("")) {
 			reminderDate = commandObject.getReminder();
 			reminderTime = GeneralFunctions.stringToMillisecond(commandObject.getReminder());
 		}
 		String categoryName = commandObject.getCategory();
+		
 		if(categoryName.equals("")) {
 			categoryName = "default";
 		}
 		Task newFloat = new Task(categoryName, taskName,taskDescription, priority, reminderDate, reminderTime, false);
-		System.out.println(newFloat.getName());
+		//System.out.println(newFloat.getName());
 		
 		allData = storage.load();
 		allData = logicToStorage.addCategory(allData, categoryName);
@@ -103,6 +109,7 @@ public class LogicCreator {
 	}
 
 	private String addEvent(Command commandObject) {
+		
 		String eventName = commandObject.getTaskName();
 		String eventDescription = commandObject.getDescription();
 		String startDate = commandObject.getStartDateAndTime();
@@ -132,6 +139,7 @@ public class LogicCreator {
 			reminderDate = commandObject.getReminder();
 			reminder = GeneralFunctions.stringToMillisecond(commandObject.getReminder());
 		}
+		
 		String categoryName = commandObject.getCategory();
 		if(categoryName.equals("")) {
 			categoryName = "default";
@@ -154,6 +162,7 @@ public class LogicCreator {
 	}
 
 	private String addToDo(Command commandObject){
+		
 		String taskName = commandObject.getTaskName();
 		String taskDescription = commandObject.getDescription();
 		String deadlineString = commandObject.getDeadline();
@@ -195,6 +204,7 @@ public class LogicCreator {
 	}	
 
 	private String addSubTask(Command commandObject) {
+		
 		String taskName = commandObject.getTaskName();
 		String subTaskDescription = commandObject.getDescription();
 //		storageObject.addSubTask(taskName,subTaskDescription);

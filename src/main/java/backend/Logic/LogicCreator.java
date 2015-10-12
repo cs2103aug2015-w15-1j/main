@@ -82,19 +82,17 @@ public class LogicCreator {
 				return logicToStorage.priorityChecker(priority);
 			}
 		}
-		String reminderDate = "";
-		long reminderTime = -1L;
+		String reminder = "";
 		
 		if (!commandObject.getReminder().equals("")) {
-			reminderDate = commandObject.getReminder();
-			reminderTime = GeneralFunctions.stringToMillisecond(commandObject.getReminder());
+			reminder = commandObject.getReminder();
 		}
 		String categoryName = commandObject.getCategory();
 		
 		if(categoryName.equals("")) {
 			categoryName = "default";
 		}
-		Task newFloat = new Task(categoryName, taskName,taskDescription, priority, reminderDate, reminderTime, false);
+		Task newFloat = new Task(categoryName, taskName, taskDescription, priority, reminder, false);
 		//System.out.println(newFloat.getName());
 		
 		allData = storage.load();
@@ -112,32 +110,24 @@ public class LogicCreator {
 		
 		String eventName = commandObject.getTaskName();
 		String eventDescription = commandObject.getDescription();
-		String startDate = commandObject.getStartDateAndTime();
-		String endDate = "";
-		long startTime = -1L;
-		long endTime = -1L;
+		String start = commandObject.getStartDateAndTime();
+		String end = "";
 		int priority = -1;
-		String reminderDate = "";
-		long reminder = -1L;
+		String reminder = "";
 		
 		if (!commandObject.getEndDateAndTime().equals("")) {
-			endDate = commandObject.getEndDateAndTime();
+			end = commandObject.getEndDateAndTime();
 		}
-		if (!startDate.equals("")){
-			startTime = GeneralFunctions.stringToMillisecond(startDate);
-		}
-		if (!endDate.equals("")) {
-			endTime = GeneralFunctions.stringToMillisecond(endDate);
-		}
+		
 		if (!commandObject.getPriority().equals("")) {
 			priority = Integer.parseInt(commandObject.getPriority());
 			if (logicToStorage.priorityChecker(priority) != null) {
 				return logicToStorage.priorityChecker(priority);
 			}
 		}
+		
 		if (!commandObject.getReminder().equals("")) {
-			reminderDate = commandObject.getReminder();
-			reminder = GeneralFunctions.stringToMillisecond(commandObject.getReminder());
+			reminder = commandObject.getReminder();
 		}
 		
 		String categoryName = commandObject.getCategory();
@@ -146,8 +136,7 @@ public class LogicCreator {
 		}
 		
 		Task newEvent = new Task(categoryName, eventName, eventDescription, 
-				startDate, endDate, startTime, endTime, 
-				priority, reminderDate, reminder);
+				start, end, priority, reminder);
 		
 		allData = storage.load();
 		allData = logicToStorage.addCategory(allData, categoryName);
@@ -165,12 +154,10 @@ public class LogicCreator {
 		
 		String taskName = commandObject.getTaskName();
 		String taskDescription = commandObject.getDescription();
-		String deadlineString = commandObject.getDeadline();
+		String deadline = commandObject.getDeadline();
 		int priority = -1;
-		String reminderDate = "";
-		long reminderTime = -1L;
-		long deadlineTime = GeneralFunctions.stringToMillisecond(deadlineString);
-		
+		String reminder = "";
+
 		if (!commandObject.getPriority().equals("")) {
 			priority = Integer.parseInt(commandObject.getPriority());
 			if (logicToStorage.priorityChecker(priority) != null) {
@@ -179,8 +166,7 @@ public class LogicCreator {
 		}
 		
 		if (!commandObject.getReminder().equals("")) {
-			reminderDate = commandObject.getReminder();
-			reminderTime = GeneralFunctions.stringToMillisecond(commandObject.getReminder());
+			reminder = commandObject.getReminder();
 		}
 		
 		String categoryName = commandObject.getCategory();
@@ -188,8 +174,8 @@ public class LogicCreator {
 			categoryName = "default";
 		}
 		
-		Task newToDo = new Task(categoryName, taskName, taskDescription, deadlineString, 
-				deadlineTime, priority, reminderDate, reminderTime, false);
+		Task newToDo = new Task(categoryName, taskName, taskDescription, 
+				deadline, priority, reminder, false);
 //		System.out.println(newToDo.toString());
 		
 		allData = storage.load();

@@ -55,7 +55,7 @@ public class LogicGetter {
 		ArrayList<Task> upcomingTasks = new ArrayList<Task> ();
 
 		for(Task task : allTasks) {
-			if(task.getEndTime() >= 
+			if(GeneralFunctions.stringToMillisecond(task.getEndDate()) >= 
 					GeneralFunctions.getCurrentTime() && !task.getDone()) {
 				upcomingTasks.add(task);
 			}
@@ -82,7 +82,8 @@ public class LogicGetter {
 		ArrayList<Task> overdueTasks = new ArrayList<Task> ();
 
 		for(Task task : allTasks) {
-			if(task.getEndTime() < GeneralFunctions.getCurrentTime()) {
+			if(GeneralFunctions.stringToMillisecond(task.getEndDate()) 
+					< GeneralFunctions.getCurrentTime()) {
 				overdueTasks.add(task);
 			}
 		}
@@ -173,8 +174,10 @@ public class LogicGetter {
 		ArrayList<Task> todayEvents = new ArrayList<Task> ();
 
 		for(Task task : allEvents) {
-			if(task.getStartTime() >= getTodayStartTime()
-					&& task.getStartTime() < getTodayEndTime()) {
+			if(GeneralFunctions.stringToMillisecond(task.getStartDate()) 
+					>= getTodayStartTime()
+					&& GeneralFunctions.stringToMillisecond(task.getStartDate()) 
+					< getTodayEndTime()) {
 				todayEvents.add(task);
 			}
 		}

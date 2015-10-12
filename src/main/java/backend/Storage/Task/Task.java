@@ -13,9 +13,6 @@ public class Task implements Comparable<Task> {
 	private String startDate;
 	private String endDate;
 	private String reminderDate;
-	private long startTime;
-	private long endTime;
-	private long reminderTime;
 	private int priority;
 	private boolean isDone;
 
@@ -26,8 +23,9 @@ public class Task implements Comparable<Task> {
 	}
 
 	// Floating task
-	public Task(String category, String taskName, String taskDescription, int priority, 
-			String reminderDate, long reminderTime, boolean isDone) {
+	public Task(String category, String taskName, String taskDescription, 
+			int priority, String reminderDate, boolean isDone) {
+		
 		setTaskId(UUID.randomUUID().toString());
 		setCategory(category);
 		setName(taskName);
@@ -35,47 +33,38 @@ public class Task implements Comparable<Task> {
 		setStartDate("");
 		setEndDate("");
 		setReminderDate(reminderDate);
-		setStartTime(-1);
-		setEndTime(-1);
 		setPriority(priority);
-		setReminder(reminderTime);
 		setDone(isDone);
 		setSubTask(new TreeMap<String, SubTask> ());
 	}
 
 	// Task
-	public Task(String category, String taskName, String taskDescription, String deadline, 
-			long endTime, int priority, String reminderDate, long reminder, boolean isDone) {
+	public Task(String category, String taskName, String taskDescription, 
+			String deadline, int priority, String reminderDate, boolean isDone) {
 		setTaskId(UUID.randomUUID().toString());
 		setCategory(category);
 		setName(taskName);
 		setDescription(taskDescription);
 		setStartDate("");
 		setEndDate(deadline);
-		setStartTime(-1);
-		setEndTime(endTime);
 		setPriority(priority);
 		setReminderDate(reminderDate);
-		setReminder(reminder);
 		setDone(isDone);
 		setSubTask(new TreeMap<String, SubTask> ());
 	}
 
 	// Event
-	public Task(String category, String eventName, String eventDescription, String startDate, 
-			String endDate, long startTime, long endTime, int priority, 
-			String reminderDate, long reminder) {
+	public Task(String category, String eventName, String eventDescription, 
+			String startDate, String endDate, int priority, String reminderDate) {
+		
 		setTaskId(UUID.randomUUID().toString());
 		setCategory(category);
 		setName(eventName);
 		setDescription(eventDescription);
 		setStartDate(startDate);
 		setEndDate(endDate);
-		setStartTime(startTime);
-		setEndTime(endTime);
 		setPriority(priority);
 		setReminderDate(reminderDate);
-		setReminder(reminder);
 		setSubTask(new TreeMap<String, SubTask> ());
 	}
 	
@@ -157,30 +146,6 @@ public class Task implements Comparable<Task> {
 
 	public void setEndDate(String endDate) {
 		this.endDate = endDate;
-	}
-
-	public long getStartTime() {
-		return startTime;
-	}
-
-	public void setStartTime(long startTime) {
-		this.startTime = startTime;
-	}
-
-	public long getEndTime() {
-		return endTime;
-	}
-
-	public void setEndTime(long endTime) {
-		this.endTime = endTime;
-	}
-
-	public long getReminder() {
-		return reminderTime;
-	}
-
-	public void setReminder(long reminderTime) {
-		this.reminderTime = reminderTime;
 	}
 	
 	public TreeMap<String, SubTask> getSubTask() {

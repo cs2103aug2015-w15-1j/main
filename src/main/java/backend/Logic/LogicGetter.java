@@ -36,16 +36,18 @@ public class LogicGetter {
 		this.storage = storage;
 	}
 	
-	public long getTodayStartTime() {
+	private long getTodayStartTime() {
 
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime midnight = now.toLocalDate().atStartOfDay();
-		Date resultDate = Date.from(midnight.atZone(ZoneId.systemDefault()).toInstant());
+		Date resultDate = Date.from(midnight
+				.atZone(ZoneId.systemDefault()).toInstant());
 
-		return GeneralFunctions.stringToMillisecond(GeneralFunctions.standardFormat.format(resultDate));
+		return GeneralFunctions.stringToMillisecond(
+				GeneralFunctions.standardFormat.format(resultDate));
 	}
 
-	public long getTodayEndTime() {
+	private long getTodayEndTime() {
 
 		return getTodayStartTime() + DAY_IN_MILLISECOND;
 	}
@@ -169,7 +171,7 @@ public class LogicGetter {
 	}
 	
 	public ArrayList<Task> getTodayEvents() {
-		
+
 		ArrayList<Task> allEvents = getEvents();
 		ArrayList<Task> todayEvents = new ArrayList<Task> ();
 
@@ -181,7 +183,7 @@ public class LogicGetter {
 				todayEvents.add(task);
 			}
 		}
-		
+
 		return todayEvents;
 	}
 	

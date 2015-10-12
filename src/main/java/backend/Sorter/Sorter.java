@@ -4,29 +4,69 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import main.java.backend.GeneralFunctions.GeneralFunctions;
+import main.java.backend.Logic.Command;
 import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
 public class Sorter {
+	
+	public Sorter() {
+		
+	}
 
-	public ArrayList<Task> sort(String field, ArrayList<Task> currentState2) {
-		ArrayList<Task> sortedCurrentState = null;
+	public ArrayList<Task> sort(String field, ArrayList<Task> taskList) {
+		
+		ArrayList<Task> sortedTaskList = new ArrayList<Task> ();
+		
 		switch (field) {
+			case "sortN":
+				sortedTaskList = sortName(taskList);
+				break;
 			case "sortP":
-				sortedCurrentState = sortPriority(currentState2);
+				sortedTaskList = sortPriority(taskList);
+				break;
+			case "sortS":
+				sortedTaskList = sortStartDate(taskList);
 				break;
 			case "sortD":
-				sortedCurrentState = sortDate(currentState2);
+				sortedTaskList = sortDeadline(taskList);
 				break;
 		}
-		return sortedCurrentState;
+		return sortedTaskList;
 	}
+	
+	private Comparator<Task> sortName = new Comparator<Task> () {
+		public int compare(Task left, Task right) {
+			if(left.getName().compareTo(right.getName()) < 0) {
+				return -1;
+			} else if(left.getName().compareTo(right.getName()) > 0) {
+				return 1;
+			}  else {
+				return 0;
+			}
+		}
+	};
 	
 	private Comparator<Task> sortPriority = new Comparator<Task> () {
 		public int compare(Task left, Task right) {
 			if(left.getPriority() < right.getPriority()) {
-				return -1;
+				return 1;
 			} else if(left.getPriority() > right.getPriority()) {
+				return -1;
+			} else {
+				return 0;
+			}
+		}
+	};
+	
+	private Comparator<Task> sortStartDate = new Comparator<Task> () {
+		public int compare(Task left, Task right) {
+			if(GeneralFunctions.stringToMillisecond(left.getStartDate())
+					< GeneralFunctions.stringToMillisecond(right.getStartDate())) {
+				return -1;
+			} else if(GeneralFunctions.stringToMillisecond(left.getStartDate()) 
+					> GeneralFunctions.stringToMillisecond(right.getStartDate())) {
 				return 1;
 			} else {
 				return 0;
@@ -36,24 +76,36 @@ public class Sorter {
 	
 	private Comparator<Task> sortDeadline = new Comparator<Task> () {
 		public int compare(Task left, Task right) {
-			if(left.getEndTime() < right.getEndTime()) {
+			if(GeneralFunctions.stringToMillisecond(left.getEndDate())
+					< GeneralFunctions.stringToMillisecond(right.getEndDate())) {
 				return -1;
-			} else if(left.getEndTime() > right.getEndTime()) {
+			} else if(GeneralFunctions.stringToMillisecond(left.getEndDate()) 
+					> GeneralFunctions.stringToMillisecond(right.getEndDate())) {
 				return 1;
 			} else {
 				return 0;
 			}
 		}
 	};
-
-	private ArrayList<Task> sortDate(ArrayList<Task> currentState2) {
-		Collections.sort(currentState2, sortPriority);
-		return currentState2;
+	
+	private ArrayList<Task> sortName(ArrayList<Task> taskList) {
+		Collections.sort(taskList, sortName);
+		return taskList;
 	}
 
-	private ArrayList<Task> sortPriority(ArrayList<Task> currentState2) {
-		Collections.sort(currentState2, sortDeadline);
-		return currentState2;
+	private ArrayList<Task> sortPriority(ArrayList<Task> taskList) {
+		Collections.sort(taskList, sortPriority);
+		return taskList;
+	}
+	
+	private ArrayList<Task> sortStartDate(ArrayList<Task> taskList) {
+		Collections.sort(taskList, sortStartDate);
+		return taskList;
+	}
+	
+	private ArrayList<Task> sortDeadline(ArrayList<Task> taskList) {
+		Collections.sort(taskList, sortDeadline);
+		return taskList;
 	}
 
 }

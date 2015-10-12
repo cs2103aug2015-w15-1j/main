@@ -8,28 +8,71 @@ import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
 public class LogicGetter {
-	
+
 	private static final String TYPE_TODO = "task";
 	private static final String TYPE_FLOAT = "floatTask";
 	private static final String TYPE_EVENT = "event";
-	
+
 	private static LogicGetter logicGetterObject;
 	private LogicToStorage logicToStorage;
 	private Storage storage;
-
-	private LogicGetter(Storage storage) {
-		logicToStorage = LogicToStorage.getInstance();
-		this.storage = storage;
-	}
-
+	
 	public static LogicGetter getInstance(Storage storageComponent) {
+		
 		if (logicGetterObject == null) {
 			logicGetterObject = new LogicGetter(storageComponent);
 		}
 		return logicGetterObject;
 	}
+
+	private LogicGetter(Storage storage) {
+		
+		logicToStorage = LogicToStorage.getInstance();
+		this.storage = storage;
+	}
+
+	private ArrayList<Task> getUpcoming(ArrayList<Task> allTasks) {
+
+		ArrayList<Task> upcomingTasks = new ArrayList<Task> ();
+
+		for(Task task : allTasks) {
+			if(task.getEndTime() >= 
+					GeneralFunctions.getCurrentTime() && !task.getDone()) {
+				upcomingTasks.add(task);
+			}
+		}
+
+		return upcomingTasks;
+	}
 	
+	public ArrayList<Task> getCompleted(ArrayList<Task> allTasks) {
+		
+		ArrayList<Task> completedTasks = new ArrayList<Task> ();
+		
+		for(Task task : allTasks) {
+			if(task.getDone()) {
+				completedTasks.add(task);
+			}
+		}
+		
+		return completedTasks;
+	}
+
+	private ArrayList<Task> getOverdue(ArrayList<Task> allTasks) {
+
+		ArrayList<Task> overdueTasks = new ArrayList<Task> ();
+
+		for(Task task : allTasks) {
+			if(task.getEndTime() < GeneralFunctions.getCurrentTime()) {
+				overdueTasks.add(task);
+			}
+		}
+
+		return overdueTasks;
+	}
+
 	public ArrayList<String> retrieveStringData(String dataType) {
+		
 		ArrayList<String> data = new ArrayList<String>();
 		switch (dataType) {
 			case ("categories") :
@@ -40,6 +83,7 @@ public class LogicGetter {
 	}
 
 	public ArrayList<Category> retrieveCategoryData(String dataType) {
+		
 		ArrayList<Category> data = new ArrayList<Category>();
 		switch (dataType) {
 			case ("searchResults") :
@@ -50,6 +94,7 @@ public class LogicGetter {
 	}
 
 	public ArrayList<Task> retrieveTaskData(String dataType) {
+		
 		ArrayList<Task> data = new ArrayList<Task>();
 		switch(dataType) {
 			case ("toDo") :
@@ -68,12 +113,12 @@ public class LogicGetter {
 				data = getUpcomingEvents();
 				break;
 			case ("overdueTasks") :
-				data = getOverdueTasks();
+				data = getAllOverdue();
 				break;
 		}
 		return data;
 	}
-	
+
 	public ArrayList<String> getCategories() {
 		ArrayList<String> categories = new ArrayList<String> ();
 
@@ -101,48 +146,44 @@ public class LogicGetter {
 	public ArrayList<Task> getEvents() {
 		return logicToStorage.getTargetTasksDone(storage.load(), TYPE_EVENT);
 	}
-	
+
 	public ArrayList<Task> getUpcomingToDo() {
-		
-		ArrayList<Task> allTasks = getToDo();
-		ArrayList<Task> upcomingTasks = new ArrayList<Task> ();
-		
-		for(Task task : allTasks) {
-			if(task.getEndTime() >= GeneralFunctions.getCurrentTime() && !task.getDone()) {
-				upcomingTasks.add(task);
-			}
-		}
-		
-		return upcomingTasks;
-	}
-	
-	public ArrayList<Task> getUpcomingEvents() {
-		
-		ArrayList<Task> allTasks = getEvents();
-		ArrayList<Task> upcomingEvents = new ArrayList<Task> ();
-		
-		for(Task task : allTasks) {
-			
-			if(GeneralFunctions.getTime(task) >= 
-					GeneralFunctions.getCurrentTime() && !task.getDone()) {
-				upcomingEvents.add(task);
-			}
-		}
-		
-		return upcomingEvents;
+
+		return getUpcoming(getToDo());
 	}
 
-	public ArrayList<Task> getOverdueTasks() {
+	public ArrayList<Task> getUpcomingEvents() {
+
+		return getUpcoming(getEvents());
+	}
+	
+	public ArrayList<Task> getCompletedFloat() {
+
+		return getCompleted(getFloatingTasks());
+	}
+
+	public ArrayList<Task> getCompletedToDo() {
+
+		return getCompleted(getToDo());
+	}
+
+	public ArrayList<Task> getPastEvents() {
 		
-		ArrayList<Task> allTasks = getToDo();
-		ArrayList<Task> overdueTasks = new ArrayList<Task> ();
-		
-		for(Task task : allTasks) {
-			if(task.getEndTime() < GeneralFunctions.getCurrentTime()) {
-				overdueTasks.add(task);
+		ArrayList<Task> pastEvents = new ArrayList<Task> ();
+
+		for(Task task : pastEvents) {
+			if(task.getDone()) {
+				pastEvents.add(task);
 			}
 		}
-		
-		return overdueTasks;
+
+		return pastEvents;
+	}
+	
+	public ArrayList<Task> getAllOverdue() {
+
+		ArrayList<Task> overdueTasks = getToDo();
+		overdueTasks.addAll(getEvents());
+		return getOverdue(overdueTasks);
 	}
 }

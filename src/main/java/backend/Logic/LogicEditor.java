@@ -49,42 +49,42 @@ public class LogicEditor {
 		String feedbackString = "";
 		//		System.out.println("Get Command Field: "+commandObject.getCommandField());
 		switch(commandObject.getCommandField()) {
-		case ("priority") :
-			feedbackString = setPriority(commandObject);
-		break;
-		case ("setT") :
-			feedbackString = setMultipleFieldsForTask(commandObject);
-		break;
-		case ("setE") :
-			feedbackString = setMultipleFieldsForEvents(commandObject);
-		break;
-		case ("delete") :
-			feedbackString = delete(commandObject);
-		break;
-		case ("setCol") :
-			feedbackString = setColour(commandObject);
-		break;
-		case ("category") :
-			feedbackString = setCategory(commandObject);
-		break;
-		case ("undone") :
-			feedbackString = setUndone(commandObject);
-		break;
-		case ("done") :
-			feedbackString = setDone(commandObject);
-		break;
-		case ("reminder") :
-			feedbackString = setReminder(commandObject);
-		break;
-		case ("description") :
-			feedbackString = setDescription(commandObject);
-		break;
-		case ("event") :
-			feedbackString = setEventStartAndEndTime(commandObject);
-		break;
-		case ("deadline") :
-			feedbackString = setDeadline(commandObject);
-		break;
+			case ("priority") :
+				feedbackString = setPriority(commandObject);
+				break;
+			case ("setT") :
+				feedbackString = setMultipleFieldsForTask(commandObject);
+				break;
+			case ("setE") :
+				feedbackString = setMultipleFieldsForEvents(commandObject);
+				break;
+			case ("delete") :
+				feedbackString = delete(commandObject);
+				break;
+			case ("setCol") :
+				feedbackString = setColour(commandObject);
+				break;
+			case ("category") :
+				feedbackString = setCategory(commandObject);
+				break;
+			case ("undone") :
+				feedbackString = setUndone(commandObject);
+				break;
+			case ("done") :
+				feedbackString = setDone(commandObject);
+				break;
+			case ("reminder") :
+				feedbackString = setReminder(commandObject);
+				break;
+			case ("description") :
+				feedbackString = setDescription(commandObject);
+				break;
+			case ("event") :
+				feedbackString = setEventStartAndEndTime(commandObject);
+				break;
+			case ("deadline") :
+				feedbackString = setDeadline(commandObject);
+				break;
 		}
 		return feedbackString;
 	}

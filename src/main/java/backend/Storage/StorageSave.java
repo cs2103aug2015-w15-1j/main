@@ -10,7 +10,8 @@ import java.util.TreeMap;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import main.java.backend.Storage.Task.Category;
+import main.java.backend.Storage.Task.Task;
+
 
 /**
  * This class parse Java object back to JSON format 
@@ -52,9 +53,9 @@ public class StorageSave {
 		}
 	}
 	
-	public TreeMap<String, Category> execute(TreeMap<String, Category> category) {
+	public TreeMap<Integer, Task> execute(TreeMap<Integer, Task> taskList) {
 		
-		if(category == null) {
+		if(taskList == null) {
 			try {
 				initializeWriter();
 			} catch (IOException e) {
@@ -65,7 +66,7 @@ public class StorageSave {
 				initializeWriter();
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.enable(SerializationFeature.INDENT_OUTPUT);
-				bufferedWriter.write(mapper.writeValueAsString(category));
+				bufferedWriter.write(mapper.writeValueAsString(taskList));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -73,6 +74,6 @@ public class StorageSave {
 		
 		closeWriter();
 		
-		return category;
+		return taskList;
 	}
 }

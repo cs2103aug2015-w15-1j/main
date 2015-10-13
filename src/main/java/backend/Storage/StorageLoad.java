@@ -14,7 +14,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import main.java.backend.Storage.Task.Category;
+import main.java.backend.Storage.Task.Task;
 
 /**
  * This class parse all texts in the file from JSON 
@@ -95,16 +95,16 @@ public class StorageLoad {
 				(Paths.get(INPUT_FILE_NAME)), StandardCharsets.UTF_8);
 	}
 	
-	public TreeMap<String, Category> execute() {
+	public TreeMap<Integer, Task> execute() {
 
-		TreeMap<String, Category> allData = new TreeMap<String, Category>();
+		TreeMap<Integer, Task> taskList = new TreeMap<Integer, Task>();
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		
 		if(!isFileEmpty()) {
 			try {
-				allData = mapper.readValue(getAllTextsFromFile(), 
-						new TypeReference<TreeMap<String, Category>>() {});
+				taskList = mapper.readValue(getAllTextsFromFile(), 
+						new TypeReference<TreeMap<Integer, Task>>() {});
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -112,7 +112,7 @@ public class StorageLoad {
 
 		closeReader();
 
-		return allData;
+		return taskList;
 	}
 	
 }

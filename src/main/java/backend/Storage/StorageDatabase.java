@@ -2,7 +2,7 @@ package main.java.backend.Storage;
 
 import java.util.TreeMap;
 
-import main.java.backend.Storage.Task.Category;
+import main.java.backend.Storage.Task.Task;
 
 /**
  * This class loads from and saves data to text file.
@@ -21,11 +21,11 @@ public class StorageDatabase implements Storage {
 		save = new StorageSave(fileName);
 	}
 	
-	public TreeMap<String, Category> load() {
+	public TreeMap<Integer, Task> load() {
 		return load.execute();
 	}
 	
-	public void save(TreeMap<String, Category> allData) {
+	public void save(TreeMap<Integer, Task> allData) {
 		save.execute(allData);
 	}
 	

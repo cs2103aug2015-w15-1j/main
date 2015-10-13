@@ -2,14 +2,14 @@ package main.java.backend.Storage;
 
 import java.util.TreeMap;
 
-import main.java.backend.Storage.Task.Category;
+import main.java.backend.Storage.Task.Task;;
 
 public interface Storage {
 
 	public void init(String fileName);
 	
-	public TreeMap<String, Category> load();
+	public TreeMap<Integer, Task> load();
 	
-	public void save(TreeMap<String, Category> allData);
+	public void save(TreeMap<Integer, Task> allData);
 	
 }

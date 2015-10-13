@@ -114,6 +114,9 @@ public class LogicController {
 			case UNDO :
 				feedbackString = undo();
 				break;
+			case REDO :
+				feedbackString = redo();
+				break;
 			default:
 				feedbackString = "Invalid Command. Please try again";
 				logicControllerLogger.warning("Unknown parameters "+commandObject.toString());
@@ -126,7 +129,7 @@ public class LogicController {
 		
 		logicControllerLogger.fine("undoing");
 		assert(receivedFromHistoryState != null);
-		receivedFromHistoryState = historyComponent.pop();
+		receivedFromHistoryState = historyComponent.undo();
 		
 		if (receivedFromHistoryState == null) {
 			return "There are no more Undos";
@@ -136,6 +139,13 @@ public class LogicController {
 		logicControllerLogger.fine("received from history stack "+currentState);
 		storageComponent.save(currentState);
 		return "Undo successful";
+	}
+	
+	private String redo() {
+		
+		currentState = historyComponent.redo();
+		storageComponent.save(currentState);
+		return "Redo successful";
 	}
 
 	private void exit() {

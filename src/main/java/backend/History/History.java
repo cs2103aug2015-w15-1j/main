@@ -13,11 +13,14 @@ import main.java.backend.Storage.Task.Task;
 
 public class History {
 	
-	Stack<TreeMap<Integer, Task>> stateStack = new Stack<TreeMap<Integer, Task>>();
+	Stack<TreeMap<Integer, Task>> stateUndo = new Stack<TreeMap<Integer, Task>>();
+	Stack<TreeMap<Integer, Task>> stateRedo = new Stack<TreeMap<Integer, Task>>();
+	
 	private static Logger historyLogger = Logger.getGlobal();	
-	private FileHandler logHandler;
-	private final String LINE_SEPARATOR = System.getProperty("line.separator");
 	private static History historyObject;
+	
+	private FileHandler logHandler;
+	
 	
 	private History() {
 		initLogger();
@@ -33,6 +36,7 @@ public class History {
 	}
 	
 	private void initLogger() {
+		
 		try {
 			logHandler = new FileHandler("HistoryComponentLog.txt",true);
 			logHandler.setFormatter(new SimpleFormatter());
@@ -44,25 +48,38 @@ public class History {
 	}
 
 	public void push(TreeMap<Integer, Task> currentState) {
+		
 		historyLogger.info("Received current state "+ currentState);
-		stateStack.push(currentState);
-		historyLogger.info("What's at the top of the stack? "+stateStack.peek());
-		historyLogger.info("History stack size after push: "+stateStack.size());
+		stateUndo.push(currentState);
+		historyLogger.info("What's at the top of the stack? "+stateUndo.peek());
+		historyLogger.info("History stack size after push: "+stateUndo.size());
 	}
 
-	public TreeMap<Integer, Task> pop() {
-		if (stateStack.isEmpty() || stateStack.peek() == null) {
+	public TreeMap<Integer, Task> undo() {
+		
+		if (stateUndo.isEmpty() || stateUndo.peek() == null) {
 			return null;
 		}
+		
 		try {
-			historyLogger.info("What's at the top of the stack? "+stateStack.peek());
-			stateStack.pop();
-			historyLogger.info("what's left in stack"+stateStack.peek());
-			historyLogger.info("History stack size after pop: "+stateStack.size());
+			historyLogger.info("What's at the top of the stack? "+stateUndo.peek());
+			stateRedo.push(stateUndo.pop());
+			historyLogger.info("what's left in stack"+stateUndo.peek());
+			historyLogger.info("History stack size after pop: "+stateUndo.size());
 		} catch(EmptyStackException e) {
 			historyLogger.warning("Error Occured: Stack is empty");
 			return null;
 		}
-		return stateStack.peek();
+		
+		return stateUndo.peek();
+	}
+	
+	public TreeMap<Integer, Task> redo() {
+		
+		if (stateRedo.isEmpty() || stateRedo.peek() == null) {
+			return null;
+		}
+
+		return stateRedo.pop();
 	}
 }

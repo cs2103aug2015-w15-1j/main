@@ -419,7 +419,13 @@ public class GUI extends Application{
 						e.printStackTrace();
 					}
 				} else if(KC.match(ke)){
-					logicComponent.executeCommand("undo");
+					String response = logicComponent.executeCommand("undo");
+					try {
+						refresh();
+					} catch (IOException | JSONException | ParseException e) {
+						e.printStackTrace();
+					}
+					displayStringToScreen(response);
 					
 				}				else if (ke.getCode().equals(KeyCode.F1)){
 					helpPopUp();

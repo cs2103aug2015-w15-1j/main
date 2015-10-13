@@ -114,7 +114,7 @@ public class LogicCommandHandler {
 		addCommandObject.setPriority(parsedUserInput.get(inputLength-3));
 		switch (parsedUserInput.get(0)){
 			case ("addT"):
-				addCommandObject.setDeadline(parsedUserInput.get(3));
+				addCommandObject.setEndDateAndTime(parsedUserInput.get(3));
 				break;
 			case ("addE"):
 				addCommandObject.setStartDateAndTime(parsedUserInput.get(3));
@@ -137,7 +137,7 @@ public class LogicCommandHandler {
 				break;
 			case ("setT") :
 				editCommandObject.setDescription(parsedUserInput.get(2));
-				editCommandObject.setDeadline(parsedUserInput.get(3));
+				editCommandObject.setEndDateAndTime(parsedUserInput.get(3));
 				editCommandObject.setPriority(parsedUserInput.get(4));
 				editCommandObject.setReminder(parsedUserInput.get(5));
 				editCommandObject.setCategory(parsedUserInput.get(6));
@@ -153,7 +153,7 @@ public class LogicCommandHandler {
 				editCommandObject.setCategory(parsedUserInput.get(7));
 				break;
 			case ("deadline") :
-				editCommandObject.setDeadline(parsedUserInput.get(2));
+				editCommandObject.setEndDateAndTime(parsedUserInput.get(2));
 				break;
 			case ("event") :
 				editCommandObject.setStartDateAndTime(parsedUserInput.get(2));

@@ -15,7 +15,6 @@ public class Command {
 	private String category = "";
 	private String startDateAndTime = "";
 	private String endDateAndTime = "";
-	private String deadline = "";
 	private String keywords = "";
 	private String colour = "";
 	private final String LINE_SEPARATOR = System.getProperty("line.separator");
@@ -74,10 +73,6 @@ public class Command {
     // Additional for tasks creation set command methods
     // ================================================================
 	
-	public void setDeadline(String deadlineInput) {
-		this.deadline = deadlineInput;
-	}
-	
 	public void setKeywords(String keywordInput) {
 		this.keywords = keywordInput;
 	}
@@ -122,10 +117,6 @@ public class Command {
 		return this.endDateAndTime;
 	}
 	
-	public String getDeadline() {
-		return this.deadline;
-	}
-	
 	public String getKeywords() {
 		return this.keywords;
 	}
@@ -145,7 +136,6 @@ public class Command {
 		format.append("category: " + getCategory() + LINE_SEPARATOR);
 		format.append("startDateAndTime " + getStartDateAndTime() + LINE_SEPARATOR);
 		format.append("endDateAndTime :" + getEndDateAndTime() + LINE_SEPARATOR);
-		format.append("deadline: " + getDeadline() + LINE_SEPARATOR);
 		format.append("keywords: " + getKeywords() + LINE_SEPARATOR);
 		format.append("colour: "+ getColour() + LINE_SEPARATOR);
 		return format.toString();

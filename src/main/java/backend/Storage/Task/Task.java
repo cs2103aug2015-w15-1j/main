@@ -7,63 +7,38 @@ public class Task implements Comparable<Task> {
 	
 	private int taskId;
 	private int indexForPrinting;
-	private String category;
+	private int priority;
+	
+	private boolean isDone;
+	
+	private String categoryName;
+	private String categoryColour;
 	private String name;
 	private String description;
-	private String startDate;
-	private String endDate;
-	private String reminderDate;
-	private int priority;
-	private boolean isDone;
+	private String start;
+	private String end;
+	private String reminder;
 
 	private TreeMap<String, SubTask> subTask;
-
-	public Task() {
-
-	}
-
-	// Floating task
-	public Task(String category, String taskName, String taskDescription, 
-			int priority, String reminderDate, boolean isDone) {
+	
+	public Task () {
 		
-		setCategory(category);
-		setName(taskName);
-		setDescription(taskDescription);
-		setStartDate("");
-		setEndDate("");
-		setReminderDate(reminderDate);
-		setPriority(priority);
-		setDone(isDone);
-		setSubTask(new TreeMap<String, SubTask> ());
 	}
-
-	// Task
-	public Task(String category, String taskName, String taskDescription, 
-			String deadline, int priority, String reminderDate, boolean isDone) {
+	
+	public Task(int priority, String categoryName, String name, String description, 
+			String start, String end, String reminder) {
 		
-		setCategory(category);
-		setName(taskName);
-		setDescription(taskDescription);
-		setStartDate("");
-		setEndDate(deadline);
-		setPriority(priority);
-		setReminderDate(reminderDate);
-		setDone(isDone);
-		setSubTask(new TreeMap<String, SubTask> ());
-	}
-
-	// Event
-	public Task(String category, String eventName, String eventDescription, 
-			String startDate, String endDate, int priority, String reminderDate) {
+		assert name != null;
 		
-		setCategory(category);
-		setName(eventName);
-		setDescription(eventDescription);
-		setStartDate(startDate);
-		setEndDate(endDate);
-		setPriority(priority);
-		setReminderDate(reminderDate);
-		setSubTask(new TreeMap<String, SubTask> ());
+		this.priority = priority;
+		this.isDone = false;
+		this.categoryName = categoryName;
+		this.name = name;
+		this.description = description;
+		this.start = start;
+		this.end = end;
+		this.reminder = reminder;
+		this.subTask = new TreeMap<String, SubTask> ();
 	}
 	
 	public int getTaskId() {
@@ -82,14 +57,6 @@ public class Task implements Comparable<Task> {
 		indexForPrinting = index;
 	}
 	
-	public String getCategory() {
-		return category;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
-	}
-
 	public int getPriority() {
 		return priority;
 	}
@@ -104,6 +71,22 @@ public class Task implements Comparable<Task> {
 
 	public void setDone(boolean isDone) {
 		this.isDone = isDone;
+	}
+	
+	public String getCategoryName() {
+		return categoryName;
+	}
+
+	public void setCategoryName(String categoryName) {
+		this.categoryName = categoryName;
+	}
+	
+	public String getCategoryColour() {
+		return categoryColour;
+	}
+
+	public void setCategoryColour(String categoryColour) {
+		this.categoryColour = categoryColour;
 	}
 
 	public String getName() {
@@ -122,28 +105,28 @@ public class Task implements Comparable<Task> {
 		this.description = description;
 	}
 
-	public String getStartDate() {
-		return startDate;
+	public String getStart() {
+		return start;
 	}
 
-	public void setStartDate(String startDate) {
-		this.startDate = startDate;
+	public void setStart(String start) {
+		this.start = start;
 	}
 
-	public String getEndDate() {
-		return endDate;
+	public String getEnd() {
+		return end;
 	}
 
-	public void setReminderDate(String reminderDate) {
-		this.reminderDate = reminderDate;
+	public void setReminder(String reminder) {
+		this.reminder = reminder;
 	}
 	
-	public String getReminderDate() {
-		return reminderDate;
+	public String getReminder() {
+		return reminder;
 	}
 
-	public void setEndDate(String endDate) {
-		this.endDate = endDate;
+	public void setEnd(String end) {
+		this.end = end;
 	}
 	
 	public TreeMap<String, SubTask> getSubTask() {
@@ -166,14 +149,14 @@ public class Task implements Comparable<Task> {
 			}
 		}
 		sb.append(System.getProperty("line.separator"));
-		if (startDate!=""){
-			sb.append(startDate + System.getProperty("line.separator"));
+		if (start!=""){
+			sb.append(start + System.getProperty("line.separator"));
 		}
-		if(endDate!=""){
-			sb.append(endDate + System.getProperty("line.separator"));
+		if(end!=""){
+			sb.append(end + System.getProperty("line.separator"));
 		}
-		if(reminderDate!=""){
-			sb.append(reminderDate + System.getProperty("line.separator"));
+		if(reminder!=""){
+			sb.append(reminder + System.getProperty("line.separator"));
 		}
 		return sb.toString();
 	}
@@ -193,14 +176,14 @@ public class Task implements Comparable<Task> {
 		if (description!=""){
 			sb.append(description + System.getProperty("line.separator"));
 		}
-		if(startDate !=""){
-			sb.append(startDate + System.getProperty("line.separator"));
+		if(start !=""){
+			sb.append(start + System.getProperty("line.separator"));
 		}
-		if (endDate!=""){
-			sb.append(endDate + System.getProperty("line.separator"));
+		if (end!=""){
+			sb.append(end + System.getProperty("line.separator"));
 		}
-		if (reminderDate!=""){
-			sb.append("reminder: "+ reminderDate + System.getProperty("line.separator"));
+		if (reminder!=""){
+			sb.append("reminder: "+ reminder + System.getProperty("line.separator"));
 		}
 		if (isDone){
 		sb.append("It's completed!" + System.getProperty("line.separator"));
@@ -213,12 +196,13 @@ public class Task implements Comparable<Task> {
 	@Override
 	public int compareTo(Task o) {
 		
-		if(this.name.compareTo(o.name) < 0) {
+		if(this.taskId < o.getTaskId()) {
 			return -1;
-		} else if(this.name.compareTo(o.name) > 0) {
+		} else if(this.taskId > o.getTaskId()) {
 			return 1;
 		} else {
 			return 0;
 		}
 	}
+
 }

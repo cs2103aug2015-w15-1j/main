@@ -9,7 +9,7 @@ import java.util.TreeMap;
 public class LogicEditor {
 
 	private static final String EXECUTION_SET_PRIORITY_SUCCESSFUL = "Task %1$s has been set to priority %2$s";
-	private static final String EXECUTION_SET_SUCCESSFUL = "Fields have been updated";
+	private static final String EXECUTION_SET_SUCCESSFUL = "Fields have been upd";
 	private static final String EXECUTION_DELETE_SUCCESSFUL = "Task %1$s has been deleted";
 	private static final String EXECUTION_SET_DEADLINE_SUCCESSFUL = "Task %1$s deadline has been set to %2$s";
 	private static final String EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL = "Event %1$s has been setted to %2$s till %3$s";
@@ -177,6 +177,14 @@ public class LogicEditor {
 
 		return String.format(EXECUTION_DELETE_SUCCESSFUL, taskIndex);
 	}
+	
+	public void setIndex(ArrayList<Task> list, int i, int taskIndex) {
+
+		int taskId = list.get(i).getTaskId();
+		taskList = storage.load();
+		taskList.get(taskId).setIndex(taskIndex);
+		storage.save(taskList);
+	}
 
 	private String setPriority(Command commandObject){
 
@@ -217,7 +225,7 @@ public class LogicEditor {
 		int taskId = getTaskId(taskIndex);
 
 		taskList = storage.load();
-		taskList.get(taskId).setCategory(categoryName);
+		taskList.get(taskId).setCategoryName(categoryName);
 		storage.save(taskList);
 
 		return String.format(EXECUTION_SET_CATEGORY_SUCCESSFUL, taskId, categoryName);
@@ -251,15 +259,15 @@ public class LogicEditor {
 	private String setReminder(Command commandObject) {
 
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
-		String reminderDate = commandObject.getReminder();
+		String reminder = commandObject.getReminder();
 		int taskId = getTaskId(taskIndex);
 		
 		taskList = storage.load();
 		taskList.get(taskId).setDone(false);
-		taskList.get(taskId).setReminderDate(reminderDate);
+		taskList.get(taskId).setReminder(reminder);
 		storage.save(taskList);
 
-		return String.format(EXECUTION_SET_REMINDER_SUCCESSFUL,taskId,reminderDate);
+		return String.format(EXECUTION_SET_REMINDER_SUCCESSFUL,taskId,reminder);
 	}
 
 	private String setDescription(Command commandObject) {
@@ -279,8 +287,8 @@ public class LogicEditor {
 	private String setEventStartAndEndTime(Command commandObject) {
 
 		int eventIndex = Integer.parseInt(commandObject.getTaskName());
-		String startDate = commandObject.getStartDateAndTime();
-		String endDate = commandObject.getEndDateAndTime();
+		String start = commandObject.getStartDateAndTime();
+		String end = commandObject.getEndDateAndTime();
 		int taskId = getTaskId(eventIndex);
 		Task task = taskList.get(taskId);
 
@@ -289,38 +297,31 @@ public class LogicEditor {
 		delete(command);
 
 		taskList = storage.load();
-		task.setStartDate(startDate);
-		task.setEndDate(endDate);
+		task.setStart(start);
+		task.setEnd(end);
 		taskList.put(taskId, task);
 		storage.save(taskList);
 
-		return String.format(EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL, eventIndex,startDate,endDate);
+		return String.format(EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL, eventIndex,start,end);
 	}
 
 	private String setDeadline(Command commandObject) {
 
-		int taskIndex = Integer.parseInt(commandObject.getTaskName());
-		String deadline = commandObject.getDeadline();
-		int taskId = getTaskId(taskIndex);
+		int eventIndex = Integer.parseInt(commandObject.getTaskName());
+		String end = commandObject.getEndDateAndTime();
+		int taskId = getTaskId(eventIndex);
 		Task task = taskList.get(taskId);
 
 		Command command = new Command();
-		command.setTaskName(Integer.toString(taskIndex));
+		command.setTaskName(Integer.toString(eventIndex));
 		delete(command);
 
 		taskList = storage.load();
-		task.setEndDate(deadline);
+		task.setEnd(end);
 		taskList.put(taskId, task);
 		storage.save(taskList);
 		
-		return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskId, deadline);
+		return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskId, end);
 	}
-
-	public void setindex(ArrayList<Task> list, int i, int taskIndex) {
-
-		int taskId = list.get(i).getTaskId();
-		taskList = storage.load();
-		taskList.get(taskId).setIndex(taskIndex);
-		storage.save(taskList);
-	}
+	
 }

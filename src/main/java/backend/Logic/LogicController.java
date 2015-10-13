@@ -75,7 +75,7 @@ public class LogicController {
 	
 	public String executeCommand(String userInput) {
 		
-		assert (userInput!= null);
+		assert (userInput != null);
 		Command commandObject = commandHandlerSubComponent.parseCommand(userInput);
 		assert (commandObject.getType()!= null);
 		logicControllerLogger.info("Command Received: "+ LINE_SEPARATOR +commandObject.getType());
@@ -157,7 +157,7 @@ public class LogicController {
 	}
 	
 	public void updateTaskNumbering(ArrayList<Task> list, int i, int taskIndex) {
-		editorSubComponent.setindex(list, i, taskIndex);
+		editorSubComponent.setIndex(list, i, taskIndex);
 	}
 	
 	private void updateCurrentState() {

@@ -8,9 +8,10 @@ import java.util.TreeMap;
 public class LogicCreator {
 	
 	private static final String EXECUTION_ADD_SUBTASK_SUCCESSFUL = "SubTask %1$s is added to Task %2$s";
-	private static final String EXECUTION_ADD_EVENT_SUCCESSFUL = "Event %1$s has been added";
 	private static final String EXECUTION_ADD_TASK_SUCCESSFUL = "Task %1$s has been added";
+	private static final String EXECUTION_COMMAND_SUCCESSFUL =  "Valid Command.";
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
+	private static final String CATEGORY_DEFAULT = "default";
 	
 	private TreeMap<Integer, Task> taskList;
 
@@ -28,29 +29,8 @@ public class LogicCreator {
 		}
 		return logicCreator;
 	}
-
-	public String execute(Command commandObject) {
-		
-		String feedbackString = "";
-		
-		switch (commandObject.getCommandField()) {
-			case ("addF") :
-				feedbackString = addFloating(commandObject);
-				break;
-			case ("addT") :
-				feedbackString = addToDo(commandObject);
-				break;
-			case ("addE") :
-				feedbackString = addEvent(commandObject);
-				break;
-			case ("adds"):
-				feedbackString = addSubTask(commandObject);
-				break;	
-		}
-		return feedbackString;
-	}
 	
-	public TreeMap<Integer, Task> generateTaskId() {
+	private TreeMap<Integer, Task> generateTaskId() {
 		
 		TreeMap<Integer, Task> taskList = storage.load();
 		TreeMap<Integer, Task> newTaskList = new TreeMap<Integer, Task> ();
@@ -58,7 +38,6 @@ public class LogicCreator {
 		
 		for(Integer taskId : taskList.keySet()) {
 			Task task = taskList.get(taskId);
-			System.out.print(" New taskId for " + task.getName() + ": " + newTaskId);
 			task.setTaskId(newTaskId);
 			newTaskList.put(newTaskId, task);
 			newTaskId++;
@@ -67,124 +46,65 @@ public class LogicCreator {
 		return newTaskList;
 	}
 	
-	private String priorityChecker(int priority) {
+	private int getPriority(String priority) {
 		
-		if (priority > 5 || priority < 1) {
-			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		if (!priority.isEmpty()) {
+			return Integer.parseInt(priority);
+		} else {
+			return -1;
 		}
+	}
+	
+	private String getCategoryName(String categoryName) {
 		
-		return null;
+		if(categoryName.isEmpty()) {
+			return CATEGORY_DEFAULT;
+		} else {
+			return categoryName;
+		}
+	}
+	
+	private String priorityChecker(String priority) {
+		
+		if (!priority.isEmpty()) {
+			int priorityInt = Integer.parseInt(priority);
+			
+			if (priorityInt < 1 || priorityInt > 5) {
+				return EXECUTION_COMMAND_UNSUCCESSFUL;
+			}
+		} 
+		
+		return EXECUTION_COMMAND_SUCCESSFUL;
+	}
+	
+	private Task getTask(Command command) {
+		
+		int priority = getPriority(command.getPriority());
+		String categoryName = getCategoryName(command.getCategory());
+		String taskName = command.getTaskName();
+		String taskDescription = command.getDescription();
+		String startDate = command.getStartDateAndTime();
+		String endDate = command.getEndDateAndTime();
+		String reminderDate = command.getReminder();
+
+		return new Task(priority, categoryName, taskName, 
+				taskDescription, startDate, endDate, reminderDate);
 	}
 
-	private String addFloating(Command commandObject) {
+	private String addTask(Command command) {
 		
-		String taskName = commandObject.getTaskName();
-		String taskDescription = commandObject.getDescription();
-		int priority = -1;
+		String execution = priorityChecker(command.getPriority());
+		Task newTask = getTask(command);
 		
-		if (!commandObject.getPriority().equals("")) {
-			priority = Integer.parseInt(commandObject.getPriority());
-			if (priorityChecker(priority) != null) {
-				return priorityChecker(priority);
-			}
+		if(execution.equals(EXECUTION_COMMAND_SUCCESSFUL)) {
+			taskList = generateTaskId();
+			newTask.setTaskId(taskList.size());
+			taskList.put(taskList.size(), newTask);
+			storage.save(taskList);
 		}
-		String reminder = "";
 		
-		if (!commandObject.getReminder().equals("")) {
-			reminder = commandObject.getReminder();
-		}
-		String categoryName = commandObject.getCategory();
-		
-		if(categoryName.equals("")) {
-			categoryName = "default";
-		}
-		Task newFloat = new Task(categoryName, taskName, taskDescription, priority, reminder, false);
-		//System.out.println(newFloat.getName());
-		
-		taskList = generateTaskId();
-		newFloat.setTaskId(taskList.size() + 1);
-		taskList.put(taskList.size() + 1, newFloat);
-		storage.save(taskList);
-		
-		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, taskName);
+		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, newTask.getName());
 	}
-
-	private String addEvent(Command commandObject) {
-		
-		String eventName = commandObject.getTaskName();
-		String eventDescription = commandObject.getDescription();
-		String start = commandObject.getStartDateAndTime();
-		String end = "";
-		int priority = -1;
-		String reminder = "";
-		
-		if (!commandObject.getEndDateAndTime().equals("")) {
-			end = commandObject.getEndDateAndTime();
-		}
-		
-		if (!commandObject.getPriority().equals("")) {
-			priority = Integer.parseInt(commandObject.getPriority());
-			if (priorityChecker(priority) != null) {
-				return priorityChecker(priority);
-			}
-		}
-		
-		if (!commandObject.getReminder().equals("")) {
-			reminder = commandObject.getReminder();
-		}
-		
-		String categoryName = commandObject.getCategory();
-		if(categoryName.equals("")) {
-			categoryName = "default";
-		}
-		
-		Task newEvent = new Task(categoryName, eventName, eventDescription, 
-				start, end, priority, reminder);
-		
-		taskList = generateTaskId();
-		newEvent.setTaskId(taskList.size() + 1);
-		taskList.put(taskList.size() + 1, newEvent);
-		storage.save(taskList);
-		
-//		System.out.println(newEvent.toString());
-		return String.format(EXECUTION_ADD_EVENT_SUCCESSFUL, eventName);
-	}
-
-	private String addToDo(Command commandObject){
-		
-		String taskName = commandObject.getTaskName();
-		String taskDescription = commandObject.getDescription();
-		String deadline = commandObject.getDeadline();
-		int priority = -1;
-		String reminder = "";
-
-		if (!commandObject.getPriority().equals("")) {
-			priority = Integer.parseInt(commandObject.getPriority());
-			if (priorityChecker(priority) != null) {
-				return priorityChecker(priority);
-			}
-		}
-		
-		if (!commandObject.getReminder().equals("")) {
-			reminder = commandObject.getReminder();
-		}
-		
-		String categoryName = commandObject.getCategory();
-		if(categoryName.equals("")) {
-			categoryName = "default";
-		}
-		
-		Task newToDo = new Task(categoryName, taskName, taskDescription, 
-				deadline, priority, reminder, false);
-//		System.out.println(newToDo.toString());
-		
-		taskList = generateTaskId();
-		newToDo.setTaskId(taskList.size() + 1);
-		taskList.put(taskList.size() + 1, newToDo);
-		storage.save(taskList);
-		
-		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, taskName);
-	}	
 
 	private String addSubTask(Command commandObject) {
 		
@@ -192,6 +112,24 @@ public class LogicCreator {
 		String subTaskDescription = commandObject.getDescription();
 //		storageObject.addSubTask(taskName,subTaskDescription);
 		return String.format(EXECUTION_ADD_SUBTASK_SUCCESSFUL, subTaskDescription,taskName);
+	}
+	
+	public String execute(Command commandObject) {
+		
+		String feedbackString = new String();
+		
+		switch (commandObject.getCommandField()) {
+			case ("addF") :
+			case ("addT") :
+			case ("addE") :
+				feedbackString = addTask(commandObject);
+				break;
+			case ("addS"):
+				feedbackString = addSubTask(commandObject);
+				break;	
+		}
+		
+		return feedbackString;
 	}
 	
 }

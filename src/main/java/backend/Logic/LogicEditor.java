@@ -274,7 +274,6 @@ public class LogicEditor {
 		int taskId = getTaskId(taskIndex);
 		
 		taskList = storage.load();
-		taskList.get(taskId).setDone(false);
 		taskList.get(taskId).setReminder(reminder);
 		storage.save(taskList);
 
@@ -288,7 +287,6 @@ public class LogicEditor {
 		int taskId = getTaskId(taskIndex);
 		
 		taskList = storage.load();
-		taskList.get(taskId).setDone(false);
 		taskList.get(taskId).setDescription(description);
 		storage.save(taskList);
 

@@ -56,15 +56,6 @@ public class LogicCreator {
 		}
 	}
 	
-	private String getCategoryName(String categoryName) {
-		
-		if(categoryName.isEmpty()) {
-			return CATEGORY_DEFAULT;
-		} else {
-			return categoryName;
-		}
-	}
-	
 	private String priorityChecker(String priority) {
 		
 		if (!priority.isEmpty()) {
@@ -78,6 +69,15 @@ public class LogicCreator {
 		return EXECUTION_COMMAND_SUCCESSFUL;
 	}
 	
+	private String getCategoryName(String categoryName) {
+		
+		if(categoryName.isEmpty()) {
+			return CATEGORY_DEFAULT;
+		} else {
+			return categoryName;
+		}
+	}
+
 	private Task getTask(TaskType taskType, Command command) {
 		
 		int priority = getPriority(command.getPriority());

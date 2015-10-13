@@ -107,7 +107,7 @@ public class LogicGetter {
 
 		for(Task task : allTasks) {
 			if(stringToMillisecond(task.getEnd()) 
-					< getCurrentTime()) {
+					< getCurrentTime() && !task.getDone()) {
 				overdueTasks.add(task);
 			}
 		}
@@ -143,7 +143,7 @@ public class LogicGetter {
 		for(int taskId : taskList.keySet()) {
 			
 			Task task = taskList.get(taskId);
-			if(task.getTaskType().equals(taskType)) {
+			if(task.getTaskType().equals(taskType) && !task.getDone()) {
 				tasks.add(task);
 			}
 		}

@@ -13,13 +13,22 @@ public class GUIController {
 	private final int NUM_EVENTS = 2;
 	private final int NUM_OVERDUE = 3;
 	private final int NUM_FLOAT = 4;
+	private final int NUM_TODAY_TASKS = 5;
+	private final int NUM_TODAY_EVENTS = 6;
 	
 	private ArrayList<Task> getTasks;
 	private ArrayList<Task> getEvents;
 	private ArrayList<Task> getOverdue;
 	private ArrayList<Task> getFloat;
 	private ArrayList<String> getCate;
+	private ArrayList<Task> getTodayTasks;
+	private ArrayList<Task> getTodayEvents;
 	private ArrayList<Task> getFocusList;
+	
+	private ArrayList<Task> getCompletedTasks;
+	private ArrayList<Task> getCompletedEvents;
+	private ArrayList<Task> getCompletedFloat;
+
 	
 	public GUIController(){
 		logicComponent = LogicController.getInstance(DEFAULT_FILENAME);
@@ -37,16 +46,45 @@ public class GUIController {
 		assert getFloat!=null;
 		getCate = logicComponent.retrieveStringData("categories");
 		assert getCate!=null;
+		retrieveTodays();
+		retrieveCompletes();
 	}
-	ArrayList<Task> retrieveTask(){
-		return logicComponent.retrieveTaskData("upcomingToDo");
+	void retrieveCompletes(){
+		getCompletedTasks = logicComponent.retrieveTaskData("completedToDo");
+		getCompletedEvents = logicComponent.retrieveTaskData("pastEvents");
+		getCompletedFloat= logicComponent.retrieveTaskData("completedFloats");
 	}
+	void retrieveTodays(){
+		getTodayTasks = logicComponent.retrieveTaskData("todayToDos");
+		getTodayEvents = logicComponent.retrieveTaskData("todayEvents");
+	}
+	ArrayList<Task> retrieveTask(){ //default view for most initialization
+		ArrayList<Task> list = logicComponent.retrieveTaskData("upcomingToDo");
+		assert list!= null;
+		return list;
+	}
+	ArrayList<Task> getCompletedTasks(){
+		return getCompletedTasks;
+	}
+	
+	ArrayList<Task> getCompletedEvents(){
+		return getCompletedEvents;
+	}
+	ArrayList<Task> getCompletedFloat(){
+		return getCompletedFloat;
+	}
+	
 	void updateIndex(){
 		retrieveAllData();
+		int a = getTasks.size(), b = getEvents.size(),c = getOverdue.size(),
+				d = getFloat.size(), e = getCompletedTasks.size(), f = getCompletedEvents.size();
 		setIndex(getTasks, 0);
-		setIndex(getEvents,getTasks.size());
-		setIndex(getOverdue,getTasks.size()+getEvents.size());
-		setIndex(getFloat, getTasks.size()+getEvents.size()+getOverdue.size());
+		setIndex(getEvents,a);
+		setIndex(getOverdue,a+b);
+		setIndex(getFloat, a+b+c);
+		setIndex(getCompletedTasks,a+b+c+d);
+		setIndex(getCompletedEvents, a+b+c+d+e);
+		setIndex(getCompletedFloat, a+b+c+d+e+f);
 		
 	}
 	
@@ -75,6 +113,10 @@ public class GUIController {
 			getFocusList = getEventsList();
 		} else if (currentList==NUM_FLOAT){
 			getFocusList = getFloatList();
+		} else if (currentList==NUM_TODAY_TASKS){
+			getFocusList = getTodayTasks;
+		}else if (currentList==NUM_TODAY_EVENTS){
+			getFocusList = getTodayEvents;
 		}
 	}
 	ArrayList<Task> getTasksList(){
@@ -94,5 +136,11 @@ public class GUIController {
 	}
 	ArrayList<Task> getFocusList(){
 		return getFocusList;
+	}
+	ArrayList<Task> getTodayT(){
+		return getTodayTasks;
+		
+	}ArrayList<Task> getTodayE(){
+		return getTodayEvents;
 	}
 }

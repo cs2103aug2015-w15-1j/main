@@ -170,6 +170,23 @@ public class LogicGetter {
 		return logicToStorage.getTargetTasksDone(storage.load(), TYPE_EVENT);
 	}
 	
+	public ArrayList<Task> getTodayTodos() {
+
+		ArrayList<Task> allToDos = getToDo();
+		ArrayList<Task> todayToDos = new ArrayList<Task> ();
+
+		for(Task task : allToDos) {
+			if(GeneralFunctions.stringToMillisecond(task.getEndDate()) 
+					>= getTodayStartTime()
+					&& GeneralFunctions.stringToMillisecond(task.getEndDate()) 
+					< getTodayEndTime()) {
+				todayToDos.add(task);
+			}
+		}
+
+		return todayToDos;
+	}
+	
 	public ArrayList<Task> getTodayEvents() {
 
 		ArrayList<Task> allEvents = getEvents();

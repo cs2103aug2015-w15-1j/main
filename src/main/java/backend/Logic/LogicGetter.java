@@ -1,18 +1,24 @@
 package main.java.backend.Logic;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.TreeMap;
 
-import main.java.backend.GeneralFunctions.GeneralFunctions;
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
+import main.java.backend.Storage.Task.TaskType;
 
 public class LogicGetter {
 	
-	public static final long DAY_IN_MILLISECOND = 86400000L;
+	private static final SimpleDateFormat formatterForDateTime = 
+			new SimpleDateFormat("EEE, dd MMM hh:mma");
+	private static final SimpleDateFormat standardFormat = 
+			new SimpleDateFormat("EEE, dd MMM hh:mma yyyy");
+	
+	private static final long DAY_IN_MILLISECOND = 86400000L;
 
 	private static LogicGetter logicGetterObject;
 	private Storage storage;
@@ -31,6 +37,27 @@ public class LogicGetter {
 		this.storage = storage;
 	}
 	
+	private long stringToMillisecond(String dateTime) {
+		try {
+			Date tempDateTime = formatterForDateTime.parse(dateTime);
+			long dateTimeMillisecond = tempDateTime.getTime();
+			return (dateTimeMillisecond);
+		} catch (java.text.ParseException e) {
+			e.printStackTrace();
+		}
+
+		//Should not reach here
+		return -1;
+	}
+
+	private long getCurrentTime() {
+
+		long currentMilliseconds = System.currentTimeMillis();
+		Date resultdate = new Date(currentMilliseconds);
+
+		return stringToMillisecond(standardFormat.format(resultdate));
+	}
+	
 	private long getTodayStartTime() {
 
 		LocalDateTime now = LocalDateTime.now();
@@ -38,8 +65,8 @@ public class LogicGetter {
 		Date resultDate = Date.from(midnight
 				.atZone(ZoneId.systemDefault()).toInstant());
 
-		return GeneralFunctions.stringToMillisecond(
-				GeneralFunctions.standardFormat.format(resultDate));
+		return stringToMillisecond(
+				standardFormat.format(resultDate));
 	}
 
 	private long getTodayEndTime() {
@@ -52,8 +79,8 @@ public class LogicGetter {
 		ArrayList<Task> upcomingTasks = new ArrayList<Task> ();
 
 		for(Task task : allTasks) {
-			if(GeneralFunctions.stringToMillisecond(task.getEnd()) >= 
-					GeneralFunctions.getCurrentTime() && !task.getDone()) {
+			if(stringToMillisecond(task.getEnd()) >= 
+					getCurrentTime() && !task.getDone()) {
 				upcomingTasks.add(task);
 			}
 		}
@@ -79,8 +106,8 @@ public class LogicGetter {
 		ArrayList<Task> overdueTasks = new ArrayList<Task> ();
 
 		for(Task task : allTasks) {
-			if(GeneralFunctions.stringToMillisecond(task.getEnd()) 
-					< GeneralFunctions.getCurrentTime()) {
+			if(stringToMillisecond(task.getEnd()) 
+					< getCurrentTime()) {
 				overdueTasks.add(task);
 			}
 		}
@@ -108,54 +135,20 @@ public class LogicGetter {
 		return null;
 	}
 	
-	private ArrayList<Task> getFloatingTasks() {
+	private ArrayList<Task> getTasks(TaskType taskType) {
 		
-		ArrayList<Task> allFloatingTasks = new ArrayList<Task> ();
+		ArrayList<Task> tasks = new ArrayList<Task> ();
 		taskList = storage.load();
 		
 		for(int taskId : taskList.keySet()) {
 			
 			Task task = taskList.get(taskId);
-			if(task.getStart().isEmpty() 
-					&& task.getEnd().isEmpty()) {
-				allFloatingTasks.add(task);
+			if(task.getTaskType().equals(taskType)) {
+				tasks.add(task);
 			}
 		}
 		
-		return allFloatingTasks;
-	}
-
-	private ArrayList<Task> getToDos() {
-		
-		ArrayList<Task> allToDos = new ArrayList<Task> ();
-		taskList = storage.load();
-		
-		for(int taskId : taskList.keySet()) {
-			
-			Task task = taskList.get(taskId);
-			if(task.getStart().isEmpty() 
-					&& !task.getEnd().isEmpty()) {
-				allToDos.add(task);
-			}
-		}
-		
-		return allToDos;
-	}
-
-	private ArrayList<Task> getEvents() {
-		
-		ArrayList<Task> allEvents = new ArrayList<Task> ();
-		taskList = storage.load();
-		
-		for(int taskId : taskList.keySet()) {
-			
-			Task task = taskList.get(taskId);
-			if(!task.getStart().isEmpty()) {
-				allEvents.add(task);
-			}
-		}
-		
-		return allEvents;
+		return tasks;
 	}
 	
 	private ArrayList<Task> getTodayToDos() {
@@ -164,9 +157,9 @@ public class LogicGetter {
 		ArrayList<Task> todayToDos = new ArrayList<Task> ();
 
 		for(Task task : allToDos) {
-			if(GeneralFunctions.stringToMillisecond(task.getEnd()) 
+			if(stringToMillisecond(task.getEnd()) 
 					>= getTodayStartTime()
-					&& GeneralFunctions.stringToMillisecond(task.getEnd()) 
+					&& stringToMillisecond(task.getEnd()) 
 					< getTodayEndTime()) {
 				todayToDos.add(task);
 			}
@@ -181,9 +174,9 @@ public class LogicGetter {
 		ArrayList<Task> todayEvents = new ArrayList<Task> ();
 
 		for(Task task : allEvents) {
-			if(GeneralFunctions.stringToMillisecond(task.getStart()) 
+			if(stringToMillisecond(task.getStart()) 
 					>= getTodayStartTime()
-					&& GeneralFunctions.stringToMillisecond(task.getStart()) 
+					&& stringToMillisecond(task.getStart()) 
 					< getTodayEndTime()) {
 				todayEvents.add(task);
 			}
@@ -219,6 +212,21 @@ public class LogicGetter {
 		}
 
 		return pastEvents;
+	}
+	
+	private ArrayList<Task> getFloatingTasks() {
+		
+		return getTasks(TaskType.FLOATING);
+	}
+
+	private ArrayList<Task> getToDos() {
+		
+		return getTasks(TaskType.TODO);
+	}
+
+	private ArrayList<Task> getEvents() {
+		
+		return getTasks(TaskType.EVENT);
 	}
 	
 	private ArrayList<Task> getCompletedFloats() {
@@ -269,15 +277,6 @@ public class LogicGetter {
 		
 		ArrayList<Task> data = new ArrayList<Task>();
 		switch(dataType) {
-			case ("ToDo") :
-				data = getToDos();
-				break;
-			case ("floating") :
-				data = getFloatingTasks();
-				break;
-			case ("events") :
-				data = getEvents();
-				break;
 			case ("todayTasks") :
 				data = getAllToday();
 				break;
@@ -292,6 +291,15 @@ public class LogicGetter {
 				break;
 			case ("pastEvents") :
 				data = getPastEvents();
+				break;
+			case ("ToDo") :
+				data = getToDos();
+				break;
+			case ("floating") :
+				data = getFloatingTasks();
+				break;
+			case ("events") :
+				data = getEvents();
 				break;
 			case ("completedFloats") :
 				data = getCompletedFloats();

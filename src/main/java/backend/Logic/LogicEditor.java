@@ -2,7 +2,9 @@ package main.java.backend.Logic;
 
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
+import main.java.backend.Storage.Task.TaskType;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -20,7 +22,7 @@ public class LogicEditor {
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
 	private static final String EXECUTION_UNDONE_COMMAND_SUCCESSFUL = "Task %1$s is completed";
 	private static final String EXECUTION_DONE_COMMAND_SUCCESSFUL = "Task %1$s is not completed";
-
+	
 	private TreeMap<Integer, Task> taskList;
 
 	private static LogicEditor logicEditorObject;
@@ -113,9 +115,9 @@ public class LogicEditor {
 			System.out.println("category: "+commandObject.getCategory());
 			setCategory(commandObject);
 		}
-		if (!commandObject.getDeadline().equals("")) {
+		if (!commandObject.getEndDateAndTime().equals("")) {
 			setDeadline(commandObject);
-			System.out.println("deadline :"+commandObject.getDeadline());
+			System.out.println("deadline :"+commandObject.getEndDateAndTime());
 		}
 		return EXECUTION_SET_SUCCESSFUL;
 	}
@@ -147,6 +149,15 @@ public class LogicEditor {
 
 		}
 		return EXECUTION_SET_SUCCESSFUL;
+	}
+	
+	private TaskType getTaskType(Task task) {
+		
+		if(!task.getEnd().isEmpty()) {
+			return TaskType.TODO;
+		} else {
+			return TaskType.FLOATING;
+		}
 	}
 	
 	private int getTaskId(int taskIndex) {
@@ -297,6 +308,7 @@ public class LogicEditor {
 		delete(command);
 
 		taskList = storage.load();
+		task.setTaskType(TaskType.EVENT);
 		task.setStart(start);
 		task.setEnd(end);
 		taskList.put(taskId, task);
@@ -318,6 +330,7 @@ public class LogicEditor {
 
 		taskList = storage.load();
 		task.setEnd(end);
+		task.setTaskType(getTaskType(task));
 		taskList.put(taskId, task);
 		storage.save(taskList);
 		

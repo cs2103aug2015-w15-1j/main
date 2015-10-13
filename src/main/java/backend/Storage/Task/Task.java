@@ -1,10 +1,10 @@
 package main.java.backend.Storage.Task;
 
 import java.util.TreeMap;
-import java.util.UUID;
 
 public class Task implements Comparable<Task> {
 	
+	private TaskType taskType;
 	private int taskId;
 	private int indexForPrinting;
 	private int priority;
@@ -25,11 +25,13 @@ public class Task implements Comparable<Task> {
 		
 	}
 	
-	public Task(int priority, String categoryName, String name, String description, 
-			String start, String end, String reminder) {
+	public Task(TaskType taskType, int priority, String categoryName, String name, 
+			String description, String start, String end, String reminder) {
 		
+		assert taskType != null;
 		assert name != null;
 		
+		this.taskType = taskType;
 		this.priority = priority;
 		this.isDone = false;
 		this.categoryName = categoryName;
@@ -39,6 +41,14 @@ public class Task implements Comparable<Task> {
 		this.end = end;
 		this.reminder = reminder;
 		this.subTask = new TreeMap<String, SubTask> ();
+	}
+	
+	public TaskType getTaskType() {
+		return taskType;
+	}
+
+	public void setTaskType(TaskType taskType) {
+		this.taskType = taskType;
 	}
 	
 	public int getTaskId() {

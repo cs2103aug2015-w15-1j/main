@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import main.java.backend.GeneralFunctions.GeneralFunctions;
 import main.java.backend.Storage.Task.Task;
 
 public class Sorter {
@@ -45,15 +44,15 @@ public class Sorter {
 		return taskList;
 	}
 	
-	private ArrayList<Task> sortStartDate(ArrayList<Task> taskList) {
+	private ArrayList<Task> sortStart(ArrayList<Task> taskList) {
 		
 		Collections.sort(taskList, new Comparator<Task> () {
 			public int compare(Task left, Task right) {
-				if(GeneralFunctions.stringToMillisecond(left.getStartDate())
-						< GeneralFunctions.stringToMillisecond(right.getStartDate())) {
+				if(stringToMillisecond(left.getStart())
+						< stringToMillisecond(right.getStart())) {
 					return -1;
-				} else if(GeneralFunctions.stringToMillisecond(left.getStartDate()) 
-						> GeneralFunctions.stringToMillisecond(right.getStartDate())) {
+				} else if(stringToMillisecond(left.getStart()) 
+						> stringToMillisecond(right.getStart())) {
 					return 1;
 				} else {
 					return 0;
@@ -67,11 +66,11 @@ public class Sorter {
 		
 		Collections.sort(taskList, new Comparator<Task> () {
 			public int compare(Task left, Task right) {
-				if(GeneralFunctions.stringToMillisecond(left.getEndDate())
-						< GeneralFunctions.stringToMillisecond(right.getEndDate())) {
+				if(stringToMillisecond(left.getEnd())
+						< stringToMillisecond(right.getEnd())) {
 					return -1;
-				} else if(GeneralFunctions.stringToMillisecond(left.getEndDate()) 
-						> GeneralFunctions.stringToMillisecond(right.getEndDate())) {
+				} else if(stringToMillisecond(left.getEnd()) 
+						> stringToMillisecond(right.getEnd())) {
 					return 1;
 				} else {
 					return 0;
@@ -93,7 +92,7 @@ public class Sorter {
 				sortedTaskList = sortPriority(taskList);
 				break;
 			case "sortS":
-				sortedTaskList = sortStartDate(taskList);
+				sortedTaskList = sortStart(taskList);
 				break;
 			case "sortD":
 				sortedTaskList = sortDeadline(taskList);

@@ -2,6 +2,7 @@ package main.java.backend.Logic;
 
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
+import main.java.backend.Storage.Task.TaskType;
 
 import java.util.TreeMap;
 
@@ -29,7 +30,7 @@ public class LogicCreator {
 		}
 		return logicCreator;
 	}
-	
+
 	private TreeMap<Integer, Task> generateTaskId() {
 		
 		TreeMap<Integer, Task> taskList = storage.load();
@@ -77,7 +78,7 @@ public class LogicCreator {
 		return EXECUTION_COMMAND_SUCCESSFUL;
 	}
 	
-	private Task getTask(Command command) {
+	private Task getTask(TaskType taskType, Command command) {
 		
 		int priority = getPriority(command.getPriority());
 		String categoryName = getCategoryName(command.getCategory());
@@ -87,14 +88,14 @@ public class LogicCreator {
 		String endDate = command.getEndDateAndTime();
 		String reminderDate = command.getReminder();
 
-		return new Task(priority, categoryName, taskName, 
+		return new Task(taskType, priority, categoryName, taskName, 
 				taskDescription, startDate, endDate, reminderDate);
 	}
 
-	private String addTask(Command command) {
+	private String addTask(TaskType taskType, Command command) {
 		
 		String execution = priorityChecker(command.getPriority());
-		Task newTask = getTask(command);
+		Task newTask = getTask(taskType, command);
 		
 		if(execution.equals(EXECUTION_COMMAND_SUCCESSFUL)) {
 			taskList = generateTaskId();
@@ -120,9 +121,13 @@ public class LogicCreator {
 		
 		switch (commandObject.getCommandField()) {
 			case ("addF") :
+				feedbackString = addTask(TaskType.FLOATING, commandObject);
+				break;
 			case ("addT") :
+				feedbackString = addTask(TaskType.TODO, commandObject);
+				break;	
 			case ("addE") :
-				feedbackString = addTask(commandObject);
+				feedbackString = addTask(TaskType.EVENT, commandObject);
 				break;
 			case ("addS"):
 				feedbackString = addSubTask(commandObject);

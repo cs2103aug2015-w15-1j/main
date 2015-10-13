@@ -1,30 +1,23 @@
 package main.java.backend.Logic;
 
 import main.java.backend.Storage.Storage;
-import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
 import java.util.TreeMap;
 
-import main.java.backend.GeneralFunctions.GeneralFunctions;
-
 public class LogicCreator {
 	
 	private static final String EXECUTION_ADD_SUBTASK_SUCCESSFUL = "SubTask %1$s is added to Task %2$s";
-	private static final String EXECUTION_ADD_CATEGORY_SUCCESSFUL = "Category %1$s has been added";
 	private static final String EXECUTION_ADD_EVENT_SUCCESSFUL = "Event %1$s has been added";
 	private static final String EXECUTION_ADD_TASK_SUCCESSFUL = "Task %1$s has been added";
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
 	
-	private TreeMap<String, Category> allData;
+	private TreeMap<Integer, Task> taskList;
 
 	private static LogicCreator logicCreator;
-	private LogicToStorage logicToStorage;
 	private Storage storage;
 	
 	private LogicCreator(Storage storage) {
-		
-		logicToStorage = LogicToStorage.getInstance();
 		this.storage = storage;
 	}
 
@@ -41,9 +34,6 @@ public class LogicCreator {
 		String feedbackString = "";
 		
 		switch (commandObject.getCommandField()) {
-			case("addcat") :
-				feedbackString = addCategory(commandObject);
-				break;		
 			case ("addF") :
 				feedbackString = addFloating(commandObject);
 				break;
@@ -60,14 +50,30 @@ public class LogicCreator {
 		return feedbackString;
 	}
 	
-	private String addCategory(Command commandObject) {
+	public TreeMap<Integer, Task> generateTaskId() {
 		
-		String categoryName = commandObject.getTaskName();
-		TreeMap<String, Category> allData = storage.load();
-		logicToStorage.addCategory(allData, categoryName);
-		storage.save(allData);
+		TreeMap<Integer, Task> taskList = storage.load();
+		TreeMap<Integer, Task> newTaskList = new TreeMap<Integer, Task> ();
+		int newTaskId = 0;
 		
-		return String.format(EXECUTION_ADD_CATEGORY_SUCCESSFUL, categoryName);
+		for(Integer taskId : taskList.keySet()) {
+			Task task = taskList.get(taskId);
+			System.out.print(" New taskId for " + task.getName() + ": " + newTaskId);
+			task.setTaskId(newTaskId);
+			newTaskList.put(newTaskId, task);
+			newTaskId++;
+		}
+		
+		return newTaskList;
+	}
+	
+	private String priorityChecker(int priority) {
+		
+		if (priority > 5 || priority < 1) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
+		
+		return null;
 	}
 
 	private String addFloating(Command commandObject) {
@@ -78,8 +84,8 @@ public class LogicCreator {
 		
 		if (!commandObject.getPriority().equals("")) {
 			priority = Integer.parseInt(commandObject.getPriority());
-			if (logicToStorage.priorityChecker(priority) != null) {
-				return logicToStorage.priorityChecker(priority);
+			if (priorityChecker(priority) != null) {
+				return priorityChecker(priority);
 			}
 		}
 		String reminder = "";
@@ -95,13 +101,10 @@ public class LogicCreator {
 		Task newFloat = new Task(categoryName, taskName, taskDescription, priority, reminder, false);
 		//System.out.println(newFloat.getName());
 		
-		allData = storage.load();
-		allData = logicToStorage.addCategory(allData, categoryName);
-		Category category = allData.get(categoryName);
-		TreeMap<String, Task> allFloatingTasks = category.getFloatTasks();
-		allFloatingTasks.put(newFloat.getTaskId(), newFloat);
-		category.setFloatTasks(allFloatingTasks);
-		storage.save(allData);
+		taskList = generateTaskId();
+		newFloat.setTaskId(taskList.size() + 1);
+		taskList.put(taskList.size() + 1, newFloat);
+		storage.save(taskList);
 		
 		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, taskName);
 	}
@@ -121,8 +124,8 @@ public class LogicCreator {
 		
 		if (!commandObject.getPriority().equals("")) {
 			priority = Integer.parseInt(commandObject.getPriority());
-			if (logicToStorage.priorityChecker(priority) != null) {
-				return logicToStorage.priorityChecker(priority);
+			if (priorityChecker(priority) != null) {
+				return priorityChecker(priority);
 			}
 		}
 		
@@ -138,13 +141,10 @@ public class LogicCreator {
 		Task newEvent = new Task(categoryName, eventName, eventDescription, 
 				start, end, priority, reminder);
 		
-		allData = storage.load();
-		allData = logicToStorage.addCategory(allData, categoryName);
-		Category category = allData.get(categoryName);
-		TreeMap<String, Task> allEvents = category.getEvents();
-		allEvents.put(newEvent.getTaskId(), newEvent);
-		category.setEvents(allEvents);
-		storage.save(allData);
+		taskList = generateTaskId();
+		newEvent.setTaskId(taskList.size() + 1);
+		taskList.put(taskList.size() + 1, newEvent);
+		storage.save(taskList);
 		
 //		System.out.println(newEvent.toString());
 		return String.format(EXECUTION_ADD_EVENT_SUCCESSFUL, eventName);
@@ -160,8 +160,8 @@ public class LogicCreator {
 
 		if (!commandObject.getPriority().equals("")) {
 			priority = Integer.parseInt(commandObject.getPriority());
-			if (logicToStorage.priorityChecker(priority) != null) {
-				return logicToStorage.priorityChecker(priority);
+			if (priorityChecker(priority) != null) {
+				return priorityChecker(priority);
 			}
 		}
 		
@@ -178,13 +178,10 @@ public class LogicCreator {
 				deadline, priority, reminder, false);
 //		System.out.println(newToDo.toString());
 		
-		allData = storage.load();
-		allData = logicToStorage.addCategory(allData, categoryName);
-		Category category = allData.get(categoryName);
-		TreeMap<String, Task> allToDos = category.getTasks();
-		allToDos.put(newToDo.getTaskId(), newToDo);
-		category.setTasks(allToDos);
-		storage.save(allData);
+		taskList = generateTaskId();
+		newToDo.setTaskId(taskList.size() + 1);
+		taskList.put(taskList.size() + 1, newToDo);
+		storage.save(taskList);
 		
 		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, taskName);
 	}	

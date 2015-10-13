@@ -13,7 +13,6 @@ import main.java.backend.Search.Search;
 import main.java.backend.Sorter.Sorter;
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.StorageDatabase;
-import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
 public class LogicController {
@@ -28,10 +27,8 @@ public class LogicController {
 	private static Parser parserComponent;
 	private static Search searcherComponent;
 	private static History historyComponent;
-	private LogicToStorage logicToStorage;
-	private static TreeMap<String, Category> currentState;
-	private static TreeMap<String, Category> receivedFromHistoryState;
-	private ArrayList<Task> taskList;
+	private static TreeMap<Integer, Task> currentState;
+	private static TreeMap<Integer, Task> receivedFromHistoryState;
 	private static Logger logicControllerLogger = Logger.getGlobal();	
 	private FileHandler logHandler;
 	private final String LINE_SEPARATOR = System.getProperty("line.separator");
@@ -43,7 +40,6 @@ public class LogicController {
 		sorterComponent = new Sorter();
 		searcherComponent = new Search();
 		historyComponent = History.getInstance();
-		logicToStorage = LogicToStorage.getInstance();
 		storageComponent.init(fileName);
 		commandHandlerSubComponent = new LogicCommandHandler(parserComponent);
 		creatorSubComponent = LogicCreator.getInstance(storageComponent);
@@ -150,21 +146,22 @@ public class LogicController {
 		return getterSubComponent.retrieveStringData(dataType);
 	}
 	
-	public ArrayList<Category> retrieveCategoryData(String dataType) {
+	/*
+	public ArrayList<Task> retrieveCategoryData(String dataType) {
 		return getterSubComponent.retrieveCategoryData(dataType);
 	}
+	*/
 	
 	public ArrayList<Task> retrieveTaskData(String dataType) {
 		return getterSubComponent.retrieveTaskData(dataType);
 	}
 	
-	public void updateTaskNumbering(ArrayList<Task> list, int i, int index) {
-		editorSubComponent.setindex(list, i, index, currentState);
+	public void updateTaskNumbering(ArrayList<Task> list, int i, int taskIndex) {
+		editorSubComponent.setindex(list, i, taskIndex);
 	}
 	
 	private void updateCurrentState() {
 		currentState = storageComponent.load();
-		taskList = logicToStorage.getTaskList(currentState);
 	}
 	
 	private void updateHistoryStack() {

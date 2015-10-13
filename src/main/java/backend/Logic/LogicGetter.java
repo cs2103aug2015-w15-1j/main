@@ -4,23 +4,20 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.TreeMap;
 
 import main.java.backend.GeneralFunctions.GeneralFunctions;
 import main.java.backend.Storage.Storage;
-import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
 public class LogicGetter {
 	
 	public static final long DAY_IN_MILLISECOND = 86400000L;
 
-	private static final String TYPE_TODO = "task";
-	private static final String TYPE_FLOAT = "floatTask";
-	private static final String TYPE_EVENT = "event";
-
 	private static LogicGetter logicGetterObject;
-	private LogicToStorage logicToStorage;
 	private Storage storage;
+	
+	private TreeMap<Integer, Task> taskList;
 	
 	public static LogicGetter getInstance(Storage storageComponent) {
 		
@@ -31,8 +28,6 @@ public class LogicGetter {
 	}
 
 	private LogicGetter(Storage storage) {
-		
-		logicToStorage = LogicToStorage.getInstance();
 		this.storage = storage;
 	}
 	
@@ -92,56 +87,9 @@ public class LogicGetter {
 
 		return overdueTasks;
 	}
-
-	public ArrayList<String> retrieveStringData(String dataType) {
-		
-		ArrayList<String> data = new ArrayList<String>();
-		switch (dataType) {
-			case ("categories") :
-				data = getCategories();
-				break;
-		}
-		return data;
-	}
-
-	public ArrayList<Category> retrieveCategoryData(String dataType) {
-		
-		ArrayList<Category> data = new ArrayList<Category>();
-		switch (dataType) {
-			case ("searchResults") :
-				data = getSearchResultsList();
-				break;
-		}
-		return data;
-	}
-
-	public ArrayList<Task> retrieveTaskData(String dataType) {
-		
-		ArrayList<Task> data = new ArrayList<Task>();
-		switch(dataType) {
-			case ("toDo") :
-				data = getToDo();
-				break;
-			case ("floating") :
-				data = getFloatingTasks();
-				break;
-			case ("events") :
-				data = getEvents();
-				break;
-			case ("upcomingToDo") :
-				data = getUpcomingToDo();
-				break;
-			case ("upcomingEvents") :
-				data = getUpcomingEvents();
-				break;
-			case ("overdueTasks") :
-				data = getAllOverdue();
-				break;
-		}
-		return data;
-	}
-
-	public ArrayList<String> getCategories() {
+	
+	/*
+	private ArrayList<String> getCategories() {
 		
 		ArrayList<String> categories = new ArrayList<String> ();
 
@@ -153,26 +101,66 @@ public class LogicGetter {
 
 		return categories;
 	}
+	*/
+	
 
-	public ArrayList<Category> getSearchResultsList() {
+	private ArrayList<Task> getSearchResultsList() {
 		return null;
 	}
-
-	public ArrayList<Task> getToDo() {
-		return logicToStorage.getTargetTasksDone(storage.load(), TYPE_TODO);	
+	
+	private ArrayList<Task> getFloatingTasks() {
+		
+		ArrayList<Task> allFloatingTasks = new ArrayList<Task> ();
+		taskList = storage.load();
+		
+		for(int taskId : taskList.keySet()) {
+			
+			Task task = taskList.get(taskId);
+			if(task.getStartDate().isEmpty() 
+					&& task.getEndDate().isEmpty()) {
+				allFloatingTasks.add(task);
+			}
+		}
+		
+		return allFloatingTasks;
 	}
 
-	public ArrayList<Task> getFloatingTasks() {
-		return logicToStorage.getTargetTasksDone(storage.load(), TYPE_FLOAT);
+	private ArrayList<Task> getToDos() {
+		
+		ArrayList<Task> allToDos = new ArrayList<Task> ();
+		taskList = storage.load();
+		
+		for(int taskId : taskList.keySet()) {
+			
+			Task task = taskList.get(taskId);
+			if(task.getStartDate().isEmpty() 
+					&& !task.getEndDate().isEmpty()) {
+				allToDos.add(task);
+			}
+		}
+		
+		return allToDos;
 	}
 
-	public ArrayList<Task> getEvents() {
-		return logicToStorage.getTargetTasksDone(storage.load(), TYPE_EVENT);
+	private ArrayList<Task> getEvents() {
+		
+		ArrayList<Task> allEvents = new ArrayList<Task> ();
+		taskList = storage.load();
+		
+		for(int taskId : taskList.keySet()) {
+			
+			Task task = taskList.get(taskId);
+			if(!task.getStartDate().isEmpty()) {
+				allEvents.add(task);
+			}
+		}
+		
+		return allEvents;
 	}
 	
-	public ArrayList<Task> getTodayTodos() {
+	private ArrayList<Task> getTodayToDos() {
 
-		ArrayList<Task> allToDos = getToDo();
+		ArrayList<Task> allToDos = getToDos();
 		ArrayList<Task> todayToDos = new ArrayList<Task> ();
 
 		for(Task task : allToDos) {
@@ -187,7 +175,7 @@ public class LogicGetter {
 		return todayToDos;
 	}
 	
-	public ArrayList<Task> getTodayEvents() {
+	private ArrayList<Task> getTodayEvents() {
 
 		ArrayList<Task> allEvents = getEvents();
 		ArrayList<Task> todayEvents = new ArrayList<Task> ();
@@ -204,23 +192,23 @@ public class LogicGetter {
 		return todayEvents;
 	}
 	
-	public ArrayList<Task> getAllToday() {
+	private ArrayList<Task> getAllToday() {
 		
-		ArrayList<Task> todayTasks = getUpcomingToDo();
+		ArrayList<Task> todayTasks = getTodayToDos();
 		todayTasks.addAll(getTodayEvents());
 		
 		return todayTasks;
 	}
 	
-	public ArrayList<Task> getAllOverdue() {
+	private ArrayList<Task> getAllOverdue() {
 
-		ArrayList<Task> overdueTasks = getToDo();
+		ArrayList<Task> overdueTasks = getToDos();
 		overdueTasks.addAll(getEvents());
 		
 		return getOverdue(overdueTasks);
 	}
 	
-	public ArrayList<Task> getPastEvents() {
+	private ArrayList<Task> getPastEvents() {
 		
 		ArrayList<Task> pastEvents = new ArrayList<Task> ();
 
@@ -233,24 +221,92 @@ public class LogicGetter {
 		return pastEvents;
 	}
 	
-	public ArrayList<Task> getCompletedFloat() {
+	private ArrayList<Task> getCompletedFloats() {
 
 		return getCompleted(getFloatingTasks());
 	}
 
-	public ArrayList<Task> getCompletedToDo() {
+	private ArrayList<Task> getCompletedToDos() {
 
-		return getCompleted(getToDo());
+		return getCompleted(getToDos());
 	}
 	
-	public ArrayList<Task> getUpcomingToDo() {
+	private ArrayList<Task> getUpcomingToDos() {
 
-		return getUpcoming(getToDo());
+		return getUpcoming(getToDos());
 	}
 
-	public ArrayList<Task> getUpcomingEvents() {
+	private ArrayList<Task> getUpcomingEvents() {
 
 		return getUpcoming(getEvents());
+	}
+	
+	public ArrayList<String> retrieveStringData(String dataType) {
+		
+		ArrayList<String> data = new ArrayList<String>();
+		switch (dataType) {
+			case ("categories") :
+//				data = getCategories();
+				break;
+		}
+		return data;
+	}
+
+	/*
+	public ArrayList<Category> retrieveCategoryData(String dataType) {
+		
+		ArrayList<Category> data = new ArrayList<Category>();
+		switch (dataType) {
+			case ("searchResults") :
+				data = getSearchResultsList();
+				break;
+		}
+		return data;
+	}
+	*/
+
+	public ArrayList<Task> retrieveTaskData(String dataType) {
+		
+		ArrayList<Task> data = new ArrayList<Task>();
+		switch(dataType) {
+			case ("ToDo") :
+				data = getToDos();
+				break;
+			case ("floating") :
+				data = getFloatingTasks();
+				break;
+			case ("events") :
+				data = getEvents();
+				break;
+			case ("todayTasks") :
+				data = getAllToday();
+				break;
+			case ("todayToDos") :
+				data = getTodayToDos();
+				break;
+			case ("todayEvents") :
+				data = getTodayEvents();
+				break;
+			case ("overdueTasks") :
+				data = getAllOverdue();
+				break;
+			case ("pastEvents") :
+				data = getPastEvents();
+				break;
+			case ("completedFloats") :
+				data = getCompletedFloats();
+				break;
+			case ("completedToDo") :
+				data = getCompletedToDos();
+				break;
+			case ("upcomingToDo") :
+				data = getUpcomingToDos();
+				break;
+			case ("upcomingEvents") :
+				data = getUpcomingEvents();
+				break;
+		}
+		return data;
 	}
 	
 }

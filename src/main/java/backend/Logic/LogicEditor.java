@@ -1,13 +1,10 @@
 package main.java.backend.Logic;
 
 import main.java.backend.Storage.Storage;
-import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
-
-import main.java.backend.GeneralFunctions.GeneralFunctions;
 
 public class LogicEditor {
 
@@ -24,15 +21,12 @@ public class LogicEditor {
 	private static final String EXECUTION_UNDONE_COMMAND_SUCCESSFUL = "Task %1$s is completed";
 	private static final String EXECUTION_DONE_COMMAND_SUCCESSFUL = "Task %1$s is not completed";
 
-	private TreeMap<String, Category> allData;
+	private TreeMap<Integer, Task> taskList;
 
 	private static LogicEditor logicEditorObject;
-	private LogicToStorage logicToStorage;
 	private Storage storage;
 
 	private LogicEditor(Storage storageComponent) {
-
-		logicToStorage = LogicToStorage.getInstance();
 		storage = storageComponent;
 	}
 
@@ -62,7 +56,7 @@ public class LogicEditor {
 				feedbackString = delete(commandObject);
 				break;
 			case ("setCol") :
-				feedbackString = setColour(commandObject);
+//				feedbackString = setColour(commandObject);
 				break;
 			case ("category") :
 				feedbackString = setCategory(commandObject);
@@ -89,6 +83,15 @@ public class LogicEditor {
 		return feedbackString;
 	}
 
+	private String priorityChecker(int priority) {
+		
+		if (priority > 5 || priority < 1) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
+		
+		return null;
+	}
+	
 	private String setMultipleFieldsForTask(Command commandObject) {
 
 		System.out.println("taskId: "+commandObject.getTaskName());
@@ -145,198 +148,179 @@ public class LogicEditor {
 		}
 		return EXECUTION_SET_SUCCESSFUL;
 	}
+	
+	private int getTaskId(int taskIndex) {
+		
+		for(Integer taskId : taskList.keySet()) {
+			Task task = taskList.get(taskId);
+			
+			if(task.getIndex() == taskIndex) {
+				return task.getTaskId();
+			}
+		}
+		
+		// Should not reach here
+		return -1;
+	}
 
 	private String delete(Command commandObject) {
 
-		allData = storage.load();
+		taskList = storage.load();
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
-		String taskId = logicToStorage.getTaskId(allData, taskIndex);
-		Task task = logicToStorage.getAllTasks(allData).get(taskId);
+		int taskId = getTaskId(taskIndex);
 
-		TreeMap<String, Task> tasks = logicToStorage.getTargetTaskList
-				(allData.get(task.getCategory()), logicToStorage.checkTaskType(task));
-
-		if(tasks.containsKey(taskId)) {
-			tasks.remove(taskId);
+		if(taskList.containsKey(taskId)) {
+			taskList.remove(taskId);
 		}
 
-		storage.save(allData);
+		storage.save(taskList);
 
 		return String.format(EXECUTION_DELETE_SUCCESSFUL, taskIndex);
 	}
 
 	private String setPriority(Command commandObject){
 
-		allData = storage.load();
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
 		int priority = Integer.parseInt(commandObject.getPriority());
+		int taskId = getTaskId(taskIndex);
 
-		if (logicToStorage.priorityChecker(priority) != null) {
-			return logicToStorage.priorityChecker(priority);
+		if (priorityChecker(priority) != null) {
+			return priorityChecker(priority);
 		}
+		
+		taskList = storage.load();
+		taskList.get(taskId).setPriority(priority);
+		storage.save(taskList);	
 
-		String taskId = logicToStorage.getTaskId(allData, taskIndex);
-		TreeMap<String, Task> targetTask = logicToStorage.getAllTasks(allData);
-		targetTask.get(taskId).setPriority(priority);
-
-		storage.save(allData);	
-
-		return String.format(EXECUTION_SET_PRIORITY_SUCCESSFUL, taskId,priority);
+		return String.format(EXECUTION_SET_PRIORITY_SUCCESSFUL, taskId, priority);
 	}
 
+	/*
 	private String setColour(Command commandObject) {
 
-		allData = storage.load();
+		taskList = storage.load();
 		String categoryName = commandObject.getCategory();
 		String colourId = commandObject.getColour();
 
-		Category category = allData.get(categoryName);
+		Category category = taskList.get(categoryName);
 		category.setCategoryColour(colourId);
-		storage.save(allData);
+		storage.save(taskList);
 
 		return String.format(EXECUTION_SET_COLOUR_SUCCESSFUL, categoryName,colourId);
 	}
+	*/
 
 	private String setCategory(Command commandObject) {
 
-		allData = storage.load();
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
 		String categoryName = commandObject.getCategory();
+		int taskId = getTaskId(taskIndex);
 
-		String taskId = logicToStorage.getTaskId(allData, taskIndex);
-		Task task = logicToStorage.getAllTasks(allData).get(taskId);
-
-		Command command = new Command();
-		command.setTaskName(Integer.toString(taskIndex));
-		delete(command);
-
-		task.setCategory(categoryName);
-		allData = logicToStorage.addNewTask(allData, task.getCategory(), 
-				logicToStorage.checkTaskType(task), task);
-
-		storage.save(allData);
+		taskList = storage.load();
+		taskList.get(taskId).setCategory(categoryName);
+		storage.save(taskList);
 
 		return String.format(EXECUTION_SET_CATEGORY_SUCCESSFUL, taskId, categoryName);
 	}
 
 	private String setUndone(Command commandObject) {
 
-		allData = storage.load();
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
-		String taskId = logicToStorage.getTaskId(allData, taskIndex);
-		TreeMap<String, Task> targetTask = logicToStorage.getAllTasks(allData);
-
-		targetTask.get(taskId).setDone(false);
-
-		storage.save(allData);
+		int taskId = getTaskId(taskIndex);
+		
+		taskList = storage.load();
+		taskList.get(taskId).setDone(false);
+		storage.save(taskList);
 
 		return String.format(EXECUTION_DONE_COMMAND_SUCCESSFUL, taskId);
 	}
 
 	private String setDone(Command commandObject) {
 
-		allData = storage.load();
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
-		System.out.println("taskId : "+taskIndex);
-		String taskId = logicToStorage.getTaskId(allData, taskIndex);
-		TreeMap<String, Task> targetTask = logicToStorage.getAllTasks(allData);
-
-		targetTask.get(taskId).setDone(true);
-		targetTask.get(taskId).setIndex(-1);
-
-		storage.save(allData);
+		int taskId = getTaskId(taskIndex);
+		
+		taskList = storage.load();
+		taskList.get(taskId).setDone(true);
+		taskList.get(taskId).setIndex(-1);
+		storage.save(taskList);
 
 		return String.format(EXECUTION_UNDONE_COMMAND_SUCCESSFUL, taskId);
 	}
 
 	private String setReminder(Command commandObject) {
 
-		allData = storage.load();
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
 		String reminderDate = commandObject.getReminder();
-		String taskId = logicToStorage.getTaskId(allData, taskIndex);
-		TreeMap<String, Task> targetTask = logicToStorage.getAllTasks(allData);
-
-		targetTask.get(taskId).setReminderDate(reminderDate);
-
-		storage.save(allData);
+		int taskId = getTaskId(taskIndex);
+		
+		taskList = storage.load();
+		taskList.get(taskId).setDone(false);
+		taskList.get(taskId).setReminderDate(reminderDate);
+		storage.save(taskList);
 
 		return String.format(EXECUTION_SET_REMINDER_SUCCESSFUL,taskId,reminderDate);
 	}
 
 	private String setDescription(Command commandObject) {
 
-		allData = storage.load();
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
-		System.out.println("taskID: " +taskIndex);
 		String description = commandObject.getDescription();
-		System.out.println("description: "+description);
-		String taskId = logicToStorage.getTaskId(allData, taskIndex);
-
-		TreeMap<String, Task> targetTask = logicToStorage.getAllTasks(allData);
-		targetTask.get(taskId).setDescription(description);
-
-		storage.save(allData);
+		int taskId = getTaskId(taskIndex);
+		
+		taskList = storage.load();
+		taskList.get(taskId).setDone(false);
+		taskList.get(taskId).setDescription(description);
+		storage.save(taskList);
 
 		return String.format(EXECUTION_SET_DESCRIPTION_SUCCESSFUL, taskId);
 	}
 
 	private String setEventStartAndEndTime(Command commandObject) {
 
-		allData = storage.load();
 		int eventIndex = Integer.parseInt(commandObject.getTaskName());
 		String startDate = commandObject.getStartDateAndTime();
 		String endDate = commandObject.getEndDateAndTime();
-		System.out.println("setEventStartAndEndTime: "+ startDate);
-		System.out.println("setEventStartAndEndTime: "+ endDate);
-		String taskId = logicToStorage.getTaskId(allData, eventIndex);
-		TreeMap<String, Task> targetTask = logicToStorage.getAllTasks(allData);
-		Task task = targetTask.get(taskId);
+		int taskId = getTaskId(eventIndex);
+		Task task = taskList.get(taskId);
 
 		Command command = new Command();
 		command.setTaskName(Integer.toString(eventIndex));
 		delete(command);
 
+		taskList = storage.load();
 		task.setStartDate(startDate);
 		task.setEndDate(endDate);
-
-		allData = logicToStorage.addNewTask(allData, task.getCategory(), logicToStorage.checkTaskType(task), task);
-
-		storage.save(allData);
+		taskList.put(taskId, task);
+		storage.save(taskList);
 
 		return String.format(EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL, eventIndex,startDate,endDate);
 	}
 
 	private String setDeadline(Command commandObject) {
 
-		allData = storage.load();
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
-		String deadlineDate = commandObject.getDeadline();
-		String taskId = logicToStorage.getTaskId(allData, taskIndex);
-		TreeMap<String, Task> targetTask = logicToStorage.getAllTasks(allData);
-		Task task = targetTask.get(taskId);
+		String deadline = commandObject.getDeadline();
+		int taskId = getTaskId(taskIndex);
+		Task task = taskList.get(taskId);
 
 		Command command = new Command();
 		command.setTaskName(Integer.toString(taskIndex));
 		delete(command);
 
-		task.setEndDate(deadlineDate);
-
-		allData = logicToStorage.addNewTask(allData, task.getCategory(), 
-				logicToStorage.checkTaskType(task), task);
-
-		storage.save(allData);
-		return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskId,deadlineDate);
+		taskList = storage.load();
+		task.setEndDate(deadline);
+		taskList.put(taskId, task);
+		storage.save(taskList);
+		
+		return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskId, deadline);
 	}
 
-	public void setindex(ArrayList<Task> list, int i, int index, 
-			TreeMap<String, Category> currentState) {
+	public void setindex(ArrayList<Task> list, int i, int taskIndex) {
 
-		String taskId = list.get(i).getTaskId();
-		TreeMap<String, Task> targetTask = logicToStorage.getAllTasks(currentState);
-
-		targetTask.get(taskId).setIndex(index);
-
-		storage.save(currentState);
+		int taskId = list.get(i).getTaskId();
+		taskList = storage.load();
+		taskList.get(taskId).setIndex(taskIndex);
+		storage.save(taskList);
 	}
 }

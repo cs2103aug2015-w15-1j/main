@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import main.java.backend.GeneralFunctions.GeneralFunctions;
-import main.java.backend.Logic.Command;
-import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
 public class Sorter {

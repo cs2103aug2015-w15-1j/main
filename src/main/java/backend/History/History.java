@@ -9,11 +9,11 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 import main.java.backend.Logic.LogicController;
-import main.java.backend.Storage.Task.Category;
+import main.java.backend.Storage.Task.Task;
 
 public class History {
 	
-	Stack<TreeMap<String, Category>> stateStack = new Stack<TreeMap<String, Category>>();
+	Stack<TreeMap<Integer, Task>> stateStack = new Stack<TreeMap<Integer, Task>>();
 	private static Logger historyLogger = Logger.getGlobal();	
 	private FileHandler logHandler;
 	private final String LINE_SEPARATOR = System.getProperty("line.separator");
@@ -43,14 +43,14 @@ public class History {
 		}
 	}
 
-	public void push(TreeMap<String, Category> currentState) {
+	public void push(TreeMap<Integer, Task> currentState) {
 		historyLogger.info("Received current state "+ currentState);
 		stateStack.push(currentState);
 		historyLogger.info("What's at the top of the stack? "+stateStack.peek());
 		historyLogger.info("History stack size after push: "+stateStack.size());
 	}
 
-	public TreeMap<String, Category> pop() {
+	public TreeMap<Integer, Task> pop() {
 		if (stateStack.isEmpty() || stateStack.peek() == null) {
 			return null;
 		}

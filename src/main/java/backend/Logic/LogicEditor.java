@@ -50,7 +50,7 @@ public class LogicEditor {
 	private void initLogger() {
 			
 			try {
-				logHandler = new FileHandler("LogicControllerLog.txt",true);
+				logHandler = new FileHandler("LogicEditorLog.txt",true);
 				logHandler.setFormatter(new SimpleFormatter());
 				logicEditorLogger.addHandler(logHandler);
 				logicEditorLogger.setUseParentHandlers(false);

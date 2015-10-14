@@ -4,14 +4,18 @@ import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
 import main.java.backend.Storage.Task.TaskType;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.TreeMap;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class LogicEditor {
 
 	private static final String EXECUTION_SET_PRIORITY_SUCCESSFUL = "Task %1$s has been set to priority %2$s";
-	private static final String EXECUTION_SET_SUCCESSFUL = "Fields have been upd";
+	private static final String EXECUTION_SET_SUCCESSFUL = "Fields have been updated";
 	private static final String EXECUTION_DELETE_SUCCESSFUL = "Task %1$s has been deleted";
 	private static final String EXECUTION_SET_DEADLINE_SUCCESSFUL = "Task %1$s deadline has been set to %2$s";
 	private static final String EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL = "Event %1$s has been setted to %2$s till %3$s";
@@ -22,6 +26,8 @@ public class LogicEditor {
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
 	private static final String EXECUTION_UNDONE_COMMAND_SUCCESSFUL = "Task %1$s is completed";
 	private static final String EXECUTION_DONE_COMMAND_SUCCESSFUL = "Task %1$s is not completed";
+	private static Logger logicEditorLogger = Logger.getGlobal();	
+	private FileHandler logHandler;
 	
 	private TreeMap<Integer, Task> taskList;
 
@@ -30,6 +36,7 @@ public class LogicEditor {
 
 	private LogicEditor(Storage storageComponent) {
 		storage = storageComponent;
+		initLogger();
 	}
 
 	public static LogicEditor getInstance(Storage storageComponent) {
@@ -39,11 +46,24 @@ public class LogicEditor {
 		}
 		return logicEditorObject;
 	}
+	
+	private void initLogger() {
+			
+			try {
+				logHandler = new FileHandler("LogicControllerLog.txt",true);
+				logHandler.setFormatter(new SimpleFormatter());
+				logicEditorLogger.addHandler(logHandler);
+				logicEditorLogger.setUseParentHandlers(false);
+				
+			} catch (SecurityException | IOException e) {
+				logicEditorLogger.warning("Logger failed to initialise: " + e.getMessage());
+			}
+		}
 
 	public String execute(Command commandObject){
 
 		String feedbackString = "";
-		//		System.out.println("Get Command Field: "+commandObject.getCommandField());
+		logicEditorLogger.info("Get Command Field: "+commandObject.getCommandField());
 		switch(commandObject.getCommandField()) {
 			case ("priority") :
 				feedbackString = setPriority(commandObject);
@@ -96,28 +116,28 @@ public class LogicEditor {
 	
 	private String setMultipleFieldsForTask(Command commandObject) {
 
-		System.out.println("taskId: "+commandObject.getTaskName());
+		logicEditorLogger.info("taskId: "+commandObject.getTaskName());
 		int taskId = Integer.parseInt(commandObject.getTaskName());
-		System.out.println("taskId: "+taskId);
+		logicEditorLogger.info("taskId: "+taskId);
 		if (!commandObject.getDescription().equals("")) {
-			System.out.println("Description: "+ commandObject.getDescription());
+			logicEditorLogger.info("Description: "+ commandObject.getDescription());
 			setDescription(commandObject);
 		}
 		if (!commandObject.getPriority().equals("")) {
-			System.out.println("priority :"+commandObject.getPriority());
+			logicEditorLogger.info("priority :"+commandObject.getPriority());
 			setPriority(commandObject);
 		}
 		if (!commandObject.getReminder().equals("")) {
-			System.out.println("reminder: "+commandObject.getReminder());
+			logicEditorLogger.info("reminder: "+commandObject.getReminder());
 			setReminder(commandObject);
 		}
 		if(!commandObject.getCategory().equals("")) {
-			System.out.println("category: "+commandObject.getCategory());
+			logicEditorLogger.info("category: "+commandObject.getCategory());
 			setCategory(commandObject);
 		}
 		if (!commandObject.getEndDateAndTime().equals("")) {
 			setDeadline(commandObject);
-			System.out.println("deadline :"+commandObject.getEndDateAndTime());
+			logicEditorLogger.info("deadline :"+commandObject.getEndDateAndTime());
 		}
 		return EXECUTION_SET_SUCCESSFUL;
 	}
@@ -125,22 +145,22 @@ public class LogicEditor {
 	private String setMultipleFieldsForEvents(Command commandObject) {
 
 		int taskId = Integer.parseInt(commandObject.getTaskName());
-		System.out.println("taskId: "+taskId);
+		logicEditorLogger.info("taskId: "+taskId);
 		if (!commandObject.getDescription().equals("")) {
-			System.out.println("Description: "+ commandObject.getDescription());
+			logicEditorLogger.info("Description: "+ commandObject.getDescription());
 			setDescription(commandObject);
 		}
 		if (!commandObject.getPriority().equals("")) {
-			System.out.println("priority :"+commandObject.getPriority());
+			logicEditorLogger.info("priority :"+commandObject.getPriority());
 			setPriority(commandObject);
 		}
 		System.out.println("priority setted");
 		if (!commandObject.getReminder().equals("")) {
-			System.out.println("reminder: "+commandObject.getReminder());
+			logicEditorLogger.info("reminder: "+commandObject.getReminder());
 			setReminder(commandObject);
 		}
 		if(!commandObject.getCategory().equals("")) {
-			System.out.println("category: "+commandObject.getCategory());
+			logicEditorLogger.info("category: "+commandObject.getCategory());
 			setCategory(commandObject);
 		}
 		if (!commandObject.getStartDateAndTime().equals("") && 

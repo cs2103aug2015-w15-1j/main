@@ -1,4 +1,4 @@
-package main.java.backend.History;
+package main.java.backend.Logic;
 
 import java.io.IOException;
 import java.util.EmptyStackException;
@@ -11,26 +11,26 @@ import java.util.logging.SimpleFormatter;
 import main.java.backend.Logic.LogicController;
 import main.java.backend.Storage.Task.Task;
 
-public class History {
+public class LogicHistory {
 	
 	Stack<TreeMap<Integer, Task>> stateUndo = new Stack<TreeMap<Integer, Task>>();
 	Stack<TreeMap<Integer, Task>> stateRedo = new Stack<TreeMap<Integer, Task>>();
 	
 	private static Logger historyLogger = Logger.getGlobal();	
-	private static History historyObject;
+	private static LogicHistory historyObject;
 	
 	private FileHandler logHandler;
 	
 	
-	private History() {
+	private LogicHistory() {
 		initLogger();
 		historyLogger.info("Logic component initialised successfully");
 	}
 	
-	public static History getInstance() {
+	public static LogicHistory getInstance() {
 		
 		if (historyObject == null) {
-			historyObject = new History();
+			historyObject = new LogicHistory();
 		}
 		return historyObject;
 	}
@@ -79,7 +79,17 @@ public class History {
 		if (stateRedo.isEmpty() || stateRedo.peek() == null) {
 			return null;
 		}
+		
+		try {
+			historyLogger.info("What's at the top of the stack? "+stateRedo.peek());
+			stateUndo.push(stateRedo.pop());
+			historyLogger.info("what's left in stack"+stateUndo.peek());
+			historyLogger.info("History stack size after pop: "+stateUndo.size());
+		} catch(EmptyStackException e) {
+			historyLogger.warning("Error Occured: Stack is empty");
+			return null;
+		}
 
-		return stateRedo.pop();
+		return stateUndo.peek();
 	}
 }

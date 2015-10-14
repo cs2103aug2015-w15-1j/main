@@ -7,10 +7,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import main.java.backend.History.History;
 import main.java.backend.Parser.Parser;
-import main.java.backend.Search.Search;
-import main.java.backend.Sorter.Sorter;
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.StorageDatabase;
 import main.java.backend.Storage.Task.Task;
@@ -22,24 +19,25 @@ public class LogicController {
 	private static LogicCreator creatorSubComponent;
 	private static LogicEditor editorSubComponent;
 	private static LogicGetter getterSubComponent;
-	private static Sorter sorterComponent;
+	private static LogicSorter sorterSubComponent;
 	private static Storage storageComponent;
 	private static Parser parserComponent;
-	private static Search searcherComponent;
-	private static History historyComponent;
+	private static LogicSearch searcherSubComponent;
+	private static LogicHistory historySubComponent;
 	private static TreeMap<Integer, Task> currentState;
 	private static TreeMap<Integer, Task> receivedFromHistoryState;
 	private static Logger logicControllerLogger = Logger.getGlobal();	
 	private FileHandler logHandler;
 	private final String LINE_SEPARATOR = System.getProperty("line.separator");
+	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
 	
 	private LogicController(String fileName) {
 		
 		parserComponent = new Parser();
 		storageComponent = new StorageDatabase();
-		sorterComponent = new Sorter();
-		searcherComponent = new Search();
-		historyComponent = History.getInstance();
+		sorterSubComponent = LogicSorter.getInstance();
+		searcherSubComponent = LogicSearch.getInstance();
+		historySubComponent = LogicHistory.getInstance();
 		storageComponent.init(fileName);
 		commandHandlerSubComponent = new LogicCommandHandler(parserComponent);
 		creatorSubComponent = LogicCreator.getInstance(storageComponent);
@@ -77,13 +75,14 @@ public class LogicController {
 		
 		assert (userInput != null);
 		Command commandObject = commandHandlerSubComponent.parseCommand(userInput);
-		assert (commandObject.getType()!= null);
+//		assert (commandObject.getType()!= null);
 		logicControllerLogger.info("Command Received: "+ LINE_SEPARATOR +commandObject.getType());
 		String feedbackString = "";
 		
 		try {
 			feedbackString = runParsedCommand(commandObject, feedbackString);
 		} catch (NullPointerException e) {
+			feedbackString = EXECUTION_COMMAND_UNSUCCESSFUL;
 			logicControllerLogger.info("Error caught " + e.getMessage());
 		}
 		return feedbackString;
@@ -118,7 +117,7 @@ public class LogicController {
 				feedbackString = redo();
 				break;
 			default:
-				feedbackString = "Invalid Command. Please try again";
+				feedbackString = EXECUTION_COMMAND_UNSUCCESSFUL;
 				logicControllerLogger.warning("Unknown parameters "+commandObject.toString());
 		}
 		logicControllerLogger.info("Execution successful: " + feedbackString);
@@ -128,9 +127,8 @@ public class LogicController {
 	private String undo() {
 		
 		logicControllerLogger.fine("undoing");
+		receivedFromHistoryState = historySubComponent.undo();
 		assert(receivedFromHistoryState != null);
-		receivedFromHistoryState = historyComponent.undo();
-		
 		if (receivedFromHistoryState == null) {
 			return "There are no more Undos";
 		}
@@ -142,8 +140,15 @@ public class LogicController {
 	}
 	
 	private String redo() {
-		
-		currentState = historyComponent.redo();
+		System.out.println("redoing");
+		logicControllerLogger.fine("redoing");
+		receivedFromHistoryState = historySubComponent.redo();
+		assert(receivedFromHistoryState != null);
+		if (receivedFromHistoryState == null) {
+			return "There are no more Redos";
+		}
+		currentState = receivedFromHistoryState;
+		logicControllerLogger.fine("received from history stack "+currentState);
 		storageComponent.save(currentState);
 		return "Redo successful";
 	}
@@ -175,6 +180,6 @@ public class LogicController {
 	}
 	
 	private void updateHistoryStack() {
-		historyComponent.push(currentState);
+		historySubComponent.push(currentState);
 	}
 }

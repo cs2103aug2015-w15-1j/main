@@ -78,11 +78,11 @@ public class Logic {
 	private static final SimpleDateFormat formatterForDateTime = 
 			new SimpleDateFormat("EEE, dd MMM hh:mma");
 	private static Calendar calendar = Calendar.getInstance();
-	private static History historyComponent;
+	private static LogicHistory historyComponent;
 	private static Parser parserComponent;
 	private static Storage storageComponent;
-	private static Sorter sortComponent;
-	private static Search searchComponent;
+	private static LogicSorter sortComponent;
+	private static LogicSearch searchComponent;
 	private static String getFeedbackAfterCommandExecution;
 	private static ArrayList<Category> currentState;
 	private static ArrayList<Category> searchResults;
@@ -95,10 +95,10 @@ public class Logic {
 	}
 
 	void initLogic(String filename) throws FileNotFoundException, IOException {
-		historyComponent = new History();
+		historyComponent = new LogicHistory();
 		parserComponent = new Parser();
 		storageComponent = new Storage(filename);
-		searchComponent = new Search();
+		searchComponent = new LogicSearch();
 	}
 
 	public String executeCommand(String userInput) throws JsonParseException, JsonMappingException, IOException, JSONException, ParseException {

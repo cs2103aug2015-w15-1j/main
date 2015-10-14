@@ -1,15 +1,28 @@
-package main.java.backend.Sorter;
+package main.java.backend.Logic;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 
 import main.java.backend.Storage.Task.Task;
 
-public class Sorter {
+public class LogicSorter {
 	
-	public Sorter() {
+	private static LogicSorter logicSorterObject;
+	private static final SimpleDateFormat formatterForDateTime = 
+			new SimpleDateFormat("EEE, dd MMM hh:mma");
+	
+	private LogicSorter() {
 		
+	}
+	
+	public static LogicSorter getInstance() {
+		if (logicSorterObject == null) {
+			logicSorterObject = new LogicSorter();
+		}
+		return logicSorterObject;
 	}
 	
 	private ArrayList<Task> sortName(ArrayList<Task> taskList) {
@@ -99,6 +112,19 @@ public class Sorter {
 				break;
 		}
 		return sortedTaskList;
+	}
+	
+	private long stringToMillisecond(String dateTime) {
+		try {
+			Date tempDateTime = formatterForDateTime.parse(dateTime);
+			long dateTimeMillisecond = tempDateTime.getTime();
+			return (dateTimeMillisecond);
+		} catch (java.text.ParseException e) {
+			e.printStackTrace();
+		}
+
+		//Should not reach here
+		return -1;
 	}
 
 }

@@ -1,11 +1,13 @@
 package main.java.backend.Logic;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
-import main.java.backend.Parser.Parser;
+import main.java.backend.Storage.Storage;
+import main.java.backend.Storage.StorageDatabase;
 
 public class LogicCommandHandler {
+	private static LogicCommandHandler commandHandler;
+	private static Storage storageComponent;
 	private static final String COMMAND_ADD = "add";
 	private static final String COMMAND_EDIT = "edit";
 	private static final String COMMAND_SORT = "sort";
@@ -21,20 +23,23 @@ public class LogicCommandHandler {
 	private static final String[] sortKeywords = new String[] {"sortp", "sortd"};
 	private static final String[] viewKeywords = new String[] {"showCat", "showf",
 			"showt", "showe"};
-	private Parser parserObject;
-	
 
-	public LogicCommandHandler(Parser parserComponent) {
-		this.parserObject = parserComponent;
+	private LogicCommandHandler(String filename) {
+		commandHandler = new LogicCommandHandler(filename);
+		storageComponent = new StorageDatabase();
+		storageComponent.init(filename);
 	}
 
-	public Command parseCommand(String userInput) {
-		ArrayList<String> parsedUserInput = parserObject.parseInput(userInput);
-		String commandGiven = parsedUserInput.get(0);
-//		System.out.println("CommandGiven "+commandGiven);
+	public static LogicCommandHandler getInstance(String filename) {
+		if (commandHandler == null) {
+			commandHandler = new LogicCommandHandler(filename);
+		}
+		return commandHandler;
+	}
+
+	public Command parse(ArrayList<String> parsedUserInput) {
+		String determinedCommandType = parsedUserInput.get(0);
 		Command commandObject = new Command();
-		String determinedCommandType = determineCommandType(commandGiven);
-//		System.out.println("determinedCommandType: "+determinedCommandType);
 		switch (determinedCommandType) {
 			case COMMAND_ADD:
 				commandObject = initAddCommand(parsedUserInput);
@@ -58,29 +63,8 @@ public class LogicCommandHandler {
 				commandObject = initViewCommand(parsedUserInput);
 				break;
 		}
-		return commandObject;
+	return commandObject;
 	}
-
-	private String determineCommandType(String commandGiven) {
-		String commandString = "";
-		if (Arrays.asList(addKeywords).contains(commandGiven)){
-			commandString =  COMMAND_ADD;
-		} else if (Arrays.asList(editKeywords).contains(commandGiven)) {
-			commandString = COMMAND_EDIT;
-		} else if (Arrays.asList(sortKeywords).contains(commandGiven)) {
-			commandString = COMMAND_SORT;
-		} else if (commandGiven.contains(COMMAND_SEARCH)) {
-			commandString = COMMAND_SEARCH;
-		} else if (Arrays.asList(viewKeywords).contains(commandGiven)) {
-			commandString = COMMAND_VIEW;
-		} else if (commandGiven.contains(COMMAND_EXIT)) {
-			commandString = COMMAND_EXIT;
-		} else if (commandGiven.contains(COMMAND_UNDO)) {
-			commandString = COMMAND_UNDO;
-		}
-		return commandString;
-	}
-	
 
 	private Command initViewCommand(ArrayList<String> parsedUserInput) {
 		Command viewCommandObject = new Command(Command.Type.VIEW);
@@ -115,7 +99,7 @@ public class LogicCommandHandler {
 
 	private Command initAddCommand(ArrayList<String> parsedUserInput) {
 		int inputLength = parsedUserInput.size();
-		Command addCommandObject = new Command(Command.Type.ADD);
+		Command addCommandObject = new AddCommand(Command.Type.ADD,storageComponent);
 		addCommandObject.setCommandField(parsedUserInput.get(0));
 		addCommandObject.setTaskName(parsedUserInput.get(1));
 		addCommandObject.setDescription(parsedUserInput.get(2));
@@ -135,7 +119,7 @@ public class LogicCommandHandler {
 	}
 	
 	private Command initEditCommand(ArrayList<String> parsedUserInput) {
-		Command editCommandObject = new Command(Command.Type.EDIT);
+		Command editCommandObject = new EditCommand(Command.Type.EDIT,storageComponent);
 		editCommandObject.setCommandField(parsedUserInput.get(0));
 		editCommandObject.setTaskName(parsedUserInput.get(1));
 		switch (parsedUserInput.get(0)) {

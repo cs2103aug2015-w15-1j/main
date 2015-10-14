@@ -140,4 +140,10 @@ public class Command {
 		format.append("colour: "+ getColour() + LINE_SEPARATOR);
 		return format.toString();
 	}
+
+
+	public String execute() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

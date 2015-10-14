@@ -57,7 +57,7 @@ public class StorageTest {
 		storage.init(TEST_FILE_NAME);
 	}
 	
-	@Test 
+	@Before
 	public void setUp() {
 		
 		taskList = new TreeMap<Integer, Task> ();
@@ -71,5 +71,12 @@ public class StorageTest {
 		taskList.put(taskId++, CATEGORY3_EVENT1);
 		taskList.put(taskId++, CATEGORY3_EVENT2);
 	}
-
+	
+	@Test
+	public void testLoad() {
+		
+		storage.save(taskList);
+		assertEquals(taskList.toString(), storage.load().toString());
+	}
+	
 }

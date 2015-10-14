@@ -53,7 +53,7 @@ public class StorageSave {
 		}
 	}
 	
-	public TreeMap<Integer, Task> execute(TreeMap<Integer, Task> taskList) {
+	public void execute(TreeMap<Integer, Task> taskList) {
 		
 		if(taskList == null) {
 			try {
@@ -73,7 +73,5 @@ public class StorageSave {
 		}
 		
 		closeWriter();
-		
-		return taskList;
 	}
 }

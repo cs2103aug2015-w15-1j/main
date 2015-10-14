@@ -53,10 +53,13 @@ public class LogicCommandHandler {
 				break;
 			case COMMAND_UNDO:
 				commandObject = initUndoCommand(parsedUserInput);
+				break;
+			case COMMAND_VIEW:
+				commandObject = initViewCommand(parsedUserInput);
+				break;
 		}
 		return commandObject;
 	}
-
 
 	private String determineCommandType(String commandGiven) {
 		String commandString = "";
@@ -76,6 +79,13 @@ public class LogicCommandHandler {
 			commandString = COMMAND_UNDO;
 		}
 		return commandString;
+	}
+	
+
+	private Command initViewCommand(ArrayList<String> parsedUserInput) {
+		Command viewCommandObject = new Command(Command.Type.VIEW);
+		viewCommandObject.setCommandField(parsedUserInput.get(0));
+		return viewCommandObject;
 	}
 
 	private Command initUndoCommand(ArrayList<String> parsedUserInput) {

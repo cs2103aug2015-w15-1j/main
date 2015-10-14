@@ -119,6 +119,12 @@ public class GUIController {
 			getFocusList = getTodayEvents;
 		}
 	}
+	
+	String executeCommand(String userInput){
+		String feedback = logicComponent.executeCommand(userInput);
+		return feedback;
+	}
+	
 	ArrayList<Task> getTasksList(){
 		return getTasks;
 	}

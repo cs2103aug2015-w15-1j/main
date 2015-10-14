@@ -27,10 +27,12 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import main.java.backend.Logic.LogicController;
 import main.java.backend.Storage.Task.Task;
+import main.java.backend.Util.hotkeyHelp;
 
 public class GUI extends Application{
 	//Possible messages
@@ -38,9 +40,9 @@ public class GUI extends Application{
 	private static final String MESSAGE_EMPTY = "List is empty";
 	private static final String DEFAULT_FILENAME="filename.txt";
 	private static final String LIST_OVERDUE = "Overdue Tasks:";
-	private static final String LIST_TASKS = "Upcoming Tasks:";
-	private static final String LIST_EVENTS = "Upcoming Events:";
-	private static final String LIST_FLOATING = "Floating Tasks:";
+	private static final String LIST_TASKS = "ToDo:";
+	private static final String LIST_EVENTS = "Events:";
+	private static final String LIST_FLOATING = "Floating";
 	private static final String MESSAGE_HELP = "Change view by typing \"change\" or pressing 'tab'";
 	private static final String MESSAGE_COMMAND_HELP = "Press F1 to see a list of commands";
 	private static final String MESSAGE_SAMPLE_ADDTASK = "to insert a task: \"add [taskname] deadline [date & time] priority [1 to 5] category [name] reminder [date]\"";
@@ -66,8 +68,8 @@ public class GUI extends Application{
 	private static int currentScene = 1;
 	private static boolean toggleCate = false;
 
-	private static LogicController logicComponent;
 	private static GUIController controller;
+	private static hotkeyHelp hotkey;
 	private static GridPane gridPane;
 	private static Scene mainScene;	
 	private static String userCommands;
@@ -97,8 +99,9 @@ public class GUI extends Application{
 	}
 
 	private static void initGUI() throws FileNotFoundException, IOException, JSONException, ParseException{
-		logicComponent = LogicController.getInstance(DEFAULT_FILENAME);
 		controller = new GUIController();
+		hotkey = new hotkeyHelp();
+		hotkey.retrieveHotkey();
 		System.out.println("GUI component initialised successfully");
 		consoleText = new TextArea();
 		console = new Console(consoleText);
@@ -209,14 +212,14 @@ public class GUI extends Application{
 	private static void setUpHeadings(){
 		gridPane.getChildren().removeAll(floating, tasks, events);
 		//Categories Heading
-		floating = new Label("Floating:");
+		floating = new Label(LIST_FLOATING);
 		GridPane.setConstraints(floating, 3, 0);
 		//Task Heading
-		tasks = new Label("Upcoming Tasks:");
+		tasks = new Label(LIST_TASKS);
 		GridPane.setColumnSpan(tasks, 2);
 		GridPane.setConstraints(tasks, 0, 0);
 		//Events Heading
-		events = new Label("Upcoming Events:");
+		events = new Label(LIST_EVENTS);
 		GridPane.setConstraints(events, 2, 0);
 
 		gridPane.getChildren().addAll(floating, tasks, events);
@@ -251,7 +254,7 @@ public class GUI extends Application{
 		else{
 			//floating
 			if (toggleCate == false){
-				floating.setText("floating:");
+				floating.setText(LIST_FLOATING);
 				listFloat = getList(controller.getFloatList());
 				listFloat.setFocusTraversable( false );
 				GridPane.setConstraints(listFloat, 3, 1);
@@ -398,7 +401,7 @@ public class GUI extends Application{
 				} else if(ke.getCode().equals(KeyCode.TAB)){
 					changeScene();
 				} else if(KC.match(ke)){
-					String response = logicComponent.executeCommand("undo");
+					String response = controller.executeCommand("undo");
 
 					refresh();
 
@@ -416,11 +419,11 @@ public class GUI extends Application{
 					showTodayTasks();
 				} else if(ke.getCode().equals(KeyCode.F4)){
 					showTodayEvents();
-				} else if(ke.getCode().equals(KeyCode.F10)){
+				} else if(ke.getCode().equals(KeyCode.F11)){
 					showCompleted();
 				} else if (ke.getCode().equals(KeyCode.F12)){
 				
-					logicComponent.executeCommand("exit");
+					controller.executeCommand("exit");
 				}
 				if (currentScene == SCENE_FOCUS){
 					try {
@@ -509,17 +512,18 @@ public class GUI extends Application{
 	private void helpPopUp() {
 		Stage pop = new Stage();
 		VBox comp = new VBox();
+		comp.setSpacing(10);
 		pop.setTitle("help");
-		ArrayList<String> help = new ArrayList<String>();
-		help.add(MESSAGE_HELP);
+		ArrayList<String> help = hotkey.retrieveHotkey();
 		help.add(MESSAGE_SAMPLE_ADDTASK);
 		help.add(MESSAGE_SAMPLE_ADDEVENT);
 		help.add(MESSAGE_SAMPLE_ADDFLOAT);
-		ListView<String> helpList = getStringList(help);
-		VBox.setVgrow(helpList, Priority.ALWAYS);
-		comp.getChildren().add(helpList);
-
-
+		for  (int i =0 ;i<help.size();i++){
+			Text label = new Text();
+			label.setText(help.get(i));
+			comp.getChildren().add(label);
+		}
+	
 		Scene stageScene = new Scene(comp, 500, 500);
 		stageScene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 		pop.setScene(stageScene);
@@ -529,6 +533,7 @@ public class GUI extends Application{
 			@Override
 			public void handle(KeyEvent event) {
 				if (event.getCode().equals(KeyCode.F1)){
+					System.out.println("weird");
 					pop.close();
 				}
 
@@ -560,7 +565,7 @@ public class GUI extends Application{
 		userCommands = userInput.getText();
 		userInput.clear();
 		System.out.println("Command: "+ userCommands);
-		String display = logicComponent.executeCommand(userCommands);
+		String display = controller.executeCommand(userCommands);
 		if (display.equals("change")){
 			changeScene();
 		}

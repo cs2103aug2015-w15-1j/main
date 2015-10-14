@@ -3,7 +3,7 @@ package main.java.backend.Logic;
 public class Command {
 	
 	public enum Type {
-		ADD, EDIT, SORT, SEARCH, EXIT, UNDO, REDO
+		ADD, EDIT, SORT, SEARCH, EXIT, UNDO, REDO, VIEW
 	}
 	
 	private Type type;

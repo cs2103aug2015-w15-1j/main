@@ -116,6 +116,9 @@ public class LogicController {
 			case REDO :
 				feedbackString = redo();
 				break;
+			case VIEW: 
+				feedbackString = commandObject.getCommandField();
+				break;
 			default:
 				feedbackString = EXECUTION_COMMAND_UNSUCCESSFUL;
 				logicControllerLogger.warning("Unknown parameters "+commandObject.toString());

@@ -1,9 +1,11 @@
 package main.java.backend.Logic;
 
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.StorageDatabase;
+import main.java.backend.Storage.Task.Task;
 
 public class LogicCommandHandler {
 	private static LogicCommandHandler commandHandler;
@@ -23,11 +25,15 @@ public class LogicCommandHandler {
 	private static final String[] sortKeywords = new String[] {"sortp", "sortd"};
 	private static final String[] viewKeywords = new String[] {"showCat", "showf",
 			"showt", "showe"};
+	private static TreeMap<Integer, Task> currentState;
+	private static TreeMap<Integer, Task> receivedFromHistoryState;
+	private static LogicHistory historySubComponent;
 
 	private LogicCommandHandler(String filename) {
 		commandHandler = new LogicCommandHandler(filename);
 		storageComponent = new StorageDatabase();
 		storageComponent.init(filename);
+		historySubComponent = LogicHistory.getInstance();
 	}
 
 	public static LogicCommandHandler getInstance(String filename) {
@@ -67,7 +73,7 @@ public class LogicCommandHandler {
 	}
 
 	private Command initViewCommand(ArrayList<String> parsedUserInput) {
-		Command viewCommandObject = new Command(Command.Type.VIEW);
+		Command viewCommandObject = new ViewCommand(Command.Type.VIEW,storageComponent);
 		viewCommandObject.setCommandField(parsedUserInput.get(0));
 		return viewCommandObject;
 	}
@@ -167,5 +173,38 @@ public class LogicCommandHandler {
 		}
 		return editCommandObject;
 	}
+	
+	private String undo() {
+		
+		receivedFromHistoryState = historySubComponent.undo();
+		assert(receivedFromHistoryState != null);
+		if (receivedFromHistoryState == null) {
+			return "There are no more Undos";
+		}
+		
+		currentState = receivedFromHistoryState;
+		storageComponent.save(currentState);
+		return "Undo successful";
+	}
+	
+	private String redo() {
+		System.out.println("redoing");
+		receivedFromHistoryState = historySubComponent.redo();
+		assert(receivedFromHistoryState != null);
+		if (receivedFromHistoryState == null) {
+			return "There are no more Redos";
+		}
+		currentState = receivedFromHistoryState;
+		storageComponent.save(currentState);
+		return "Redo successful";
+	}
+
+	private void exit() {
+		System.exit(0);
+	}
+	
+//	public ArrayList<String> retrieveStringData(String dataType){
+//		return getterSubComponent.retrieveStringData(dataType);
+//	}
 
 }

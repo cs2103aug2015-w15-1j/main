@@ -16,12 +16,33 @@ public class AddCommand extends Command {
 	
 	private TreeMap<Integer, Task> taskList;
 
-	private static LogicCreator logicCreator;
 	private Storage storageComponent;
 
 	public AddCommand(Type typeInput, Storage storage) {
 		super(typeInput);
 		storageComponent = storage;
+	}
+	
+	public String execute(Command commandObject) {
+		
+		String feedbackString = new String();
+		
+		switch (commandObject.getCommandField()) {
+			case ("addF") :
+				feedbackString = addTask(TaskType.FLOATING, commandObject);
+				break;
+			case ("addT") :
+				feedbackString = addTask(TaskType.TODO, commandObject);
+				break;	
+			case ("addE") :
+				feedbackString = addTask(TaskType.EVENT, commandObject);
+				break;
+			case ("addS"):
+				feedbackString = addSubTask(commandObject);
+				break;	
+		}
+		
+		return feedbackString;
 	}
 	
 	private TreeMap<Integer, Task> generateTaskId() {
@@ -106,27 +127,5 @@ public class AddCommand extends Command {
 		String subTaskDescription = commandObject.getDescription();
 //		storageObject.addSubTask(taskName,subTaskDescription);
 		return String.format(EXECUTION_ADD_SUBTASK_SUCCESSFUL, subTaskDescription,taskName);
-	}
-	
-	public String execute(Command commandObject) {
-		
-		String feedbackString = new String();
-		
-		switch (commandObject.getCommandField()) {
-			case ("addF") :
-				feedbackString = addTask(TaskType.FLOATING, commandObject);
-				break;
-			case ("addT") :
-				feedbackString = addTask(TaskType.TODO, commandObject);
-				break;	
-			case ("addE") :
-				feedbackString = addTask(TaskType.EVENT, commandObject);
-				break;
-			case ("addS"):
-				feedbackString = addSubTask(commandObject);
-				break;	
-		}
-		
-		return feedbackString;
 	}
 }

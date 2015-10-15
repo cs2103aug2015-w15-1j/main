@@ -6,6 +6,8 @@ import main.java.backend.Storage.Task.Task;;
 
 public interface Storage {
 
+	public void init();
+	
 	public void init(String fileName);
 	
 	public TreeMap<Integer, Task> load();

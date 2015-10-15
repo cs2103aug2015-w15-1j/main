@@ -25,23 +25,25 @@ import main.java.backend.Storage.Task.Task;
  * 
  */
 
-public class StorageLoad {
-	
-	private String INPUT_FILE_NAME;
-	private File textFile;
+public class StorageLoad extends StorageOperation {
 	
 	private BufferedReader bufferedReader;
 	private FileReader textFileReader;
 	
+	public StorageLoad() {
+		this(DEFAULT_FILE_LOCATION);
+	}
+	
 	public StorageLoad(String fileName) {
 
-		this.INPUT_FILE_NAME = fileName;
+		this.CURRENT_FILE_LOCATION = fileName;
 		initFile();
 	}
 	
 	private void initFile() {
 		
-		textFile = new File(INPUT_FILE_NAME);
+		// TODO: Change default location to current location once bug resolved
+		textFile = new File(DEFAULT_FILE_LOCATION);
 		createFile();
 		initReader();
 	}
@@ -91,19 +93,20 @@ public class StorageLoad {
 
 	public String getAllTextsFromFile() throws IOException {
 		
+		//TODO: Change to CURRENT_FILE_LOCATION once bug resolved
 		return new String(Files.readAllBytes
-				(Paths.get(INPUT_FILE_NAME)), StandardCharsets.UTF_8);
+				(Paths.get(DEFAULT_FILE_LOCATION)), StandardCharsets.UTF_8);
 	}
 	
-	public TreeMap<Integer, Task> execute() {
+	public TreeMap<Integer, Task> execute(TreeMap<Integer, Task> nullData) {
 
-		TreeMap<Integer, Task> taskList = new TreeMap<Integer, Task>();
+		TreeMap<Integer, Task> allData = new TreeMap<Integer, Task>();
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		
 		if(!isFileEmpty()) {
 			try {
-				taskList = mapper.readValue(getAllTextsFromFile(), 
+				allData = mapper.readValue(getAllTextsFromFile(), 
 						new TypeReference<TreeMap<Integer, Task>>() {});
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -112,7 +115,7 @@ public class StorageLoad {
 
 		closeReader();
 
-		return taskList;
+		return allData;
 	}
 	
 }

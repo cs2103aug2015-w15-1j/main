@@ -22,23 +22,27 @@ import main.java.backend.Storage.Task.Task;
  * 
  */
 
-public class StorageSave {
-	
-	private String INPUT_FILE_NAME;
-	private File textFile;
+public class StorageSave extends StorageOperation {
 	
 	private BufferedWriter bufferedWriter;
 	private FileWriter textFileWriter;
 	
+	public StorageSave() {
+		this(DEFAULT_FILE_LOCATION);
+	}
+	
 	public StorageSave(String fileName) {
-		this.INPUT_FILE_NAME = fileName;
+		this.CURRENT_FILE_LOCATION = fileName;
 	}
 
-	private void initializeWriter() 
-			throws IOException, FileNotFoundException {
+	private void initializeWriter() {
 		
-		textFile = new File(INPUT_FILE_NAME);
-		textFileWriter = new FileWriter(textFile);
+		textFile = new File(CURRENT_FILE_LOCATION);
+		try {
+			textFileWriter = new FileWriter(textFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		bufferedWriter = new BufferedWriter(textFileWriter);
 	}
 
@@ -53,25 +57,38 @@ public class StorageSave {
 		}
 	}
 	
-	public void execute(TreeMap<Integer, Task> taskList) {
+	private void changeFileDirectory() {
 		
-		if(taskList == null) {
-			try {
-				initializeWriter();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} else {
-			try {
-				initializeWriter();
-				ObjectMapper mapper = new ObjectMapper();
-				mapper.enable(SerializationFeature.INDENT_OUTPUT);
-				bufferedWriter.write(mapper.writeValueAsString(taskList));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		// TODO: Change to newFile(CURRENT_FILE_LOCATION) once bug resolved
+		if(!CURRENT_FILE_LOCATION.equals(DEFAULT_FILE_LOCATION)) {
+			File newFile = new File(DEFAULT_FILE_LOCATION);
+			System.out.println(newFile.getAbsolutePath());
+			textFile.renameTo(newFile);
+		}
+	}
+	
+	private void saveData(TreeMap<Integer, Task> allData) {
+		
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.enable(SerializationFeature.INDENT_OUTPUT);
+			bufferedWriter.write(mapper.writeValueAsString(allData));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public TreeMap<Integer, Task> execute(TreeMap<Integer, Task> allData) {
+		
+		initializeWriter();
+		changeFileDirectory();
+		
+		if(allData != null) {
+			saveData(allData);
 		}
 		
 		closeWriter();
+		
+		return allData;
 	}
 }

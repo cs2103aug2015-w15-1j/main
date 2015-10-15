@@ -12,7 +12,6 @@
 	-fx-font-size: 18px;
 	-fx-font-weight: bold;
 	-fx-text-fill: #ffffff;
-	-fx-font-family: "";
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.7) , 5, 0.0 , 3, 3 );
     -fx-background-color: linear-gradient(#c0c0c0, darkgrey);
 }
@@ -65,4 +64,15 @@
 	-fx-border-width: 3px;
 	-fx-text-fill: #E41B17;
 	-fx-font-size: 16px;
+}
+.helpLabel{
+	-fx-background-insets: 0,1;
+    -fx-padding: 5px;
+    -fx-background-radius: 3px;
+    -fx-border-radius: 3px;
+	-fx-font-size: 18px;
+	-fx-font-weight: bold;
+	-fx-text-fill: #ffffff;
+	-fx-font-family: "";
+    -fx-background-color: linear-gradient(#ffffff, darkgrey);
 }

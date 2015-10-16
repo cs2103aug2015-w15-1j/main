@@ -11,7 +11,7 @@ import main.java.backend.Storage.Task.Task;
  *
  */
 
-public class StorageDatabase implements Storage {
+public class StorageFacade implements Storage {
 
 	private StorageLoad load;
 	private StorageSave save;

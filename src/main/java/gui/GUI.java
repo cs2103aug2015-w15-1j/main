@@ -18,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -124,6 +125,8 @@ public class GUI extends Application{
 		setUpMainScene();
 		setupUserInput();
 		setUpConsole();
+		Image icon = new Image(getClass().getResourceAsStream("tank.png")); 
+		primaryStage.getIcons().add(icon);
 
 		primaryStage.setScene(mainScene);
 		primaryStage.show();
@@ -528,6 +531,8 @@ public class GUI extends Application{
 			comp.getChildren().add(label);
 		}
 		Scene stageScene = new Scene(comp, 500, 500);
+		Image icon = new Image(getClass().getResourceAsStream("tank.png")); 
+		pop.getIcons().add(icon);
 		stageScene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 		pop.setScene(stageScene);
 		pop.show();

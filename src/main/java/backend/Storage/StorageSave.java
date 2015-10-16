@@ -2,7 +2,6 @@ package main.java.backend.Storage;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.TreeMap;
@@ -27,67 +26,66 @@ public class StorageSave extends StorageOperation {
 	private BufferedWriter bufferedWriter;
 	private FileWriter textFileWriter;
 	
-	public StorageSave() {
-		this(DEFAULT_FILE_LOCATION);
-	}
-	
-	public StorageSave(String fileName) {
-		this.CURRENT_FILE_LOCATION = fileName;
+	public StorageSave(String filePath) {
+		//String.format(CUSTOM_FILE_LOCATION, filePath);
 	}
 
-	private void initializeWriter() {
+	private void initializeWriter() throws StorageException {
 		
-		textFile = new File(CURRENT_FILE_LOCATION);
+		textFile = new File(CUSTOM_FILE_LOCATION);
 		try {
 			textFileWriter = new FileWriter(textFile);
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new StorageException();
 		}
 		bufferedWriter = new BufferedWriter(textFileWriter);
 	}
 
-	private void closeWriter() {
+	private void closeWriter() throws StorageException {
 		
 		try { 
 			bufferedWriter.flush();
 			textFileWriter.close();
 			bufferedWriter.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new StorageException();
 		}
 	}
 	
 	private void changeFileDirectory() {
-		
-		// TODO: Change to newFile(CURRENT_FILE_LOCATION) once bug resolved
-		if(!CURRENT_FILE_LOCATION.equals(DEFAULT_FILE_LOCATION)) {
-			File newFile = new File(DEFAULT_FILE_LOCATION);
-			System.out.println(newFile.getAbsolutePath());
-			textFile.renameTo(newFile);
-		}
+
+		File newFile = new File(CUSTOM_FILE_LOCATION);
+		System.out.println(newFile.getAbsolutePath());
+		textFile.renameTo(newFile);
 	}
 	
-	private void saveData(TreeMap<Integer, Task> allData) {
+	private void saveData(TreeMap<Integer, Task> allData) throws StorageException {
 		
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
 			bufferedWriter.write(mapper.writeValueAsString(allData));
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new StorageException();
 		}
 	}
 	
 	public TreeMap<Integer, Task> execute(TreeMap<Integer, Task> allData) {
 		
-		initializeWriter();
-		changeFileDirectory();
-		
-		if(allData != null) {
-			saveData(allData);
+		try {
+			initializeWriter();
+			changeFileDirectory();
+			
+			System.out.println("FINAL: " + CUSTOM_FILE_LOCATION);
+			
+			if(allData != null) {
+				saveData(allData);
+			}
+			
+			closeWriter();
+		} catch (StorageException e) {
+			e.getMessage();
 		}
-		
-		closeWriter();
 		
 		return allData;
 	}

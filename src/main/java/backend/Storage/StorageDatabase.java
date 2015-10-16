@@ -16,14 +16,9 @@ public class StorageDatabase implements Storage {
 	private StorageLoad load;
 	private StorageSave save;
 	
-	public void init() {
-		load = new StorageLoad();
-		save = new StorageSave();
-	}
-	
-	public void init(String fileName) {
-		load = new StorageLoad(fileName);
-		save = new StorageSave(fileName);
+	public void init(String filePath) {
+		load = new StorageLoad(filePath);
+		save = new StorageSave(filePath);
 	}
 	
 	public TreeMap<Integer, Task> load() {

@@ -27,6 +27,8 @@ public class StorageSave extends StorageOperation {
 	private FileWriter textFileWriter;
 	
 	public StorageSave(String filePath) {
+		
+		storageFormat = new StorageFormat();
 		//String.format(CUSTOM_FILE_LOCATION, filePath);
 	}
 
@@ -76,14 +78,12 @@ public class StorageSave extends StorageOperation {
 			initializeWriter();
 			changeFileDirectory();
 			
-			System.out.println("FINAL: " + CUSTOM_FILE_LOCATION);
-			
 			if(allData != null) {
-				saveData(allData);
+				bufferedWriter.write(storageFormat.serialize(allData));
 			}
 			
 			closeWriter();
-		} catch (StorageException e) {
+		} catch (IOException | StorageException e) {
 			e.getMessage();
 		}
 		

@@ -27,6 +27,7 @@ public class LogicFacade {
 	private static TreeMap<Integer, Task> futureState;
 	private static Stack<Command> historyStack;
 	private static Stack<Command> futureStack;
+	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
 	
 	private LogicFacade(String filename) {
 		initLogger();
@@ -60,33 +61,37 @@ public class LogicFacade {
 	}
 	
 	public String execute(String userInput) {
-		System.out.println("History stack size before command execution: "+historyStack.size());
-		ArrayList<String> parsedUserInput = parserComponent.parseInput(userInput);
-		Command commandObject = logicCommandHandler.parse(parsedUserInput);
-		System.out.println("CommandObject type: "+commandObject.getType());
-		System.out.println(commandObject.getType().equals(Command.Type.UNDO) == true);
-		String feedbackString = "";
-		switch (commandObject.getType()) {
-			case UNDO:
-				feedbackString = historyStack.peek().undo();
-				System.out.println(feedbackString);
-				System.out.println("historyStack size" + historyStack.size());
-				System.out.println("futureStack size" + futureStack.size());
-				futureStack.push(historyStack.pop());
-				break;
-			case REDO:
-				feedbackString = futureStack.peek().redo();
-				historyStack.push(futureStack.pop());
-				break;
-			case EXIT:
-				System.exit(0);
-			default:
-				feedbackString = commandObject.execute();
-				historyStack.push(commandObject);
+		try {
+			System.out.println("History stack size before command execution: "+historyStack.size());
+			ArrayList<String> parsedUserInput = parserComponent.parseInput(userInput);
+			Command commandObject = logicCommandHandler.parse(parsedUserInput);
+			System.out.println("CommandObject type: "+commandObject.getType());
+			String feedbackString = "";
+			switch (commandObject.getType()) {
+				case UNDO:
+					feedbackString = historyStack.peek().undo();
+					System.out.println(feedbackString);
+					System.out.println("historyStack size" + historyStack.size());
+					System.out.println("futureStack size" + futureStack.size());
+					futureStack.push(historyStack.pop());
+					break;
+				case REDO:
+					feedbackString = futureStack.peek().redo();
+					historyStack.push(futureStack.pop());
+					break;
+				case EXIT:
+					System.exit(0);
+				default:
+					feedbackString = commandObject.execute();
+					historyStack.push(commandObject);
+			}
+			getterSubComponent.updateIndex();
+			System.out.println("feedbackString: "+feedbackString);
+			System.out.println("History stack size after command execution: "+historyStack.size());
+			return feedbackString;
+		} catch (NullPointerException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
-		System.out.println("feedbackString: "+feedbackString);
-		System.out.println("History stack size after command execution: "+historyStack.size());
-		return feedbackString;
 	}
 	
 	public ArrayList<String> retrieveStringData(String dataType){

@@ -27,6 +27,9 @@ public class EditCommand extends Command {
 	private static final String EXECUTION_DONE_COMMAND_SUCCESSFUL = "Task %1$s is not completed";
 	private static Logger logicEditorLogger = Logger.getGlobal();	
 	private FileHandler logHandler;
+	private static TreeMap<Integer, Task> historyState;
+	private static TreeMap<Integer, Task> currentState;
+	private static TreeMap<Integer, Task> futureState;
 	
 	private TreeMap<Integer, Task> taskList;
 
@@ -52,7 +55,8 @@ public class EditCommand extends Command {
 		}
 
 	public String execute(){
-
+		System.out.println("i'm here");
+		historyState = storageComponent.load();
 		String feedbackString = "";
 		logicEditorLogger.info("Get Command Field: "+this.getCommandField());
 		switch(this.getCommandField()) {
@@ -93,7 +97,24 @@ public class EditCommand extends Command {
 				feedbackString = setDeadline(this);
 				break;
 		}
+		currentState = storageComponent.load();
 		return feedbackString;
+	}
+	
+	public String undo() {
+		futureState = currentState;
+		currentState = historyState;
+		System.out.println("Future state: "+futureState);
+		System.out.println("Current state: "+currentState);
+		storageComponent.save(currentState);
+		return "Undo successfully";
+	}
+	
+	public String redo() {
+		historyState = currentState;
+		currentState = futureState;
+		storageComponent.save(currentState);
+		return "Redo successfully";
 	}
 
 	private String priorityChecker(int priority) {
@@ -108,58 +129,66 @@ public class EditCommand extends Command {
 	private String setMultipleFieldsForTask(Command commandObject) {
 
 		logicEditorLogger.info("taskId: "+commandObject.getTaskName());
-		int taskId = Integer.parseInt(commandObject.getTaskName());
-		logicEditorLogger.info("taskId: "+taskId);
-		if (!commandObject.getDescription().equals("")) {
-			logicEditorLogger.info("Description: "+ commandObject.getDescription());
-			setDescription(commandObject);
+		try {
+			int taskId = Integer.parseInt(commandObject.getTaskName());
+			logicEditorLogger.info("taskId: "+taskId);
+			if (!commandObject.getDescription().equals("")) {
+				logicEditorLogger.info("Description: "+ commandObject.getDescription());
+				setDescription(commandObject);
+			}
+			if (!commandObject.getPriority().equals("")) {
+				logicEditorLogger.info("priority :"+commandObject.getPriority());
+				setPriority(commandObject);
+			}
+			if (!commandObject.getReminder().equals("")) {
+				logicEditorLogger.info("reminder: "+commandObject.getReminder());
+				setReminder(commandObject);
+			}
+			if(!commandObject.getCategory().equals("")) {
+				logicEditorLogger.info("category: "+commandObject.getCategory());
+				setCategory(commandObject);
+			}
+			if (!commandObject.getEndDateAndTime().equals("")) {
+				setDeadline(commandObject);
+				logicEditorLogger.info("deadline :"+commandObject.getEndDateAndTime());
+			}
+			return EXECUTION_SET_SUCCESSFUL;
+		} catch (NumberFormatException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
-		if (!commandObject.getPriority().equals("")) {
-			logicEditorLogger.info("priority :"+commandObject.getPriority());
-			setPriority(commandObject);
-		}
-		if (!commandObject.getReminder().equals("")) {
-			logicEditorLogger.info("reminder: "+commandObject.getReminder());
-			setReminder(commandObject);
-		}
-		if(!commandObject.getCategory().equals("")) {
-			logicEditorLogger.info("category: "+commandObject.getCategory());
-			setCategory(commandObject);
-		}
-		if (!commandObject.getEndDateAndTime().equals("")) {
-			setDeadline(commandObject);
-			logicEditorLogger.info("deadline :"+commandObject.getEndDateAndTime());
-		}
-		return EXECUTION_SET_SUCCESSFUL;
 	}
 
 	private String setMultipleFieldsForEvents(Command commandObject) {
 
-		int taskId = Integer.parseInt(commandObject.getTaskName());
-		logicEditorLogger.info("taskId: "+taskId);
-		if (!commandObject.getDescription().equals("")) {
-			logicEditorLogger.info("Description: "+ commandObject.getDescription());
-			setDescription(commandObject);
-		}
-		if (!commandObject.getPriority().equals("")) {
-			logicEditorLogger.info("priority :"+commandObject.getPriority());
-			setPriority(commandObject);
-		}
-		System.out.println("priority setted");
-		if (!commandObject.getReminder().equals("")) {
-			logicEditorLogger.info("reminder: "+commandObject.getReminder());
-			setReminder(commandObject);
-		}
-		if(!commandObject.getCategory().equals("")) {
-			logicEditorLogger.info("category: "+commandObject.getCategory());
-			setCategory(commandObject);
-		}
-		if (!commandObject.getStartDateAndTime().equals("") && 
-				!commandObject.getEndDateAndTime().equals("")) {
-			setEventStartAndEndTime(commandObject);
+		try {
+			int taskId = Integer.parseInt(commandObject.getTaskName());
+			logicEditorLogger.info("taskId: "+taskId);
+			if (!commandObject.getDescription().equals("")) {
+				logicEditorLogger.info("Description: "+ commandObject.getDescription());
+				setDescription(commandObject);
+			}
+			if (!commandObject.getPriority().equals("")) {
+				logicEditorLogger.info("priority :"+commandObject.getPriority());
+				setPriority(commandObject);
+			}
+			System.out.println("priority setted");
+			if (!commandObject.getReminder().equals("")) {
+				logicEditorLogger.info("reminder: "+commandObject.getReminder());
+				setReminder(commandObject);
+			}
+			if(!commandObject.getCategory().equals("")) {
+				logicEditorLogger.info("category: "+commandObject.getCategory());
+				setCategory(commandObject);
+			}
+			if (!commandObject.getStartDateAndTime().equals("") && 
+					!commandObject.getEndDateAndTime().equals("")) {
+				setEventStartAndEndTime(commandObject);
 
+			}
+			return EXECUTION_SET_SUCCESSFUL;
+		} catch (NumberFormatException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
-		return EXECUTION_SET_SUCCESSFUL;
 	}
 	
 	private TaskType getTaskType(Task task) {
@@ -186,43 +215,49 @@ public class EditCommand extends Command {
 	}
 
 	private String delete(Command commandObject) {
+		try{
+			taskList = storageComponent.load();
+			int taskIndex = Integer.parseInt(commandObject.getTaskName());
+			int taskId = getTaskId(taskIndex);
 
-		taskList = storageComponent.load();
-		int taskIndex = Integer.parseInt(commandObject.getTaskName());
-		int taskId = getTaskId(taskIndex);
+			if(taskList.containsKey(taskId)) {
+				taskList.remove(taskId);
+			}
 
-		if(taskList.containsKey(taskId)) {
-			taskList.remove(taskId);
+			storageComponent.save(taskList);
+			return String.format(EXECUTION_DELETE_SUCCESSFUL, taskIndex);
+		} catch (NumberFormatException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
-
-		storageComponent.save(taskList);
-
-		return String.format(EXECUTION_DELETE_SUCCESSFUL, taskIndex);
 	}
 	
-	public void setIndex(ArrayList<Task> list, int i, int taskIndex) {
-
-		int taskId = list.get(i).getTaskId();
-		taskList = storageComponent.load();
-		taskList.get(taskId).setIndex(taskIndex);
-		storageComponent.save(taskList);
-	}
+//	public void setIndex(ArrayList<Task> list, int i, int taskIndex) {
+//
+//		int taskId = list.get(i).getTaskId();
+//		taskList = storageComponent.load();
+//		taskList.get(taskId).setIndex(taskIndex);
+//		storageComponent.save(taskList);
+//	}
 
 	private String setPriority(Command commandObject){
+		System.out.println("I'm in priority");
+		try {
+			int taskIndex = Integer.parseInt(commandObject.getTaskName());
+			int priority = Integer.parseInt(commandObject.getPriority());
+			int taskId = getTaskId(taskIndex);
 
-		int taskIndex = Integer.parseInt(commandObject.getTaskName());
-		int priority = Integer.parseInt(commandObject.getPriority());
-		int taskId = getTaskId(taskIndex);
+			if (priorityChecker(priority) != null) {
+				return priorityChecker(priority);
+			}
+			
+			taskList = storageComponent.load();
+			taskList.get(taskId).setPriority(priority);
+			storageComponent.save(taskList);	
 
-		if (priorityChecker(priority) != null) {
-			return priorityChecker(priority);
+			return String.format(EXECUTION_SET_PRIORITY_SUCCESSFUL, taskId, priority);
+		} catch (NumberFormatException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
-		
-		taskList = storageComponent.load();
-		taskList.get(taskId).setPriority(priority);
-		storageComponent.save(taskList);	
-
-		return String.format(EXECUTION_SET_PRIORITY_SUCCESSFUL, taskId, priority);
 	}
 
 	/*
@@ -254,96 +289,114 @@ public class EditCommand extends Command {
 	}
 
 	private String setUndone(Command commandObject) {
+		try {
+			int taskIndex = Integer.parseInt(commandObject.getTaskName());
+			int taskId = getTaskId(taskIndex);
+			
+			taskList = storageComponent.load();
+			taskList.get(taskId).setDone(false);
+			storageComponent.save(taskList);
 
-		int taskIndex = Integer.parseInt(commandObject.getTaskName());
-		int taskId = getTaskId(taskIndex);
-		
-		taskList = storageComponent.load();
-		taskList.get(taskId).setDone(false);
-		storageComponent.save(taskList);
-
-		return String.format(EXECUTION_DONE_COMMAND_SUCCESSFUL, taskId);
+			return String.format(EXECUTION_DONE_COMMAND_SUCCESSFUL, taskId);
+		} catch (NumberFormatException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
 	}
 
 	private String setDone(Command commandObject) {
+		try {
+			int taskIndex = Integer.parseInt(commandObject.getTaskName());
+			int taskId = getTaskId(taskIndex);
+			
+			taskList = storageComponent.load();
+			taskList.get(taskId).setDone(true);
+			taskList.get(taskId).setIndex(-1);
+			storageComponent.save(taskList);
 
-		int taskIndex = Integer.parseInt(commandObject.getTaskName());
-		int taskId = getTaskId(taskIndex);
-		
-		taskList = storageComponent.load();
-		taskList.get(taskId).setDone(true);
-		taskList.get(taskId).setIndex(-1);
-		storageComponent.save(taskList);
-
-		return String.format(EXECUTION_UNDONE_COMMAND_SUCCESSFUL, taskId);
+			return String.format(EXECUTION_UNDONE_COMMAND_SUCCESSFUL, taskId);
+		} catch (NumberFormatException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
 	}
 
 	private String setReminder(Command commandObject) {
+		try {
+			int taskIndex = Integer.parseInt(commandObject.getTaskName());
+			String reminder = commandObject.getReminder();
+			int taskId = getTaskId(taskIndex);
+			
+			taskList = storageComponent.load();
+			taskList.get(taskId).setReminder(reminder);
+			storageComponent.save(taskList);
 
-		int taskIndex = Integer.parseInt(commandObject.getTaskName());
-		String reminder = commandObject.getReminder();
-		int taskId = getTaskId(taskIndex);
-		
-		taskList = storageComponent.load();
-		taskList.get(taskId).setReminder(reminder);
-		storageComponent.save(taskList);
-
-		return String.format(EXECUTION_SET_REMINDER_SUCCESSFUL,taskId,reminder);
+			return String.format(EXECUTION_SET_REMINDER_SUCCESSFUL,taskId,reminder);
+		} catch (NumberFormatException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
 	}
 
 	private String setDescription(Command commandObject) {
+		try {
+			int taskIndex = Integer.parseInt(commandObject.getTaskName());
+			String description = commandObject.getDescription();
+			int taskId = getTaskId(taskIndex);
+			
+			taskList = storageComponent.load();
+			taskList.get(taskId).setDescription(description);
+			storageComponent.save(taskList);
 
-		int taskIndex = Integer.parseInt(commandObject.getTaskName());
-		String description = commandObject.getDescription();
-		int taskId = getTaskId(taskIndex);
-		
-		taskList = storageComponent.load();
-		taskList.get(taskId).setDescription(description);
-		storageComponent.save(taskList);
-
-		return String.format(EXECUTION_SET_DESCRIPTION_SUCCESSFUL, taskId);
+			return String.format(EXECUTION_SET_DESCRIPTION_SUCCESSFUL, taskId);
+		} catch (NumberFormatException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
 	}
 
 	private String setEventStartAndEndTime(Command commandObject) {
+		try {
+			int eventIndex = Integer.parseInt(commandObject.getTaskName());
+			String start = commandObject.getStartDateAndTime();
+			String end = commandObject.getEndDateAndTime();
+			int taskId = getTaskId(eventIndex);
+			Task task = taskList.get(taskId);
 
-		int eventIndex = Integer.parseInt(commandObject.getTaskName());
-		String start = commandObject.getStartDateAndTime();
-		String end = commandObject.getEndDateAndTime();
-		int taskId = getTaskId(eventIndex);
-		Task task = taskList.get(taskId);
+			Command command = new Command();
+			command.setTaskName(Integer.toString(eventIndex));
+			delete(command);
 
-		Command command = new Command();
-		command.setTaskName(Integer.toString(eventIndex));
-		delete(command);
+			taskList = storageComponent.load();
+			task.setTaskType(TaskType.EVENT);
+			task.setStart(start);
+			task.setEnd(end);
+			taskList.put(taskId, task);
+			storageComponent.save(taskList);
 
-		taskList = storageComponent.load();
-		task.setTaskType(TaskType.EVENT);
-		task.setStart(start);
-		task.setEnd(end);
-		taskList.put(taskId, task);
-		storageComponent.save(taskList);
-
-		return String.format(EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL, eventIndex,start,end);
+			return String.format(EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL, eventIndex,start,end);
+		} catch (NumberFormatException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
 	}
 
 	private String setDeadline(Command commandObject) {
+		try {
+			int eventIndex = Integer.parseInt(commandObject.getTaskName());
+			String end = commandObject.getEndDateAndTime();
+			int taskId = getTaskId(eventIndex);
+			Task task = taskList.get(taskId);
 
-		int eventIndex = Integer.parseInt(commandObject.getTaskName());
-		String end = commandObject.getEndDateAndTime();
-		int taskId = getTaskId(eventIndex);
-		Task task = taskList.get(taskId);
+			Command command = new Command();
+			command.setTaskName(Integer.toString(eventIndex));
+			delete(command);
 
-		Command command = new Command();
-		command.setTaskName(Integer.toString(eventIndex));
-		delete(command);
-
-		taskList = storageComponent.load();
-		task.setEnd(end);
-		task.setTaskType(getTaskType(task));
-		taskList.put(taskId, task);
-		storageComponent.save(taskList);
-		
-		return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskId, end);
+			taskList = storageComponent.load();
+			task.setEnd(end);
+			task.setTaskType(getTaskType(task));
+			taskList.put(taskId, task);
+			storageComponent.save(taskList);
+			
+			return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskId, end);
+		} catch (NumberFormatException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
 	}
 	
 

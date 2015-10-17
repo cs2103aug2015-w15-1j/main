@@ -253,7 +253,7 @@ public class EditCommand extends Command {
 			taskList.get(taskId).setPriority(priority);
 			storageComponent.save(taskList);	
 
-			return String.format(EXECUTION_SET_PRIORITY_SUCCESSFUL, taskId, priority);
+			return String.format(EXECUTION_SET_PRIORITY_SUCCESSFUL, taskIndex, priority);
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}

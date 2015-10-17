@@ -13,6 +13,9 @@ public class AddCommand extends Command {
 	private static final String EXECUTION_COMMAND_SUCCESSFUL =  "Valid Command.";
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
 	private static final String CATEGORY_DEFAULT = "default";
+	private static TreeMap<Integer, Task> historyState;
+	private static TreeMap<Integer, Task> currentState;
+	private static TreeMap<Integer, Task> futureState;
 	
 	private TreeMap<Integer, Task> taskList;
 
@@ -24,9 +27,11 @@ public class AddCommand extends Command {
 	}
 	
 	public String execute() {	
-		System.out.println("I'm here");
+//		System.out.println("Future state before execution: "+futureState);
+//		System.out.println("Current state before execution: "+currentState);
+		historyState = storageComponent.load();
 		String feedbackString = new String();
-		System.out.println("execute commandObject.getCommandField: "+this.getCommandField());
+//		System.out.println("execute commandObject.getCommandField: "+this.getCommandField());
 		switch (this.getCommandField()) {
 			case ("addF") :
 				feedbackString = addTask(TaskType.FLOATING, this);
@@ -41,8 +46,27 @@ public class AddCommand extends Command {
 				feedbackString = addSubTask(this);
 				break;	
 		}
-		System.out.println("feedbackString in AddCommandObject: "+ feedbackString);
+		currentState = storageComponent.load();
+//		System.out.println("Future state after execution: "+futureState);
+//		System.out.println("Current state after execution: "+currentState);
+//		System.out.println("feedbackString in AddCommandObject: "+ feedbackString);
 		return feedbackString;
+	}
+	
+	public String undo() {
+		futureState = currentState;
+		currentState = historyState;
+		System.out.println("Future state: "+futureState);
+		System.out.println("Current state: "+currentState);
+		storageComponent.save(currentState);
+		return "Undo successfully";
+	}
+	
+	public String redo() {
+		historyState = currentState;
+		currentState = futureState;
+		storageComponent.save(currentState);
+		return "Redo successfully";
 	}
 	
 	private TreeMap<Integer, Task> generateTaskId() {
@@ -117,7 +141,6 @@ public class AddCommand extends Command {
 			taskList.put(taskList.size(), newTask);
 			storageComponent.save(taskList);
 		}
-		
 		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, newTask.getName());
 	}
 
@@ -126,6 +149,7 @@ public class AddCommand extends Command {
 		String taskName = commandObject.getTaskName();
 		String subTaskDescription = commandObject.getDescription();
 //		storageObject.addSubTask(taskName,subTaskDescription);
+		currentState = storageComponent.load();
 		return String.format(EXECUTION_ADD_SUBTASK_SUCCESSFUL, subTaskDescription,taskName);
 	}
 }

@@ -51,46 +51,46 @@ public class EditCommand extends Command {
 			}
 		}
 
-	public String execute(Command commandObject){
+	public String execute(){
 
 		String feedbackString = "";
-		logicEditorLogger.info("Get Command Field: "+commandObject.getCommandField());
-		switch(commandObject.getCommandField()) {
+		logicEditorLogger.info("Get Command Field: "+this.getCommandField());
+		switch(this.getCommandField()) {
 			case ("priority") :
-				feedbackString = setPriority(commandObject);
+				feedbackString = setPriority(this);
 				break;
 			case ("setT") :
-				feedbackString = setMultipleFieldsForTask(commandObject);
+				feedbackString = setMultipleFieldsForTask(this);
 				break;
 			case ("setE") :
-				feedbackString = setMultipleFieldsForEvents(commandObject);
+				feedbackString = setMultipleFieldsForEvents(this);
 				break;
 			case ("delete") :
-				feedbackString = delete(commandObject);
+				feedbackString = delete(this);
 				break;
 			case ("setCol") :
-//				feedbackString = setColour(commandObject);
+//				feedbackString = setColour(this);
 				break;
 			case ("category") :
-				feedbackString = setCategory(commandObject);
+				feedbackString = setCategory(this);
 				break;
 			case ("undone") :
-				feedbackString = setUndone(commandObject);
+				feedbackString = setUndone(this);
 				break;
 			case ("done") :
-				feedbackString = setDone(commandObject);
+				feedbackString = setDone(this);
 				break;
 			case ("reminder") :
-				feedbackString = setReminder(commandObject);
+				feedbackString = setReminder(this);
 				break;
 			case ("description") :
-				feedbackString = setDescription(commandObject);
+				feedbackString = setDescription(this);
 				break;
 			case ("event") :
-				feedbackString = setEventStartAndEndTime(commandObject);
+				feedbackString = setEventStartAndEndTime(this);
 				break;
 			case ("deadline") :
-				feedbackString = setDeadline(commandObject);
+				feedbackString = setDeadline(this);
 				break;
 		}
 		return feedbackString;

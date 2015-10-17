@@ -10,7 +10,7 @@ import java.util.logging.SimpleFormatter;
 
 import main.java.backend.Parser.Parser;
 import main.java.backend.Storage.Storage;
-import main.java.backend.Storage.StorageDatabase;
+import main.java.backend.Storage.StorageFacade;
 import main.java.backend.Storage.Task.Task;
 
 public class LogicFacade {
@@ -23,17 +23,21 @@ public class LogicFacade {
 	private static Parser parserComponent;
 	private static LogicCommandHandler logicCommandHandler;
 	private static TreeMap<Integer, Task> currentState;
-	private static TreeMap<Integer, Task> receivedFromHistoryState;
+	private static TreeMap<Integer, Task> historyState;
+	private static TreeMap<Integer, Task> futureState;
 	private static Stack<Command> historyStack;
+	private static Stack<Command> futureStack;
 	
 	private LogicFacade(String filename) {
 		initLogger();
-		storageComponent = new StorageDatabase();
+		storageComponent = new StorageFacade();
 		logicCommandHandler = LogicCommandHandler.getInstance(filename,storageComponent);
 		storageComponent.init(filename);
 		parserComponent = new Parser();
 		getterSubComponent = LogicGetter.getInstance(storageComponent);
 		historyStack = new Stack<Command>();
+		futureStack = new Stack<Command>();
+		currentState = storageComponent.load();
 	}
 	
 	public static LogicFacade getInstance(String filename) {
@@ -56,12 +60,32 @@ public class LogicFacade {
 	}
 	
 	public String execute(String userInput) {
+		System.out.println("History stack size before command execution: "+historyStack.size());
 		ArrayList<String> parsedUserInput = parserComponent.parseInput(userInput);
 		Command commandObject = logicCommandHandler.parse(parsedUserInput);
 		System.out.println("CommandObject type: "+commandObject.getType());
-		String feedbackString = commandObject.execute();
+		System.out.println(commandObject.getType().equals(Command.Type.UNDO) == true);
+		String feedbackString = "";
+		switch (commandObject.getType()) {
+			case UNDO:
+				feedbackString = historyStack.peek().undo();
+				System.out.println(feedbackString);
+				System.out.println("historyStack size" + historyStack.size());
+				System.out.println("futureStack size" + futureStack.size());
+				futureStack.push(historyStack.pop());
+				break;
+			case REDO:
+				feedbackString = futureStack.peek().redo();
+				historyStack.push(futureStack.pop());
+				break;
+			case EXIT:
+				System.exit(0);
+			default:
+				feedbackString = commandObject.execute();
+				historyStack.push(commandObject);
+		}
 		System.out.println("feedbackString: "+feedbackString);
-		historyStack.push(commandObject);
+		System.out.println("History stack size after command execution: "+historyStack.size());
 		return feedbackString;
 	}
 	
@@ -79,9 +103,9 @@ public class LogicFacade {
 		return getterSubComponent.retrieveTaskData(dataType);
 	}
 	
-	public void updateTaskNumbering(ArrayList<Task> list, int i, int taskIndex) {
-		historyStack.peek().setIndex(list, i, taskIndex);
-	}
+//	public void updateTaskNumbering(ArrayList<Task> list, int i, int taskIndex) {
+//		getterSubComponent.setIndex(list, i, taskIndex);
+//	}
 	
 	private void updateCurrentState() {
 		currentState = storageComponent.load();

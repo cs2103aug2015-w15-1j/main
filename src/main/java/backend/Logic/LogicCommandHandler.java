@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.TreeMap;
 
 import main.java.backend.Storage.Storage;
-import main.java.backend.Storage.StorageDatabase;
 import main.java.backend.Storage.Task.Task;
 
 public class LogicCommandHandler {
@@ -18,6 +17,7 @@ public class LogicCommandHandler {
 	private static final String COMMAND_VIEW = "view";
 	private static final String COMMAND_EXIT = "exit";
 	private static final String COMMAND_UNDO = "undo";
+	private static final String COMMAND_REDO = "redo";
 	private static final String[] addKeywords = new String[] {"addF", "addT",
 			"addE", "adds", "addcat"};
 	private static final String[] editKeywords = new String[] {"set", "setT", 
@@ -63,13 +63,16 @@ public class LogicCommandHandler {
 			case COMMAND_UNDO:
 				commandObject = initUndoCommand(parsedUserInput);
 				break;
+			case COMMAND_REDO:
+				commandObject = initRedoCommand(parsedUserInput);
+				break;
 //			case COMMAND_VIEW:
 //				commandObject = initViewCommand(parsedUserInput);
 //				break;
 		}
 	return commandObject;
 	}
-	
+
 	private String determineCommandType(String commandGiven) {
 		String commandString = "";
 		if (Arrays.asList(addKeywords).contains(commandGiven)){
@@ -86,6 +89,8 @@ public class LogicCommandHandler {
 			commandString = COMMAND_EXIT;
 		} else if (commandGiven.contains(COMMAND_UNDO)) {
 			commandString = COMMAND_UNDO;
+		} else if (commandGiven.contains(COMMAND_REDO)) {
+			commandString = COMMAND_REDO;
 		}
 		return commandString;
 	}
@@ -95,8 +100,15 @@ public class LogicCommandHandler {
 //		viewCommandObject.setCommandField(parsedUserInput.get(0));
 //		return viewCommandObject;
 //	}
+	
+	private Command initRedoCommand(ArrayList<String> parsedUserInput) {
+		Command redoCommandObject = new Command(Command.Type.REDO);
+		redoCommandObject.setCommandField(parsedUserInput.get(0));
+		return redoCommandObject;
+	}
 
 	private Command initUndoCommand(ArrayList<String> parsedUserInput) {
+//		System.out.println("Initialising undoCommandObject");
 		Command undoCommandObject = new Command(Command.Type.UNDO);
 		undoCommandObject.setCommandField(parsedUserInput.get(0));
 		return undoCommandObject;

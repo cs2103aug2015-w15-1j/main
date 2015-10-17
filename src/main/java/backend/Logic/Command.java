@@ -1,6 +1,7 @@
 package main.java.backend.Logic;
 
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 import main.java.backend.Storage.Task.Task;
 
@@ -21,6 +22,9 @@ public class Command {
 	private String endDateAndTime = "";
 	private String keywords = "";
 	private String colour = "";
+	private static TreeMap<Integer, Task> historyState;
+	private static TreeMap<Integer, Task> currentState;
+	private static TreeMap<Integer, Task> futureState;
 	private final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     // ================================================================
@@ -84,6 +88,18 @@ public class Command {
 	public void setColour(String colourInput) {
 		this.colour = colourInput;
 	}
+	
+	public void setHistoryState(TreeMap<Integer, Task> history) {
+		historyState = history;
+	}
+	
+	public void setCurrentState(TreeMap<Integer, Task> current) {
+		currentState = current;
+	}
+	
+	public void setFutureState(TreeMap<Integer, Task> future) {
+		futureState = future;
+	}
 
 	public Type getType() {
 		return this.type;
@@ -144,6 +160,18 @@ public class Command {
 		format.append("colour: "+ getColour() + LINE_SEPARATOR);
 		return format.toString();
 	}
+	
+	public TreeMap<Integer, Task> getHistoryState() {
+		return historyState;
+	}
+	
+	public TreeMap<Integer, Task> getCurrentState() {
+		return currentState;
+	}
+	
+	public TreeMap<Integer, Task> getFutureState() {
+		return futureState;
+	}
 
 
 	public String execute() {
@@ -155,5 +183,15 @@ public class Command {
 	public void setIndex(ArrayList<Task> list, int i, int taskIndex) {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+	public String undo() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public String redo() {
+		return null;
 	}
 }

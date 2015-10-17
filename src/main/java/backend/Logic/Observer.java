@@ -11,7 +11,7 @@ import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
 import main.java.backend.Storage.Task.TaskType;
 
-public class LogicGetter {
+public class Observer {
 	
 	private static final SimpleDateFormat formatterForDateTime = 
 			new SimpleDateFormat("EEE, dd MMM hh:mma");
@@ -20,20 +20,32 @@ public class LogicGetter {
 	
 	private static final long DAY_IN_MILLISECOND = 86400000L;
 
-	private static LogicGetter logicGetterObject;
+	private static Observer logicGetterObject;
 	private Storage storage;
 	
 	private TreeMap<Integer, Task> taskList;
+	private ArrayList<Task> getTasks;
+	private ArrayList<Task> getEvents;
+	private ArrayList<Task> getOverdue;
+	private ArrayList<Task> getFloat;
+	private ArrayList<String> getCate;
+	private ArrayList<Task> getTodayTasks;
+	private ArrayList<Task> getTodayEvents;
+	private ArrayList<Task> getFocusList;
 	
-	public static LogicGetter getInstance(Storage storageComponent) {
+	private ArrayList<Task> getCompletedTasks;
+	private ArrayList<Task> getCompletedEvents;
+	private ArrayList<Task> getCompletedFloat;
+	
+	public static Observer getInstance(Storage storageComponent) {
 		
 		if (logicGetterObject == null) {
-			logicGetterObject = new LogicGetter(storageComponent);
+			logicGetterObject = new Observer(storageComponent);
 		}
 		return logicGetterObject;
 	}
 
-	private LogicGetter(Storage storage) {
+	private Observer(Storage storage) {
 		this.storage = storage;
 	}
 	
@@ -315,6 +327,54 @@ public class LogicGetter {
 				break;
 		}
 		return data;
+	}
+	
+	void retrieveAllData(){
+		getTasks = retrieveTaskData("upcomingToDo");
+		assert getTasks!=null;
+		getEvents = retrieveTaskData("upcomingEvents");
+		assert getEvents!=null;
+		getOverdue = retrieveTaskData("overdueTasks");
+		assert getOverdue!=null;
+		getFloat = retrieveTaskData("floating");
+		assert getFloat!=null;
+		getCate = retrieveStringData("categories");
+		assert getCate!=null;
+		retrieveTodays();
+		retrieveCompletes();
+	}
+	
+	void retrieveCompletes(){
+		getCompletedTasks = retrieveTaskData("completedToDo");
+		getCompletedEvents = retrieveTaskData("pastEvents");
+		getCompletedFloat= retrieveTaskData("completedFloats");
+	}
+	void retrieveTodays(){
+		getTodayTasks = retrieveTaskData("todayToDos");
+		getTodayEvents = retrieveTaskData("todayEvents");
+	}
+	
+	void updateIndex(){
+		retrieveAllData();
+		int a = getTasks.size(), b = getEvents.size(),c = getOverdue.size(),
+				d = getFloat.size(), e = getCompletedTasks.size(), f = getCompletedEvents.size();
+		setIndex(getTasks, 0);
+		setIndex(getEvents,a);
+		setIndex(getOverdue,a+b);
+		setIndex(getFloat, a+b+c);
+		setIndex(getCompletedTasks,a+b+c+d);
+		setIndex(getCompletedEvents, a+b+c+d+e);
+		setIndex(getCompletedFloat, a+b+c+d+e+f);
+		System.out.println("update Index a: "+a);
+	}
+	
+	void setIndex(ArrayList<Task> list, int taskIndex) {
+		for (int i=0;i<list.size();i++){ 
+			int taskId = list.get(i).getTaskId();
+			taskList = storage.load();
+			taskList.get(taskId).setIndex(++taskIndex);
+			storage.save(taskList);
+		}
 	}
 	
 }

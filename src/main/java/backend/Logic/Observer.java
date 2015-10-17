@@ -11,7 +11,7 @@ import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
 import main.java.backend.Storage.Task.TaskType;
 
-public class LogicGetter {
+public class Observer {
 	
 	private static final SimpleDateFormat formatterForDateTime = 
 			new SimpleDateFormat("EEE, dd MMM hh:mma");
@@ -20,7 +20,7 @@ public class LogicGetter {
 	
 	private static final long DAY_IN_MILLISECOND = 86400000L;
 
-	private static LogicGetter logicGetterObject;
+	private static Observer logicGetterObject;
 	private Storage storage;
 	
 	private TreeMap<Integer, Task> taskList;
@@ -37,15 +37,15 @@ public class LogicGetter {
 	private ArrayList<Task> getCompletedEvents;
 	private ArrayList<Task> getCompletedFloat;
 	
-	public static LogicGetter getInstance(Storage storageComponent) {
+	public static Observer getInstance(Storage storageComponent) {
 		
 		if (logicGetterObject == null) {
-			logicGetterObject = new LogicGetter(storageComponent);
+			logicGetterObject = new Observer(storageComponent);
 		}
 		return logicGetterObject;
 	}
 
-	private LogicGetter(Storage storage) {
+	private Observer(Storage storage) {
 		this.storage = storage;
 	}
 	

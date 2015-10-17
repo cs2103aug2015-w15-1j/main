@@ -1,5 +1,6 @@
 package main.java.backend.Logic;
 
+import java.util.EmptyStackException;
 import java.util.TreeMap;
 
 import main.java.backend.Storage.Storage;
@@ -54,19 +55,27 @@ public class AddCommand extends Command {
 	}
 	
 	public String undo() {
-		futureState = currentState;
-		currentState = historyState;
-		System.out.println("Future state: "+futureState);
-		System.out.println("Current state: "+currentState);
-		storageComponent.save(currentState);
-		return "Undo successfully";
+		try {
+			futureState = currentState;
+			currentState = historyState;
+			System.out.println("Future state: "+futureState);
+			System.out.println("Current state: "+currentState);
+			storageComponent.save(historyState);
+			return "Undo successfully";
+		} catch (EmptyStackException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
 	}
 	
 	public String redo() {
-		historyState = currentState;
-		currentState = futureState;
-		storageComponent.save(currentState);
-		return "Redo successfully";
+		try {
+			historyState = currentState;
+			currentState = futureState;
+			storageComponent.save(currentState);
+			return "Redo successfully";
+		} catch (EmptyStackException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
 	}
 	
 	private TreeMap<Integer, Task> generateTaskId() {

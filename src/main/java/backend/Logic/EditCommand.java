@@ -2,6 +2,7 @@ package main.java.backend.Logic;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EmptyStackException;
 import java.util.TreeMap;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
@@ -55,7 +56,6 @@ public class EditCommand extends Command {
 		}
 
 	public String execute(){
-		System.out.println("i'm here");
 		historyState = storageComponent.load();
 		String feedbackString = "";
 		logicEditorLogger.info("Get Command Field: "+this.getCommandField());
@@ -102,19 +102,27 @@ public class EditCommand extends Command {
 	}
 	
 	public String undo() {
-		futureState = currentState;
-		currentState = historyState;
-		System.out.println("Future state: "+futureState);
-		System.out.println("Current state: "+currentState);
-		storageComponent.save(currentState);
-		return "Undo successfully";
+		try {
+			futureState = currentState;
+			currentState = historyState;
+			System.out.println("Future state: "+futureState);
+			System.out.println("Current state: "+currentState);
+			storageComponent.save(historyState);
+			return "Undo successfully";
+		} catch (EmptyStackException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
 	}
 	
 	public String redo() {
-		historyState = currentState;
-		currentState = futureState;
-		storageComponent.save(currentState);
-		return "Redo successfully";
+		try {
+			historyState = currentState;
+			currentState = futureState;
+			storageComponent.save(currentState);
+			return "Redo successfully";
+		} catch (EmptyStackException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
 	}
 
 	private String priorityChecker(int priority) {
@@ -171,7 +179,7 @@ public class EditCommand extends Command {
 				logicEditorLogger.info("priority :"+commandObject.getPriority());
 				setPriority(commandObject);
 			}
-			System.out.println("priority setted");
+//			System.out.println("priority setted");
 			if (!commandObject.getReminder().equals("")) {
 				logicEditorLogger.info("reminder: "+commandObject.getReminder());
 				setReminder(commandObject);
@@ -232,7 +240,6 @@ public class EditCommand extends Command {
 	}
 
 	private String setPriority(Command commandObject){
-		System.out.println("I'm in priority");
 		try {
 			taskList = storageComponent.load();
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
@@ -248,7 +255,6 @@ public class EditCommand extends Command {
 
 			return String.format(EXECUTION_SET_PRIORITY_SUCCESSFUL, taskId, priority);
 		} catch (NumberFormatException e) {
-			System.out.println(e.getMessage());
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}

@@ -37,7 +37,7 @@ public class LogicCommandHandler {
 
 	public Command parse(ArrayList<String> parsedUserInput) {
 		String determinedCommandType = determineCommandType(parsedUserInput.get(0));
-		System.out.println("determined Command Type: "+determinedCommandType);
+//		System.out.println("determined Command Type: "+determinedCommandType);
 		Command commandObject = new Command();
 		switch (determinedCommandType) {
 			case COMMAND_ADD:
@@ -197,10 +197,6 @@ public class LogicCommandHandler {
 				editCommandObject.setPriority(parsedUserInput.get(2));
 		}
 		return editCommandObject;
-	}
-
-	private void exit() {
-		System.exit(0);
 	}
 
 }

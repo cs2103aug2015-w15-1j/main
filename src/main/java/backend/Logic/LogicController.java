@@ -18,7 +18,7 @@ public class LogicController {
 	private static LogicCommandHandler commandHandlerSubComponent;
 	private static LogicCreator creatorSubComponent;
 	private static LogicEditor editorSubComponent;
-	private static LogicGetter getterSubComponent;
+	private static Observer getterSubComponent;
 	private static LogicSorter sorterSubComponent;
 	private static Storage storageComponent;
 	private static Parser parserComponent;
@@ -42,7 +42,7 @@ public class LogicController {
 		commandHandlerSubComponent = new LogicCommandHandler(parserComponent);
 		creatorSubComponent = LogicCreator.getInstance(storageComponent);
 		editorSubComponent = LogicEditor.getInstance(storageComponent);
-		getterSubComponent = LogicGetter.getInstance(storageComponent);
+		getterSubComponent = Observer.getInstance(storageComponent);
 		updateCurrentState();
 		updateHistoryStack();
 		initLogger();

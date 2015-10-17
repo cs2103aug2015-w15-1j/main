@@ -230,18 +230,11 @@ public class EditCommand extends Command {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-	
-//	public void setIndex(ArrayList<Task> list, int i, int taskIndex) {
-//
-//		int taskId = list.get(i).getTaskId();
-//		taskList = storageComponent.load();
-//		taskList.get(taskId).setIndex(taskIndex);
-//		storageComponent.save(taskList);
-//	}
 
 	private String setPriority(Command commandObject){
 		System.out.println("I'm in priority");
 		try {
+			taskList = storageComponent.load();
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			int priority = Integer.parseInt(commandObject.getPriority());
 			int taskId = getTaskId(taskIndex);
@@ -250,12 +243,12 @@ public class EditCommand extends Command {
 				return priorityChecker(priority);
 			}
 			
-			taskList = storageComponent.load();
 			taskList.get(taskId).setPriority(priority);
 			storageComponent.save(taskList);	
 
 			return String.format(EXECUTION_SET_PRIORITY_SUCCESSFUL, taskId, priority);
 		} catch (NumberFormatException e) {
+			System.out.println(e.getMessage());
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
@@ -276,12 +269,11 @@ public class EditCommand extends Command {
 	*/
 
 	private String setCategory(Command commandObject) {
-
+		taskList = storageComponent.load();
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
 		String categoryName = commandObject.getCategory();
 		int taskId = getTaskId(taskIndex);
 
-		taskList = storageComponent.load();
 		taskList.get(taskId).setCategoryName(categoryName);
 		storageComponent.save(taskList);
 
@@ -290,10 +282,10 @@ public class EditCommand extends Command {
 
 	private String setUndone(Command commandObject) {
 		try {
+			taskList = storageComponent.load();
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			int taskId = getTaskId(taskIndex);
 			
-			taskList = storageComponent.load();
 			taskList.get(taskId).setDone(false);
 			storageComponent.save(taskList);
 
@@ -305,10 +297,10 @@ public class EditCommand extends Command {
 
 	private String setDone(Command commandObject) {
 		try {
+			taskList = storageComponent.load();
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			int taskId = getTaskId(taskIndex);
 			
-			taskList = storageComponent.load();
 			taskList.get(taskId).setDone(true);
 			taskList.get(taskId).setIndex(-1);
 			storageComponent.save(taskList);
@@ -321,11 +313,10 @@ public class EditCommand extends Command {
 
 	private String setReminder(Command commandObject) {
 		try {
+			taskList = storageComponent.load();
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			String reminder = commandObject.getReminder();
 			int taskId = getTaskId(taskIndex);
-			
-			taskList = storageComponent.load();
 			taskList.get(taskId).setReminder(reminder);
 			storageComponent.save(taskList);
 
@@ -337,11 +328,10 @@ public class EditCommand extends Command {
 
 	private String setDescription(Command commandObject) {
 		try {
+			taskList = storageComponent.load();
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			String description = commandObject.getDescription();
 			int taskId = getTaskId(taskIndex);
-			
-			taskList = storageComponent.load();
 			taskList.get(taskId).setDescription(description);
 			storageComponent.save(taskList);
 
@@ -353,6 +343,7 @@ public class EditCommand extends Command {
 
 	private String setEventStartAndEndTime(Command commandObject) {
 		try {
+			taskList = storageComponent.load();
 			int eventIndex = Integer.parseInt(commandObject.getTaskName());
 			String start = commandObject.getStartDateAndTime();
 			String end = commandObject.getEndDateAndTime();
@@ -362,8 +353,6 @@ public class EditCommand extends Command {
 			Command command = new Command();
 			command.setTaskName(Integer.toString(eventIndex));
 			delete(command);
-
-			taskList = storageComponent.load();
 			task.setTaskType(TaskType.EVENT);
 			task.setStart(start);
 			task.setEnd(end);
@@ -378,6 +367,7 @@ public class EditCommand extends Command {
 
 	private String setDeadline(Command commandObject) {
 		try {
+			taskList = storageComponent.load();
 			int eventIndex = Integer.parseInt(commandObject.getTaskName());
 			String end = commandObject.getEndDateAndTime();
 			int taskId = getTaskId(eventIndex);
@@ -386,8 +376,6 @@ public class EditCommand extends Command {
 			Command command = new Command();
 			command.setTaskName(Integer.toString(eventIndex));
 			delete(command);
-
-			taskList = storageComponent.load();
 			task.setEnd(end);
 			task.setTaskType(getTaskType(task));
 			taskList.put(taskId, task);

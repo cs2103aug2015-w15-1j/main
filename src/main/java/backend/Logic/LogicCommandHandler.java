@@ -2,10 +2,7 @@ package main.java.backend.Logic;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.TreeMap;
-
 import main.java.backend.Storage.Storage;
-import main.java.backend.Storage.Task.Task;
 
 public class LogicCommandHandler {
 	private static LogicCommandHandler commandHandler;
@@ -24,13 +21,11 @@ public class LogicCommandHandler {
 			"setE", "deadline", "event", "description", "reminder", "done", "undone",
 			"category","setCol","delete", "priority"};
 	private static final String[] sortKeywords = new String[] {"sortp", "sortd"};
-	private static final String[] viewKeywords = new String[] {"showCat", "showf",
-			"showt", "showe"};
-	private static LogicHistory historySubComponent;
-
+	private static final String[] viewKeywords = new String[] {"showCat", "show float",
+			"show tasks", "show events", "show overdue"};
 	private LogicCommandHandler(String filename, Storage storage) {
 		storageComponent = storage;
-		historySubComponent = LogicHistory.getInstance();
+		LogicHistory.getInstance();
 	}
 
 	public static LogicCommandHandler getInstance(String filename, Storage storage) {
@@ -66,9 +61,9 @@ public class LogicCommandHandler {
 			case COMMAND_REDO:
 				commandObject = initRedoCommand(parsedUserInput);
 				break;
-//			case COMMAND_VIEW:
-//				commandObject = initViewCommand(parsedUserInput);
-//				break;
+			case COMMAND_VIEW:
+				commandObject = initViewCommand(parsedUserInput);
+				break;
 		}
 	return commandObject;
 	}
@@ -95,11 +90,11 @@ public class LogicCommandHandler {
 		return commandString;
 	}
 
-//	private Command initViewCommand(ArrayList<String> parsedUserInput) {
-//		Command viewCommandObject = new ViewCommand(Command.Type.VIEW,storageComponent);
-//		viewCommandObject.setCommandField(parsedUserInput.get(0));
-//		return viewCommandObject;
-//	}
+	private Command initViewCommand(ArrayList<String> parsedUserInput) {
+		Command viewCommandObject = new ViewCommand(Command.Type.VIEW,storageComponent);
+		viewCommandObject.setCommandField(parsedUserInput.get(0));
+		return viewCommandObject;
+	}
 	
 	private Command initRedoCommand(ArrayList<String> parsedUserInput) {
 		Command redoCommandObject = new Command(Command.Type.REDO);
@@ -203,38 +198,9 @@ public class LogicCommandHandler {
 		}
 		return editCommandObject;
 	}
-	
-//	private String undo() {
-//		
-//		receivedFromHistoryState = historySubComponent.undo();
-//		assert(receivedFromHistoryState != null);
-//		if (receivedFromHistoryState == null) {
-//			return "There are no more Undos";
-//		}
-//		
-//		currentState = receivedFromHistoryState;
-//		storageComponent.save(currentState);
-//		return "Undo successful";
-//	}
-//	
-//	private String redo() {
-//		System.out.println("redoing");
-//		receivedFromHistoryState = historySubComponent.redo();
-//		assert(receivedFromHistoryState != null);
-//		if (receivedFromHistoryState == null) {
-//			return "There are no more Redos";
-//		}
-//		currentState = receivedFromHistoryState;
-//		storageComponent.save(currentState);
-//		return "Redo successful";
-//	}
 
 	private void exit() {
 		System.exit(0);
 	}
-	
-//	public ArrayList<String> retrieveStringData(String dataType){
-//		return getterSubComponent.retrieveStringData(dataType);
-//	}
 
 }

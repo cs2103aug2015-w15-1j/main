@@ -79,6 +79,8 @@ public class LogicFacade {
 					feedbackString = futureStack.peek().redo();
 					historyStack.push(futureStack.pop());
 					break;
+				case VIEW:
+					feedbackString = commandObject.getCommandField();
 				case EXIT:
 					System.exit(0);
 				default:
@@ -112,12 +114,12 @@ public class LogicFacade {
 //		getterSubComponent.setIndex(list, i, taskIndex);
 //	}
 	
+//	public ArrayList<String> retrieveStringData(String dataType){
+//		return getterSubComponent.retrieveStringData(dataType);
+//}
+	
 	private void updateCurrentState() {
 		currentState = storageComponent.load();
 	}
-	
-//	private void updateHistoryStack() {
-//		historySubComponent.push(currentState);
-//	}
 
 }

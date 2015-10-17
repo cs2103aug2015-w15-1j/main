@@ -230,6 +230,8 @@ public class EditCommand extends Command {
 
 			if(taskList.containsKey(taskId)) {
 				taskList.remove(taskId);
+			} else {
+				return EXECUTION_COMMAND_UNSUCCESSFUL;
 			}
 
 			storageComponent.save(taskList);

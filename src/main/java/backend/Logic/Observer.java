@@ -365,7 +365,7 @@ public class Observer {
 		setIndex(getCompletedTasks,a+b+c+d);
 		setIndex(getCompletedEvents, a+b+c+d+e);
 		setIndex(getCompletedFloat, a+b+c+d+e+f);
-		System.out.println("update Index a: "+a);
+//		System.out.println("update Index a: "+a);
 	}
 	
 	void setIndex(ArrayList<Task> list, int taskIndex) {

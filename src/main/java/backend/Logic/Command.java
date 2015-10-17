@@ -1,5 +1,9 @@
 package main.java.backend.Logic;
 
+import java.util.ArrayList;
+
+import main.java.backend.Storage.Task.Task;
+
 public class Command {
 	
 	public enum Type {
@@ -145,5 +149,11 @@ public class Command {
 	public String execute() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+
+	public void setIndex(ArrayList<Task> list, int i, int taskIndex) {
+		// TODO Auto-generated method stub
+		
 	}
 }

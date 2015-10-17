@@ -23,25 +23,25 @@ public class AddCommand extends Command {
 		storageComponent = storage;
 	}
 	
-	public String execute(Command commandObject) {
-		
+	public String execute() {	
+		System.out.println("I'm here");
 		String feedbackString = new String();
-		
-		switch (commandObject.getCommandField()) {
+		System.out.println("execute commandObject.getCommandField: "+this.getCommandField());
+		switch (this.getCommandField()) {
 			case ("addF") :
-				feedbackString = addTask(TaskType.FLOATING, commandObject);
+				feedbackString = addTask(TaskType.FLOATING, this);
 				break;
 			case ("addT") :
-				feedbackString = addTask(TaskType.TODO, commandObject);
+				feedbackString = addTask(TaskType.TODO, this);
 				break;	
 			case ("addE") :
-				feedbackString = addTask(TaskType.EVENT, commandObject);
+				feedbackString = addTask(TaskType.EVENT, this);
 				break;
 			case ("addS"):
-				feedbackString = addSubTask(commandObject);
+				feedbackString = addSubTask(this);
 				break;	
 		}
-		
+		System.out.println("feedbackString in AddCommandObject: "+ feedbackString);
 		return feedbackString;
 	}
 	

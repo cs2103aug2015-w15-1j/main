@@ -1,6 +1,7 @@
 package main.java.backend.Logic;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.TreeMap;
 
 import main.java.backend.Storage.Storage;
@@ -25,26 +26,23 @@ public class LogicCommandHandler {
 	private static final String[] sortKeywords = new String[] {"sortp", "sortd"};
 	private static final String[] viewKeywords = new String[] {"showCat", "showf",
 			"showt", "showe"};
-	private static TreeMap<Integer, Task> currentState;
-	private static TreeMap<Integer, Task> receivedFromHistoryState;
 	private static LogicHistory historySubComponent;
 
-	private LogicCommandHandler(String filename) {
-		commandHandler = new LogicCommandHandler(filename);
-		storageComponent = new StorageDatabase();
-		storageComponent.init(filename);
+	private LogicCommandHandler(String filename, Storage storage) {
+		storageComponent = storage;
 		historySubComponent = LogicHistory.getInstance();
 	}
 
-	public static LogicCommandHandler getInstance(String filename) {
+	public static LogicCommandHandler getInstance(String filename, Storage storage) {
 		if (commandHandler == null) {
-			commandHandler = new LogicCommandHandler(filename);
+			commandHandler = new LogicCommandHandler(filename,storage);
 		}
 		return commandHandler;
 	}
 
 	public Command parse(ArrayList<String> parsedUserInput) {
-		String determinedCommandType = parsedUserInput.get(0);
+		String determinedCommandType = determineCommandType(parsedUserInput.get(0));
+		System.out.println("determined Command Type: "+determinedCommandType);
 		Command commandObject = new Command();
 		switch (determinedCommandType) {
 			case COMMAND_ADD:
@@ -65,18 +63,38 @@ public class LogicCommandHandler {
 			case COMMAND_UNDO:
 				commandObject = initUndoCommand(parsedUserInput);
 				break;
-			case COMMAND_VIEW:
-				commandObject = initViewCommand(parsedUserInput);
-				break;
+//			case COMMAND_VIEW:
+//				commandObject = initViewCommand(parsedUserInput);
+//				break;
 		}
 	return commandObject;
 	}
-
-	private Command initViewCommand(ArrayList<String> parsedUserInput) {
-		Command viewCommandObject = new ViewCommand(Command.Type.VIEW,storageComponent);
-		viewCommandObject.setCommandField(parsedUserInput.get(0));
-		return viewCommandObject;
+	
+	private String determineCommandType(String commandGiven) {
+		String commandString = "";
+		if (Arrays.asList(addKeywords).contains(commandGiven)){
+			commandString =  COMMAND_ADD;
+		} else if (Arrays.asList(editKeywords).contains(commandGiven)) {
+			commandString = COMMAND_EDIT;
+		} else if (Arrays.asList(sortKeywords).contains(commandGiven)) {
+			commandString = COMMAND_SORT;
+		} else if (commandGiven.contains(COMMAND_SEARCH)) {
+			commandString = COMMAND_SEARCH;
+		} else if (Arrays.asList(viewKeywords).contains(commandGiven)) {
+			commandString = COMMAND_VIEW;
+		} else if (commandGiven.contains(COMMAND_EXIT)) {
+			commandString = COMMAND_EXIT;
+		} else if (commandGiven.contains(COMMAND_UNDO)) {
+			commandString = COMMAND_UNDO;
+		}
+		return commandString;
 	}
+
+//	private Command initViewCommand(ArrayList<String> parsedUserInput) {
+//		Command viewCommandObject = new ViewCommand(Command.Type.VIEW,storageComponent);
+//		viewCommandObject.setCommandField(parsedUserInput.get(0));
+//		return viewCommandObject;
+//	}
 
 	private Command initUndoCommand(ArrayList<String> parsedUserInput) {
 		Command undoCommandObject = new Command(Command.Type.UNDO);
@@ -174,30 +192,30 @@ public class LogicCommandHandler {
 		return editCommandObject;
 	}
 	
-	private String undo() {
-		
-		receivedFromHistoryState = historySubComponent.undo();
-		assert(receivedFromHistoryState != null);
-		if (receivedFromHistoryState == null) {
-			return "There are no more Undos";
-		}
-		
-		currentState = receivedFromHistoryState;
-		storageComponent.save(currentState);
-		return "Undo successful";
-	}
-	
-	private String redo() {
-		System.out.println("redoing");
-		receivedFromHistoryState = historySubComponent.redo();
-		assert(receivedFromHistoryState != null);
-		if (receivedFromHistoryState == null) {
-			return "There are no more Redos";
-		}
-		currentState = receivedFromHistoryState;
-		storageComponent.save(currentState);
-		return "Redo successful";
-	}
+//	private String undo() {
+//		
+//		receivedFromHistoryState = historySubComponent.undo();
+//		assert(receivedFromHistoryState != null);
+//		if (receivedFromHistoryState == null) {
+//			return "There are no more Undos";
+//		}
+//		
+//		currentState = receivedFromHistoryState;
+//		storageComponent.save(currentState);
+//		return "Undo successful";
+//	}
+//	
+//	private String redo() {
+//		System.out.println("redoing");
+//		receivedFromHistoryState = historySubComponent.redo();
+//		assert(receivedFromHistoryState != null);
+//		if (receivedFromHistoryState == null) {
+//			return "There are no more Redos";
+//		}
+//		currentState = receivedFromHistoryState;
+//		storageComponent.save(currentState);
+//		return "Redo successful";
+//	}
 
 	private void exit() {
 		System.exit(0);

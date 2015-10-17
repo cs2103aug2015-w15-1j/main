@@ -10,10 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.TreeMap;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import main.java.backend.Storage.Task.Task;
 
 /**
@@ -25,56 +21,58 @@ import main.java.backend.Storage.Task.Task;
  * 
  */
 
-public class StorageLoad {
-	
-	private String INPUT_FILE_NAME;
-	private File textFile;
-	
+public class StorageLoad extends StorageOperation {
+
 	private BufferedReader bufferedReader;
 	private FileReader textFileReader;
-	
-	public StorageLoad(String fileName) {
 
-		this.INPUT_FILE_NAME = fileName;
+	public StorageLoad(String filePath) {
+
+		//String.format(CUSTOM_FILE_LOCATION, filePath);
+		storageFormat = new StorageFormat();
 		initFile();
 	}
-	
+
 	private void initFile() {
-		
-		textFile = new File(INPUT_FILE_NAME);
-		createFile();
-		initReader();
+
+		textFile = new File(CUSTOM_FILE_LOCATION);
+		try {
+			createFile();
+			initReader();
+		} catch (StorageException e) {
+			e.getMessage();
+		}
 	}
-	
-	private void createFile() {
+
+	private void createFile() throws StorageException {
 		if(!textFile.exists()) {
 			try {
 				textFile.createNewFile();
 			} catch (IOException e) {
-				e.printStackTrace();
+				throw new StorageException();
 			}
 		}
 	}
-	
-	private void initReader() {
+
+	private void initReader() throws StorageException {
 		try {
 			textFileReader = new FileReader(textFile);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			throw new StorageException();
 		}
 		bufferedReader = new BufferedReader(textFileReader);
 	}
 
-	private void closeReader() {
+	private void closeReader() throws StorageException {
 		try {
 			textFileReader.close();
 			bufferedReader.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new StorageException();
 		}
 	}
-	
-	private boolean isFileEmpty() {    
+
+	private boolean isFileEmpty() throws StorageException {    
 		initFile();
 		initReader();
 
@@ -83,36 +81,41 @@ public class StorageLoad {
 				return true;
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new StorageException();
 		}
 
 		return false;
 	}
 
-	public String getAllTextsFromFile() throws IOException {
-		
-		return new String(Files.readAllBytes
-				(Paths.get(INPUT_FILE_NAME)), StandardCharsets.UTF_8);
-	}
-	
-	public TreeMap<Integer, Task> execute() {
+	public String getAllTextsFromFile() throws StorageException {
 
-		TreeMap<Integer, Task> taskList = new TreeMap<Integer, Task>();
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		
-		if(!isFileEmpty()) {
-			try {
-				taskList = mapper.readValue(getAllTextsFromFile(), 
-						new TypeReference<TreeMap<Integer, Task>>() {});
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		String plainText = new String();
+		try {
+			plainText = new String(Files.readAllBytes
+					(Paths.get(CUSTOM_FILE_LOCATION)), StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new StorageException();
 		}
-
-		closeReader();
-
-		return taskList;
+		
+		return plainText;
 	}
-	
+
+	public TreeMap<Integer, Task> execute(TreeMap<Integer, Task> nullData) {
+		
+		TreeMap<Integer, Task> allData = new TreeMap<Integer, Task> ();
+		
+		try {
+			if(!isFileEmpty()) {
+				allData = storageFormat.deserialize(getAllTextsFromFile());
+			}
+			
+			closeReader();
+		} catch (StorageException e) {
+			e.getMessage();
+		}
+		
+		return allData;
+
+	}
+
 }

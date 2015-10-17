@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import main.java.backend.Storage.Storage;
-import main.java.backend.Storage.StorageDatabase;
+import main.java.backend.Storage.StorageFacade;
 import main.java.backend.Storage.Task.Task;
 import main.java.backend.Storage.Task.TaskType;
 
@@ -53,11 +53,11 @@ public class StorageTest {
 	@Before
 	public void init() {
 		
-		storage = new StorageDatabase();
+		storage = new StorageFacade();
 		storage.init(TEST_FILE_NAME);
 	}
 	
-	@Test 
+	@Before
 	public void setUp() {
 		
 		taskList = new TreeMap<Integer, Task> ();
@@ -71,5 +71,12 @@ public class StorageTest {
 		taskList.put(taskId++, CATEGORY3_EVENT1);
 		taskList.put(taskId++, CATEGORY3_EVENT2);
 	}
-
+	
+	@Test
+	public void testLoad() {
+		
+		storage.save(taskList);
+		assertEquals(taskList.toString(), storage.load().toString());
+	}
+	
 }

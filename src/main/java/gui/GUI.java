@@ -18,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -35,6 +36,7 @@ import main.java.backend.Storage.Task.Task;
 import main.java.backend.Util.hotkeyHelp;
 
 public class GUI extends Application{
+	
 	//Possible messages
 	private static final String MESSAGE_WELCOME = "Welcome to TankTask!";
 	private static final String MESSAGE_EMPTY = "List is empty";
@@ -123,6 +125,8 @@ public class GUI extends Application{
 		setUpMainScene();
 		setupUserInput();
 		setUpConsole();
+		Image icon = new Image(getClass().getResourceAsStream("tank.png")); 
+		primaryStage.getIcons().add(icon);
 
 		primaryStage.setScene(mainScene);
 		primaryStage.show();
@@ -518,22 +522,25 @@ public class GUI extends Application{
 		help.add(MESSAGE_SAMPLE_ADDTASK);
 		help.add(MESSAGE_SAMPLE_ADDEVENT);
 		help.add(MESSAGE_SAMPLE_ADDFLOAT);
-		for  (int i =0 ;i<help.size();i++){
-			Text label = new Text();
+		for  (int i =0 ;i<help.size();i++) {
+			Label label = new Label();
 			label.setText(help.get(i));
+			label.setWrapText(true);
+			label.getStyleClass().add("helpLabel");
+			label.getStyleClass().remove("label");
 			comp.getChildren().add(label);
 		}
-	
 		Scene stageScene = new Scene(comp, 500, 500);
+		Image icon = new Image(getClass().getResourceAsStream("tank.png")); 
+		pop.getIcons().add(icon);
 		stageScene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 		pop.setScene(stageScene);
 		pop.show();
-		comp.setOnKeyPressed(new EventHandler<KeyEvent>(){
+		stageScene.setOnKeyPressed(new EventHandler<KeyEvent>(){
 
 			@Override
 			public void handle(KeyEvent event) {
 				if (event.getCode().equals(KeyCode.F1)){
-					System.out.println("weird");
 					pop.close();
 				}
 
@@ -541,7 +548,6 @@ public class GUI extends Application{
 
 		});
 	}
-
 
 	private static void changeScene() {
 		if (currentScene == SCENE_MAIN){

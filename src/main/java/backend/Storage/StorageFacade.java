@@ -11,18 +11,18 @@ import main.java.backend.Storage.Task.Task;
  *
  */
 
-public class StorageDatabase implements Storage {
+public class StorageFacade implements Storage {
 
 	private StorageLoad load;
 	private StorageSave save;
 	
-	public void init(String fileName) {
-		load = new StorageLoad(fileName);
-		save = new StorageSave(fileName);
+	public void init(String filePath) {
+		load = new StorageLoad(filePath);
+		save = new StorageSave(filePath);
 	}
 	
 	public TreeMap<Integer, Task> load() {
-		return load.execute();
+		return load.execute(null);
 	}
 	
 	public void save(TreeMap<Integer, Task> allData) {

@@ -6,6 +6,7 @@ import main.java.backend.Logic.LogicController;
 import main.java.backend.Storage.Task.Task;
 
 public class GUIController {
+	
 	private final String DEFAULT_FILENAME="filename.txt";
 	LogicController logicComponent;
 	
@@ -24,18 +25,19 @@ public class GUIController {
 	private ArrayList<Task> getTodayTasks;
 	private ArrayList<Task> getTodayEvents;
 	private ArrayList<Task> getFocusList;
-	
 	private ArrayList<Task> getCompletedTasks;
 	private ArrayList<Task> getCompletedEvents;
 	private ArrayList<Task> getCompletedFloat;
 
 	
-	public GUIController(){
+	public GUIController() {
+		
 		logicComponent = LogicController.getInstance(DEFAULT_FILENAME);
 		retrieveAllData();
 		getFocusList = logicComponent.retrieveTaskData("toDo"); //default as tasks
 	}
-	void retrieveAllData(){
+	
+	void retrieveAllData() {
 		getTasks = logicComponent.retrieveTaskData("upcomingToDo");
 		assert getTasks!=null;
 		getEvents = logicComponent.retrieveTaskData("upcomingEvents");
@@ -47,34 +49,39 @@ public class GUIController {
 		getCate = logicComponent.retrieveStringData("categories");
 		assert getCate!=null;
 		retrieveTodays();
-		retrieveCompletes();
+		retrieveCompletes();	
 	}
-	void retrieveCompletes(){
+	
+	void retrieveCompletes() {
 		getCompletedTasks = logicComponent.retrieveTaskData("completedToDo");
 		getCompletedEvents = logicComponent.retrieveTaskData("pastEvents");
 		getCompletedFloat= logicComponent.retrieveTaskData("completedFloats");
 	}
-	void retrieveTodays(){
+	
+	void retrieveTodays() {
 		getTodayTasks = logicComponent.retrieveTaskData("todayToDos");
 		getTodayEvents = logicComponent.retrieveTaskData("todayEvents");
 	}
-	ArrayList<Task> retrieveTask(){ //default view for most initialization
+	
+	ArrayList<Task> retrieveTask() { //default view for most initialization
 		ArrayList<Task> list = logicComponent.retrieveTaskData("upcomingToDo");
 		assert list!= null;
 		return list;
 	}
-	ArrayList<Task> getCompletedTasks(){
+	
+	ArrayList<Task> getCompletedTasks() {
 		return getCompletedTasks;
 	}
 	
-	ArrayList<Task> getCompletedEvents(){
+	ArrayList<Task> getCompletedEvents() {
 		return getCompletedEvents;
 	}
-	ArrayList<Task> getCompletedFloat(){
+	
+	ArrayList<Task> getCompletedFloat() {
 		return getCompletedFloat;
 	}
 	
-	void updateIndex(){
+	void updateIndex() {
 		retrieveAllData();
 		int a = getTasks.size(), b = getEvents.size(),c = getOverdue.size(),
 				d = getFloat.size(), e = getCompletedTasks.size(), f = getCompletedEvents.size();
@@ -98,55 +105,61 @@ public class GUIController {
 	 */
 	void setIndex(ArrayList<Task> list, int index) {
 		assert index >= 0;
-		for (int i=0;i<list.size();i++){ 
+		for (int i=0;i<list.size();i++) { 
 		logicComponent.updateTaskNumbering(list,i,(++index));
 		}
 		
 	}
 	
-	void determineList(int currentList){
+	void determineList(int currentList) {
 		if(currentList==NUM_OVERDUE){
 			getFocusList = getOverdueList();
-		} else if(currentList==NUM_TASKS){
+		} else if(currentList==NUM_TASKS) {
 			getFocusList = getTasksList();
-		} else if(currentList==NUM_EVENTS){
+		} else if(currentList==NUM_EVENTS) {
 			getFocusList = getEventsList();
-		} else if (currentList==NUM_FLOAT){
+		} else if (currentList==NUM_FLOAT) {
 			getFocusList = getFloatList();
-		} else if (currentList==NUM_TODAY_TASKS){
+		} else if (currentList==NUM_TODAY_TASKS) {
 			getFocusList = getTodayTasks;
-		}else if (currentList==NUM_TODAY_EVENTS){
+		}else if (currentList==NUM_TODAY_EVENTS) {
 			getFocusList = getTodayEvents;
 		}
 	}
 	
-	String executeCommand(String userInput){
+	String executeCommand(String userInput) {
 		String feedback = logicComponent.executeCommand(userInput);
 		return feedback;
 	}
 	
-	ArrayList<Task> getTasksList(){
+	ArrayList<Task> getTasksList() {
 		return getTasks;
 	}
-	ArrayList<Task> getEventsList(){
+	
+	ArrayList<Task> getEventsList() {
 		return getEvents;
 	}
-	ArrayList<Task> getOverdueList(){
+	
+	ArrayList<Task> getOverdueList() {
 		return getOverdue;
 	}
-	ArrayList<Task> getFloatList(){
+	
+	ArrayList<Task> getFloatList() {
 		return getFloat;
 	}
-	ArrayList<String> getCateList(){
+	
+	ArrayList<String> getCateList() {
 		return getCate;
 	}
-	ArrayList<Task> getFocusList(){
+	ArrayList<Task> getFocusList() {
 		return getFocusList;
 	}
-	ArrayList<Task> getTodayT(){
+	
+	ArrayList<Task> getTodayT() {
 		return getTodayTasks;
-		
-	}ArrayList<Task> getTodayE(){
+	}
+	
+	ArrayList<Task> getTodayE() {
 		return getTodayEvents;
 	}
 }

@@ -343,7 +343,7 @@ public class EditCommand extends Command {
 			taskList.get(taskId).setDescription(description);
 			storageComponent.save(taskList);
 
-			return String.format(EXECUTION_SET_DESCRIPTION_SUCCESSFUL, taskId);
+			return String.format(EXECUTION_SET_DESCRIPTION_SUCCESSFUL, taskIndex);
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}

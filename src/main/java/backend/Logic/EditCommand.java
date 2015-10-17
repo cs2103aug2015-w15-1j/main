@@ -376,20 +376,20 @@ public class EditCommand extends Command {
 	private String setDeadline(Command commandObject) {
 		try {
 			taskList = storageComponent.load();
-			int eventIndex = Integer.parseInt(commandObject.getTaskName());
+			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			String end = commandObject.getEndDateAndTime();
-			int taskId = getTaskId(eventIndex);
+			int taskId = getTaskId(taskIndex);
 			Task task = taskList.get(taskId);
 
 			Command command = new Command();
-			command.setTaskName(Integer.toString(eventIndex));
+			command.setTaskName(Integer.toString(taskIndex));
 			delete(command);
 			task.setEnd(end);
 			task.setTaskType(getTaskType(task));
 			taskList.put(taskId, task);
 			storageComponent.save(taskList);
 			
-			return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskId, end);
+			return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskIndex, end);
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}

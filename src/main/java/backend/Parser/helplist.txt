@@ -25,6 +25,9 @@ Example: 1 undone
 undo
 Format: undo
 
+redo
+Format: redo
+
 search
 Format: search [Search Term(s)]
 Example: search fish
@@ -73,8 +76,8 @@ Example: every week fri 11am
 Example: every month 15th
 Example: every year Apr 1
 
-show (Alternate form: showT, showE, showF)
-Format 1: show [Task Type (Todo/Event/Floating)]
+show (Alternate form: showT, showE, showF, showO)
+Format 1: show [Task Type (Todo/Event/Floating/Overdue)]
 Example: show event
 Format 2: show[X]
 Example: showE

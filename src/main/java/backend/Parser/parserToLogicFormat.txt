@@ -40,6 +40,8 @@ Exit:
 ("exit")
 Undo:
 ("undo")
+Redo:
+("redo")
 
 Search:
 ("search", Keywords)
@@ -62,6 +64,8 @@ Show ToDo:
 ("showT")
 Show Event:
 ("showE")
+Show Overdue:
+("showO")
 
 Sort Priority:
 ("sortP")

@@ -12,280 +12,449 @@ import java.util.HashMap;
 import com.joestelmach.natty.*;
 
 public class Parser {
-	//List of commands accepted by the program
-	private final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList("add", "addcat", "category", "deadline", "description", 
-											   "delete", "done", "event", "exit", "priority", "reminder", "return", "setcol", "showcat", "showe", 
-											   "showf", "showt", "sortd", "sortp", "undo", "undone") );
+	//List of all command words accepted by the program
+	private final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList(
+	"add", "addcat", "category", "deadline", "description", "delete", "done", "event", 
+	"every", "exit", "priority", "reminder", "rename", "search", "setcol", "showcat", 
+	"show", "showE", "showF", "showT", "sort", "sortD", "sortN", "sortP", "undo", "undone") );
 	
-	private final ArrayList<String> COMMANDS_NO_PARAMETER = new ArrayList<String>( Arrays.asList("exit", "showcat", "showe", "showf", "showt", 
-			   																"sortd", "sortp", "return", "undo") );
+	//Commands that work just by typing the command word (without additional content)
+	private final ArrayList<String> COMMANDS_NO_CONTENT = new ArrayList<String>( Arrays.asList(
+	"exit", "showE", "showF", "showT", "sortD", "sortN", "sortP", "undo") );
 	
-	private final ArrayList<String> COMMANDS_DOMINATING = new ArrayList<String>( Arrays.asList("addcat", "delete", "done", 
-															"exit", "return", "search", "setcol", "showcat", "undo", "undone") );
+	//Commands that if appear first, will prevent other command keywords from having effect
+	private final ArrayList<String> COMMANDS_DOMINATING = new ArrayList<String>( Arrays.asList(
+	"addcat", "delete", "done", "every", "search", "setcol", "show", "showcat", "sort", "undone") );
 	
-	private final ArrayList<String> COMMANDS_READ_TASKNAME = new ArrayList<String>( Arrays.asList(
-			   														  "add", "addcat", "delete", "done", "setcol", "showcat", "undone") );
+	//Commands that create a new item
+	private final ArrayList<String> COMMANDS_ADD_STUFF = new ArrayList<String>( Arrays.asList(
+	"add", "addcat") );
 	
-	//The default list of fields and the order in which their parameters are put into result
+	//Commands that can accept any amount of words
+	private final ArrayList<String> COMMANDS_NEED_WORDS = new ArrayList<String>( 
+	Arrays.asList("add", "addcat", "category", "description", "search") );
+	
+	//Commands that only accept an index
+	private final ArrayList<String> COMMANDS_NEED_INDEX = new ArrayList<String>( 
+	Arrays.asList("delete", "done", "undone", "showcat") );
+	
+	//Command words that indicate that the command is one-shot
+	private final ArrayList<String> COMMANDS_ONE_SHOT = new ArrayList<String>( 
+	Arrays.asList("add", "set") );	
+	
+	//The default list of fields and the order in which their contents are put into result
 	private final ArrayList<String> FIELDS_DEFAULT = new ArrayList<String>( Arrays.asList(
-			"command", "task", "description", "deadline", "eventStart", "eventEnd", "priority", "reminder", "category") );
+	"command", "name", "description", "deadline", "eventStart", "eventEnd", "priority", "reminder", "category", "rename") );
 	
-	//Temporary holder for the current parameter before it's being stored
-	private String currParameter = "";
+	//How often a recurring task can recur
+	private final ArrayList<String> RECUR_FREQUENCY = new ArrayList<String>( Arrays.asList(
+	"day", "week", "month", "year") );
+	
+	//List of fields that are used in the current result
+	private ArrayList<String> fields = new ArrayList<String>(FIELDS_DEFAULT);
+	
+	//Holds the merged tokens until they are stored into field content
+	private String growingToken = "";
 	
 	//List of commands that have appeared in the current input
 	private ArrayList<String> seenCommands = new ArrayList<String>();
 	
-	//List of fields that are included in the current result
-	private ArrayList<String> fields = new ArrayList<String>(FIELDS_DEFAULT);
-	
-	//This stores the parameters under their respective fields
-	private HashMap<String, String> parameters = new HashMap<String, String>(){
+	//Stores the fields and their respective contents
+	private HashMap<String, String> fieldContent = new HashMap<String, String>(){
 		private static final long serialVersionUID = 1L; {
-        put("command",""); put("task", ""); put("description", ""); put("deadline", ""); put("event", ""); 
-        put("priority",""); put("reminder", ""); put("category", "");
+        put("command",""); put("name", ""); put("description", ""); put("deadline", ""); put("event", ""); 
+        put("priority",""); put("reminder", ""); put("category", ""); put("every", ""); put("rename", "");
     }};
     
+    //Contains the variants or short forms of some of the commands
     private HashMap<String, ArrayList<String>> command_families = new HashMap<String, ArrayList<String>>(){
 		private static final long serialVersionUID = 1L; {
-        put("add", new ArrayList<String>( Arrays.asList("adds", "newtask")));
-        put("priority", new ArrayList<String>( Arrays.asList("pri"))); 
-    }};
-    
-    public ArrayList<String> command_variants = gatherCommandVariants();
-    
-    private ArrayList<String> gatherCommandVariants(){
-    	ArrayList<String> allCommands = new ArrayList<String>();
-    	for (ArrayList<String> family: command_families.values()) {
-			allCommands.addAll(0, family);
-		}
-    	return allCommands;
-    }
-    
-    //private final ArrayList<String> INDEX_LETTERS = new ArrayList<String>( Arrays.asList("C", "D", "E", "F", "O"));
-    
-    private HashMap<String, String> INDEX_LETTERS = new HashMap<String, String>(){
-		private static final long serialVersionUID = 1L; {
-        put("D", "task"); put("E", "event"); put("F", "floatTask"); 
+		put("category", new ArrayList<String>( Arrays.asList("cat")));
+		put("deadline", new ArrayList<String>( Arrays.asList("by", "dea")));
+		put("delete", new ArrayList<String>( Arrays.asList("del")));
+        put("description", new ArrayList<String>( Arrays.asList("des")));
+        put("event", new ArrayList<String>( Arrays.asList("from"))); 
+        put("every", new ArrayList<String>( Arrays.asList("recur"))); 
+        put("priority", new ArrayList<String>( Arrays.asList("pri")));
+        put("reminder", new ArrayList<String>( Arrays.asList("rem")));
     }};
     
 	/**
-	 * This method parses the user input and returns its components as an arraylist
+	 * This method parses the user input and returns an ArrayList of string tokens
 	 */
 	public ArrayList<String> parseInput(String input){
-		ArrayList<String> result = new ArrayList<String>();
-		String[] inputTokens = input.split(" ");
-		String firstWord = getFirst(inputTokens).toLowerCase();
+		ArrayList<String> result = new ArrayList<String>(); 
 		
-		if (isDominatingCommand(firstWord)) {
+		String[] inputTokens = input.split(" ");
+		String firstWordOriginal = getFirst(inputTokens);
+		String firstWord = getDefaultCommand(firstWordOriginal);
+		
+		if (noNeedContent(firstWord)) {
 			result.add(firstWord);
-			
-			if (firstWord.equals("setcol")) {
-				String catName = mergeTokens(inputTokens, 1, inputTokens.length-1);
-				result.add(catName);
-				String colour = inputTokens[inputTokens.length-1];
-				result.add(colour);
-			//if first word is "delete", "done" or "search"
-			} else if (!hasNoParameter(firstWord)) {
-				String parameter = mergeTokens(inputTokens, 1, inputTokens.length);
-				result.add(parameter);
-				result = convertNameToIndex(result);
-			}  
+			return result;
+		} else if (isCommand(firstWord) && inputTokens.length == 1) {
+			result = makeErrorResult(result, "EmptyFieldError", firstWord);
+		} else if (!(isCommand(firstWord) || isNumber(firstWord))) {
+			result = makeErrorResult(result, "UnrecognisedFirstWordError", firstWordOriginal);
+		} else if (isDominatingCommand(firstWord)) {
+			result.add(firstWord);
+			String content = mergeTokens(inputTokens, 1, inputTokens.length);
+			if (firstWord.equals("show")) {
+				String taskType = getTaskType(content);
+				if (taskType.equals("ERROR")) {
+					result = makeErrorResult(result, "InvalidTaskTypeError", content);
+				} else {
+					result.set(0, firstWord+taskType);
+				}
+				return result;
+			} else if (firstWord.equals("sort")) {
+				String field = getSortField(getDefaultCommand(content));
+				if (field.equals("ERROR")) {
+					result = makeErrorResult(result, "InvalidSortFieldError", content);
+				} else {
+					result.set(0, firstWord+field);
+				}
+				return result;
+				
+			} if (needWords(firstWord)) { //if first word is addcat or search
+				result.add(content);
+			} else if (needIndex(firstWord)) { //if first word is delete, done, or undone 
+				if (isNumber(content)) {
+					result.add(content);
+				} else {
+					result = makeErrorResult(result, "IndexError", content);
+				}
+			}
 
 		} else {
 			for (String token: inputTokens) {
 				String originalToken = token;
-				token = token.toLowerCase();
-				if (isCommandVariant(token)) {
-					token = getDefaultCommand(token);
-				}
-				if (isDefaultCommand(token)) {
-					putParameter();
+				//token = token.toLowerCase();
+				token = getDefaultCommand(token);
+				if (isCommand(token) && !noNeedContent(token)) {
+					putToken();
+					String lastCommand = getLast(seenCommands);
 					
 					if (isSeenCommand(token)) {
-						String oldCommand = token;
-						mergeToPrevParameter(oldCommand);
-						moveToBack(seenCommands, oldCommand);
+						if (needWords(lastCommand)) {
+							addToFieldContent(lastCommand, originalToken);
+						} else {
+							result = makeErrorResult(result, "DuplicateCommandError", originalToken);
+							break;
+						}
 
 					} else {
-						String command = parameters.get("command");
-						if (isDominatingCommand(token) && (!command.isEmpty() || !isLast(inputTokens, token))) {
-							appendToParameter(originalToken);
+						String command = fieldContent.get("command");
+						if (!command.isEmpty() && isDominatingCommand(token)) {
+							appendToken(originalToken);
 						} else {
+							if (!lastCommand.isEmpty()) {
+								String content;
+								if (isAddStuff(lastCommand)) {
+									content = fieldContent.get("name");
+								} else {
+									content = fieldContent.get(lastCommand);
+								}
+								if (content.isEmpty()) {
+									result = makeErrorResult(result, "EmptyFieldError", lastCommand);
+									break;
+								}
+							}
 							putCommand(token);
 						}
 					}
 					
 				} else {
-					appendToParameter(originalToken);
+					appendToken(originalToken);
 				}
 			}
-			putParameter();
+			putToken();
 			
-			String command = parameters.get("command");
-			if (command.equals("add") || command.equals("set")) {
-				result = makeLongResult(result);
-			} else {
-				result = makeShortResult(result);
-			}
+			String command = fieldContent.get("command");
+			result = makeResult(result, command);
 			
 		}	
 		seenCommands.clear();
 		fields = new ArrayList<String>(FIELDS_DEFAULT);
-		parameters.replaceAll((field,parameter) -> "");
+		fieldContent.replaceAll((field,content) -> "");
 		return result;
 	}
+
+	private void appendToken(String token) {
+		growingToken += token + " ";
+	}
 	
+	/**
+	 * This methods checks if token is a command variant (if yes, convert it to the default command)
+	 */
 	private String getDefaultCommand(String token) {
+		for (String command: COMMANDS) {
+			if (token.equalsIgnoreCase(command)){
+				return command;
+			}
+		}
     	for (String command: command_families.keySet()) {
     		ArrayList<String> family = command_families.get(command);
 			if (family.contains(token)) {
 				return command;
 			}
 		}
-    	return null;
-	}
-
-	private void appendToParameter(String token) {
-		currParameter += token + " ";
+    	return token;
 	}
 	
 	/**
 	 * This method marks the command as seen and stores it as the main command (if there isn't one) 
-	 * @param token
 	 */
 	private void putCommand(String token) {
-		String command = parameters.get("command");
+		String command = fieldContent.get("command");
 		seenCommands.add(token);
-	
+
 		if (command.isEmpty()) {
-			parameters.put("command", token);
-		} else if (!isReadingTaskName(command)) {
-			parameters.put("command", "set");
+			fieldContent.put("command", token);
+		} else if (!isAddStuff(command)) {
+			fieldContent.put("command", "set");
 		}
 	}
 	
 	/**
-	 * This method stores the current parameter under its rightful field or appends it to an existing parameter
+	 * This method stores the growingToken under its rightful field or appends it to an existing field content
 	 */
-	private void putParameter() {
-		if (!currParameter.isEmpty()) {
-			currParameter = removeEndSpaces(currParameter);
+	private void putToken() {
+		if (!growingToken.isEmpty()) {
+			growingToken = removeEndSpaces(growingToken);
 			String lastCommand = getLast(seenCommands);
 			String field;
 			
-			if (lastCommand.isEmpty() || isReadingTaskName(lastCommand)) {
-				field = "task";
+			if (lastCommand.isEmpty() || isAddStuff(lastCommand)) {
+				field = "name";
 			} else {
 				field = lastCommand;
 			}
 			
-			/*if (lastCommand.equals("deadline") || lastCommand.equals("reminder")) {
-				currParameter = parseDate(currParameter);
-			}*/
-			String parameter = parameters.get(field);
-			String command = parameters.get("command");
-			if (parameter.isEmpty()) {
-				parameters.put(field, currParameter);
-			} else if (!command.isEmpty() && !isReadingTaskName(lastCommand) && !isDominatingCommand(currParameter)) {
-				parameters.put(field, currParameter);
+			String content = fieldContent.get(field);
+			if (content.isEmpty()) {
+				fieldContent.put(field, growingToken);
 			} else {
-				parameters.put(field, parameter + " " + currParameter);
+				fieldContent.put(field, content + " " + growingToken);
 			}
 			
-			currParameter = "";
+			growingToken = "";
 		}
 	}
 
 	/**
-	 * This method creates a short arrayList for a result that contains 3 or less components
+	 * This method directly adds or appends a token to a field's content
+	 */
+	private void addToFieldContent(String command, String token){
+		String content;
+		String field;
+		if (isAddStuff(command)) {
+			field = "name";
+			content = fieldContent.get(command);
+		} else {
+			field = command;
+			content = fieldContent.get(command);
+		}
+		
+		if (content != null) {
+			fieldContent.put(field, removeEndSpaces(content + " " + token));
+		} else {
+			fieldContent.put(field, removeEndSpaces(token));
+		}
+	}
+
+	private ArrayList<String> makeResult(ArrayList<String> result, String command) {
+		if (command.equals("ERROR")) {
+			return result;
+		} else if (canBeOneShot(command)) {
+			result = makeLongResult(result);
+		} else {
+			result = makeShortResult(result);
+		}
+		return result;
+	}
+	
+	/**
+	 * This method makes a result that indicates an error in the command
+	 */
+	private ArrayList<String> makeErrorResult(ArrayList<String> result, String error, String token) {
+		result.clear();
+		result.add("error");
+		fieldContent.put("command", "ERROR");
+		switch (error) {
+			case "UnrecognisedFirstWordError":
+				result.add(error + ": '" + token + "' is not recognised as a command or index");
+				break;
+			case "IndexError":
+				result.add(error + ": '" + token + "' is not recognised as an index");
+				break;
+			case "DuplicateCommandError":
+				result.add(error + ": duplicate command '" + token + "'");
+				break;
+			case "EmptyFieldError":
+				result.add(error + ": please enter content for the command '" + token + "'");
+				break;
+			case "InvalidPriorityError":
+				result.add(error + ": '" + token + "' is not between 1 to 5");
+				break;
+			case "InvalidDateError":
+				result.add(error + ": '" + token + "' is not an acceptable date format");
+				break;
+			case "InvalidFrequencyError":
+				result.add(error + ": '" + token + "' is not 'day', 'week', 'month' or 'year'");
+				break;
+			case "InvalidDayOfMonthError":
+				result.add(error + ": '" + token + "' is not between 1 to 31");
+				break;
+			case "InvalidTaskTypeError":
+				result.add(error + ": '" + token + "' is not 'todo', 'event' or 'floating'");
+				break;
+			case "InvalidSortFieldError":
+				result.add(error + ": '" + token + "' is not 'deadline', 'name' or 'priority'");
+				break;
+			default:
+				break; 
+		}
+		return result;
+	}
+
+	/**
+	 * This method creates a short result (for non one-shot commands)
 	 */
 	private ArrayList<String> makeShortResult(ArrayList<String> result) {
-		String command = parameters.get("command");
-		String task = parameters.get("task");
-		String newField = parameters.get(command);
-		if (newField == null) {
-			result.addAll( Arrays.asList(command, task) );
+		String command = fieldContent.get("command");
+		String name = fieldContent.get("name");
+		String newField = fieldContent.get(command);
+		if (name.isEmpty()) {
+			result = makeErrorResult(result, "EmptyFieldError", command);
+		} else if (!needIndex(command) && newField.isEmpty()){
+			result = makeErrorResult(result, "EmptyFieldError", command);
+		} else if (newField == null) {
+			result.addAll( Arrays.asList(command, name) );
 		} else {
-			if (command.equals("deadline") || command.equals("reminder")) {
-				newField = parseDate(newField);
+			if (command.equals("deadline") || command.equals("reminder") || command.equals("every")) {
+				String freq = "";
+				if (command.equals("every")) {
+					String[] tokens = newField.split(" ");
+					freq = getFirst(tokens);
+					if (!isValidFrequency(freq)) {
+						result = makeErrorResult(result, "InvalidFrequencyError", newField);
+						return result;
+					} 
+					newField = mergeTokens(tokens, 1, tokens.length);
+					if (freq.equals("month")) {
+						newField = getNumber(newField);
+						if (!isValidDayOfMonth(newField)) {
+							result = makeErrorResult(result, "InvalidDayOfMonthError", newField);
+						} else {
+							/*if (newField.endsWith("1")) {
+								newField += "st";
+							} else if (newField.endsWith("2")) {
+								newField += "nd";
+							} else if (newField.endsWith("3")) {
+								newField += "rd";
+							} else {
+								newField += "th";
+							}*/
+							newField += " of month";
+							result.addAll( Arrays.asList(command, name, newField) );
+						}
+						return result;
+					}
+				} 		
+				String date = parseDate(command, newField);
+
+				if (date.equals("ERROR")) {
+					result = makeErrorResult(result, "InvalidDateError", newField);
+					return result;
+				} else if (command.equals("every")){
+					date = changeToRecurFormat(freq, date);
+				}
+				newField = date;
 			}
-			if (command.equals("event")) {
+			if (command.equals("priority") && !isValidPriority(newField)) {
+				result = makeErrorResult(result, "InvalidPriorityError", newField);
+			} else if (command.equals("event")) {
 				String[] eventStartEnd = getStartAndEnd(newField);
 				String eventStart = eventStartEnd[0];
 				String eventEnd = eventStartEnd[1];
-				result.addAll( Arrays.asList(command, task, eventStart, eventEnd) );
+				if (eventStart.equals("ERROR") ) {
+					eventStart = removeEndSpaces(newField.split("to")[0]);
+					result = makeErrorResult(result, "InvalidDateError", eventStart);
+					return result;
+				} else if (eventEnd.equals("ERROR") ){
+					eventEnd = removeEndSpaces(newField.split("to")[1]);
+					result = makeErrorResult(result, "InvalidDateError", eventEnd);
+					return result;
+				}
+				result.addAll( Arrays.asList(command, name, eventStart, eventEnd) );
 			} else {
-				result.addAll( Arrays.asList(command, task, newField) );
+				result.addAll( Arrays.asList(command, name, newField) );
 			}
-		}	
-		
-		result = convertNameToIndex(result);
+		}
 		
 		return result;
 	}
 
 	/**
-	 * This method creates a long arrayList for a result that contains more than 3 components
+	 * This method creates a long result (for one-shot commands)
 	 */
 	private ArrayList<String> makeLongResult(ArrayList<String> result) {
-		String command = parameters.get("command");
-		String deadline = parameters.get("deadline");
-		String event = parameters.get("event");
-		String reminder = parameters.get("reminder");
+		String command = fieldContent.get("command");
+		String deadline = fieldContent.get("deadline");
+		String event = fieldContent.get("event");
+		String reminder = fieldContent.get("reminder");
+		String priority = fieldContent.get("priority");
 		
-		if (!reminder.isEmpty()) {
-			parameters.put("reminder", parseDate(reminder));
+		if (command.equals("add")) {
+			fields.remove("rename");
 		}
-		if (!deadline.isEmpty()) {
-			command += "T";
-			fields.remove("eventStart");
-			fields.remove("eventEnd");
-			parameters.put("deadline", parseDate(deadline));
-		} else if (!event.isEmpty()) {
-			command += "E";
-			fields.remove("deadline");
-			getStartAndEnd(event);
+		
+		if (!priority.isEmpty() && !isValidPriority(priority)) {
+			result = makeErrorResult(result, "InvalidPriorityError", priority);
 		} else {
-			if (command.equals("add")) {
-				command += "F";
+			if (!reminder.isEmpty()) {
+				String date = parseDate("reminder", reminder);
+				if (date.equals("ERROR")) {
+					result = makeErrorResult(result, "InvalidDateError", reminder);
+					return result;
+				} else {
+					reminder = date;
+				}
+				fieldContent.put("reminder", reminder);
 			}
-			fields.remove("deadline");
-			fields.remove("eventStart");
-			fields.remove("eventEnd");
+			if (!deadline.isEmpty()) {
+				command += "T";
+				fields.remove("eventStart");
+				fields.remove("eventEnd");
+				String date = parseDate("deadline", deadline);
+				if (date.equals("ERROR")) {
+					result = makeErrorResult(result, "InvalidDateError", deadline);
+					return result;
+				} else {
+					deadline = date;
+				}
+				fieldContent.put("deadline", deadline);
+			} else if (!event.isEmpty()) {
+				command += "E";
+				fields.remove("deadline");
+				getStartAndEnd(event);
+			} else {
+				if (command.equals("add")) {
+					command += "F";
+				}
+				fields.remove("deadline");
+				fields.remove("eventStart");
+				fields.remove("eventEnd");
+			}
+			fieldContent.put("command", command);
+			
+			for (String field: fields) {
+				String para = fieldContent.get(field);
+				result.add(para);
+			}
 		}
-		parameters.put("command", command);
-		
-		for (String field: fields) {
-			String para = parameters.get(field);
-			result.add(para);
-		}
-		
-		result = convertNameToIndex(result);
-		
-		return result;
-	}
 
-	private ArrayList<String> convertNameToIndex(ArrayList<String> result) {
-		String command = result.get(0);
-		String task = result.get(1);
-		if (!(command.equals("add") || task.isEmpty())) {
-			String firstChar = task.substring(0, 1);
-			if (INDEX_LETTERS.keySet().contains(firstChar) ) {
-				String stringIndex = task.substring(1, task.length());
-				Integer index = null;
-				try {
-					index = Integer.parseInt(stringIndex);
-				} catch (Exception e) {
-					System.out.println("parseIntError");
-				}
-				if (index != null) {
-					result.remove(1);
-					result.add(1, INDEX_LETTERS.get(firstChar));
-					result.add(2, stringIndex);
-				}
-			}
-		}
 		return result;
 	}
 
@@ -302,7 +471,7 @@ public class Parser {
 		}
 		
 		//If eventEnd has no date, set its date as eventStart date
-		if (!eventEnd.contains(" ") && !eventEnd.isEmpty()) {
+		if (!eventEnd.contains(" ") && !eventEnd.isEmpty() && !parseDate("eventEnd", eventEnd).equals("ERROR")) {
 			String startDate = "";
 			String[] startTokens = eventStart.split(" ");
 			for (int i = 0; i < startTokens.length-1; i++) {
@@ -317,10 +486,11 @@ public class Parser {
 			String endTime = endTokens[0];
 			eventEnd = endDate + " " + endTime;
 		} 
-		eventStart = parseDate(removeEndSpaces(eventStart));
-		eventEnd = parseDate(removeEndSpaces(eventEnd));
-		parameters.put("eventStart", eventStart);
-		parameters.put("eventEnd", eventEnd);
+		eventStart = parseDate("eventStart", removeEndSpaces(eventStart));
+		eventEnd = parseDate("eventEnd", removeEndSpaces(eventEnd));
+		
+		fieldContent.put("eventStart", eventStart);
+		fieldContent.put("eventEnd", eventEnd);
 		
 		String[] result = new String[2];
 		result[0] = eventStart;
@@ -328,7 +498,10 @@ public class Parser {
 		return result;
 	}
 
-	private String parseDate(String date) {
+	/**
+	 * This method checks that a date string is valid and parses it into the default date format 
+	 */
+	private String parseDate(String field, String date) {
 		if (date.isEmpty()) {
 			return date;
 		}
@@ -336,23 +509,48 @@ public class Parser {
 		
 		com.joestelmach.natty.Parser dateParser = new com.joestelmach.natty.Parser();
 		String dateString = "";
+		DateGroup group;
 		try {
-			DateGroup group = dateParser.parse(date).get(0);
-			List<Date> dates = group.getDates();
-			dateString = dates.toString();
-			
-			dateString = dateString.substring(1, dateString.length()-1); //remove brackets
-			dateString = confirmDateIsInFuture(dateString);
-			dateString = changeDateFormat(dateString);
+			group = dateParser.parse(date).get(0);
 		} catch (Exception e){
-			//parseerror
+			return "ERROR";
 		}
+		
+		if (hasNoTime(date)) {
+			if (field.equals("deadline")) {
+				date += " 23:59";
+			} else {
+				date += " 12:00";
+			}
+			group = dateParser.parse(date).get(0);
+		}
+		
+		List<Date> dates = group.getDates();
+		dateString = dates.toString();
+		dateString = dateString.substring(1, dateString.length()-1); //remove brackets
+		dateString = confirmDateIsInFuture(dateString);
+		dateString = changeDateFormat(dateString);
 		
 		return dateString;
 	}
 
 	/**
-	 * This method swaps the position of day and month (so that it will work for natty)
+	 * This method checks if the user have included the time in the date string
+	 */
+	private boolean hasNoTime(String date){
+		String[] temp;
+		String[] timeSymbols = {":", ".", "am", "pm", "AM", "PM"};
+		for (String sym: timeSymbols) {
+			temp = date.split(sym);
+			if (temp.length > 1) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * This method swaps the position of day and month (so that it will work correctly for the natty parser)
 	 */
 	private String swapDayAndMonth(String date) {
 		String[] dateTokens = date.split(" ");
@@ -419,7 +617,8 @@ public class Parser {
 			try {
 				dateMilli = formatter.parse(dateString).getTime();
 			} catch (ParseException e) {
-				System.out.println("parseError");
+				System.out.println("Parsing Error");
+				e.printStackTrace();
 			}
 			if (year == currYear) {
 				if (dayMonth < nowMilli) {
@@ -437,17 +636,49 @@ public class Parser {
 		return dateString;
 	}
 
+	/**
+	 * This method sets the date to the standardized format
+	 */
 	private String changeDateFormat(String dateString) {
 		SimpleDateFormat nattyFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM hh:mma yyyy");
+		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM hh:mma");
 		Date tempDate = null;
 		try {
 			tempDate = nattyFormat.parse(dateString);
 		} catch (Exception e) {
-			System.out.println("parseError");
+			System.out.println("Parsing Error");
+			e.printStackTrace();
 		}
 		dateString = standardFormat.format(tempDate);
-		dateString = dateString.substring(0, dateString.length()-5);
+		return dateString;
+	}
+
+	private String changeToRecurFormat(String freq, String dateString) {
+		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM hh:mma");
+		SimpleDateFormat recurDayFormat = new SimpleDateFormat("hh:mma");
+		SimpleDateFormat recurWeekFormat = new SimpleDateFormat("EEE hh:mma");
+		SimpleDateFormat recurYearFormat = new SimpleDateFormat("dd MMM");
+		Date tempDate = null;
+		try {
+			tempDate = standardFormat.parse(dateString);
+		} catch (Exception e) {
+			System.out.println("Parsing Error");
+			e.printStackTrace();
+		}
+		switch (freq) {
+		case "day":
+			dateString = recurDayFormat.format(tempDate);
+			break;
+		case "week":
+			dateString = recurWeekFormat.format(tempDate);
+			break;
+		case "year":
+			dateString = recurYearFormat.format(tempDate);
+			break;
+		default:
+			dateString = standardFormat.format(tempDate);
+			break;
+		}
 		return dateString;
 	}
 
@@ -482,13 +713,6 @@ public class Parser {
 		return milli;
 	}
 	
-	/*private String getCurrentDate() {
-		SimpleDateFormat sdfDate = new SimpleDateFormat("MMM dd");
-	    Date now = new Date();
-	    String strDate = sdfDate.format(now);
-		return strDate;
-	}*/
-	
 	private int getCurrentYear() {
 		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy");
 	    Date now = new Date();
@@ -501,54 +725,12 @@ public class Parser {
 	 * @return the merged tokens as a string
 	 */
 	private String mergeTokens(String[] inputTokens, int startIndex, int endIndex) {
-		String parameter = "";
+		String merged = "";
 		for (int i = startIndex; i < endIndex; i++) {
 			String token = inputTokens[i];
-			parameter += token + " ";
+			merged += token + " ";
 		}
-		return removeEndSpaces(parameter);
-	}
-
-	/**
-	 * This method takes in an old command and merges the command and its parameter to the previous parameter
-	 * @param oldCommand
-	 */
-	private void mergeToPrevParameter(String oldCommand) {
-		String prevField;
-		if (isFirst(seenCommands, oldCommand)) {
-			prevField = "task";
-		}
-		else {
-			prevField = getPrevious(seenCommands, oldCommand);
-			if (prevField.equals("add")) {
-				prevField = "task";
-			}
-		}	
-		
-		String prevParameter = parameters.get(prevField);
-		String oldParameter = parameters.get(oldCommand);
-		if (oldParameter == null) {
-			oldParameter = "";
-		}
-		
-		if (prevParameter.isEmpty() && oldParameter.isEmpty()) {
-			parameters.put(prevField, oldCommand);
-		} else if (oldParameter.isEmpty()) {
-			parameters.put(prevField, prevParameter + " " + oldCommand);
-		} else if (prevParameter.isEmpty()) {
-			parameters.put(prevField, oldCommand + " " + oldParameter);
-		} else {
-			parameters.put(prevField, prevParameter + " " + oldCommand + " " + oldParameter);
-		}
-	}
-
-	/**
-	 * This method moves a token to the back of its arrayList
-	 */
-	private void moveToBack(ArrayList<String> arrayList, String token) {
-		int index = arrayList.indexOf(token);
-		arrayList.remove(index);
-		arrayList.add(token);
+		return removeEndSpaces(merged);
 	}
 
 	/**
@@ -565,48 +747,135 @@ public class Parser {
 		}
 	}
 
-	private boolean isDefaultCommand(String token){
+	private boolean isCommand(String token){
 		return COMMANDS.contains(token);
-	}
-	
-	private boolean isCommandVariant(String token){
-		return command_variants.contains(token);
 	}
 	
 	private boolean isDominatingCommand(String token){
 		return COMMANDS_DOMINATING.contains(token);
 	}
 	
-	private boolean hasNoParameter(String token){
-		return COMMANDS_NO_PARAMETER.contains(token);
+	private boolean noNeedContent(String token){
+		return COMMANDS_NO_CONTENT.contains(token);
 	}
 	
-	/*private boolean hasTextParameter(String token){
-		return COMMANDS_WITH_TEXT_PARAMETER.contains(token);
-	}*/
-	
-	private boolean isReadingTaskName(String token){
-		return COMMANDS_READ_TASKNAME.contains(token);
+	private boolean isAddStuff(String token){
+		return COMMANDS_ADD_STUFF.contains(token);
 	}
 	
 	private boolean isSeenCommand(String token) {
 		return seenCommands.contains(token);
 	}
 	
+	private boolean needWords(String token) {
+		return COMMANDS_NEED_WORDS.contains(token);
+	}
+	
+	private boolean needIndex(String token) {
+		return COMMANDS_NEED_INDEX.contains(token);
+	}
+	
+	private boolean canBeOneShot(String token) {
+		return COMMANDS_ONE_SHOT.contains(token);
+	}
+	
+	private boolean isNumber(String token) {
+		try {
+			Integer.parseInt(token);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+	
+	private boolean isValidPriority(String token){
+		int[] priorityLevels = {1,2,3,4,5};
+		if (isNumber(token)) {
+			int intToken = Integer.parseInt(token);
+			for (int i = 0; i < priorityLevels.length; i++) {
+				if (intToken == priorityLevels[i]) {
+					return true;
+				}
+			}
+			return false;
+		}
+		return false;
+	}
+	
+	private boolean isValidFrequency(String token){
+		return RECUR_FREQUENCY.contains(token);
+	}
+	
+	private boolean isValidDayOfMonth(String token){
+		if (isNumber(token)){
+			if (Integer.parseInt(token) <= 31) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private String getTaskType(String token){
+		switch (token.toLowerCase()) {
+		case "todo":
+			return "T";
+		case "event":
+			return "E";
+		case "floating":
+			return "F";
+		default:
+			return "ERROR";
+		}
+	}
+	
+	private String getSortField(String token){
+		switch (token.toLowerCase()) {
+		case "deadline":
+			return "D";
+		case "priority":
+			return "P";
+		case "name":
+			return "N";
+		default:
+			return "ERROR";
+		}
+	}
+	
+	private String getNumber(String token){
+		if (isNumber(token)){
+			return token;
+		} else {
+			String c;
+			String number = "";
+			for (int i = 0; i < token.length(); i++) {
+				c = token.substring(i, i+1);
+				if (!isNumber(c)) {
+					break;
+				}
+				number += c;
+			}
+			if (!number.isEmpty()) {
+				return number;
+			} else {
+				return token;
+			}
+		}
+	}
+	
 	/*private boolean isFirst(String[] array, String token) {
 		String firstWord = getFirst(array);
 		return firstWord.equals(token);
-	}*/
+	}
 	
 	private boolean isFirst(ArrayList<String> list, String token) {
 		String firstWord = getFirst(list);
 		return firstWord.equals(token);
-	}
+	}*/
 	
-	private boolean isLast(String[] array, String token) {
+	/*private boolean isLast(String[] array, String token) {
 		String lastWord = getLast(array);
 		return lastWord.equals(token);
-	}
+	}*/
 
 	/*private boolean isLast(ArrayList<String> list, String token) {
 		String lastWord = getLast(list);
@@ -617,9 +886,9 @@ public class Parser {
 		return array[0];
 	}
 	
-	private String getFirst(ArrayList<String> arrayList){
+	/*private String getFirst(ArrayList<String> arrayList){
 		return arrayList.get(0);
-	}
+	}*/
 	
 	private String getLast(String[] array){
 		if (array.length == 0) {
@@ -635,8 +904,8 @@ public class Parser {
 		return arrayList.get(arrayList.size()-1);
 	}
 	
-	private String getPrevious(ArrayList<String> list, String token) {
+	/*private String getPrevious(ArrayList<String> list, String token) {
 		return list.get( list.indexOf(token)-1 );
-	}
+	}*/
 	
 }

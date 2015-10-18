@@ -3,7 +3,7 @@ package main.java.backend.Storage;
 public class StorageException extends Exception {
 	
 	private static final long serialVersionUID = 1L;
-	private static final String MESSAGE_ERROR = "There is an error in storage.";
+	private static final String MESSAGE_ERROR = "An error occurred in storage.";
 	
 	public StorageException() {
 		super(MESSAGE_ERROR);

@@ -6,9 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.TreeMap;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
 import main.java.backend.Storage.Task.Task;
 
 
@@ -27,6 +24,8 @@ public class StorageSave extends StorageOperation {
 	private FileWriter textFileWriter;
 	
 	public StorageSave(String filePath) {
+		
+		storageFormat = new StorageFormat();
 		//String.format(CUSTOM_FILE_LOCATION, filePath);
 	}
 
@@ -59,31 +58,18 @@ public class StorageSave extends StorageOperation {
 		textFile.renameTo(newFile);
 	}
 	
-	private void saveData(TreeMap<Integer, Task> allData) throws StorageException {
-		
-		try {
-			ObjectMapper mapper = new ObjectMapper();
-			mapper.enable(SerializationFeature.INDENT_OUTPUT);
-			bufferedWriter.write(mapper.writeValueAsString(allData));
-		} catch (IOException e) {
-			throw new StorageException();
-		}
-	}
-	
 	public TreeMap<Integer, Task> execute(TreeMap<Integer, Task> allData) {
 		
 		try {
 			initializeWriter();
 			changeFileDirectory();
 			
-			System.out.println("FINAL: " + CUSTOM_FILE_LOCATION);
-			
 			if(allData != null) {
-				saveData(allData);
+				bufferedWriter.write(storageFormat.serialize(allData));
 			}
 			
 			closeWriter();
-		} catch (StorageException e) {
+		} catch (IOException | StorageException e) {
 			e.getMessage();
 		}
 		

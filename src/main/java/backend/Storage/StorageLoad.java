@@ -10,10 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.TreeMap;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import main.java.backend.Storage.Task.Task;
 
 /**
@@ -33,6 +29,7 @@ public class StorageLoad extends StorageOperation {
 	public StorageLoad(String filePath) {
 
 		//String.format(CUSTOM_FILE_LOCATION, filePath);
+		storageFormat = new StorageFormat();
 		initFile();
 	}
 
@@ -104,22 +101,21 @@ public class StorageLoad extends StorageOperation {
 	}
 
 	public TreeMap<Integer, Task> execute(TreeMap<Integer, Task> nullData) {
-
-		TreeMap<Integer, Task> allData = new TreeMap<Integer, Task>();
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+		
+		TreeMap<Integer, Task> allData = new TreeMap<Integer, Task> ();
+		
 		try {
 			if(!isFileEmpty()) {
-				allData = mapper.readValue(getAllTextsFromFile(), 
-						new TypeReference<TreeMap<Integer, Task>>() {});
-				closeReader();
+				allData = storageFormat.deserialize(getAllTextsFromFile());
 			}
-		}catch (IOException | StorageException e) {
+			
+			closeReader();
+		} catch (StorageException e) {
 			e.getMessage();
 		}
-
+		
 		return allData;
+
 	}
 
 }

@@ -13,6 +13,8 @@ public abstract class StorageOperation {
 	
 	public String CURRENT_FILE_LOCATION = new String();
 	public File textFile;
+	
+	public StorageFormat storageFormat;
 
 	public abstract TreeMap<Integer, Task> execute(TreeMap<Integer, Task> taskList);
 }

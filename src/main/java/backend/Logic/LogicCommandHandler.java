@@ -2,10 +2,11 @@ package main.java.backend.Logic;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import main.java.backend.Parser.Parser;
+import main.java.backend.Storage.Storage;
 
 public class LogicCommandHandler {
+	private static LogicCommandHandler commandHandler;
+	private static Storage storageComponent;
 	private static final String COMMAND_ADD = "add";
 	private static final String COMMAND_EDIT = "edit";
 	private static final String COMMAND_SORT = "sort";
@@ -13,28 +14,31 @@ public class LogicCommandHandler {
 	private static final String COMMAND_VIEW = "view";
 	private static final String COMMAND_EXIT = "exit";
 	private static final String COMMAND_UNDO = "undo";
+	private static final String COMMAND_REDO = "redo";
 	private static final String[] addKeywords = new String[] {"addF", "addT",
 			"addE", "adds", "addcat"};
 	private static final String[] editKeywords = new String[] {"set", "setT", 
 			"setE", "deadline", "event", "description", "reminder", "done", "undone",
 			"category","setCol","delete", "priority"};
 	private static final String[] sortKeywords = new String[] {"sortp", "sortd"};
-	private static final String[] viewKeywords = new String[] {"showCat", "showf",
-			"showt", "showe"};
-	private Parser parserObject;
-	
-
-	public LogicCommandHandler(Parser parserComponent) {
-		this.parserObject = parserComponent;
+	private static final String[] viewKeywords = new String[] {"showCat", "show float",
+			"show tasks", "show events", "show overdue"};
+	private LogicCommandHandler(String filename, Storage storage) {
+		storageComponent = storage;
+		LogicHistory.getInstance();
 	}
 
-	public Command parseCommand(String userInput) {
-		ArrayList<String> parsedUserInput = parserObject.parseInput(userInput);
-		String commandGiven = parsedUserInput.get(0);
-//		System.out.println("CommandGiven "+commandGiven);
+	public static LogicCommandHandler getInstance(String filename, Storage storage) {
+		if (commandHandler == null) {
+			commandHandler = new LogicCommandHandler(filename,storage);
+		}
+		return commandHandler;
+	}
+
+	public Command parse(ArrayList<String> parsedUserInput) {
+		String determinedCommandType = determineCommandType(parsedUserInput.get(0));
+//		System.out.println("determined Command Type: "+determinedCommandType);
 		Command commandObject = new Command();
-		String determinedCommandType = determineCommandType(commandGiven);
-//		System.out.println("determinedCommandType: "+determinedCommandType);
 		switch (determinedCommandType) {
 			case COMMAND_ADD:
 				commandObject = initAddCommand(parsedUserInput);
@@ -54,11 +58,14 @@ public class LogicCommandHandler {
 			case COMMAND_UNDO:
 				commandObject = initUndoCommand(parsedUserInput);
 				break;
+			case COMMAND_REDO:
+				commandObject = initRedoCommand(parsedUserInput);
+				break;
 			case COMMAND_VIEW:
 				commandObject = initViewCommand(parsedUserInput);
 				break;
 		}
-		return commandObject;
+	return commandObject;
 	}
 
 	private String determineCommandType(String commandGiven) {
@@ -77,18 +84,26 @@ public class LogicCommandHandler {
 			commandString = COMMAND_EXIT;
 		} else if (commandGiven.contains(COMMAND_UNDO)) {
 			commandString = COMMAND_UNDO;
+		} else if (commandGiven.contains(COMMAND_REDO)) {
+			commandString = COMMAND_REDO;
 		}
 		return commandString;
 	}
-	
 
 	private Command initViewCommand(ArrayList<String> parsedUserInput) {
-		Command viewCommandObject = new Command(Command.Type.VIEW);
+		Command viewCommandObject = new ViewCommand(Command.Type.VIEW,storageComponent);
 		viewCommandObject.setCommandField(parsedUserInput.get(0));
 		return viewCommandObject;
 	}
+	
+	private Command initRedoCommand(ArrayList<String> parsedUserInput) {
+		Command redoCommandObject = new Command(Command.Type.REDO);
+		redoCommandObject.setCommandField(parsedUserInput.get(0));
+		return redoCommandObject;
+	}
 
 	private Command initUndoCommand(ArrayList<String> parsedUserInput) {
+//		System.out.println("Initialising undoCommandObject");
 		Command undoCommandObject = new Command(Command.Type.UNDO);
 		undoCommandObject.setCommandField(parsedUserInput.get(0));
 		return undoCommandObject;
@@ -115,7 +130,7 @@ public class LogicCommandHandler {
 
 	private Command initAddCommand(ArrayList<String> parsedUserInput) {
 		int inputLength = parsedUserInput.size();
-		Command addCommandObject = new Command(Command.Type.ADD);
+		Command addCommandObject = new AddCommand(Command.Type.ADD,storageComponent);
 		addCommandObject.setCommandField(parsedUserInput.get(0));
 		addCommandObject.setTaskName(parsedUserInput.get(1));
 		addCommandObject.setDescription(parsedUserInput.get(2));
@@ -135,7 +150,7 @@ public class LogicCommandHandler {
 	}
 	
 	private Command initEditCommand(ArrayList<String> parsedUserInput) {
-		Command editCommandObject = new Command(Command.Type.EDIT);
+		Command editCommandObject = new EditCommand(Command.Type.EDIT,storageComponent);
 		editCommandObject.setCommandField(parsedUserInput.get(0));
 		editCommandObject.setTaskName(parsedUserInput.get(1));
 		switch (parsedUserInput.get(0)) {

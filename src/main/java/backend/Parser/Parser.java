@@ -15,7 +15,7 @@ public class Parser {
 	//List of all command words accepted by the program
 	private final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList(
 	"add", "addcat", "category", "deadline", "description", "delete", "done", "event", 
-	"every", "exit", "priority", "reminder", "rename", "search", "setcol", "showcat", 
+	"every", "exit", "priority", "reminder", "rename", "reset", "search", "setcol", "showcat", 
 	"show", "showE", "showF", "showT", "sort", "sortD", "sortN", "sortP", "undo", "undone") );
 	
 	//Commands that work just by typing the command word (without additional content)
@@ -24,7 +24,7 @@ public class Parser {
 	
 	//Commands that if appear first, will prevent other command keywords from having effect
 	private final ArrayList<String> COMMANDS_DOMINATING = new ArrayList<String>( Arrays.asList(
-	"addcat", "delete", "done", "every", "search", "setcol", "show", "showcat", "sort", "undone") );
+	"addcat", "delete", "done", "every", "reset", "search", "setcol", "show", "showcat", "sort", "undone") );
 	
 	//Commands that create a new item
 	private final ArrayList<String> COMMANDS_ADD_STUFF = new ArrayList<String>( Arrays.asList(
@@ -36,11 +36,15 @@ public class Parser {
 	
 	//Commands that only accept an index
 	private final ArrayList<String> COMMANDS_NEED_INDEX = new ArrayList<String>( 
-	Arrays.asList("delete", "done", "undone", "showcat") );
+	Arrays.asList("delete", "done", "reset", "undone", "showcat") );
 	
 	//Command words that indicate that the command is one-shot
 	private final ArrayList<String> COMMANDS_ONE_SHOT = new ArrayList<String>( 
 	Arrays.asList("add", "set") );	
+	
+	//Command fields that can be edited/resetted
+	private final ArrayList<String> COMMANDS_CAN_EDIT = new ArrayList<String>( 
+	Arrays.asList("all", "description", "deadline", "event", "priority", "reminder", "category") );	
 	
 	//The default list of fields and the order in which their contents are put into result
 	private final ArrayList<String> FIELDS_DEFAULT = new ArrayList<String>( Arrays.asList(
@@ -106,7 +110,6 @@ public class Parser {
 				} else {
 					result.set(0, firstWord+taskType);
 				}
-				return result;
 			} else if (firstWord.equals("sort")) {
 				String field = getSortField(getDefaultCommand(content));
 				if (field.equals("ERROR")) {
@@ -114,20 +117,20 @@ public class Parser {
 				} else {
 					result.set(0, firstWord+field);
 				}
-				return result;
-				
-			} if (needWords(firstWord)) { //if first word is addcat or search
+			} else if (needWords(firstWord)) { //if first word is addcat or search
 				result.add(content);
 			} else if (needIndex(firstWord)) { //if first word is delete, done, or undone 
-				if (isNumber(content)) {
-					result.add(content);
+				String nextWord = getFirst(content);
+				if (isNumber(nextWord)) {
+					result.add(nextWord);
 				} else {
 					result = makeErrorResult(result, "IndexError", content);
 				}
 			}
 
 		} else {
-			for (String token: inputTokens) {
+			for (int i = 0; i < inputTokens.length; i++) {
+				String token = inputTokens[i];
 				String originalToken = token;
 				//token = token.toLowerCase();
 				token = getDefaultCommand(token);
@@ -161,6 +164,23 @@ public class Parser {
 								}
 							}
 							putCommand(token);
+							//if command is delete, done or reset, ends here
+							if (isDominatingCommand(token) && !token.equals("every")) { 
+								if (token.equals("reset")) {
+									if (isLast(inputTokens, token)) {
+										result = makeErrorResult(result, "EmptyFieldError", token);
+									} else {
+										String content = mergeTokens(inputTokens, i+1, inputTokens.length);
+										String field = getDefaultCommand(content);
+										if (isLast(inputTokens, content) && canEdit(field)) {
+											fieldContent.put("reset", field);
+										} else {
+											result = makeErrorResult(result, "InvalidResetError", content);
+										}
+									}
+								}
+								break;
+							}
 						}
 					}
 					
@@ -311,6 +331,9 @@ public class Parser {
 				break;
 			case "InvalidSortFieldError":
 				result.add(error + ": '" + token + "' is not 'deadline', 'name' or 'priority'");
+				break;
+			case "InvalidResetError":
+				result.add(error + ": '" + token + "' is not a field that can be resetted");
 				break;
 			default:
 				break; 
@@ -779,6 +802,10 @@ public class Parser {
 		return COMMANDS_ONE_SHOT.contains(token);
 	}
 	
+	private boolean canEdit(String token) {
+		return COMMANDS_CAN_EDIT.contains(token);
+	}
+	
 	private boolean isNumber(String token) {
 		try {
 			Integer.parseInt(token);
@@ -872,10 +899,10 @@ public class Parser {
 		return firstWord.equals(token);
 	}*/
 	
-	/*private boolean isLast(String[] array, String token) {
+	private boolean isLast(String[] array, String token) {
 		String lastWord = getLast(array);
 		return lastWord.equals(token);
-	}*/
+	}
 
 	/*private boolean isLast(ArrayList<String> list, String token) {
 		String lastWord = getLast(list);
@@ -884,6 +911,10 @@ public class Parser {
 	
 	private String getFirst(String[] array){
 		return array[0];
+	}
+	
+	private String getFirst(String str){
+		return str.split(" ")[0];
 	}
 	
 	/*private String getFirst(ArrayList<String> arrayList){

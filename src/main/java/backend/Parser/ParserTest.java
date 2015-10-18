@@ -255,9 +255,41 @@ public class ParserTest {
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-	    input = "add addcat delete search sortp exit showf";
+	    input = "add addcat delete search reset sortp exit showf";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("addF", "addcat delete search sortp exit showf", "", "", "", "") );
+	    expected = new ArrayList<String>( Arrays.asList("addF", "addcat delete search reset sortp exit showf", "", "", "", "") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
+	    input = "delete 1 aaaaaaaaaa";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("delete", "1") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
+	    input = "1 reset all";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("reset", "1", "all") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
+	    input = "1 reset deadline";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("reset", "1", "deadline") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
+	    input = "1 reset pri";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("reset", "1", "priority") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -742,13 +774,13 @@ public class ParserTest {
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-	    /*input = "deadline deadline";
+	    input = "deadline deadline";
 	    parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("error", "DuplicateCommandError: duplicate command 'deadline'") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
-	    assertEquals(expected, parsed);*/
+	    assertEquals(expected, parsed);
 	    
 		input = "1 deadline 30 October 12:34 deadline 30 December 23:59";
 	    parsed = parser.parseInput(input);
@@ -957,5 +989,22 @@ public class ParserTest {
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
+	    
+	    input = "1 reset";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: please enter content for the command 'reset'") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
+	    input = "1 reset aaaaaaaaaa";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidResetError: 'aaaaaaaaaa' is not a field that can be resetted") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
 	}
 }

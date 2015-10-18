@@ -1,80 +1,71 @@
-Add Float:
+Add Floating:
 ("addF", Task Name, Description, Priority, Reminder, Category)
-
-Add To-Do:
+Add ToDo:
 ("addT", Task Name, Description, Deadline, Priority, Reminder, Category)
-
 Add Event:
-("addE", Task Name, Description, Start Date/Time, End Date/Time, Priority, Reminder, Category)
+("addE", Task Name, Description, Start Date & Time, End Date & Time, Priority, Reminder, Category)
 
 Set:
-("set", Task Name, Description, Priority, Reminder, Category)
-
-Set To-Do:
-("setT", Task Name, Description, Deadline, Priority, Reminder, Category)
-
+("set", Task Index, Description, Priority, Reminder, Category, New Task Name)
+Set ToDo:
+("setT", Task Index, Description, Deadline, Priority, Reminder, Category, New Task Name)
 Set Event:
-("setE", Task Name, Description, Start Date/Time, End Date/Time, Priority, Reminder, Category)
-
-SetDeadline:
-("deadline", Task Name, Task Deadline)
-
-Set Start and End Time:
-("event", Task Name, Start Date/Time, End Date/Time)
+("setE", Task Index, Description, Start Date/Time, End Date/Time, Priority, Reminder, Category, New Task Name)
 
 Set Description:
-("description", Task Name, Description)
-
+("description", Task Index, Description)
+Set Deadline:
+("deadline", Task Index, Task Deadline)
+Set Start and End Time:
+("event", Task Index, Start Date/Time, End Date/Time)
+Set Priority:
+("priority", Task Index, Priority)
 Set Reminder:
-("reminder", Task Name, Reminder)
-
-Return To Home Screen:
-("return")
+("reminder", Task Index, Reminder)
+Set Category:
+("category", Task Index, Category)
+Rename Task:
+("rename", Task Index, New Task Name)
 
 Set Done:
-("done", Task Name)
-
+("done", Task Index)
 Set Undone:
-("undone", Task Name)
+("undone", Task Index)
+Delete:
+("delete", Task Index)
+Reset:
+("reset", Task Index, Field to be resetted)
 
+Exit:
+("exit")
 Undo:
 ("undo")
 
-Sort Priority:
-("sortp")
-
-Sort Date:
-("sortd")
-
-Setting a Task to be subtasked(So that it can be subtasked)
-("subtask", Task Name)
-
-Adding a Subtask:
-("adds", Task Name, Description)
-
-Adding a Category:
-("addcat", Category Name)
-
-Setting a task/event to the specified Category:
-("setcat", Task Name, Category Name)
-
-Show specific category:
-("showcat", Category Name)
-
-Setting a colour to a category:
-("setcol", Category Name, ColourID)
-
 Search:
-("search", keywords)
+("search", Keywords)
 
-Delete:
-("delete", Task Name)
+Error:
+("error", Error Message)
 
-Show Floats:
-("showf")
+Recurring every day:
+("every", Task Index, Time)
+Recurring every week:
+("every", Task Index, Dayoftheweek & Time)
+Recurring every month:
+("every", Task Index, Dayofthemonth)
+Recurring every year:
+("every", Task Index, Day & Month)
 
-Show To-Dos:
-("showt")
+Show Floating:
+("showF")
+Show ToDo:
+("showT")
+Show Event:
+("showE")
 
-Show Events:
-("showe")
+Sort Priority:
+("sortP")
+Sort Date:
+("sortD")
+Sort Name:
+("sortN")

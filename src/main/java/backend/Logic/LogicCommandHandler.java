@@ -22,7 +22,7 @@ public class LogicCommandHandler {
 			"category","setCol","delete", "priority"};
 	private static final String[] sortKeywords = new String[] {"sortp", "sortd"};
 	private static final String[] viewKeywords = new String[] {"showCat", "show float",
-			"show tasks", "show events", "show overdue"};
+			"show todo", "show events", "show overdue", "showT", "showE", "showO"};
 	private LogicCommandHandler(String filename, Storage storage) {
 		storageComponent = storage;
 	}

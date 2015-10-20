@@ -59,6 +59,7 @@ public class EditCommand extends Command {
 		historyState = storageComponent.load();
 		String feedbackString = "";
 		logicEditorLogger.info("Get Command Field: "+this.getCommandField());
+		System.out.println("Get Command Field: "+this.getCommandField());
 		switch(this.getCommandField()) {
 			case ("priority") :
 				feedbackString = setPriority(this);
@@ -68,6 +69,9 @@ public class EditCommand extends Command {
 				break;
 			case ("setE") :
 				feedbackString = setMultipleFieldsForEvents(this);
+				break;
+			case ("set") :
+				feedbackString = setMultipleFieldsForFloats(this);
 				break;
 			case ("delete") :
 				feedbackString = delete(this);
@@ -100,7 +104,7 @@ public class EditCommand extends Command {
 		currentState = storageComponent.load();
 		return feedbackString;
 	}
-	
+
 	public String undo() {
 		try {
 			futureState = currentState;
@@ -192,6 +196,34 @@ public class EditCommand extends Command {
 					!commandObject.getEndDateAndTime().equals("")) {
 				setEventStartAndEndTime(commandObject);
 
+			}
+			return EXECUTION_SET_SUCCESSFUL;
+		} catch (NumberFormatException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
+	}
+	
+	private String setMultipleFieldsForFloats(Command commandObject) {
+
+		try {
+			int taskId = Integer.parseInt(commandObject.getTaskName());
+			logicEditorLogger.info("taskId: "+taskId);
+			if (!commandObject.getDescription().equals("")) {
+				logicEditorLogger.info("Description: "+ commandObject.getDescription());
+				setDescription(commandObject);
+			}
+			if (!commandObject.getPriority().equals("")) {
+				logicEditorLogger.info("priority :"+commandObject.getPriority());
+				setPriority(commandObject);
+			}
+//			System.out.println("priority setted");
+			if (!commandObject.getReminder().equals("")) {
+				logicEditorLogger.info("reminder: "+commandObject.getReminder());
+				setReminder(commandObject);
+			}
+			if(!commandObject.getCategory().equals("")) {
+				logicEditorLogger.info("category: "+commandObject.getCategory());
+				setCategory(commandObject);
 			}
 			return EXECUTION_SET_SUCCESSFUL;
 		} catch (NumberFormatException e) {

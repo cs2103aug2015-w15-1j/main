@@ -193,7 +193,7 @@ public class Task implements Comparable<Task> {
 			sb.append(end + System.getProperty("line.separator"));
 		}
 		if (reminder!=""){
-			sb.append("reminder: "+ reminder + System.getProperty("line.separator"));
+			sb.append("reminder has been set."+ System.getProperty("line.separator"));
 		}
 		if (isDone){
 		sb.append("It's completed!" + System.getProperty("line.separator"));

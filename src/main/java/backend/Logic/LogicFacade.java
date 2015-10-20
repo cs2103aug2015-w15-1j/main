@@ -78,8 +78,10 @@ public class LogicFacade {
 					break;
 				case VIEW:
 					feedbackString = commandObject.getCommandField();
+					break;
 				case EXIT:
 					System.exit(0);
+					break;
 				default:
 					feedbackString = commandObject.execute();
 					historyStack.push(commandObject);

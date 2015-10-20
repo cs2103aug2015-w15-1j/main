@@ -25,7 +25,6 @@ public class LogicCommandHandler {
 			"show tasks", "show events", "show overdue"};
 	private LogicCommandHandler(String filename, Storage storage) {
 		storageComponent = storage;
-		LogicHistory.getInstance();
 	}
 
 	public static LogicCommandHandler getInstance(String filename, Storage storage) {

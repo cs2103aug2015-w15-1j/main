@@ -339,7 +339,8 @@ public class GUI extends Application{
 	private static void refresh(){
 		//System.out.println("refreshing");
 		if (currentScene == SCENE_MAIN){
-			gridPane.getChildren().removeAll(listOverdue, listFloat,listTasks,listEvents);
+			gridPane.getChildren().removeAll(tasks,events,floating,listOverdue, listFloat,listTasks,listEvents);
+			setUpHeadings();
 			setUpContents();
 		}
 		else{

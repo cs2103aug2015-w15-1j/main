@@ -62,7 +62,7 @@ public class LogicFacade {
 			System.out.println("History stack size before command execution: "+historyStack.size());
 			ArrayList<String> parsedUserInput = parserComponent.parseInput(userInput);
 			Command commandObject = logicCommandHandler.parse(parsedUserInput);
-//			System.out.println("CommandObject type: "+commandObject.getType());
+			System.out.println("CommandObject type: "+commandObject.getType());
 			String feedbackString = "";
 			switch (commandObject.getType()) {
 				case UNDO:

@@ -664,7 +664,7 @@ public class Parser {
 	 */
 	private String changeDateFormat(String dateString) {
 		SimpleDateFormat nattyFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM hh:mma");
+		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM hh:mma yyyy");
 		Date tempDate = null;
 		try {
 			tempDate = nattyFormat.parse(dateString);

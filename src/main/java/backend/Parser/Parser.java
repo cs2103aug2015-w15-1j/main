@@ -14,13 +14,13 @@ import com.joestelmach.natty.*;
 public class Parser {
 	//List of all command words accepted by the program
 	private final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList(
-	"add", "addcat", "category", "deadline", "description", "delete", "done", "event", 
-	"every", "exit", "priority", "reminder", "rename", "reset", "search", "setcol", "showcat", 
-	"show", "showE", "showF", "showT", "sort", "sortD", "sortN", "sortP", "undo", "undone") );
+	"add", "addcat", "category", "deadline", "description", "delete", "done", "event", "every", 
+	"exit", "priority", "redo", "reminder", "rename", "reset", "search", "setcol", "showcat",   
+	"show", "showE", "showF", "showO", "showT", "sort", "sortD", "sortN", "sortP", "undo", "undone") );
 	
 	//Commands that work just by typing the command word (without additional content)
 	private final ArrayList<String> COMMANDS_NO_CONTENT = new ArrayList<String>( Arrays.asList(
-	"exit", "showE", "showF", "showT", "sortD", "sortN", "sortP", "undo") );
+	"exit", "redo", "showE", "showF", "showO", "showT", "sortD", "sortN", "sortP", "undo") );
 	
 	//Commands that if appear first, will prevent other command keywords from having effect
 	private final ArrayList<String> COMMANDS_DOMINATING = new ArrayList<String>( Arrays.asList(
@@ -844,12 +844,21 @@ public class Parser {
 	
 	private String getTaskType(String token){
 		switch (token.toLowerCase()) {
-		case "todo":
+		case "todo": 
+		case "todos":
+		case "t":
 			return "T";
 		case "event":
+		case "events":
+		case "e":
 			return "E";
 		case "floating":
+		case "floatings":
+		case "f":
 			return "F";
+		case "overdue":
+		case "o":
+			return "O";
 		default:
 			return "ERROR";
 		}
@@ -858,10 +867,16 @@ public class Parser {
 	private String getSortField(String token){
 		switch (token.toLowerCase()) {
 		case "deadline":
+		case "by deadline":
+		case "d":
 			return "D";
 		case "priority":
+		case "by priority":
+		case "p":
 			return "P";
 		case "name":
+		case "by name":
+		case "n":
 			return "N";
 		default:
 			return "ERROR";

@@ -56,6 +56,14 @@ public class ParserTest {
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 		
+	    input = "redo";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("redo") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
 		input = "add Project Proposal";
 		parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("addF", "Project Proposal", "", "", "", "") );
@@ -136,6 +144,14 @@ public class ParserTest {
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
+	    input = "showO";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("showO") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
 	    input = "show floating";
 	    parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("showF") );
@@ -144,9 +160,17 @@ public class ParserTest {
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-	    input = "show event";
+	    input = "show events";
 	    parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("showE") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
+	    input = "show o";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("showO") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -179,6 +203,14 @@ public class ParserTest {
 	    input = "sort name";
 	    parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("sortN") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
+	    input = "sort by priority";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("sortP") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());

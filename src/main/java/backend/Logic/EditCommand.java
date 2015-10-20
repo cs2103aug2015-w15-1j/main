@@ -59,7 +59,7 @@ public class EditCommand extends Command {
 		historyState = storageComponent.load();
 		String feedbackString = "";
 		logicEditorLogger.info("Get Command Field: "+this.getCommandField());
-		System.out.println("Get Command Field: "+this.getCommandField());
+//		System.out.println("Get Command Field: "+this.getCommandField());
 		switch(this.getCommandField()) {
 			case ("priority") :
 				feedbackString = setPriority(this);
@@ -109,8 +109,8 @@ public class EditCommand extends Command {
 		try {
 			futureState = currentState;
 			currentState = historyState;
-			System.out.println("Future state: "+futureState);
-			System.out.println("Current state: "+currentState);
+//			System.out.println("Future state: "+futureState);
+//			System.out.println("Current state: "+currentState);
 			storageComponent.save(historyState);
 			return "Undo successfully";
 		} catch (EmptyStackException e) {

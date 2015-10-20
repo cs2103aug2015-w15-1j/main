@@ -58,8 +58,8 @@ public class AddCommand extends Command {
 		try {
 			futureState = currentState;
 			currentState = historyState;
-			System.out.println("Future state: "+futureState);
-			System.out.println("Current state: "+currentState);
+//			System.out.println("Future state: "+futureState);
+//			System.out.println("Current state: "+currentState);
 			storageComponent.save(historyState);
 			return "Undo successfully";
 		} catch (EmptyStackException e) {

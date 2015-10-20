@@ -14,9 +14,9 @@ import main.java.backend.Storage.Task.TaskType;
 public class Observer {
 	
 	private static final SimpleDateFormat standardFormat = 
-			new SimpleDateFormat("EEE, dd MMM yy hh:mma");
+			new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
 	private static final SimpleDateFormat standardFormatNoMinute = 
-			new SimpleDateFormat("EEE, dd MMM yy hha");
+			new SimpleDateFormat("EEE, dd MMM yy, hha");
 	
 	private static final long DAY_IN_MILLISECOND = 86400000L;
 

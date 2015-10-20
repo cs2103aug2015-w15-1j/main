@@ -553,6 +553,7 @@ public class Parser {
 		dateString = dateString.substring(1, dateString.length()-1); //remove brackets
 		dateString = confirmDateIsInFuture(dateString);
 		dateString = changeDateFormat(dateString);
+		dateString = removeMinuteIfZero(dateString);
 		
 		return dateString;
 	}
@@ -664,7 +665,7 @@ public class Parser {
 	 */
 	private String changeDateFormat(String dateString) {
 		SimpleDateFormat nattyFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM hh:mma yyyy");
+		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM yyyy h:mma");
 		Date tempDate = null;
 		try {
 			tempDate = nattyFormat.parse(dateString);
@@ -674,6 +675,45 @@ public class Parser {
 		}
 		dateString = standardFormat.format(tempDate);
 		return dateString;
+	}
+
+	private String removeMinuteIfZero(String dateString) {
+		String result = "";
+		String[] dateTokens = dateString.split(" ", 5);
+		String time = getLast(dateTokens);
+		String year = dateTokens[dateTokens.length-2];
+		//String[] dateTokens = dateString.split(":", 2);
+		//String part1 = getFirst(dateTokens);
+		//String part2 = getLast(dateTokens);
+		result += mergeTokens(dateTokens, 0, 3) + " ";
+		
+		year = year.substring(2, year.length());
+		result += year + " ";
+		
+		String[] timeTokens = time.split(":", 2);
+		String hour = getFirst(timeTokens);
+		if (hour.charAt(0) == '0'){
+			result += hour.charAt(1);
+		} else {
+			result += hour;
+		}
+		//result += getFirst(dateTokens);
+		
+		//dateTokens = part2.split(" ", 2);
+		String minute = getLast(timeTokens);
+		if (minute.equals("00AM")) {
+			result += "am";
+		} else if (minute.equals("00PM")) {
+			result += "pm";
+		} else {
+			minute = minute.replace("AM", "am");
+			minute = minute.replace("PM", "pm");
+			result += ":" + minute;
+		}
+		/*if (dateTokens.length > 1) {
+			result += getSecond(dateTokens);
+		}*/
+		return result;
 	}
 
 	private String changeToRecurFormat(String freq, String dateString) {
@@ -932,6 +972,10 @@ public class Parser {
 		return str.split(" ")[0];
 	}
 	
+	private String getSecond(String[] array){
+		return array[1];
+	}
+	
 	/*private String getFirst(ArrayList<String> arrayList){
 		return arrayList.get(0);
 	}*/
@@ -948,6 +992,11 @@ public class Parser {
 			return "";
 		}
 		return arrayList.get(arrayList.size()-1);
+	}
+	
+	private String getLast(String str){
+		String[] temp = str.split(" ");
+		return temp[temp.length-1];
 	}
 	
 	/*private String getPrevious(ArrayList<String> list, String token) {

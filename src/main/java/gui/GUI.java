@@ -49,7 +49,8 @@ public class GUI extends Application{
 	private static final String COMMAND_SHOW_OVERDUE = "show overdue"; 
 	private static final String COMMAND_SHOW_FLOAT = "show float";
 	private static final String COMMAND_EXIT = "exit";
-	private final KeyCombination KC = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
+	private final KeyCombination undo = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
+	private final KeyCombination redo = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);
 	private static final Logger GUILOG= Logger.getLogger(GUI.class.getName());;
 	
 	private static final int SCENE_MAIN = 1;
@@ -407,8 +408,15 @@ public class GUI extends Application{
 
 				} else if(ke.getCode().equals(KeyCode.TAB)){
 					changeScene();
-				} else if(KC.match(ke)){
+				} else if(undo.match(ke)){
 					String response = controller.executeCommand("undo");
+
+					refresh();
+
+					displayStringToScreen(response);
+
+				} else if(redo.match(ke)){
+					String response = controller.executeCommand("redo");
 
 					refresh();
 
@@ -426,9 +434,9 @@ public class GUI extends Application{
 					showTodayTasks();
 				} else if(ke.getCode().equals(KeyCode.F4)){
 					showTodayEvents();
-				} else if(ke.getCode().equals(KeyCode.F11)){
+				} else if(ke.getCode().equals(KeyCode.F5)){
 					showCompleted();
-				} else if (ke.getCode().equals(KeyCode.F12)){
+				} else if (ke.getCode().equals(KeyCode.ESCAPE)){
 				
 					controller.executeCommand("exit");
 				}

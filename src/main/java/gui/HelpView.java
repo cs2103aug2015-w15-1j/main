@@ -77,7 +77,7 @@ public class HelpView {
 		row1.setPercentHeight(95);
 		pane.getRowConstraints().addAll(row1);
 		comp.setPadding(new Insets(15,15,15,15));
-		comp.setSpacing(8);
+		comp.setSpacing(9);
 		pop.setTitle("help");
 		
 		hotKey(comp, imageBox,pane);
@@ -93,7 +93,7 @@ public class HelpView {
 		
 		pane.setGridLinesVisible(false);
 		pane.getChildren().addAll(leftNavi,rightNavi);
-		Scene stageScene = new Scene(pane, 700, 600);
+		Scene stageScene = new Scene(pane, 700, 650);
 		Image icon = new Image(getClass().getResourceAsStream("tank.png")); 
 		pop.getIcons().add(icon);
 		stageScene.getStylesheets().add(getClass().getResource("HelpStyle.css").toExternalForm());
@@ -168,30 +168,33 @@ public class HelpView {
 	}
 	private void hotKey(VBox comp, VBox imageBox,GridPane pane) {
 		ArrayList<String>imageNames = hotkey.getResourceList();	
-		for (int i=0;i<imageNames.size()-2;i++){
-			ImageView imv = new ImageView();
-			Image image = new Image(GUI.class.getResourceAsStream(imageNames.get(i)));
-			imv.setImage(image);
-			imv.setFitWidth(45);
-			imv.setPreserveRatio(true);
-			imageBox.getChildren().add(imv);
+		for (int i=0;i<imageNames.size();i++){
+			if (i<=imageNames.size()-5) {
+				ImageView imv = new ImageView();
+				Image image = new Image(GUI.class.getResourceAsStream(imageNames.get(i)));
+				imv.setImage(image);
+				imv.setFitWidth(47);
+				imv.setPreserveRatio(true);
+				imageBox.getChildren().add(imv);
+			}else{ //double images
+				HBox box = new HBox();
+				box.setAlignment(Pos.CENTER);
+				ImageView newimv = new ImageView();
+				Image newimage = new Image(GUI.class.getResourceAsStream(imageNames.get(i)));
+				newimv.setImage(newimage);
+				newimv.setFitWidth(45);
+				newimv.setPreserveRatio(true);
+				ImageView newimv2 = new ImageView();
+				Image newimage2 = new Image(GUI.class.getResourceAsStream(imageNames.get(i+1)));
+				newimv2.setImage(newimage2);
+				newimv2.setFitWidth(45);
+				newimv2.setPreserveRatio(true);
+				box.getChildren().addAll(newimv,newimv2);
+				imageBox.getChildren().add(box);
+				i++;
+			} 
 		}
-		HBox ctrlz = new HBox();
-		ctrlz.setAlignment(Pos.CENTER);
-		ImageView imv = new ImageView();
-		Image image = new Image(GUI.class.getResourceAsStream("Resources/ctrl.png"));
-		imv.setImage(image);
-		imv.setFitWidth(45);
-		imv.setPreserveRatio(true);
-		ImageView imv2 = new ImageView();
-		Image image2 = new Image(GUI.class.getResourceAsStream("Resources/z.png"));
-		imv2.setImage(image2);
-		imv2.setFitWidth(45);
-		imv2.setPreserveRatio(true);
-		ctrlz.getChildren().addAll(imv,imv2);
-		imageBox.getChildren().add(ctrlz);
 		
-
 		ArrayList<String> help = hotkey.retrieveHotkey();
 		for  (int i =0 ;i<help.size();i++) {
 			Label label = new Label();

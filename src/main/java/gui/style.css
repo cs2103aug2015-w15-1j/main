@@ -2,6 +2,7 @@
 .root{
 	-fx-background-image:url(../../../../src/main/java/gui/Resources/background.png);
 	-fx-text-inner-color: black;
+	-fx-font-size: 14px;
 }
 
 .label{
@@ -46,7 +47,7 @@
   -fx-font-size: 16px;
 }
 .txtarea:disabled{  
-  -fx-font-size:14px;
+  -fx-font-size:1.0em;
   -fx-opacity: 1.0;
   -fx-text-inner-color: black;
   -fx-text-fill: #000000;

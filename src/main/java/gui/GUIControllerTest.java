@@ -7,6 +7,7 @@ import org.junit.Test;
 
 public class GUIControllerTest {
 	GUIController controller = new GUIController();
+	//white box testing
 	@Test
 	public void testExecuteCommand() {
 		//add
@@ -45,12 +46,12 @@ public class GUIControllerTest {
 		//changing dates
 		//date exist
 		controller.executeCommand("add submit proposal deadline 31 dec 7 pm");
-		assertEquals("Task 1 deadline has been set to Sun, 20 Dec 07:00PM",controller.executeCommand("1 deadline 20 dec 7 pm"));
+		assertEquals("Task 1 deadline has been set to Sun, 20 Dec 15 7pm",controller.executeCommand("1 deadline 20 dec 7 pm"));
 		
 		//date dne (fails. date becomes 1st dec...?)
 		//assertEquals("Task 1 deadline has been set to Sun, 20 Dec 07:00PM",controller.executeCommand("1 deadline 32 dec 7 pm"));
 		//date is blank (becomes a floating task)
-		//assertEquals("Invalid Command. Please try again.",controller.executeCommand("1 deadline "));
+		assertEquals("Invalid Command. Please try again.",controller.executeCommand("1 deadline "));
 		
 		//Description
 		assertEquals("Description for task 1 has been set", controller.executeCommand("1 description hello"));
@@ -58,23 +59,28 @@ public class GUIControllerTest {
 		// undo
 		assertEquals("Undo successfully", controller.executeCommand("undo"));
 		
-		//changename
+		//reminder
+		//reminder date after deadline/event dates
+		//reminder before deadline/event dates
+		assertEquals("Reminder for Task 1 has been set to be at Sun, 20 Dec 15 12pm",controller.executeCommand("1 reminder 20 dec"));
+		//change name
+		
 	}
 
-/*	@Test
+	@Test
 	public void testGetTasksList() {
 		
 		controller.executeCommand("delete 1");
 		controller.retrieveAllData();
-	//	assertEquals("[]",controller.getTasksList().toString());
+		assertEquals("[]",controller.getTasksList().toString());
 		
 		controller.executeCommand("add taskname deadline 31 dec 7pm");
 		controller.retrieveAllData();
 		StringBuilder sb = new StringBuilder();
 		sb.append("1. taskname "+System.getProperty("line.separator"));
-		sb.append("Thu, 31 Dec 07:00PM"+System.getProperty("line.separator"));
+		sb.append("Thu, 31 Dec 07:00PM 2015"+System.getProperty("line.separator"));
 		String expected =sb.toString();
-		assertEquals("["+expected+"]",controller.getTasksList());
+		assertEquals("["+expected+"]",controller.getTasksList().toString());
 	}
 
 /*	@Test

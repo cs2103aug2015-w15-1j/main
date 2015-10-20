@@ -665,7 +665,7 @@ public class Parser {
 	 */
 	private String changeDateFormat(String dateString) {
 		SimpleDateFormat nattyFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM yyyy h:mma");
+		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM yy, h:mma");
 		Date tempDate = null;
 		try {
 			tempDate = nattyFormat.parse(dateString);
@@ -679,54 +679,69 @@ public class Parser {
 
 	private String removeMinuteIfZero(String dateString) {
 		String result = "";
-		String[] dateTokens = dateString.split(" ", 5);
-		String time = getLast(dateTokens);
-		String year = dateTokens[dateTokens.length-2];
-		//String[] dateTokens = dateString.split(":", 2);
-		//String part1 = getFirst(dateTokens);
-		//String part2 = getLast(dateTokens);
-		result += mergeTokens(dateTokens, 0, 3) + " ";
-		
-		year = year.substring(2, year.length());
-		result += year + " ";
-		
-		String[] timeTokens = time.split(":", 2);
-		String hour = getFirst(timeTokens);
-		if (hour.charAt(0) == '0'){
-			result += hour.charAt(1);
+		if (containLetter(dateString, ":")) {
+			String[] dateTokens = dateString.split(" ");
+			String time = getLast(dateTokens);
+			if (dateTokens.length > 1) {
+				//String year = dateTokens[dateTokens.length-2];
+				result += mergeTokens(dateTokens, 0, dateTokens.length-1) + " ";
+				/*if (!result.isEmpty()) {
+					result += " ";
+				}
+				if (year.length() == 4) {
+					year = year.substring(2, year.length());
+				}
+				result += year + " ";*/
+			}
+			
+			String[] timeTokens = time.split(":", 2);
+			String hour = getFirst(timeTokens);
+			if (hour.charAt(0) == '0'){
+				result += hour.charAt(1);
+			} else {
+				result += hour;
+			}
+			
+			String minute = getLast(timeTokens);
+			if (minute.equals("00AM")) {
+				result += "am";
+			} else if (minute.equals("00PM")) {
+				result += "pm";
+			} else {
+				minute = minute.replace("AM", "am");
+				minute = minute.replace("PM", "pm");
+				result += ":" + minute;
+			}
 		} else {
-			result += hour;
+			result = dateString;
 		}
-		//result += getFirst(dateTokens);
-		
-		//dateTokens = part2.split(" ", 2);
-		String minute = getLast(timeTokens);
-		if (minute.equals("00AM")) {
-			result += "am";
-		} else if (minute.equals("00PM")) {
-			result += "pm";
-		} else {
-			minute = minute.replace("AM", "am");
-			minute = minute.replace("PM", "pm");
-			result += ":" + minute;
-		}
-		/*if (dateTokens.length > 1) {
-			result += getSecond(dateTokens);
-		}*/
 		return result;
 	}
 
 	private String changeToRecurFormat(String freq, String dateString) {
-		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM hh:mma");
-		SimpleDateFormat recurDayFormat = new SimpleDateFormat("hh:mma");
-		SimpleDateFormat recurWeekFormat = new SimpleDateFormat("EEE hh:mma");
+		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
+		SimpleDateFormat standardFormatNoMinute = new SimpleDateFormat("EEE, dd MMM yy, hha");
+		SimpleDateFormat recurDayFormat = new SimpleDateFormat("h:mma");
+		SimpleDateFormat recurWeekFormat = new SimpleDateFormat("EEE h:mma");
 		SimpleDateFormat recurYearFormat = new SimpleDateFormat("dd MMM");
 		Date tempDate = null;
-		try {
-			tempDate = standardFormat.parse(dateString);
-		} catch (Exception e) {
-			System.out.println("Parsing Error");
-			e.printStackTrace();
+		
+		dateString = dateString.replace("am", "AM");
+		dateString = dateString.replace("pm", "PM");
+		if (containLetter(dateString, ":")) {
+			try {
+				tempDate = standardFormat.parse(dateString);
+			} catch (Exception e) {
+				System.out.println("Parsing Error");
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				tempDate = standardFormatNoMinute.parse(dateString);
+			} catch (Exception e) {
+				System.out.println("Parsing Error");
+				e.printStackTrace();
+			}
 		}
 		switch (freq) {
 		case "day":
@@ -742,6 +757,9 @@ public class Parser {
 			dateString = standardFormat.format(tempDate);
 			break;
 		}
+		dateString = removeMinuteIfZero(dateString);
+		//dateString = dateString.replace("AM", "am");
+		//dateString = dateString.replace("PM", "pm");
 		return dateString;
 	}
 
@@ -997,6 +1015,10 @@ public class Parser {
 	private String getLast(String str){
 		String[] temp = str.split(" ");
 		return temp[temp.length-1];
+	}
+	
+	private boolean containLetter(String str, String letter){
+		return str.split(letter).length > 1;
 	}
 	
 	/*private String getPrevious(ArrayList<String> list, String token) {

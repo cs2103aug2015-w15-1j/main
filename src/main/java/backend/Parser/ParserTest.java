@@ -74,7 +74,7 @@ public class ParserTest {
 	    
 	    input = "1 deadline 30 December 23:59";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 11:59PM 2015") );
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 15, 11:59pm") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -112,17 +112,17 @@ public class ParserTest {
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	   
-	    input = "1 by 12 Feb 3PM";
+	    input = "1 by 12 Feb 3pm";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Fri, 12 Feb 03:00PM 2016") );
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Fri, 12 Feb 16, 3pm") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-	    input = "3 from 4 Apr 4PM to 5 May 5PM";
+	    input = "3 from 4 Apr 4pm to 5 May 5:30pm";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "3", "Mon, 04 Apr 04:00PM 2016", "Thu, 05 May 05:00PM 2016") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "3", "Mon, 04 Apr 16, 4pm", "Thu, 05 May 16, 5:30pm") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -334,7 +334,7 @@ public class ParserTest {
 	    
 	    input = "add Project Proposal deadline 30 December 23:59";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("addT", "Project Proposal", "", "Wed, 30 Dec 11:59PM 2015", "", "", "") );
+	    expected = new ArrayList<String>( Arrays.asList("addT", "Project Proposal", "", "Wed, 30 Dec 15, 11:59pm", "", "", "") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -351,16 +351,16 @@ public class ParserTest {
 	    input = "add Project Proposal deadline 30 December 23:59 priority 5 description i need to start doing this!";
 	    parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("addT", "Project Proposal", "i need to start doing this!",  
-	    								  "Wed, 30 Dec 11:59PM 2015", "5", "", "") );
+	    								  "Wed, 30 Dec 15, 11:59pm", "5", "", "") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);   
 	    
-	    input = "add User Guide reminder 20 October 12:00 description i will do this in 10 days priority 3";
+	    input = "add User Guide reminder 20 December 12:00 description i will do this in 10 days priority 3";
 	    parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("addF", "User Guide", "i will do this in 10 days", "3", 
-	    												"Tue, 20 Oct 12:00PM 2015", "") );
+	    												"Sun, 20 Dec 15, 12pm", "") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -369,7 +369,7 @@ public class ParserTest {
 	    input = "1 description i must finish this early reminder 25 Dec 21:00";
 	    parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("set", "1", "i must finish this early", "", 
-	    												"Fri, 25 Dec 09:00PM 2015", "", "") );
+	    												"Fri, 25 Dec 15, 9pm", "", "") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -377,25 +377,25 @@ public class ParserTest {
 	    
 	    input = "2 priority 4 deadline 5 October 20:00 category research ";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("setT", "2", "", "Wed, 05 Oct 08:00PM 2016",
+	    expected = new ArrayList<String>( Arrays.asList("setT", "2", "", "Wed, 05 Oct 16, 8pm",
 	    												"4", "", "research", "") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-	    input = "3 deadline 19 Nov 3PM category important";
+	    input = "3 deadline 19 Nov 3pm category important";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("setT", "3", "", "Thu, 19 Nov 03:00PM 2015", 
+	    expected = new ArrayList<String>( Arrays.asList("setT", "3", "", "Thu, 19 Nov 15, 3pm", 
 													"", "", "important", "") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-	    input = "1 des hello cat world dea 11 Jan 2PM rem 5 Jan 2PM pri 2";
+	    input = "1 des hello cat world dea 11 Jan 2pm rem 5 Jan 2pm pri 2";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("setT", "1", "hello", "Mon, 11 Jan 02:00PM 2016", "2", "Tue, 05 Jan 02:00PM 2016", "world", "") );
+	    expected = new ArrayList<String>( Arrays.asList("setT", "1", "hello", "Mon, 11 Jan 16, 2pm", "2", "Tue, 05 Jan 16, 2pm", "world", "") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -474,7 +474,7 @@ public class ParserTest {
 		
 		input = "1 deadline 30/12/15 23:59";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 11:59PM 2015") );
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 15, 11:59pm") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -482,23 +482,23 @@ public class ParserTest {
 	    
 		input = "1 deadline 30-12-15 23.59";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 11:59PM 2015") );
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 15, 11:59pm") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-		input = "1 deadline 30/12 11:59PM";
+		input = "1 deadline 30/12 11:59pm";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 11:59PM 2015") );
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 15, 11:59pm") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-		input = "1 deadline 30-12 11PM";
+		input = "1 deadline 30-12 11pm";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 11:00PM 2015") );
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 15, 11pm") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -506,7 +506,7 @@ public class ParserTest {
 	    
 		input = "1 deadline 30/12 23:59";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 11:59PM 2015") );
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 15, 11:59pm") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -514,7 +514,7 @@ public class ParserTest {
 	    
 		input = "1 deadline 30 Dec 23:59";
 		parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 11:59PM 2015") );
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 15, 11:59pm") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -522,7 +522,7 @@ public class ParserTest {
 	    
 		input = "1 deadline 12/3/2016 04:56:22";
 		parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Sat, 12 Mar 04:56AM 2016") );
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Sat, 12 Mar 16, 4:56am") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -530,7 +530,7 @@ public class ParserTest {
 	    
 		input = "1 deadline 30/12";
 		parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 11:59PM 2015") );
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 15, 11:59pm") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -538,7 +538,7 @@ public class ParserTest {
 	    
 		input = "1 deadline 30 Dec";
 		parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 11:59PM 2015") );
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 15, 11:59pm") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -546,14 +546,14 @@ public class ParserTest {
 	    
 		input = "1 deadline December 30";
 		parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 11:59PM 2015") );
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 15, 11:59pm") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
 	    //The result of these tests depend on whether the current time is before or after the stated deadline
-		/*input = "1 deadline 2:30PM 2015";
+		/*input = "1 deadline 2:30pm 2015";
 		parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", dateTmr + " 14:30:00 " + yearNow) );
 	    System.out.println("Input:    " + input);
@@ -568,17 +568,17 @@ public class ParserTest {
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);*/
 		
-	    input = "2 event 15/09 10AM";
+	    input = "2 event 15/09 10am";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 15 Sep 10:00AM 2016", "") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 15 Sep 16, 10am", "") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-	    input = "2 event 15-09 10AM";
+	    input = "2 event 15-09 10am";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 15 Sep 10:00AM 2016", "") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 15 Sep 16, 10am", "") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -586,26 +586,26 @@ public class ParserTest {
 		
 	    input = "3 event 15/09 10:00 to 17/09 09:59";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "3", "Thu, 15 Sep 10:00AM 2016", 
-	    								  "Sat, 17 Sep 09:59AM 2016") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "3", "Thu, 15 Sep 16, 10am", 
+	    								  "Sat, 17 Sep 16, 9:59am") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-	    input = "4 event 15/09 10AM to 2PM";
+	    input = "4 event 15/09 10am to 2pm";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 10:00AM 2016", 
-		"Thu, 15 Sep 02:00PM 2016") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10am", 
+		"Thu, 15 Sep 16, 2pm") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-	    input = "2 description i must reach there early event 30/12 11AM to 3PM reminder 29/12/15 12:00";
+	    input = "2 description i must reach there early event 30/12 11am to 3pm reminder 29/12/15 12:00";
 	    parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("setE", "2", "i must reach there early", 
-	    "Wed, 30 Dec 11:00AM 2015", "Wed, 30 Dec 03:00PM 2015", "", "Tue, 29 Dec 12:00PM 2015", "", "") );
+	    "Wed, 30 Dec 15, 11am", "Wed, 30 Dec 15, 3pm", "", "Tue, 29 Dec 15, 12pm", "", "") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -613,16 +613,16 @@ public class ParserTest {
 	    
 	    input = "add 2101 meeting category meetings event 12/12/15 12:00 to 18:00 priority 3";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("addE", "2101 meeting", "", "Sat, 12 Dec 12:00PM 2015", 
-	    "Sat, 12 Dec 06:00PM 2015", "3", "", "meetings") );
+	    expected = new ArrayList<String>( Arrays.asList("addE", "2101 meeting", "", "Sat, 12 Dec 15, 12pm", 
+	    "Sat, 12 Dec 15, 6pm", "3", "", "meetings") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-	    input = "2 event 15 Sep 10AM";
+	    input = "2 event 15 Sep 10am";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 15 Sep 10:00AM 2016", "") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 15 Sep 16, 10am", "") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -630,8 +630,8 @@ public class ParserTest {
 	    
 	    input = "add 2101 meeting category meetings event Dec 12 12:00 to 18:00 priority 3";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("addE", "2101 meeting", "", "Sat, 12 Dec 12:00PM 2015", 
-	    "Sat, 12 Dec 06:00PM 2015", "3", "", "meetings") );
+	    expected = new ArrayList<String>( Arrays.asList("addE", "2101 meeting", "", "Sat, 12 Dec 15, 12pm", 
+	    "Sat, 12 Dec 15, 6pm", "3", "", "meetings") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -639,8 +639,8 @@ public class ParserTest {
 	    
 	    input = "add 2101 meeting category meetings event 12 Dec 2015 12:00 to 18:00 priority 3";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("addE", "2101 meeting", "", "Sat, 12 Dec 12:00PM 2015", 
-	    										"Sat, 12 Dec 06:00PM 2015", "3", "", "meetings") );
+	    expected = new ArrayList<String>( Arrays.asList("addE", "2101 meeting", "", "Sat, 12 Dec 15, 12pm", 
+	    										"Sat, 12 Dec 15, 6pm", "3", "", "meetings") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -648,8 +648,8 @@ public class ParserTest {
 	    
 	    input = "add 2101 meeting category meetings event Dec 12 12:00 to 12 Dec 18:00 priority 3";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("addE", "2101 meeting", "", "Sat, 12 Dec 12:00PM 2015", 
-	    										"Sat, 12 Dec 06:00PM 2015", "3", "", "meetings") );
+	    expected = new ArrayList<String>( Arrays.asList("addE", "2101 meeting", "", "Sat, 12 Dec 15, 12pm", 
+	    										"Sat, 12 Dec 15, 6pm", "3", "", "meetings") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -657,8 +657,8 @@ public class ParserTest {
 	    
 	    input = "add longest meeting ever category meetings event Dec 12 2015 12:00 to Dec 12 2016 18:00 priority 3";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("addE", "longest meeting ever", "", "Sat, 12 Dec 12:00PM 2015", 
-	    										"Mon, 12 Dec 06:00PM 2016", "3", "", "meetings") );
+	    expected = new ArrayList<String>( Arrays.asList("addE", "longest meeting ever", "", "Sat, 12 Dec 15, 12pm", 
+	    										"Mon, 12 Dec 16, 6pm", "3", "", "meetings") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -666,32 +666,32 @@ public class ParserTest {
 	    
 	    input = "add longest meeting ever category meetings event 12/12/15 12:00 to 12/12/16 18:00 priority 3";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("addE", "longest meeting ever", "", "Sat, 12 Dec 12:00PM 2015", 
-	    										"Mon, 12 Dec 06:00PM 2016", "3", "", "meetings") );
+	    expected = new ArrayList<String>( Arrays.asList("addE", "longest meeting ever", "", "Sat, 12 Dec 15, 12pm", 
+	    										"Mon, 12 Dec 16, 6pm", "3", "", "meetings") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-	    input = "2 by 31 Dec 10AM 1995";
+	    input = "2 by 31 Dec 10am 1995";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("deadline", "2", "Thu, 31 Dec 10:00AM 2015") );
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "2", "Thu, 31 Dec 15, 10am") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-	    input = "2 event 31 Dec 10AM";
+	    input = "2 event 31 Dec 10am";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 31 Dec 10:00AM 2015", "") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 31 Dec 15, 10am", "") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-	    input = "2 event 2 Jan 10AM";
+	    input = "2 event 2 Jan 10am";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Sat, 02 Jan 10:00AM 2016", "") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Sat, 02 Jan 16, 10am", "") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -699,7 +699,7 @@ public class ParserTest {
 	    
 	    input = "2 event 2 Jan";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Sat, 02 Jan 12:00PM 2016", "") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Sat, 02 Jan 16, 12pm", "") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -707,7 +707,7 @@ public class ParserTest {
 	    
 	    input = "3 by today";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("deadline", "3", getTodayDate() + " 11:59PM 2015") );
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "3", getTodayDate() + " 15, 11:59pm") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -715,23 +715,31 @@ public class ParserTest {
 	    
 	    input = "3 by tmr";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("deadline", "3", getTmrDate() + " 11:59PM 2015") );
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "3", getTmrDate() + " 15, 11:59pm") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-	    input = "5 every day 10AM";
+	    input = "5 every day 10am";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "10:00AM") );
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "10am") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-	    input = "5 every week Tuesday 10AM";
+	    input = "5 every week Tuesday 10am";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "Tue 10:00AM") );
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "Tue 10am") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
+	    input = "5 every week Wed 10.30";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "Wed 10:30am") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -739,7 +747,7 @@ public class ParserTest {
 	    
 	    input = "5 every week Tue";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "Tue 12:00PM") );
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "Tue 12pm") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -966,7 +974,7 @@ public class ParserTest {
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-	    input = "1 event asdfghjkl to 30 Dec 2PM 2015";
+	    input = "1 event asdfghjkl to 30 Dec 2pm 2015";
 	    parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDateError: 'asdfghjkl' is not an acceptable date format") );
 	    System.out.println("Input:    " + input);
@@ -974,7 +982,7 @@ public class ParserTest {
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-	    input = "1 event 30 Dec 2PM 2015 to asdfghjkl";
+	    input = "1 event 30 Dec 2pm 2015 to asdfghjkl";
 	    parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDateError: 'asdfghjkl' is not an acceptable date format") );
 	    System.out.println("Input:    " + input);
@@ -982,9 +990,9 @@ public class ParserTest {
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
-	    input = "5 every 2PM 2015";
+	    input = "5 every 2pm 2015";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidFrequencyError: '2PM 2015' is not 'day', 'week', 'month' or 'year'") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidFrequencyError: '2pm 2015' is not 'day', 'week', 'month' or 'year'") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());

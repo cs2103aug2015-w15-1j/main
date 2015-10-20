@@ -149,13 +149,11 @@ public class Observer {
 	private ArrayList<String> getCategories() {
 		
 		ArrayList<String> categories = new ArrayList<String> ();
-
 		for(String name : storage.load().keySet()) {
 			if(!name.isEmpty()) {
 				categories.add(name);
 			}
 		}
-
 		return categories;
 	}
 	*/
@@ -173,7 +171,7 @@ public class Observer {
 		for(int taskId : taskList.keySet()) {
 			
 			Task task = taskList.get(taskId);
-			if(task.getTaskType().equals(taskType) && !task.getDone()) {
+			if(task.getTaskType().equals(taskType)) {
 				tasks.add(task);
 			}
 		}
@@ -244,6 +242,22 @@ public class Observer {
 		}
 
 		return pastEvents;
+	}
+	
+	private ArrayList<Task> getUnDoneFloatingTasks() {
+		
+		ArrayList<Task> tasks = new ArrayList<Task> ();
+		taskList = storage.load();
+		
+		for(int taskId : taskList.keySet()) {
+			
+			Task task = taskList.get(taskId);
+			if(task.getTaskType().equals(TaskType.FLOATING) && !task.getDone()) {
+				tasks.add(task);
+			}
+		}
+		
+		return tasks;
 	}
 	
 	private ArrayList<Task> getFloatingTasks() {
@@ -328,7 +342,7 @@ public class Observer {
 				data = getToDos();
 				break;
 			case ("floating") :
-				data = getFloatingTasks();
+				data = getUnDoneFloatingTasks();
 				break;
 			case ("events") :
 				data = getEvents();

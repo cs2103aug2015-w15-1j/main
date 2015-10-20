@@ -59,7 +59,7 @@ public class LogicFacade {
 	
 	public String execute(String userInput) {
 		try {
-//			System.out.println("History stack size before command execution: "+historyStack.size());
+			System.out.println("History stack size before command execution: "+historyStack.size());
 			ArrayList<String> parsedUserInput = parserComponent.parseInput(userInput);
 			Command commandObject = logicCommandHandler.parse(parsedUserInput);
 //			System.out.println("CommandObject type: "+commandObject.getType());
@@ -78,16 +78,14 @@ public class LogicFacade {
 					break;
 				case VIEW:
 					feedbackString = commandObject.getCommandField();
-					break;
 				case EXIT:
 					System.exit(0);
-					break;
 				default:
 					feedbackString = commandObject.execute();
 					historyStack.push(commandObject);
 			}
 			getterSubComponent.updateIndex();
-//			System.out.println("feedbackString: "+feedbackString);
+			System.out.println("feedbackString: "+feedbackString);
 //			System.out.println("History stack size after command execution: "+historyStack.size());
 			return feedbackString;
 		} catch (NullPointerException | EmptyStackException e) {

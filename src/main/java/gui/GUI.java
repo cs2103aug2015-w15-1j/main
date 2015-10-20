@@ -44,7 +44,7 @@ public class GUI extends Application{
 	private static final String LIST_EVENTS = "Events:";
 	private static final String LIST_FLOATING = "Floating:";
 	private static final String MESSAGE_COMMAND_HELP = "Press F1 to see a list of commands";
-	private static final String COMMAND_SHOW_TASKS = "show tasks";
+	private static final String COMMAND_SHOW_TASKS = "show todo";
 	private static final String COMMAND_SHOW_EVENTS = "show events";
 	private static final String COMMAND_SHOW_OVERDUE = "show overdue"; 
 	private static final String COMMAND_SHOW_FLOAT = "show float";
@@ -541,23 +541,23 @@ public class GUI extends Application{
 		if (display.equals("change")){
 			changeScene();
 		}
-		else if(display.equals(COMMAND_SHOW_OVERDUE)){
+		else if(display.equals(COMMAND_SHOW_OVERDUE)||display.equals("showO")){
 			currentList = NUM_OVERDUE;
 			setUpFocus();
 			refreshingFocus(currentList);
 			currentScene = SCENE_FOCUS;
 		}
-		else if(display.equals(COMMAND_SHOW_TASKS)){
+		else if(display.equals(COMMAND_SHOW_TASKS)||display.equals("showT")){
 			currentList = NUM_TASKS;
 			setUpFocus();
 			refreshingFocus(currentList);
 			currentScene = SCENE_FOCUS;
-		}else if(display.equals(COMMAND_SHOW_EVENTS)){
+		}else if(display.equals(COMMAND_SHOW_EVENTS)||display.equals("showE")){
 			currentList = NUM_EVENTS;
 			setUpFocus();
 			refreshingFocus(currentList);
 			currentScene = SCENE_FOCUS;
-		}else if(display.equals(COMMAND_SHOW_FLOAT)){
+		}else if(display.equals(COMMAND_SHOW_FLOAT)||display.equals("showF")){
 			currentList = NUM_FLOAT;
 			setUpFocus();
 			refreshingFocus(currentList);

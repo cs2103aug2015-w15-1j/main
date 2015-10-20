@@ -32,6 +32,8 @@ public class GUIController {
 	public GUIController() {
 		
 		logicComponent = LogicFacade.getInstance();
+		
+	
 		retrieveAllData();
 		getFocusList = logicComponent.retrieveTaskData("toDo"); //default as tasks
 	}

@@ -34,7 +34,7 @@ public class HelpView {
 	VBox comp;
 	VBox imageBox;
 	ListView<String> showList;
-	int currentView = -1;
+	int currentView;
 	ArrayList<ArrayList<String>> fullList;
 	ArrayList<String> textList;
 	
@@ -55,6 +55,7 @@ public class HelpView {
 	}
 	
 	public void helpPopUp() {
+		currentView=-1;
 		Stage pop = new Stage();
 		pane = new GridPane();
 		comp = new VBox();

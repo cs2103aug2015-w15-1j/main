@@ -2,13 +2,13 @@ package main.java.gui;
 
 import java.util.ArrayList;
 
-import main.java.backend.Logic.LogicController;
+import main.java.backend.Logic.LogicFacade;
 import main.java.backend.Storage.Task.Task;
 
 public class GUIController {
 	
 	private final String DEFAULT_FILENAME="filename.txt";
-	LogicController logicComponent;
+	LogicFacade logicComponent;
 	
 	private final int NUM_TASKS = 1;
 	private final int NUM_EVENTS = 2;
@@ -32,7 +32,7 @@ public class GUIController {
 	
 	public GUIController() {
 		
-		logicComponent = LogicController.getInstance(DEFAULT_FILENAME);
+		logicComponent = LogicFacade.getInstance(DEFAULT_FILENAME);
 		retrieveAllData();
 		getFocusList = logicComponent.retrieveTaskData("toDo"); //default as tasks
 	}
@@ -81,36 +81,6 @@ public class GUIController {
 		return getCompletedFloat;
 	}
 	
-	void updateIndex() {
-		retrieveAllData();
-		int a = getTasks.size(), b = getEvents.size(),c = getOverdue.size(),
-				d = getFloat.size(), e = getCompletedTasks.size(), f = getCompletedEvents.size();
-		setIndex(getTasks, 0);
-		setIndex(getEvents,a);
-		setIndex(getOverdue,a+b);
-		setIndex(getFloat, a+b+c);
-		setIndex(getCompletedTasks,a+b+c+d);
-		setIndex(getCompletedEvents, a+b+c+d+e);
-		setIndex(getCompletedFloat, a+b+c+d+e+f);
-		
-	}
-	
-	/**
-	 * this operation adds the index into the list.
-	 * numbering ordering are as follows:
-	 * 0>task>events>overdue>float 
-	 * 
-	 * @param list
-	 * @param index
-	 */
-	void setIndex(ArrayList<Task> list, int index) {
-		assert index >= 0;
-		for (int i=0;i<list.size();i++) { 
-		logicComponent.updateTaskNumbering(list,i,(++index));
-		}
-		
-	}
-	
 	void determineList(int currentList) {
 		if(currentList==NUM_OVERDUE){
 			getFocusList = getOverdueList();
@@ -128,7 +98,7 @@ public class GUIController {
 	}
 	
 	String executeCommand(String userInput) {
-		String feedback = logicComponent.executeCommand(userInput);
+		String feedback = logicComponent.execute(userInput);
 		return feedback;
 	}
 	

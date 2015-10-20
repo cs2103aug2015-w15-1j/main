@@ -6,6 +6,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.simple.parser.ParseException;
+import java.util.logging.*;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -19,44 +20,38 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import main.java.backend.Logic.LogicController;
 import main.java.backend.Storage.Task.Task;
-import main.java.backend.Util.hotkeyHelp;
+import main.java.backend.Util.HotkeyHelp;
 
 public class GUI extends Application{
 	
 	//Possible messages
 	private static final String MESSAGE_WELCOME = "Welcome to TankTask!";
 	private static final String MESSAGE_EMPTY = "List is empty";
-	private static final String DEFAULT_FILENAME="filename.txt";
 	private static final String LIST_OVERDUE = "Overdue Tasks:";
 	private static final String LIST_TASKS = "ToDo:";
 	private static final String LIST_EVENTS = "Events:";
-	private static final String LIST_FLOATING = "Floating";
-	private static final String MESSAGE_HELP = "Change view by typing \"change\" or pressing 'tab'";
+	private static final String LIST_FLOATING = "Floating:";
 	private static final String MESSAGE_COMMAND_HELP = "Press F1 to see a list of commands";
-	private static final String MESSAGE_SAMPLE_ADDTASK = "to insert a task: \"add [taskname] deadline [date & time] priority [1 to 5] category [name] reminder [date]\"";
-	private static final String MESSAGE_SAMPLE_ADDEVENT = "to insert an event: \"add [taskname] event [starting date & time] [ending date & time] priority [1 to 5] category [name] reminder [date]\"";
-	private static final String MESSAGE_SAMPLE_ADDFLOAT= "to insert a floating task: \"add [taskname] priority [1 to 5] category [name] reminder [date]\"";
 	private static final String COMMAND_SHOW_TASKS = "show tasks";
 	private static final String COMMAND_SHOW_EVENTS = "show events";
 	private static final String COMMAND_SHOW_OVERDUE = "show overdue"; 
 	private static final String COMMAND_SHOW_FLOAT = "show float";
 	private static final String COMMAND_EXIT = "exit";
 	private final KeyCombination KC = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
-
+	private static final Logger GUILOG= Logger.getLogger(GUI.class.getName());;
+	
 	private static final int SCENE_MAIN = 1;
 	private static final int SCENE_FOCUS = 2;
 	private static final int NUM_TASKS = 1;
@@ -71,7 +66,7 @@ public class GUI extends Application{
 	private static boolean toggleCate = false;
 
 	private static GUIController controller;
-	private static hotkeyHelp hotkey;
+	private static HelpView help;
 	private static GridPane gridPane;
 	private static Scene mainScene;	
 	private static String userCommands;
@@ -95,19 +90,22 @@ public class GUI extends Application{
 	private static TextArea detailField;
 	private static ListView<Task> listFocus;
 
-	public static void main(String[] args) throws IOException, JSONException, ParseException {
-		initGUI();
+	public static void main(String[] args){
+		try {
+			initGUI();
+		} catch (IOException | JSONException | ParseException e) {
+			e.printStackTrace();
+		}
 		launch(args);
 	}
 
 	private static void initGUI() throws FileNotFoundException, IOException, JSONException, ParseException{
 		controller = new GUIController();
-		hotkey = new hotkeyHelp();
-		hotkey.retrieveHotkey();
-		System.out.println("GUI component initialised successfully");
+		help = new HelpView();
 		consoleText = new TextArea();
 		console = new Console(consoleText);
 		ps = new PrintStream(console, true);
+		
 		redirectOutput(ps);
 		displayStringToScreen(MESSAGE_WELCOME);
 		displayStringToScreen(MESSAGE_COMMAND_HELP);
@@ -122,7 +120,7 @@ public class GUI extends Application{
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		primaryStage.setTitle("TankTask");
-		setUpMainScene();
+		setUpDefault();
 		setupUserInput();
 		setUpConsole();
 		Image icon = new Image(getClass().getResourceAsStream("tank.png")); 
@@ -133,7 +131,7 @@ public class GUI extends Application{
 		determineEvents();
 	}
 
-	private void setUpMainScene() throws IOException, JSONException, ParseException{
+	private void setUpDefault() throws IOException, JSONException, ParseException{
 		setUpGrid(); //general info
 		initGrid(); //setting up individual sizing
 		setUpGridContents();//setting up contents;
@@ -230,7 +228,6 @@ public class GUI extends Application{
 	}
 
 	private static void setUpContents() {
-		controller.updateIndex();
 		controller.retrieveAllData();
 		gridPane.getChildren().removeAll(listTasks,listEvents,listOverdue,listCate);
 		//tasks		
@@ -341,21 +338,18 @@ public class GUI extends Application{
 	}
 
 	private static void refreshingFocus(int currentListNum){
-		if (currentListNum!=NUM_TODAY_TASKS && currentListNum!=NUM_TODAY_EVENTS){
-			controller.updateIndex();
-		}
 		controller.retrieveAllData();
 		controller.determineList(currentListNum);
 		try {
-			changeList(currentListNum);
+			changeFocusList(currentListNum);
 		} catch (IOException | JSONException | ParseException e) {
 			e.printStackTrace();
 		}
-		changeListDetails(currentListNum);
+		changeFocusListDetails(currentListNum);
 
 	}
 
-	private static void changeList(int listNum) throws IOException, JSONException, ParseException{
+	private static void changeFocusList(int listNum) throws IOException, JSONException, ParseException{
 		gridPane.getChildren().remove(listFocus);
 		listFocus = getList(controller.getFocusList());
 		listFocus.setFocusTraversable(false);
@@ -363,7 +357,7 @@ public class GUI extends Application{
 		gridPane.getChildren().add(listFocus);	
 	}
 
-	private static void changeListDetails(int headNum){
+	private static void changeFocusListDetails(int headNum){
 
 		if (headNum == NUM_OVERDUE){
 			focusHeading.setText(LIST_OVERDUE);
@@ -412,7 +406,7 @@ public class GUI extends Application{
 					displayStringToScreen(response);
 
 				} else if (ke.getCode().equals(KeyCode.F1)){
-					helpPopUp();
+					help.helpPopUp();
 				} else if(ke.getCode().equals(KeyCode.F2)){
 					try {
 						toggleCategory();
@@ -431,11 +425,11 @@ public class GUI extends Application{
 				}
 				if (currentScene == SCENE_FOCUS){
 					try {
-						changeList(currentList);
+						changeFocusList(currentList);
 					} catch (IOException | JSONException | ParseException e2) {
 						e2.printStackTrace();
 					}
-					changeListDetails(currentList);
+					changeFocusListDetails(currentList);
 
 					refresh();
 
@@ -481,7 +475,6 @@ public class GUI extends Application{
 			e.printStackTrace();
 		}
 		currentScene = SCENE_MAIN;
-		controller.updateIndex();
 		tasks.setText("Completed Tasks: ");
 		events.setText("Completed Events: ");
 		floating.setText("Completed Floating: ");
@@ -511,42 +504,6 @@ public class GUI extends Application{
 		setUpFocus();
 		refreshingFocus(currentList);
 		currentScene = SCENE_FOCUS;
-	}
-
-	private void helpPopUp() {
-		Stage pop = new Stage();
-		VBox comp = new VBox();
-		comp.setSpacing(10);
-		pop.setTitle("help");
-		ArrayList<String> help = hotkey.retrieveHotkey();
-		help.add(MESSAGE_SAMPLE_ADDTASK);
-		help.add(MESSAGE_SAMPLE_ADDEVENT);
-		help.add(MESSAGE_SAMPLE_ADDFLOAT);
-		for  (int i =0 ;i<help.size();i++) {
-			Label label = new Label();
-			label.setText(help.get(i));
-			label.setWrapText(true);
-			label.getStyleClass().add("helpLabel");
-			label.getStyleClass().remove("label");
-			comp.getChildren().add(label);
-		}
-		Scene stageScene = new Scene(comp, 500, 500);
-		Image icon = new Image(getClass().getResourceAsStream("tank.png")); 
-		pop.getIcons().add(icon);
-		stageScene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
-		pop.setScene(stageScene);
-		pop.show();
-		stageScene.setOnKeyPressed(new EventHandler<KeyEvent>(){
-
-			@Override
-			public void handle(KeyEvent event) {
-				if (event.getCode().equals(KeyCode.F1)){
-					pop.close();
-				}
-
-			}
-
-		});
 	}
 
 	private static void changeScene() {
@@ -610,12 +567,12 @@ public class GUI extends Application{
 
 	private static void eventDown() throws IOException, JSONException, ParseException{
 		currentPosition++;
-		changeList(currentList);
+		changeFocusList(currentList);
 
 		if (currentPosition>=controller.getFocusList().size()){
 			currentPosition = controller.getFocusList().size()-1;  
 		}
-		changeListDetails(currentList);
+		changeFocusListDetails(currentList);
 
 	}
 
@@ -659,7 +616,7 @@ public class GUI extends Application{
 
 			} else{
 				toggleCate = false;
-				floating.setText("Floating:");
+				floating.setText(LIST_FLOATING);
 				listFloat = getList(controller.getFloatList());
 				listFloat.setFocusTraversable( false );
 				GridPane.setConstraints(listFloat, 3, 1);
@@ -668,7 +625,7 @@ public class GUI extends Application{
 			}
 		}
 	}
-
+/*
 	private static void subTaskView(){
 		if (currentScene == SCENE_MAIN){
 			gridPane.getChildren().remove(listEvents);
@@ -683,5 +640,5 @@ public class GUI extends Application{
 			//without saying which specific task. 
 			//or get the name of specific task and call logic again (waste time)
 		}
-	}
+	}*/
 }

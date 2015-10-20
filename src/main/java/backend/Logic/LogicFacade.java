@@ -24,12 +24,13 @@ public class LogicFacade {
 	private static Stack<Command> historyStack;
 	private static Stack<Command> futureStack;
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
+	private static final String DEFAULT_FILENAME = "default.txt";
 	
-	private LogicFacade(String filename) {
+	private LogicFacade() {
 		initLogger();
 		storageComponent = new StorageFacade();
-		logicCommandHandler = LogicCommandHandler.getInstance(filename,storageComponent);
-		storageComponent.init(filename);
+		logicCommandHandler = LogicCommandHandler.getInstance(DEFAULT_FILENAME,storageComponent);
+		storageComponent.init(DEFAULT_FILENAME);
 		parserComponent = new Parser();
 		getterSubComponent = Observer.getInstance(storageComponent);
 		historyStack = new Stack<Command>();
@@ -37,9 +38,9 @@ public class LogicFacade {
 		storageComponent.load();
 	}
 	
-	public static LogicFacade getInstance(String filename) {
+	public static LogicFacade getInstance() {
 		if (logicFacade == null) {
-			logicFacade = new LogicFacade(filename);
+			logicFacade = new LogicFacade();
 		}
 		return logicFacade;
 	}
@@ -84,8 +85,8 @@ public class LogicFacade {
 					historyStack.push(commandObject);
 			}
 			getterSubComponent.updateIndex();
-//			System.out.println("feedbackString: "+feedbackString);
-			System.out.println("History stack size after command execution: "+historyStack.size());
+			System.out.println("feedbackString: "+feedbackString);
+//			System.out.println("History stack size after command execution: "+historyStack.size());
 			return feedbackString;
 		} catch (NullPointerException | EmptyStackException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;

@@ -328,7 +328,7 @@ public class EditCommand extends Command {
 			taskList.get(taskId).setReminder(reminder);
 			storageComponent.save(taskList);
 
-			return String.format(EXECUTION_SET_REMINDER_SUCCESSFUL,taskId,reminder);
+			return String.format(EXECUTION_SET_REMINDER_SUCCESSFUL,taskIndex,reminder);
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}

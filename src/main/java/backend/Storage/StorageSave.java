@@ -54,7 +54,6 @@ public class StorageSave extends StorageOperation {
 	private void changeFileDirectory() {
 
 		File newFile = new File(CUSTOM_FILE_LOCATION);
-		System.out.println(newFile.getAbsolutePath());
 		textFile.renameTo(newFile);
 	}
 	

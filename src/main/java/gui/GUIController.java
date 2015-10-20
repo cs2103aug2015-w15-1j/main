@@ -7,7 +7,6 @@ import main.java.backend.Storage.Task.Task;
 
 public class GUIController {
 	
-	private final String DEFAULT_FILENAME="filename.txt";
 	LogicFacade logicComponent;
 	
 	private final int NUM_TASKS = 1;
@@ -32,7 +31,7 @@ public class GUIController {
 	
 	public GUIController() {
 		
-		logicComponent = LogicFacade.getInstance(DEFAULT_FILENAME);
+		logicComponent = LogicFacade.getInstance();
 		retrieveAllData();
 		getFocusList = logicComponent.retrieveTaskData("toDo"); //default as tasks
 	}

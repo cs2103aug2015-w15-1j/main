@@ -97,6 +97,7 @@ public class GUI extends Application{
 			e.printStackTrace();
 		}
 		launch(args);
+		
 	}
 
 	private static void initGUI() throws FileNotFoundException, IOException, JSONException, ParseException{
@@ -130,6 +131,14 @@ public class GUI extends Application{
 		primaryStage.show();
 		determineEvents();
 	}
+		/*if (reminder()!=null){
+			System.out.println("hello");
+		}
+	}
+	private String reminder(){
+			if ()
+		return null;
+	}*/
 
 	private void setUpDefault() throws IOException, JSONException, ParseException{
 		setUpGrid(); //general info

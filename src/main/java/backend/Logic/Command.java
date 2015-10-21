@@ -8,7 +8,7 @@ import main.java.backend.Storage.Task.Task;
 public class Command {
 	
 	public enum Type {
-		ADD, EDIT, SORT, SEARCH, EXIT, UNDO, REDO, VIEW
+		ADD, EDIT, SORT, SEARCH, EXIT, UNDO, REDO, VIEW, ERROR
 	}
 	
 	private Type type;
@@ -205,5 +205,17 @@ public class Command {
 	public void setNewName(String name) {
 		this.newName = name;
 		
+	}
+
+
+	public void setErrorMessage(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public String getErrorMessage() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

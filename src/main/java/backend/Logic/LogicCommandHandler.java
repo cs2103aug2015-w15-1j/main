@@ -16,6 +16,7 @@ public class LogicCommandHandler {
 	private static final String COMMAND_EXIT = "exit";
 	private static final String COMMAND_UNDO = "undo";
 	private static final String COMMAND_REDO = "redo";
+	private static final String COMMAND_ERROR = "error";
 	private static final String[] addKeywords = new String[] {"addF", "addT",
 			"addE", "adds", "addcat"};
 	private static final String[] editKeywords = new String[] {"set", "setT", 
@@ -37,7 +38,7 @@ public class LogicCommandHandler {
 	}
 
 	public Command parse(ArrayList<String> parsedUserInput) {
-		System.out.println("Command from parser: "+parsedUserInput.get(0));
+//		System.out.println("Command from parser: "+parsedUserInput.get(0));
 		String determinedCommandType = determineCommandType(parsedUserInput.get(0));
 //		System.out.println("determined Command Type: "+determinedCommandType);
 		Command commandObject = new Command();
@@ -66,6 +67,8 @@ public class LogicCommandHandler {
 			case COMMAND_VIEW:
 				commandObject = initViewCommand(parsedUserInput);
 				break;
+			case COMMAND_ERROR:
+				commandObject = initErrorCommand(parsedUserInput);
 		}
 	return commandObject;
 	}
@@ -80,6 +83,8 @@ public class LogicCommandHandler {
 			commandString = COMMAND_SORT;
 		} else if (commandGiven.contains(COMMAND_SEARCH)) {
 			commandString = COMMAND_SEARCH;
+		} else if (commandGiven.contains(COMMAND_ERROR)) {
+			commandString = COMMAND_ERROR;
 		} else if (Arrays.asList(viewKeywords).contains(commandGiven)) {
 			commandString = COMMAND_VIEW;
 		} else if (commandGiven.contains(COMMAND_EXIT)) {
@@ -90,6 +95,13 @@ public class LogicCommandHandler {
 			commandString = COMMAND_REDO;
 		}
 		return commandString;
+	}
+	
+	private Command initErrorCommand(ArrayList<String> parsedUserInput) {
+		Command errorCommandObject = new ErrorCommand(Command.Type.ERROR);
+		errorCommandObject.setCommandField(parsedUserInput.get(0));
+		errorCommandObject.setErrorMessage(parsedUserInput.get(1));
+		return errorCommandObject;
 	}
 
 	private Command initViewCommand(ArrayList<String> parsedUserInput) {

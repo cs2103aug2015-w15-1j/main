@@ -81,6 +81,9 @@ public class LogicFacade {
 				case VIEW:
 					feedbackString = commandObject.getCommandField();
 					break;
+				case ERROR:
+					feedbackString = commandObject.getErrorMessage();
+					break;
 				case EXIT:
 					System.exit(0);
 				default:

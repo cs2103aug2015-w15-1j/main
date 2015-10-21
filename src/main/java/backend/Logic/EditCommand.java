@@ -367,7 +367,7 @@ public class EditCommand extends Command {
 			taskList.get(taskId).setIndex(-1);
 			storageComponent.save(taskList);
 
-			return String.format(EXECUTION_UNDONE_COMMAND_SUCCESSFUL, taskId);
+			return String.format(EXECUTION_UNDONE_COMMAND_SUCCESSFUL, taskIndex);
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}

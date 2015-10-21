@@ -8,29 +8,28 @@ import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import main.java.backend.Logic.LogicController;
 import main.java.backend.Storage.Task.Task;
 
-public class LogicHistory {
+public class History {
 	
 	Stack<TreeMap<Integer, Task>> stateUndo = new Stack<TreeMap<Integer, Task>>();
 	Stack<TreeMap<Integer, Task>> stateRedo = new Stack<TreeMap<Integer, Task>>();
 	
 	private static Logger historyLogger = Logger.getGlobal();	
-	private static LogicHistory historyObject;
+	private static History historyObject;
 	
 	private FileHandler logHandler;
 	
 	
-	private LogicHistory() {
+	private History() {
 		initLogger();
 		historyLogger.info("Logic component initialised successfully");
 	}
 	
-	public static LogicHistory getInstance() {
+	public static History getInstance() {
 		
 		if (historyObject == null) {
-			historyObject = new LogicHistory();
+			historyObject = new History();
 		}
 		return historyObject;
 	}

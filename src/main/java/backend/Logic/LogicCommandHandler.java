@@ -7,6 +7,7 @@ import main.java.backend.Storage.Storage;
 public class LogicCommandHandler {
 	private static LogicCommandHandler commandHandler;
 	private static Storage storageComponent;
+	private static History historySubComponent;
 	private static final String COMMAND_ADD = "add";
 	private static final String COMMAND_EDIT = "edit";
 	private static final String COMMAND_SORT = "sort";
@@ -23,13 +24,14 @@ public class LogicCommandHandler {
 	private static final String[] sortKeywords = new String[] {"sortp", "sortd"};
 	private static final String[] viewKeywords = new String[] {"showCat", "show float",
 			"show todo", "show events", "show overdue", "showT", "showE", "showO"};
-	private LogicCommandHandler(String filename, Storage storage) {
+	private LogicCommandHandler(String filename, Storage storage, History history) {
 		storageComponent = storage;
+		historySubComponent = history;
 	}
 
-	public static LogicCommandHandler getInstance(String filename, Storage storage) {
+	public static LogicCommandHandler getInstance(String filename, Storage storage, History history) {
 		if (commandHandler == null) {
-			commandHandler = new LogicCommandHandler(filename,storage);
+			commandHandler = new LogicCommandHandler(filename,storage,history);
 		}
 		return commandHandler;
 	}
@@ -129,13 +131,16 @@ public class LogicCommandHandler {
 
 	private Command initAddCommand(ArrayList<String> parsedUserInput) {
 		int inputLength = parsedUserInput.size();
-		Command addCommandObject = new AddCommand(Command.Type.ADD,storageComponent);
+		Command addCommandObject = new AddCommand(Command.Type.ADD,storageComponent,historySubComponent);
 		addCommandObject.setCommandField(parsedUserInput.get(0));
 		addCommandObject.setTaskName(parsedUserInput.get(1));
 		addCommandObject.setDescription(parsedUserInput.get(2));
 		addCommandObject.setCategory(parsedUserInput.get(inputLength-1));
 		addCommandObject.setReminder(parsedUserInput.get(inputLength-2));
 		addCommandObject.setPriority(parsedUserInput.get(inputLength-3));
+		addCommandObject.setCurrentState(null);
+		addCommandObject.setFutureState(null);
+		addCommandObject.setHistoryState(null);
 		switch (parsedUserInput.get(0)){
 			case ("addT"):
 				addCommandObject.setEndDateAndTime(parsedUserInput.get(3));
@@ -149,7 +154,7 @@ public class LogicCommandHandler {
 	}
 	
 	private Command initEditCommand(ArrayList<String> parsedUserInput) {
-		Command editCommandObject = new EditCommand(Command.Type.EDIT,storageComponent);
+		Command editCommandObject = new EditCommand(Command.Type.EDIT,storageComponent,historySubComponent);
 		editCommandObject.setCommandField(parsedUserInput.get(0));
 		editCommandObject.setTaskName(parsedUserInput.get(1));
 		switch (parsedUserInput.get(0)) {

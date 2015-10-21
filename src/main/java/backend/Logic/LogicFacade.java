@@ -17,6 +17,7 @@ public class LogicFacade {
 	private static LogicFacade logicFacade;
 	private static Storage storageComponent;
 	private static Observer getterSubComponent;
+	private static History historySubComponent;
 	private static Logger logicControllerLogger = Logger.getGlobal();	
 	private FileHandler logHandler;
 	private static Parser parserComponent;
@@ -29,7 +30,8 @@ public class LogicFacade {
 	private LogicFacade() {
 		initLogger();
 		storageComponent = new StorageFacade();
-		logicCommandHandler = LogicCommandHandler.getInstance(DEFAULT_FILENAME,storageComponent);
+		historySubComponent = History.getInstance();
+		logicCommandHandler = LogicCommandHandler.getInstance(DEFAULT_FILENAME,storageComponent,historySubComponent);
 		storageComponent.init(DEFAULT_FILENAME);
 		parserComponent = new Parser();
 		getterSubComponent = Observer.getInstance(storageComponent);
@@ -59,7 +61,7 @@ public class LogicFacade {
 	
 	public String execute(String userInput) {
 		try {
-			System.out.println("History stack size before command execution: "+historyStack.size());
+//			System.out.println("History stack size before command execution: "+historyStack.size());
 			ArrayList<String> parsedUserInput = parserComponent.parseInput(userInput);
 			Command commandObject = logicCommandHandler.parse(parsedUserInput);
 //			System.out.println("CommandObject type: "+commandObject.getType());
@@ -78,6 +80,7 @@ public class LogicFacade {
 					break;
 				case VIEW:
 					feedbackString = commandObject.getCommandField();
+					break;
 				case EXIT:
 					System.exit(0);
 				default:
@@ -85,7 +88,7 @@ public class LogicFacade {
 					historyStack.push(commandObject);
 			}
 			getterSubComponent.updateIndex();
-			System.out.println("feedbackString: "+feedbackString);
+//			System.out.println("feedbackString: "+feedbackString);
 //			System.out.println("History stack size after command execution: "+historyStack.size());
 			return feedbackString;
 		} catch (NullPointerException | EmptyStackException e) {

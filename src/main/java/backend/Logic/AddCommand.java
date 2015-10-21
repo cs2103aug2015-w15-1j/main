@@ -14,25 +14,25 @@ public class AddCommand extends Command {
 	private static final String EXECUTION_COMMAND_SUCCESSFUL =  "Valid Command.";
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
 	private static final String CATEGORY_DEFAULT = "default";
-	private static TreeMap<Integer, Task> historyState;
-	private static TreeMap<Integer, Task> currentState;
-	private static TreeMap<Integer, Task> futureState;
 	
 	private TreeMap<Integer, Task> taskList;
+	private TreeMap<Integer, Task> currentState;
 
 	private Storage storageComponent;
+	private History historySubComponent;
 
-	public AddCommand(Type typeInput, Storage storage) {
+	public AddCommand(Type typeInput, Storage storage, History history) {
 		super(typeInput);
 		storageComponent = storage;
+		historySubComponent = history;
 	}
 	
 	public String execute() {	
 //		System.out.println("Future state before execution: "+futureState);
+//		System.out.println("History state before execution: "+historyState);
 //		System.out.println("Current state before execution: "+currentState);
-		historyState = storageComponent.load();
 		String feedbackString = new String();
-//		System.out.println("execute commandObject.getCommandField: "+this.getCommandField());
+		System.out.println("execute commandObject.getCommandField: "+this.getCommandField());
 		switch (this.getCommandField()) {
 			case ("addF") :
 				feedbackString = addTask(TaskType.FLOATING, this);
@@ -47,17 +47,18 @@ public class AddCommand extends Command {
 				feedbackString = addSubTask(this);
 				break;	
 		}
-		currentState = storageComponent.load();
+//		System.out.println("History state after execution: "+historyState);
 //		System.out.println("Future state after execution: "+futureState);
 //		System.out.println("Current state after execution: "+currentState);
-//		System.out.println("feedbackString in AddCommandObject: "+ feedbackString);
+		System.out.println("feedbackString in AddCommandObject: "+ feedbackString);
+		currentState = storageComponent.load();
+		historySubComponent.push(currentState);
 		return feedbackString;
 	}
 	
 	public String undo() {
 		try {
-			futureState = currentState;
-			currentState = historyState;
+			TreeMap<Integer, Task> historyState = historySubComponent.undo();
 //			System.out.println("Future state: "+futureState);
 //			System.out.println("Current state: "+currentState);
 			storageComponent.save(historyState);
@@ -69,9 +70,8 @@ public class AddCommand extends Command {
 	
 	public String redo() {
 		try {
-			historyState = currentState;
-			currentState = futureState;
-			storageComponent.save(currentState);
+			TreeMap<Integer, Task> futureState = historySubComponent.redo();
+			storageComponent.save(futureState);
 			return "Redo successfully";
 		} catch (EmptyStackException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;

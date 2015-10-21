@@ -28,17 +28,17 @@ public class EditCommand extends Command {
 	private static final String EXECUTION_DONE_COMMAND_SUCCESSFUL = "Task %1$s is not completed";
 	private static Logger logicEditorLogger = Logger.getGlobal();	
 	private FileHandler logHandler;
-	private static TreeMap<Integer, Task> historyState;
-	private static TreeMap<Integer, Task> currentState;
-	private static TreeMap<Integer, Task> futureState;
 	
 	private TreeMap<Integer, Task> taskList;
+	private TreeMap<Integer, Task> currentState;
 
 	private Storage storageComponent;
+	private History historySubComponent;
 	
-	public EditCommand(Type typeInput, Storage storage) {
+	public EditCommand(Type typeInput, Storage storage, History history) {
 		super(typeInput);
 		storageComponent = storage;
+		historySubComponent = history;
 		initLogger();
 	}
 	
@@ -56,7 +56,6 @@ public class EditCommand extends Command {
 		}
 
 	public String execute(){
-		historyState = storageComponent.load();
 		String feedbackString = "";
 		logicEditorLogger.info("Get Command Field: "+this.getCommandField());
 //		System.out.println("Get Command Field: "+this.getCommandField());
@@ -102,13 +101,13 @@ public class EditCommand extends Command {
 				break;
 		}
 		currentState = storageComponent.load();
+		historySubComponent.push(currentState);
 		return feedbackString;
 	}
 
 	public String undo() {
 		try {
-			futureState = currentState;
-			currentState = historyState;
+			TreeMap<Integer, Task> historyState = historySubComponent.undo();
 //			System.out.println("Future state: "+futureState);
 //			System.out.println("Current state: "+currentState);
 			storageComponent.save(historyState);
@@ -120,9 +119,8 @@ public class EditCommand extends Command {
 	
 	public String redo() {
 		try {
-			historyState = currentState;
-			currentState = futureState;
-			storageComponent.save(currentState);
+			TreeMap<Integer, Task> futureState = historySubComponent.redo();
+			storageComponent.save(futureState);
 			return "Redo successfully";
 		} catch (EmptyStackException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;

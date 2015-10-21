@@ -104,6 +104,9 @@ public class EditCommand extends Command {
 				break;
 			case ("rename"):
 				feedbackString = rename(this);
+				break;
+			case ("reset"):
+				feedbackString = reset(this);
 		}
 		currentState = storageComponent.load();
 		historySubComponent.push(currentState);
@@ -274,6 +277,27 @@ public class EditCommand extends Command {
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
+	}
+	
+	private String reset(Command commandObject) {
+		taskList = storageComponent.load();
+		int taskIndex = Integer.parseInt(commandObject.getTaskName());
+		int taskId = getTaskId(taskIndex);
+		String resetField = commandObject.getResetField();
+//		System.out.println(resetField);
+		switch(resetField) {
+			case "priority" :
+				taskList.get(taskId).setPriority(0);
+				break;
+			case "description" :
+				taskList.get(taskId).setDescription("");
+				break;
+			case "reminder" :
+				taskList.get(taskId).setReminder("");
+				break;
+		}
+		storageComponent.save(taskList);
+		return String.format("Field %1$s has been reset", resetField);
 	}
 	
 	private String deleteAll(EditCommand editCommand) {

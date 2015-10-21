@@ -27,6 +27,7 @@ public class Command {
 	private static TreeMap<Integer, Task> currentState;
 	private static TreeMap<Integer, Task> futureState;
 	private final String LINE_SEPARATOR = System.getProperty("line.separator");
+	private String resetField = "";
 
     // ================================================================
     // General set command methods
@@ -217,5 +218,14 @@ public class Command {
 	public String getErrorMessage() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+
+	public void setResetField(String command) {
+		this.resetField = command;
+	}
+	
+	public String getResetField() {
+		return this.resetField;
 	}
 }

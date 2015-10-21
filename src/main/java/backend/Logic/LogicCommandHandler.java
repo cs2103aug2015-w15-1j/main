@@ -213,6 +213,9 @@ public class LogicCommandHandler {
 			case ("rename") :
 				editCommandObject.setNewName(parsedUserInput.get(2));
 				break;
+			case("reset") :
+				editCommandObject.setResetField(parsedUserInput.get(2));
+				break;
 		}
 		return editCommandObject;
 	}

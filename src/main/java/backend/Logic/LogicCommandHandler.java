@@ -20,7 +20,7 @@ public class LogicCommandHandler {
 			"addE", "adds", "addcat"};
 	private static final String[] editKeywords = new String[] {"set", "setT", 
 			"setE", "deadline", "event", "description", "reminder", "done", "undone",
-			"category","setCol","delete", "priority"};
+			"category","setCol","delete", "deleteAll", "priority", "reset", "rename"};
 	private static final String[] sortKeywords = new String[] {"sortp", "sortd"};
 	private static final String[] viewKeywords = new String[] {"showCat", "show float",
 			"show todo", "show events", "show overdue", "showT", "showE", "showO"};
@@ -37,6 +37,7 @@ public class LogicCommandHandler {
 	}
 
 	public Command parse(ArrayList<String> parsedUserInput) {
+		System.out.println("Command from parser: "+parsedUserInput.get(0));
 		String determinedCommandType = determineCommandType(parsedUserInput.get(0));
 //		System.out.println("determined Command Type: "+determinedCommandType);
 		Command commandObject = new Command();
@@ -138,9 +139,6 @@ public class LogicCommandHandler {
 		addCommandObject.setCategory(parsedUserInput.get(inputLength-1));
 		addCommandObject.setReminder(parsedUserInput.get(inputLength-2));
 		addCommandObject.setPriority(parsedUserInput.get(inputLength-3));
-		addCommandObject.setCurrentState(null);
-		addCommandObject.setFutureState(null);
-		addCommandObject.setHistoryState(null);
 		switch (parsedUserInput.get(0)){
 			case ("addT"):
 				addCommandObject.setEndDateAndTime(parsedUserInput.get(3));
@@ -199,6 +197,10 @@ public class LogicCommandHandler {
 			 	break;	
 			case ("priority") :
 				editCommandObject.setPriority(parsedUserInput.get(2));
+				break;
+			case ("rename") :
+				editCommandObject.setNewName(parsedUserInput.get(2));
+				break;
 		}
 		return editCommandObject;
 	}

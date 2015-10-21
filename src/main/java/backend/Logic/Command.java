@@ -22,6 +22,7 @@ public class Command {
 	private String endDateAndTime = "";
 	private String keywords = "";
 	private String colour = "";
+	private String newName = "";
 	private static TreeMap<Integer, Task> historyState;
 	private static TreeMap<Integer, Task> currentState;
 	private static TreeMap<Integer, Task> futureState;
@@ -145,6 +146,11 @@ public class Command {
 		return this.colour;
 	}
 	
+	
+	public String getNewName() {
+		return this.newName;
+	}
+	
 	public String toString() {
 		StringBuilder format = new StringBuilder();
 		format.append("type: "+ getType() + LINE_SEPARATOR);
@@ -193,5 +199,11 @@ public class Command {
 	
 	public String redo() {
 		return null;
+	}
+
+
+	public void setNewName(String name) {
+		this.newName = name;
+		
 	}
 }

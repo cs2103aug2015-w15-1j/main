@@ -75,6 +75,9 @@ public class EditCommand extends Command {
 			case ("delete") :
 				feedbackString = delete(this);
 				break;
+			case ("deleteAll"):
+				feedbackString = deleteAll(this);
+				break;
 			case ("setCol") :
 //				feedbackString = setColour(this);
 				break;
@@ -99,6 +102,8 @@ public class EditCommand extends Command {
 			case ("deadline") :
 				feedbackString = setDeadline(this);
 				break;
+			case ("rename"):
+				feedbackString = rename(this);
 		}
 		currentState = storageComponent.load();
 		historySubComponent.push(currentState);
@@ -270,6 +275,15 @@ public class EditCommand extends Command {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
+	
+	private String deleteAll(EditCommand editCommand) {
+		taskList = storageComponent.load();
+		for(int taskId : taskList.keySet()) {
+			taskList.remove(taskId);
+		}
+		storageComponent.save(taskList);
+		return "Everything has been deleted";
+	}
 
 	private String setPriority(Command commandObject){
 		try {
@@ -289,6 +303,16 @@ public class EditCommand extends Command {
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
+	}
+	
+	private String rename(EditCommand commandObject) {
+		taskList = storageComponent.load();
+		int taskIndex = Integer.parseInt(commandObject.getTaskName());
+		int taskId = getTaskId(taskIndex);
+		String newName = commandObject.getNewName();
+		taskList.get(taskId).setName(newName);
+		storageComponent.save(taskList);
+		return String.format("Task %1$s has been renamed to %2$s", taskIndex, newName);
 	}
 
 	/*

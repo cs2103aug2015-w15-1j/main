@@ -15,6 +15,7 @@ public class GUIController {
 	private final int NUM_FLOAT = 4;
 	private final int NUM_TODAY_TASKS = 5;
 	private final int NUM_TODAY_EVENTS = 6;
+	private final int NUM_SEARCH = 7;
 	
 	private ArrayList<Task> getTasks;
 	private ArrayList<Task> getEvents;
@@ -27,6 +28,7 @@ public class GUIController {
 	private ArrayList<Task> getCompletedTasks;
 	private ArrayList<Task> getCompletedEvents;
 	private ArrayList<Task> getCompletedFloat;
+	private ArrayList<Task> getSearch;
 
 	
 	public GUIController() {
@@ -52,7 +54,9 @@ public class GUIController {
 		retrieveTodays();
 		retrieveCompletes();	
 	}
-	
+	void retrieveSearch(){
+		getSearch = logicComponent.retrieveTaskData("upcomingToDo");
+	}
 	void retrieveCompletes() {
 		getCompletedTasks = logicComponent.retrieveTaskData("completedToDo");
 		getCompletedEvents = logicComponent.retrieveTaskData("pastEvents");
@@ -95,6 +99,8 @@ public class GUIController {
 			getFocusList = getTodayTasks;
 		}else if (currentList==NUM_TODAY_EVENTS) {
 			getFocusList = getTodayEvents;
+		} else if (currentList == NUM_SEARCH){
+			getFocusList = getSearch;
 		}
 	}
 	
@@ -132,5 +138,9 @@ public class GUIController {
 	
 	ArrayList<Task> getTodayE() {
 		return getTodayEvents;
+	}
+	
+	ArrayList<Task> getSearchList(){
+		return getSearch;
 	}
 }

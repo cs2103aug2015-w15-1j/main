@@ -48,6 +48,7 @@ public class GUI extends Application{
 	private static final String COMMAND_SHOW_EVENTS = "show events";
 	private static final String COMMAND_SHOW_OVERDUE = "show overdue"; 
 	private static final String COMMAND_SHOW_FLOAT = "show float";
+	private static final String COMMAND_SEARCH = "search";
 	private static final String COMMAND_EXIT = "exit";
 	private final KeyCombination undo = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
 	private final KeyCombination redo = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);
@@ -61,6 +62,7 @@ public class GUI extends Application{
 	private static final int NUM_FLOAT = 4;
 	private static final int NUM_TODAY_TASKS = 5;
 	private static final int NUM_TODAY_EVENTS = 6;
+	private static final int NUM_SEARCH = 7;
 	private static int currentList = 1;
 	private static int currentPosition = 0;
 	private static int currentScene = 1;
@@ -75,6 +77,8 @@ public class GUI extends Application{
 	private static TextArea consoleText;
 	private static PrintStream ps;
 	private static TextField userInput;
+	private static ArrayList<String> recentCommands;
+	private static int commandIndex;
 
 	private static Label tasks;
 	private static Label events;
@@ -107,6 +111,7 @@ public class GUI extends Application{
 		consoleText = new TextArea();
 		console = new Console(consoleText);
 		ps = new PrintStream(console, true);
+		recentCommands = new ArrayList<String>();
 		
 		redirectOutput(ps);
 		displayStringToScreen(MESSAGE_WELCOME);
@@ -215,6 +220,7 @@ public class GUI extends Application{
 		//userInput
 		userInput = new TextField();
 		userInput.setStyle("-fx-focus-color: transparent;");
+		userInput.getStyleClass().add("user");
 
 		GridPane.setColumnSpan(userInput, 4);
 		GridPane.setConstraints(userInput, 0, 3);
@@ -303,7 +309,8 @@ public class GUI extends Application{
 		detailField = new TextArea();
 		detailField.setEditable(false);
 		detailField.setDisable(true);
-		detailField.getStyleClass().add("custom");
+		detailField.setId("custom");
+		//detailField.getStyleClass().add("custom");
 		detailField.getStyleClass().add("txtarea");
 		detailField.getStyleClass().add("txtarea .scroll-pane");
 		detailField.getStyleClass().add("text-area .scroll-bar");
@@ -350,6 +357,9 @@ public class GUI extends Application{
 
 	private static void refreshingFocus(int currentListNum){
 		controller.retrieveAllData();
+		if (currentListNum == NUM_SEARCH){
+			controller.retrieveSearch();
+		}
 		controller.determineList(currentListNum);
 		try {
 			changeFocusList(currentListNum);
@@ -441,7 +451,26 @@ public class GUI extends Application{
 				
 					controller.executeCommand("exit");
 				}
-				if (currentScene == SCENE_FOCUS){
+				if (currentScene == SCENE_MAIN){
+					if (ke.getCode().equals(KeyCode.UP)){
+						if (!recentCommands.isEmpty()){
+							userInput.setText(recentCommands.get(commandIndex));
+							commandIndex--;
+							if (commandIndex<0){
+								commandIndex = 0;
+							}
+						}
+
+					} else if (ke.getCode().equals(KeyCode.DOWN)){
+						if (!recentCommands.isEmpty()){
+							commandIndex++;
+							if (commandIndex>recentCommands.size()-1){
+								commandIndex = recentCommands.size()-1;
+							}
+							userInput.setText(recentCommands.get(commandIndex));
+						}
+					}
+				}else if (currentScene == SCENE_FOCUS){
 					try {
 						changeFocusList(currentList);
 					} catch (IOException | JSONException | ParseException e2) {
@@ -544,6 +573,8 @@ public class GUI extends Application{
 
 	private static void userInputCommads(){	
 		userCommands = userInput.getText();
+		recentCommands.add(userCommands);
+		commandIndex = recentCommands.size()-1;
 		userInput.clear();
 		System.out.println("Command: "+ userCommands);
 		String display = controller.executeCommand(userCommands);
@@ -571,12 +602,24 @@ public class GUI extends Application{
 			setUpFocus();
 			refreshingFocus(currentList);
 			currentScene = SCENE_FOCUS;
+		} else if(display.equals(COMMAND_SEARCH)){
+			setUpFocus();
+			currentScene = SCENE_FOCUS;
+			setUpSearchResults();
 		} else if(display.equals(COMMAND_EXIT)){
 			exit();
 		} else {
 			refresh();
 			displayStringToScreen(display);
 		}
+	}
+
+	private static void setUpSearchResults() {
+		focusHeading.setText("Search Result");
+		currentList = NUM_SEARCH;
+		
+		refreshingFocus(currentList);
+		
 	}
 
 	private static void exit(){

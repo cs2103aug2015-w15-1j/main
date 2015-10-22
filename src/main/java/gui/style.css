@@ -2,7 +2,7 @@
 .root{
 	-fx-background-image:url(../../../../src/main/java/gui/Resources/background.png);
 	-fx-text-inner-color: black;
-	-fx-font-size: 14px;
+	-fx-font-size: 15px;
 }
 
 .label{
@@ -42,10 +42,12 @@
 	-fx-background-color:#A0CFEC;
 }
 
-.custom {
-  -fx-control-inner-background: #FFF5EE;
-  -fx-font-size: 16px;
+
+
+.user{
+	-fx-dont-size: 0.1em
 }
+
 .txtarea:disabled{  
   -fx-font-size:1.0em;
   -fx-opacity: 1.0;
@@ -58,6 +60,12 @@
 .text-area .scroll-bar:vertical:disabled {
     -fx-opacity: 0;
 }
+
+#custom {
+  -fx-control-inner-background: #FFF5EE;
+  -fx-font-size: 24px;
+}
+
 #listOverdue{
 	-fx-font-weight:bold;
 	-fx-font-family: "arial";

@@ -5,7 +5,8 @@ import java.util.TreeMap;
 
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
-import main.java.backend.Storage.Task.TaskType;
+import main.java.backend.Storage.Task.Task.RecurrenceType;
+import main.java.backend.Storage.Task.Task.TaskType;
 
 public class AddCommand extends Command {
 	
@@ -94,10 +95,25 @@ public class AddCommand extends Command {
 		return newTaskList;
 	}
 	
-	private int getPriority(String priority) {
+	private RecurrenceType getRecurrence(String recurrence) {
 		
-		if (!priority.isEmpty()) {
-			return Integer.parseInt(priority);
+		if(recurrence.equals("day")) {
+			return RecurrenceType.DAILY;
+		} else if(recurrence.equals("week")) {
+			return RecurrenceType.WEEKLY;
+		} else if(recurrence.equals("month")) {
+			return RecurrenceType.MONTHLY;
+		} else if(recurrence.equals("year")) {
+			return RecurrenceType.YEARLY;
+		}
+		
+		return RecurrenceType.NONE;
+	}
+	
+	private int stringToInteger(String string) {
+		
+		if (!string.isEmpty()) {
+			return Integer.parseInt(string);
 		} else {
 			return -1;
 		}
@@ -127,7 +143,9 @@ public class AddCommand extends Command {
 
 	private Task getTask(TaskType taskType, Command command) {
 		
-		int priority = getPriority(command.getPriority());
+		RecurrenceType recurrenceType = getRecurrence(command.getRecurrenceType());
+		int recurrenceNumber = stringToInteger(command.getRecurrenceNumber());
+		int priority = stringToInteger(command.getPriority());
 		String categoryName = getCategoryName(command.getCategory());
 		String taskName = command.getTaskName();
 		String taskDescription = command.getDescription();
@@ -135,8 +153,8 @@ public class AddCommand extends Command {
 		String endDate = command.getEndDateAndTime();
 		String reminderDate = command.getReminder();
 
-		return new Task(taskType, priority, categoryName, taskName, 
-				taskDescription, startDate, endDate, reminderDate);
+		return new Task(taskType, recurrenceType, recurrenceNumber, priority, categoryName, 
+				taskName, taskDescription, startDate, endDate, reminderDate);
 	}
 
 	private String addTask(TaskType taskType, Command command) {

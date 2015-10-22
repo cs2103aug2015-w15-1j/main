@@ -9,7 +9,7 @@ import java.util.TreeMap;
 
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
-import main.java.backend.Storage.Task.TaskType;
+import main.java.backend.Storage.Task.Task.TaskType;
 
 public class Observer {
 	

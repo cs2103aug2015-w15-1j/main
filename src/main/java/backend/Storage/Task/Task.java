@@ -4,7 +4,17 @@ import java.util.TreeMap;
 
 public class Task implements Comparable<Task> {
 	
+	public enum TaskType {
+		FLOATING, TODO, EVENT;
+	}
+	
+	public enum RecurrenceType {
+		NONE, DAILY, WEEKLY, MONTHLY, YEARLY;
+	}
+	
 	private TaskType taskType;
+	private RecurrenceType recurrenceType;
+	private int recurrenceNumber;
 	private int taskId;
 	private int indexForPrinting;
 	private int priority;
@@ -25,13 +35,16 @@ public class Task implements Comparable<Task> {
 		
 	}
 	
-	public Task(TaskType taskType, int priority, String categoryName, String name, 
-			String description, String start, String end, String reminder) {
+	public Task(TaskType taskType, RecurrenceType recurrenceType, int recurrenceNumber, 
+			int priority, String categoryName, String name, String description, 
+			String start, String end, String reminder) {
 		
 		assert taskType != null;
 		assert name != null;
 		
 		this.taskType = taskType;
+		this.recurrenceType = recurrenceType;
+		this.recurrenceNumber = recurrenceNumber;
 		this.priority = priority;
 		this.isDone = false;
 		this.categoryName = categoryName;
@@ -49,6 +62,22 @@ public class Task implements Comparable<Task> {
 
 	public void setTaskType(TaskType taskType) {
 		this.taskType = taskType;
+	}
+	
+	public RecurrenceType getRecurrenceType() {
+		return recurrenceType;
+	}
+
+	public void setRecurrenceType(RecurrenceType recurrenceType) {
+		this.recurrenceType = recurrenceType;
+	}
+	
+	public int getRecurrenceNumber() {
+		return recurrenceNumber;
+	}
+
+	public void setRecurrenceNumber(int recurrenceNumber) {
+		this.recurrenceNumber = recurrenceNumber;
 	}
 	
 	public int getTaskId() {

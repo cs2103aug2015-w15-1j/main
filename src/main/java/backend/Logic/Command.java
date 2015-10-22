@@ -14,6 +14,8 @@ public class Command {
 	private Type type;
 	private String commandField = "";
 	private String taskName = "";
+	private String recurrenceType = "";
+	private String recurrenceNumber = "";
 	private String description = "";
 	private String priority = "";
 	private String reminder = ""; 
@@ -49,6 +51,14 @@ public class Command {
 	
 	public void setTaskName(String taskNameInput) {
 		this.taskName = taskNameInput;
+	}
+	
+	public void setRecurrenceType(String recurrenceType) {
+		this.recurrenceType = recurrenceType;
+	}
+
+	public void setRecurrenceNumber(String recurrenceNumber) {
+		this.recurrenceNumber = recurrenceNumber;
 	}
 	
 	public void setDescription(String descriptionInput) {
@@ -113,6 +123,14 @@ public class Command {
 	
 	public String getTaskName() {
 		return this.taskName;
+	}
+	
+	public String getRecurrenceType() {
+		return this.recurrenceType;
+	}
+
+	public String getRecurrenceNumber() {
+		return this.recurrenceNumber;
 	}
 	
 	public String getDescription() {

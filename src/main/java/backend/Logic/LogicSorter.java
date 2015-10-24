@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.TreeMap;
 
 import main.java.backend.Storage.Task.Task;
 
@@ -93,25 +94,36 @@ public class LogicSorter {
 		return taskList;
 	}
 	
-	public ArrayList<Task> sort(String field, ArrayList<Task> taskList) {
+	public TreeMap<Integer, Task> sort(String field, TreeMap<Integer, Task> taskList) {
 		
-		ArrayList<Task> sortedTaskList = new ArrayList<Task> ();
+		TreeMap<Integer, Task> sortedTaskList = new TreeMap<Integer, Task> ();
 		
 		switch (field) {
 			case "sortN":
-				sortedTaskList = sortName(taskList);
+				sortedTaskList = arrayListToTreeMap(sortName(new ArrayList<Task> (taskList.values())));
 				break;
 			case "sortP":
-				sortedTaskList = sortPriority(taskList);
+				sortedTaskList = arrayListToTreeMap(sortPriority(new ArrayList<Task> (taskList.values())));
 				break;
 			case "sortS":
-				sortedTaskList = sortStart(taskList);
+				sortedTaskList = arrayListToTreeMap(sortStart(new ArrayList<Task> (taskList.values())));
 				break;
 			case "sortD":
-				sortedTaskList = sortDeadline(taskList);
+				sortedTaskList = arrayListToTreeMap(sortDeadline(new ArrayList<Task> (taskList.values())));
 				break;
 		}
 		return sortedTaskList;
+	}
+	
+	private TreeMap<Integer, Task> arrayListToTreeMap(ArrayList<Task> taskList) {
+		
+		TreeMap<Integer, Task> allData = new TreeMap<Integer, Task> ();
+		
+		for(Task task : taskList) {
+			allData.put(task.getTaskId(), task);
+		}
+		
+		return allData;
 	}
 	
 	private long stringToMillisecond(String dateTime) {

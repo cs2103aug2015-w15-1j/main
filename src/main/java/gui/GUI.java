@@ -451,7 +451,6 @@ public class GUI extends Application{
 				
 					controller.executeCommand("exit");
 				}
-				if (currentScene == SCENE_MAIN){
 					if (ke.getCode().equals(KeyCode.UP)){
 						if (!recentCommands.isEmpty()){
 							userInput.setText(recentCommands.get(commandIndex));
@@ -470,17 +469,17 @@ public class GUI extends Application{
 							userInput.setText(recentCommands.get(commandIndex));
 						}
 					}
-				}else if (currentScene == SCENE_FOCUS){
-					try {
-						changeFocusList(currentList);
-					} catch (IOException | JSONException | ParseException e2) {
-						e2.printStackTrace();
-					}
-					changeFocusListDetails(currentList);
+					if (currentScene == SCENE_FOCUS){
+						try {
+							changeFocusList(currentList);
+						} catch (IOException | JSONException | ParseException e2) {
+							e2.printStackTrace();
+						}
+						changeFocusListDetails(currentList);
 
-					refresh();
+						refresh();
 
-					if (ke.getCode().equals(KeyCode.DOWN))
+						if (ke.getCode().equals(KeyCode.DOWN))
 					{	
 						try {
 							eventDown();

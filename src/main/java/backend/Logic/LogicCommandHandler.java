@@ -23,8 +23,8 @@ public class LogicCommandHandler {
 			"setE", "deadline", "event", "description", "reminder", "done", "undone",
 			"category","setCol","delete", "deleteAll", "priority", "reset", "rename"};
 	private static final String[] sortKeywords = new String[] {"sortp", "sortd"};
-	private static final String[] viewKeywords = new String[] {"showCat", "show float",
-			"show todo", "show events", "show overdue", "showT", "showE", "showO"};
+	private static final String[] viewKeywords = new String[] {"showCat", "show floating",
+			"show todo", "show events", "show overdue", "showT", "showE", "showO","showF"};
 	private LogicCommandHandler(String filename, Storage storage, History history) {
 		storageComponent = storage;
 		historySubComponent = history;

@@ -396,6 +396,8 @@ public class GUI extends Application{
 			focusHeading.setText("TODAY'S TASKS: ");
 		} else if (headNum == NUM_TODAY_EVENTS){
 			focusHeading.setText("TODAY'S EVENTS: ");
+		} else if (headNum == NUM_SEARCH){
+			focusHeading.setText("Search Result: ");
 		}
 		
 		assert controller.getFocusList()!=null;
@@ -556,9 +558,6 @@ public class GUI extends Application{
 		if (currentScene == SCENE_MAIN){
 			
 			setUpFocus();
-			if(currentList ==NUM_SEARCH){
-				currentList = NUM_TASKS;
-			}
 			refreshingFocus(currentList);
 
 			currentScene = SCENE_FOCUS;
@@ -584,45 +583,41 @@ public class GUI extends Application{
 			changeScene();
 		}
 		else if(display.equals(COMMAND_SHOW_OVERDUE)||display.equals("showO")){
+			currentPosition = 0;
 			currentList = NUM_OVERDUE;
 			setUpFocus();
 			refreshingFocus(currentList);
 			currentScene = SCENE_FOCUS;
 		}
 		else if(display.equals(COMMAND_SHOW_TASKS)||display.equals("showT")){
+			currentPosition = 0;
 			currentList = NUM_TASKS;
 			setUpFocus();
 			refreshingFocus(currentList);
 			currentScene = SCENE_FOCUS;
 		}else if(display.equals(COMMAND_SHOW_EVENTS)||display.equals("showE")){
+			currentPosition = 0;
 			currentList = NUM_EVENTS;
 			setUpFocus();
 			refreshingFocus(currentList);
 			currentScene = SCENE_FOCUS;
 		}else if(display.equals(COMMAND_SHOW_FLOAT)||display.equals("showF")){
+			currentPosition = 0;
 			currentList = NUM_FLOAT;
 			setUpFocus();
 			refreshingFocus(currentList);
 			currentScene = SCENE_FOCUS;
 		} else if(display.equals(COMMAND_SEARCH)){
+			currentPosition = 0;
+			currentList = NUM_SEARCH;
 			setUpFocus();
-			currentScene = SCENE_FOCUS;
-			setUpSearchResults();
+			refreshingFocus(currentList);
 		} else if(display.equals(COMMAND_EXIT)){
 			exit();
 		} else {
 			refresh();
 			displayStringToScreen(display);
 		}
-	}
-
-	private static void setUpSearchResults() {
-		focusHeading.setText("Search Result");
-		currentPosition = 0;
-		currentList = NUM_SEARCH;
-		
-		refreshingFocus(currentList);
-		
 	}
 
 	private static void exit(){
@@ -660,8 +655,8 @@ public class GUI extends Application{
 	private static void eventRight() throws IOException, JSONException, ParseException{
 		currentList++;
 		currentPosition=0;
-		if(currentList>6){
-			currentList=6;
+		if(currentList>7){
+			currentList=7;
 		}
 		refreshingFocus(currentList);
 	}

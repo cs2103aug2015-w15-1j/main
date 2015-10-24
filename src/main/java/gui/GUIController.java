@@ -52,7 +52,8 @@ public class GUIController {
 		getCate = logicComponent.retrieveStringData("categories");
 		assert getCate!=null;
 		retrieveTodays();
-		retrieveCompletes();	
+		retrieveCompletes();
+		retrieveSearch();
 	}
 	void retrieveSearch(){
 		getSearch = logicComponent.retrieveSearchData();

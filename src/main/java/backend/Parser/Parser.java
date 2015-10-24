@@ -54,6 +54,11 @@ public class Parser {
 	private final ArrayList<String> RECUR_FREQUENCY = new ArrayList<String>( Arrays.asList(
 	"day", "week", "month", "year") );
 	
+	//List of months and their shortforms
+	private final ArrayList<String> MONTHS = new ArrayList<String>( Arrays.asList(
+	"january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december", 
+	"jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "oct", "nov", "dec") );
+	
 	//List of fields that are used in the current result
 	private ArrayList<String> fields = new ArrayList<String>(FIELDS_DEFAULT);
 	
@@ -314,6 +319,9 @@ public class Parser {
 			case "EmptyFieldError":
 				result.add(error + ": please enter content for the command '" + token + "'");
 				break;
+			case "NoEndDateError":
+				result.add(error + ": please enter an end date after the command word 'to'");
+				break;
 			case "InvalidPriorityError":
 				result.add(error + ": '" + token + "' is not between 1 to 5");
 				break;
@@ -321,7 +329,7 @@ public class Parser {
 				result.add(error + ": '" + token + "' is not an acceptable date format");
 				break;
 			case "InvalidFrequencyError":
-				result.add(error + ": '" + token + "' is not 'day', 'week', 'month' or 'year'");
+				result.add(error + ": please enter 'day'/'week'/'month'/'year' after 'every' to indicate the frequency");
 				break;
 			case "InvalidDayOfMonthError":
 				result.add(error + ": '" + token + "' is not between 1 to 31");
@@ -361,7 +369,7 @@ public class Parser {
 					String[] tokens = newField.split(" ");
 					freq = getFirst(tokens);
 					if (!isValidFrequency(freq)) {
-						result = makeErrorResult(result, "InvalidFrequencyError", newField);
+						result = makeErrorResult(result, "InvalidFrequencyError", freq);
 						return result;
 					} 
 					newField = mergeTokens(tokens, 1, tokens.length);
@@ -398,19 +406,24 @@ public class Parser {
 			if (command.equals("priority") && !isValidPriority(newField)) {
 				result = makeErrorResult(result, "InvalidPriorityError", newField);
 			} else if (command.equals("event")) {
-				String[] eventStartEnd = getStartAndEnd(newField);
-				String eventStart = eventStartEnd[0];
-				String eventEnd = eventStartEnd[1];
-				if (eventStart.equals("ERROR") ) {
-					eventStart = removeEndSpaces(newField.split("to")[0]);
-					result = makeErrorResult(result, "InvalidDateError", eventStart);
+				if (newField.endsWith("to")) {
+					result = makeErrorResult(result, "NoEndDateError", newField);
 					return result;
-				} else if (eventEnd.equals("ERROR") ){
-					eventEnd = removeEndSpaces(newField.split("to")[1]);
-					result = makeErrorResult(result, "InvalidDateError", eventEnd);
-					return result;
+				} else {
+					String[] eventStartEnd = getStartAndEnd(newField);
+					String eventStart = getFirst(eventStartEnd);
+					String eventEnd = getLast(eventStartEnd);
+					if (eventStart.equals("ERROR") ) {
+						eventStart = removeEndSpaces(getFirst(newField.split(" to ")));
+						result = makeErrorResult(result, "InvalidDateError", eventStart);
+						return result;
+					} else if (eventEnd.equals("ERROR") ){
+						eventEnd = removeEndSpaces(getLast(newField.split(" to ")));
+						result = makeErrorResult(result, "InvalidDateError", eventEnd);
+						return result;
+					}
+					result.addAll( Arrays.asList(command, name, eventStart, eventEnd) );
 				}
-				result.addAll( Arrays.asList(command, name, eventStart, eventEnd) );
 			} else {
 				result.addAll( Arrays.asList(command, name, newField) );
 			}
@@ -461,7 +474,23 @@ public class Parser {
 			} else if (!event.isEmpty()) {
 				command += "E";
 				fields.remove("deadline");
-				getStartAndEnd(event);
+				if (event.endsWith("to")) {
+					result = makeErrorResult(result, "NoEndDateError", event);
+					return result;
+				} else {
+					String[] eventStartEnd = getStartAndEnd(event);
+					String eventStart = getFirst(eventStartEnd);
+					String eventEnd = getLast(eventStartEnd);
+					if (eventStart.equals("ERROR") ) {
+						eventStart = removeEndSpaces(getFirst(event.split(" to ")));
+						result = makeErrorResult(result, "InvalidDateError", eventStart);
+						return result;
+					} else if (eventEnd.equals("ERROR") ){
+						eventEnd = removeEndSpaces(getLast(event.split(" to ")));
+						result = makeErrorResult(result, "InvalidDateError", eventEnd);
+						return result;
+					}
+				}
 			} else {
 				if (command.equals("add")) {
 					command += "F";
@@ -487,38 +516,123 @@ public class Parser {
 	 */
 	private String[] getStartAndEnd(String event) {
 		String[] eventTokens = event.split(" to ", 2);
-		String eventStart = eventTokens[0];
+		String eventStart = getFirst(eventTokens);
 		String eventEnd = "";
 		if (eventTokens.length > 1) {
-			eventEnd = removeEndSpaces(eventTokens[1]);
+			eventEnd = removeEndSpaces(getLast(eventTokens));
 		}
 		
-		//If eventEnd has no date, set its date as eventStart date
-		if (!eventEnd.contains(" ") && !eventEnd.isEmpty() && !parseDate("eventEnd", eventEnd).equals("ERROR")) {
+		if (parseDate("eventStart", eventStart).equals("ERROR")) {
+			eventStart = "ERROR";
+		} else if (parseDate("eventEnd", eventEnd).equals("ERROR")) {
+			eventEnd = "ERROR";
+		} else {
 			String startDate = "";
+			if (hasNoTime(eventStart)) {
+				eventStart += " 12:00";
+			}
 			String[] startTokens = eventStart.split(" ");
 			for (int i = 0; i < startTokens.length-1; i++) {
 				startDate += startTokens[i] + " ";
 			}
-			String startTime = startTokens[startTokens.length-1];
-			eventStart = startDate + " " + startTime;
-			//System.out.println(eventStart);
+			String startTime = getLast(startTokens);
 			
-			String[] endTokens = eventEnd.split(" ", 2);
-			String endDate = startDate;
-			String endTime = endTokens[0];
-			eventEnd = endDate + " " + endTime;
-		} 
-		eventStart = parseDate("eventStart", removeEndSpaces(eventStart));
-		eventEnd = parseDate("eventEnd", removeEndSpaces(eventEnd));
-		
-		fieldContent.put("eventStart", eventStart);
-		fieldContent.put("eventEnd", eventEnd);
+			if (eventEnd.isEmpty()) {
+				eventEnd = startDate + "23:59";
+			} else if (hasNoDate(eventEnd)) {
+				String endTime = eventEnd;
+				long startTimeLong = getTimeLong(startTime);
+				long endTimeLong = getTimeLong(endTime);
+				if (endTimeLong <= startTimeLong) {
+					startDate = plusOneDay(startDate);
+				} 
+				eventEnd = startDate + " " + endTime;	
+			} else if (hasNoTime(eventEnd)) {
+				String endDate = eventEnd;
+				eventEnd = endDate + " " + startTime;
+			} 
+
+			eventStart = parseDate("eventStart", removeEndSpaces(eventStart));
+			eventEnd = parseDate("eventEnd", removeEndSpaces(eventEnd));
+			
+			fieldContent.put("eventStart", eventStart);
+			fieldContent.put("eventEnd", eventEnd);
+		}
 		
 		String[] result = new String[2];
 		result[0] = eventStart;
 		result[1] = eventEnd;
 		return result;
+	}
+
+	/*private long plusOneDay(long dateMilli) {
+		dateMilli += (1000 * 60 * 60 * 24);
+		return dateMilli;
+	}*/
+	private String plusOneDay(String dateString) {
+		dateString = parseDate("event", dateString);
+		SimpleDateFormat sdfDate = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
+		SimpleDateFormat sdfDateNoMinute = new SimpleDateFormat("EEE, dd MMM yy, hha");
+		Date date = null;
+		if (hasMinute(dateString)) {
+			try {
+				date = sdfDate.parse(dateString);
+			} catch (ParseException e) {
+				System.out.println("parseError");
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				date = sdfDateNoMinute.parse(dateString);
+			} catch (ParseException e) {
+				System.out.println("parseError");
+				e.printStackTrace();
+			}
+		}
+		Calendar c = Calendar.getInstance(); 
+		c.setTime(date); 
+		c.add(Calendar.DATE, 1);
+		date = c.getTime();
+		return date.toString().substring(4, 10);
+	}
+
+	private long getTimeLong(String time){
+		time = parseDate("event", time);
+		SimpleDateFormat sdfDate = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
+		SimpleDateFormat sdfDateNoMinute = new SimpleDateFormat("EEE, dd MMM yy, hha");
+	    Date parseTime = null;
+	    if (hasMinute(time)) {
+			try {
+				parseTime = sdfDate.parse(time);
+			} catch (ParseException e) {
+				System.out.println("parseError");
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				parseTime = sdfDateNoMinute.parse(time);
+			} catch (ParseException e) {
+				System.out.println("parseError");
+				e.printStackTrace();
+			}
+		}
+	    return parseTime.getTime();
+	}
+
+	private boolean hasNoDate(String eventEnd) {
+		//System.out.println(eventEnd);
+		if (eventEnd.split("/").length > 1 || eventEnd.split("-").length > 1) {
+			return false;
+		} else {
+			String[] tokens = eventEnd.split(" ");
+			for (String token: tokens) {
+				//System.out.println(token);
+				if (MONTHS.contains(token.toLowerCase())) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -563,10 +677,16 @@ public class Parser {
 	 */
 	private boolean hasNoTime(String date){
 		String[] temp;
-		String[] timeSymbols = {":", ".", "am", "pm", "AM", "PM"};
+		String[] timeSymbols = {":", "."};
 		for (String sym: timeSymbols) {
 			temp = date.split(sym);
 			if (temp.length > 1) {
+				return false;
+			}
+		}
+		temp = date.split(" ");
+		for (String token: temp) {
+			if (token.toLowerCase().endsWith("am") || token.toLowerCase().endsWith("pm")) {
 				return false;
 			}
 		}
@@ -622,7 +742,7 @@ public class Parser {
 		}
 		
 		if (dateMilli != -1 && dateMilli < nowMilli) {
-			System.out.println(dateString);
+			//System.out.println(dateString);
 			String[] dateStringTokens = dateString.split(" ");
 			long dayMonth = getDateLong(dateStringTokens[1] + " " + dateStringTokens[2]);
 			int year = Integer.parseInt(getLast(dateStringTokens));
@@ -721,8 +841,8 @@ public class Parser {
 	private String changeToRecurFormat(String freq, String dateString) {
 		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
 		SimpleDateFormat standardFormatNoMinute = new SimpleDateFormat("EEE, dd MMM yy, hha");
-		SimpleDateFormat recurDayFormat = new SimpleDateFormat("h:mma");
-		SimpleDateFormat recurWeekFormat = new SimpleDateFormat("EEE h:mma");
+		SimpleDateFormat recurDayFormat = new SimpleDateFormat("hh:mma");
+		SimpleDateFormat recurWeekFormat = new SimpleDateFormat("EEE hh:mma");
 		SimpleDateFormat recurYearFormat = new SimpleDateFormat("dd MMM");
 		Date tempDate = null;
 		
@@ -744,25 +864,23 @@ public class Parser {
 			}
 		}
 		switch (freq) {
-		case "day":
-			dateString = recurDayFormat.format(tempDate);
-			break;
-		case "week":
-			dateString = recurWeekFormat.format(tempDate);
-			break;
-		case "year":
-			dateString = recurYearFormat.format(tempDate);
-			break;
-		default:
-			dateString = standardFormat.format(tempDate);
-			break;
+			case "day":
+				dateString = recurDayFormat.format(tempDate);
+				break;
+			case "week":
+				dateString = recurWeekFormat.format(tempDate);
+				break;
+			case "year":
+				dateString = recurYearFormat.format(tempDate);
+				break;
+			default:
+				dateString = standardFormat.format(tempDate);
+				break;
 		}
 		dateString = removeMinuteIfZero(dateString);
-		//dateString = dateString.replace("AM", "am");
-		//dateString = dateString.replace("PM", "pm");
 		return dateString;
 	}
-
+	
 	private Date plusOneYear(Date date) {
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
@@ -770,11 +888,6 @@ public class Parser {
 		date = c.getTime();
 		return date;
 	}
-
-	/*private long plusOneDay(long dateMilli) {
-		dateMilli += (1000 * 60 * 60 * 24);
-		return dateMilli;
-	}*/
 
 	private long getDateLong(String date){
 		SimpleDateFormat sdfDate = new SimpleDateFormat("MMM dd");
@@ -784,8 +897,13 @@ public class Parser {
 			return parseDate.getTime();
 		} catch (ParseException e) {
 			System.out.println("parseError");
+			e.printStackTrace();
 		}
 		return 0;
+	}
+	
+	private boolean hasMinute(String time){
+		return time.split(":").length > 1;
 	}
 	
 	private long getCurrentDateLong() {
@@ -990,9 +1108,9 @@ public class Parser {
 		return str.split(" ")[0];
 	}
 	
-	private String getSecond(String[] array){
+	/*private String getSecond(String[] array){
 		return array[1];
-	}
+	}*/
 	
 	/*private String getFirst(ArrayList<String> arrayList){
 		return arrayList.get(0);
@@ -1012,10 +1130,10 @@ public class Parser {
 		return arrayList.get(arrayList.size()-1);
 	}
 	
-	private String getLast(String str){
+	/*private String getLast(String str){
 		String[] temp = str.split(" ");
 		return temp[temp.length-1];
-	}
+	}*/
 	
 	private boolean containLetter(String str, String letter){
 		return str.split(letter).length > 1;

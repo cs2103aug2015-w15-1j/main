@@ -246,4 +246,10 @@ public class Command {
 	public String getResetField() {
 		return this.resetField;
 	}
+
+
+	public ArrayList<Task> getSearchResults() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

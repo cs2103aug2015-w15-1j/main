@@ -1,7 +1,6 @@
 package main.java.backend.Logic;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.TreeMap;
 import java.util.logging.FileHandler;
@@ -10,7 +9,6 @@ import java.util.logging.SimpleFormatter;
 
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
-import main.java.backend.Storage.Task.TaskType;
 
 public class EditCommand extends Command {
 	
@@ -237,12 +235,12 @@ public class EditCommand extends Command {
 		}
 	}
 	
-	private TaskType getTaskType(Task task) {
+	private Task.TaskType getTaskType(Task task) {
 		
 		if(!task.getEnd().isEmpty()) {
-			return TaskType.TODO;
+			return Task.TaskType.TODO;
 		} else {
-			return TaskType.FLOATING;
+			return Task.TaskType.FLOATING;
 		}
 	}
 	
@@ -439,7 +437,7 @@ public class EditCommand extends Command {
 			Command command = new Command();
 			command.setTaskName(Integer.toString(eventIndex));
 			delete(command);
-			task.setTaskType(TaskType.EVENT);
+			task.setTaskType(Task.TaskType.EVENT);
 			task.setStart(start);
 			task.setEnd(end);
 			taskList.put(taskId, task);

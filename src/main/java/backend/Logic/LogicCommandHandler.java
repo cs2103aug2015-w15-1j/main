@@ -38,7 +38,7 @@ public class LogicCommandHandler {
 	}
 
 	public Command parse(ArrayList<String> parsedUserInput) {
-//		System.out.println("Command from parser: "+parsedUserInput.get(0));
+		System.out.println("Command from parser: "+parsedUserInput.get(0));
 		String determinedCommandType = determineCommandType(parsedUserInput.get(0));
 //		System.out.println("determined Command Type: "+determinedCommandType);
 		Command commandObject = new Command();
@@ -69,6 +69,7 @@ public class LogicCommandHandler {
 				break;
 			case COMMAND_ERROR:
 				commandObject = initErrorCommand(parsedUserInput);
+				break;				
 		}
 	return commandObject;
 	}
@@ -130,7 +131,9 @@ public class LogicCommandHandler {
 	}
 
 	private Command initSearchCommand(ArrayList<String> parsedUserInput) {
-		Command searchCommandObject = new Command(Command.Type.SEARCH);
+		System.out.println("setCommandField: "+parsedUserInput.get(0));
+		System.out.println("setKeywords: "+parsedUserInput.get(1));
+		Command searchCommandObject = new SearchCommand(Command.Type.SEARCH,storageComponent);
 		searchCommandObject.setCommandField(parsedUserInput.get(0));
 		searchCommandObject.setKeywords(parsedUserInput.get(1));
 		return searchCommandObject;

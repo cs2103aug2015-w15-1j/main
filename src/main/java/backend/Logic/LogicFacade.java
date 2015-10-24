@@ -24,6 +24,7 @@ public class LogicFacade {
 	private static LogicCommandHandler logicCommandHandler;
 	private static Stack<Command> historyStack;
 	private static Stack<Command> futureStack;
+	private static ArrayList<Task> searchResults;
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
 	private static final String DEFAULT_FILENAME = "default.txt";
 	
@@ -84,6 +85,10 @@ public class LogicFacade {
 				case ERROR:
 					feedbackString = commandObject.getErrorMessage();
 					break;
+				case SEARCH:
+					feedbackString = commandObject.execute();
+					searchResults = commandObject.getSearchResults();
+					break;
 				case EXIT:
 					System.exit(0);
 				default:
@@ -91,7 +96,7 @@ public class LogicFacade {
 					historyStack.push(commandObject);
 			}
 			getterSubComponent.updateIndex();
-//			System.out.println("feedbackString: "+feedbackString);
+			System.out.println("feedbackString: "+feedbackString);
 //			System.out.println("History stack size after command execution: "+historyStack.size());
 			return feedbackString;
 		} catch (NullPointerException | EmptyStackException e) {
@@ -123,6 +128,10 @@ public class LogicFacade {
 	
 	private void updateCurrentState() {
 		storageComponent.load();
+	}
+	
+	public ArrayList<Task> retrieveSearchData() {
+		return this.searchResults;
 	}
 
 }

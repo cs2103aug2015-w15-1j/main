@@ -102,7 +102,7 @@ public class GUI extends Application{
 			e.printStackTrace();
 		}
 		launch(args);
-		
+	//	Notification info = new Notification
 	}
 
 	private static void initGUI() throws FileNotFoundException, IOException, JSONException, ParseException{
@@ -555,8 +555,11 @@ public class GUI extends Application{
 
 	private static void changeScene() {
 		if (currentScene == SCENE_MAIN){
-
+			
 			setUpFocus();
+			if(currentList ==NUM_SEARCH){
+				currentList = NUM_TASKS;
+			}
 			refreshingFocus(currentList);
 
 			currentScene = SCENE_FOCUS;
@@ -616,6 +619,7 @@ public class GUI extends Application{
 
 	private static void setUpSearchResults() {
 		focusHeading.setText("Search Result");
+		currentPosition = 0;
 		currentList = NUM_SEARCH;
 		
 		refreshingFocus(currentList);

@@ -874,19 +874,35 @@ public class ParserTest {
 		//Parser should generate error if first word is not a command keyword or index
 	    input = "addd Project Proposal";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "UnrecognisedFirstWordError: 'addd' is not recognised as a command or index") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "UnrecognisedWordError: 'addd' is not recognised as a command or index") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 		input = "Project Proposal done";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "UnrecognisedFirstWordError: 'Project' is not recognised as a command or index") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "UnrecognisedWordError: 'Project' is not recognised as a command or index") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 		
+	    //Parser should generate error if task index is not followed by a command keyword
+		input = "1 bla";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "UnrecognisedWordError: 'bla' is not recognised as a command or index") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+		input = "1";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "NoCommandError: please enter a command after the task index") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
 	    //Parser should generate error when a command is expecting an index, but the next word(s) is not an index
 	    input = "delete Project Proposal";
 	    parsed = parser.parseInput(input);

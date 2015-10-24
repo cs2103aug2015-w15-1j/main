@@ -104,7 +104,7 @@ public class Parser {
 		} else if (isCommand(firstWord) && inputTokens.length == 1) {
 			result = makeErrorResult(result, "EmptyFieldError", firstWord);
 		} else if (!(isCommand(firstWord) || isNumber(firstWord))) {
-			result = makeErrorResult(result, "UnrecognisedFirstWordError", firstWordOriginal);
+			result = makeErrorResult(result, "UnrecognisedWordError", firstWordOriginal);
 		} else if (isDominatingCommand(firstWord)) {
 			result.add(firstWord);
 			String content = mergeTokens(inputTokens, 1, inputTokens.length);
@@ -131,9 +131,19 @@ public class Parser {
 				} else {
 					result = makeErrorResult(result, "IndexError", content);
 				}
-			}
-
+			} 
 		} else {
+			if (isNumber(firstWord)) { //first word is task index
+				String secondWordOriginal = getSecond(inputTokens);
+				String secondWord = getDefaultCommand(secondWordOriginal);
+				if (secondWord.isEmpty()) {
+					result = makeErrorResult(result, "NoCommandError", secondWordOriginal);
+					return result;
+				} else if (!(isCommand(secondWord) || isNumber(secondWord))) {
+					result = makeErrorResult(result, "UnrecognisedWordError", secondWordOriginal);
+					return result;
+				}
+			}
 			for (int i = 0; i < inputTokens.length; i++) {
 				String token = inputTokens[i];
 				String originalToken = token;
@@ -307,7 +317,7 @@ public class Parser {
 		result.add("error");
 		fieldContent.put("command", "ERROR");
 		switch (error) {
-			case "UnrecognisedFirstWordError":
+			case "UnrecognisedWordError":
 				result.add(error + ": '" + token + "' is not recognised as a command or index");
 				break;
 			case "IndexError":
@@ -321,6 +331,9 @@ public class Parser {
 				break;
 			case "NoEndDateError":
 				result.add(error + ": please enter an end date after the command word 'to'");
+				break;
+			case "NoCommandError":
+				result.add(error + ": please enter a command after the task index");
 				break;
 			case "InvalidPriorityError":
 				result.add(error + ": '" + token + "' is not between 1 to 5");
@@ -1115,6 +1128,13 @@ public class Parser {
 	/*private String getFirst(ArrayList<String> arrayList){
 		return arrayList.get(0);
 	}*/
+	
+	private String getSecond(String[] array){
+		if (array.length < 2) {
+			return "";
+		}
+		return array[1];
+	}
 	
 	private String getLast(String[] array){
 		if (array.length == 0) {

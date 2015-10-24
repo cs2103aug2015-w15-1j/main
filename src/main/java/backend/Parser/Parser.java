@@ -14,13 +14,13 @@ import com.joestelmach.natty.*;
 public class Parser {
 	//List of all command words accepted by the program
 	private final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList(
-	"add", "addcat", "category", "deadline", "description", "delete", "done", "event", "every", 
+	"add", "addcat", "category", "deadline", "description", "delete", "deleteAll", "done", "event", "every", 
 	"exit", "priority", "redo", "reminder", "rename", "reset", "search", "setcol", "showcat",   
 	"show", "showE", "showF", "showO", "showT", "sort", "sortD", "sortN", "sortP", "undo", "undone") );
 	
 	//Commands that work just by typing the command word (without additional content)
 	private final ArrayList<String> COMMANDS_NO_CONTENT = new ArrayList<String>( Arrays.asList(
-	"exit", "redo", "showE", "showF", "showO", "showT", "sortD", "sortN", "sortP", "undo") );
+	"deleteAll", "exit", "redo", "showE", "showF", "showO", "showT", "sortD", "sortN", "sortP", "undo") );
 	
 	//Commands that if appear first, will prevent other command keywords from having effect
 	private final ArrayList<String> COMMANDS_DOMINATING = new ArrayList<String>( Arrays.asList(
@@ -104,7 +104,7 @@ public class Parser {
 		} else if (isCommand(firstWord) && inputTokens.length == 1) {
 			result = makeErrorResult(result, "EmptyFieldError", firstWord);
 		} else if (!(isCommand(firstWord) || isNumber(firstWord))) {
-			result = makeErrorResult(result, "UnrecognisedWordError", firstWordOriginal);
+			result = makeErrorResult(result, "CommandOrIndexError", firstWordOriginal);
 		} else if (isDominatingCommand(firstWord)) {
 			result.add(firstWord);
 			String content = mergeTokens(inputTokens, 1, inputTokens.length);
@@ -139,8 +139,8 @@ public class Parser {
 				if (secondWord.isEmpty()) {
 					result = makeErrorResult(result, "NoCommandError", secondWordOriginal);
 					return result;
-				} else if (!(isCommand(secondWord) || isNumber(secondWord))) {
-					result = makeErrorResult(result, "UnrecognisedWordError", secondWordOriginal);
+				} else if (!(isCommand(secondWord))) {
+					result = makeErrorResult(result, "CommandError", secondWordOriginal);
 					return result;
 				}
 			}
@@ -317,11 +317,17 @@ public class Parser {
 		result.add("error");
 		fieldContent.put("command", "ERROR");
 		switch (error) {
-			case "UnrecognisedWordError":
+			case "CommandOrIndexError":
 				result.add(error + ": '" + token + "' is not recognised as a command or index");
 				break;
 			case "IndexError":
 				result.add(error + ": '" + token + "' is not recognised as an index");
+				break;
+			case "CommandError":
+				result.add(error + ": '" + token + "' is not recognised as a command");
+				break;
+			case "NoCommandError":
+				result.add(error + ": please enter a command after the task index");
 				break;
 			case "DuplicateCommandError":
 				result.add(error + ": duplicate command '" + token + "'");
@@ -331,9 +337,6 @@ public class Parser {
 				break;
 			case "NoEndDateError":
 				result.add(error + ": please enter an end date after the command word 'to'");
-				break;
-			case "NoCommandError":
-				result.add(error + ": please enter a command after the task index");
 				break;
 			case "InvalidPriorityError":
 				result.add(error + ": '" + token + "' is not between 1 to 5");

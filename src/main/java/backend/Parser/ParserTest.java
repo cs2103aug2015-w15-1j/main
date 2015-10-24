@@ -67,6 +67,14 @@ public class ParserTest {
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
+	    input = "deleteall";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("deleteAll") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
 		input = "add Project Proposal";
 		parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("addF", "Project Proposal", "", "", "", "") );
@@ -874,14 +882,14 @@ public class ParserTest {
 		//Parser should generate error if first word is not a command keyword or index
 	    input = "addd Project Proposal";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "UnrecognisedWordError: 'addd' is not recognised as a command or index") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "CommandOrIndexError: 'addd' is not recognised as a command or index") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 		input = "Project Proposal done";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "UnrecognisedWordError: 'Project' is not recognised as a command or index") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "CommandOrIndexError: 'Project' is not recognised as a command or index") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -890,7 +898,7 @@ public class ParserTest {
 	    //Parser should generate error if task index is not followed by a command keyword
 		input = "1 bla";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "UnrecognisedWordError: 'bla' is not recognised as a command or index") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "CommandError: 'bla' is not recognised as a command") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());

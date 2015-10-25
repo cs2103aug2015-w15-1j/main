@@ -15,7 +15,7 @@ public class LogicSorter {
 	private static final SimpleDateFormat formatterForDateTime = 
 			new SimpleDateFormat("EEE, dd MMM hh:mma");
 	
-	private LogicSorter() {
+	public LogicSorter() {
 		
 	}
 	
@@ -122,9 +122,10 @@ public class LogicSorter {
 	private TreeMap<Integer, Task> arrayListToTreeMap(ArrayList<Task> taskList) {
 		
 		TreeMap<Integer, Task> allData = new TreeMap<Integer, Task> ();
+		int index = 0;
 		
 		for(Task task : taskList) {
-			allData.put(task.getTaskId(), task);
+			allData.put(index++, task);
 		}
 		
 		return allData;

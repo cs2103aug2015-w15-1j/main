@@ -195,14 +195,14 @@ public class Task implements Comparable<Task> {
 			sb.append(end + System.getProperty("line.separator"));
 		}
 		if(reminder!=""){
-			sb.append("reminder has been set." + System.getProperty("line.separator"));
+			sb.append("Reminder has been set." + System.getProperty("line.separator"));
 		}
 		return sb.toString();
 	}
 	
 	public String printFull() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(indexForPrinting+". ");
+		//sb.append(indexForPrinting+". ");
 		if(name!=""){
 			sb.append(name + " ");
 		}
@@ -213,12 +213,18 @@ public class Task implements Comparable<Task> {
 		}
 		sb.append(System.getProperty("line.separator"));
 		if (description!=""){
-			sb.append(description + System.getProperty("line.separator"));
+			sb.append("Description: "+description + System.getProperty("line.separator"));
 		}
 		if(start !=""){
-			sb.append(start + System.getProperty("line.separator"));
+			sb.append("From: "+start + System.getProperty("line.separator"));
 		}
 		if (end!=""){
+			if(start!=""){
+				sb.append ("To: ");
+			}
+			else{
+				sb.append("Deadline: ");
+			}
 			sb.append(end + System.getProperty("line.separator"));
 		}
 		if (reminder!=""){

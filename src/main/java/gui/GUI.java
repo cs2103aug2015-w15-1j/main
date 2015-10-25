@@ -461,6 +461,13 @@ public class GUI extends Application{
 								commandIndex = 0;
 							}
 						}
+						if (currentScene==SCENE_FOCUS){
+							try {
+								eventUp();
+							} catch (IOException | JSONException | ParseException e) {
+								e.printStackTrace();
+							}
+						}
 
 					} else if (ke.getCode().equals(KeyCode.DOWN)){
 						if (!recentCommands.isEmpty()){
@@ -469,6 +476,13 @@ public class GUI extends Application{
 								commandIndex = recentCommands.size()-1;
 							}
 							userInput.setText(recentCommands.get(commandIndex));
+						}
+						if (currentScene==SCENE_FOCUS){
+							try {
+								eventDown();
+							} catch (IOException | JSONException | ParseException e) {
+								e.printStackTrace();
+							}
 						}
 					}
 					if (currentScene == SCENE_FOCUS){
@@ -481,25 +495,25 @@ public class GUI extends Application{
 
 						refresh();
 
-						if (ke.getCode().equals(KeyCode.DOWN))
-					{	
-						try {
-							eventDown();
-						} catch (IOException | JSONException | ParseException e) {
-							e.printStackTrace();
+						/*if (ke.getCode().equals(KeyCode.DOWN))
+						{	
+							try {
+								eventDown();
+							} catch (IOException | JSONException | ParseException e) {
+								e.printStackTrace();
+							}
 						}
-					}
-					if (ke.getCode().equals(KeyCode.UP)){
-						try {
-							eventUp();
-						} catch (IOException | JSONException | ParseException e) {
-							e.printStackTrace();
-						}
-					}
-					if (ke.getCode().equals(KeyCode.LEFT)){
-						try {
-							eventLeft();
-						} catch (IOException | JSONException | ParseException e) {
+						if (ke.getCode().equals(KeyCode.UP)){
+							try {
+								eventUp();
+							} catch (IOException | JSONException | ParseException e) {
+								e.printStackTrace();
+							}
+						}*/
+						if (ke.getCode().equals(KeyCode.LEFT)){
+							try {
+								eventLeft();
+							} catch (IOException | JSONException | ParseException e) {
 							e.printStackTrace();
 						}
 					}
@@ -612,6 +626,7 @@ public class GUI extends Application{
 			currentList = NUM_SEARCH;
 			setUpFocus();
 			refreshingFocus(currentList);
+			currentScene = SCENE_FOCUS;
 		} else if(display.equals(COMMAND_EXIT)){
 			exit();
 		} else {

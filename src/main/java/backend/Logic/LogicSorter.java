@@ -29,6 +29,7 @@ public class LogicSorter {
 	private ArrayList<Task> sortName(ArrayList<Task> taskList) {
 		
 		Collections.sort(taskList, new Comparator<Task> () {
+			@Override
 			public int compare(Task left, Task right) {
 				if(left.getName().compareTo(right.getName()) < 0) {
 					return -1;
@@ -45,6 +46,7 @@ public class LogicSorter {
 	private ArrayList<Task> sortPriority(ArrayList<Task> taskList) {
 		
 		Collections.sort(taskList, new Comparator<Task> () {
+			@Override
 			public int compare(Task left, Task right) {
 				if(left.getPriority() < right.getPriority()) {
 					return 1;
@@ -61,6 +63,7 @@ public class LogicSorter {
 	private ArrayList<Task> sortStart(ArrayList<Task> taskList) {
 		
 		Collections.sort(taskList, new Comparator<Task> () {
+			@Override
 			public int compare(Task left, Task right) {
 				if(stringToMillisecond(left.getStart())
 						< stringToMillisecond(right.getStart())) {
@@ -79,6 +82,7 @@ public class LogicSorter {
 	private ArrayList<Task> sortDeadline(ArrayList<Task> taskList) {
 		
 		Collections.sort(taskList, new Comparator<Task> () {
+			@Override
 			public int compare(Task left, Task right) {
 				if(stringToMillisecond(left.getEnd())
 						< stringToMillisecond(right.getEnd())) {

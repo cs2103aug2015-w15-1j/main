@@ -345,6 +345,22 @@ public class ParserTest {
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
+	    
+	    //If last word is a commad keyword and 'add' is in effect, the last command keyword is taken as part of task name
+	    input = "add bla deadline";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("addF", "bla deadline", "", "", "", "") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    input = "1 des bla bla deadline";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("description", "1", "bla bla deadline") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
 	}
 	
 	@Test
@@ -492,6 +508,57 @@ public class ParserTest {
 	    input = "1 cat hello des this is a cat";
 	    parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("set", "1", "this is a cat", "", "", "hello", "") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
+	    //Test whether command keywords inside quotations will be ignored
+	    input = "1 des buy cat from pet shop";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: please enter content for the command 'category'") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    input = "1 des \"buy cat from pet shop\"";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("description", "1", "buy cat from pet shop") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    input = "add \"buy new cat\" des \"buy cat from pet shop\"";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("addF", "buy new cat", "buy cat from pet shop", "", "", "") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    input = "add \"buy new cat\" pri 3 rem 21 Jul 7pm des \"buy cat from pet shop\"";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("addF", "buy new cat", "buy cat from pet shop", "3", "Thu, 21 Jul 16, 7pm", "") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    input = "add \"buy new cat\" rem 21 Jul 7pm des \"buy cat from pet shop\" pri 3";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("addF", "buy new cat", "buy cat from pet shop", "3", "Thu, 21 Jul 16, 7pm", "") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    input = "1 des \"buy new pet";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("description", "1", "\"buy new pet") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    input = "1 des \"buy\"";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("description", "1", "buy") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -965,13 +1032,7 @@ public class ParserTest {
 	    assertEquals(expected, parsed);
 	   
 	    //Parser should generate error when duplicate commands are detected
-	    input = "deadline deadline";
-	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "DuplicateCommandError: duplicate command 'deadline'") );
-	    System.out.println("Input:    " + input);
-	    System.out.println("Expected: " + expected.toString());
-	    System.out.println("Actual:   " + parsed.toString());
-	    assertEquals(expected, parsed);
+
 		input = "1 deadline 30 October 12:34 deadline 30 December 23:59";
 	    parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("error", "DuplicateCommandError: duplicate command 'deadline'") );
@@ -996,6 +1057,13 @@ public class ParserTest {
 	    
 	    //Parser should generate error when user never include the content for a command
 	    input = "deadline";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: please enter content for the command 'deadline'") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    input = "deadline deadline";
 	    parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: please enter content for the command 'deadline'") );
 	    System.out.println("Input:    " + input);

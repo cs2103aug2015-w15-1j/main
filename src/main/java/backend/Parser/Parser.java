@@ -144,15 +144,34 @@ public class Parser {
 					return result;
 				}
 			}
+			boolean quoteStart = false;
 			for (int i = 0; i < inputTokens.length; i++) {
 				String token = inputTokens[i];
 				String originalToken = token;
-				//token = token.toLowerCase();
 				token = getDefaultCommand(token);
-				if (isCommand(token) && !noNeedContent(token)) {
-					putToken();
+				if (token.startsWith("\"")) {
+					if (containsQuote(inputTokens)) {
+						quoteStart = true;
+						System.out.println(quoteStart);
+					}
+				}
+				if (quoteStart == true) {
+					appendToken(originalToken);
+					if (token.endsWith("\"")) {
+						quoteStart = false;
+					}
+				} else if (isCommand(token) && !noNeedContent(token)) {
+					putToken();			
 					String lastCommand = getLast(seenCommands);
-					
+					if (i == inputTokens.length-1) {
+						if (needWords(lastCommand)) {
+							appendToken(originalToken);
+							continue;
+						} else if (!isDominatingCommand(originalToken)){
+							result = makeErrorResult(result, "EmptyFieldError", originalToken);
+							return result;
+						}
+					}
 					if (isSeenCommand(token)) {
 						if (needWords(lastCommand)) {
 							addToFieldContent(lastCommand, originalToken);
@@ -237,6 +256,22 @@ public class Parser {
     	return token;
 	}
 	
+	private boolean containsQuote(String[] inputTokens){
+		/*String[] tokens = input.split("\"");
+		System.out.println("Length " + tokens.length);
+		return tokens.length > 1 && tokens.length % 2 == 0;*/
+		int quoteCommaCount = 0;
+		for (String token: inputTokens) {
+			if (token.startsWith("\"")) {
+				quoteCommaCount++;
+			}
+			if (token.endsWith("\"")) {
+				quoteCommaCount++;
+			}
+		}
+		return quoteCommaCount > 1 && quoteCommaCount % 2 == 0;
+	}
+	
 	/**
 	 * This method marks the command as seen and stores it as the main command (if there isn't one) 
 	 */
@@ -257,6 +292,7 @@ public class Parser {
 	private void putToken() {
 		if (!growingToken.isEmpty()) {
 			growingToken = removeEndSpaces(growingToken);
+			growingToken = removeQuotes(growingToken);
 			String lastCommand = getLast(seenCommands);
 			String field;
 			
@@ -290,7 +326,6 @@ public class Parser {
 			field = command;
 			content = fieldContent.get(command);
 		}
-		
 		if (content != null) {
 			fieldContent.put(field, removeEndSpaces(content + " " + token));
 		} else {
@@ -1037,6 +1072,13 @@ public class Parser {
 		} else {
 			return token;
 		}
+	}
+	
+	private String removeQuotes(String token){
+		if (token.startsWith("\"") && token.endsWith("\"")) {
+			token =  token.substring(1, token.length()-1);
+		} 
+		return token;
 	}
 
 	private boolean isCommand(String token){

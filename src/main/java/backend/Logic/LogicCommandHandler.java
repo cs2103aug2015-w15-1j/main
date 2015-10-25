@@ -22,7 +22,7 @@ public class LogicCommandHandler {
 	private static final String[] editKeywords = new String[] {"set", "setT", 
 			"setE", "deadline", "event", "description", "reminder", "done", "undone",
 			"category","setCol","delete", "deleteAll", "priority", "reset", "rename"};
-	private static final String[] sortKeywords = new String[] {"sortp", "sortd"};
+	private static final String[] sortKeywords = new String[] {"sortN", "sortP","sortS","sortD"};
 	private static final String[] viewKeywords = new String[] {"showCat", "show floating",
 			"show todo", "show events", "show overdue", "showT", "showE", "showO","showF"};
 	private LogicCommandHandler(String filename, Storage storage, History history) {
@@ -169,15 +169,16 @@ public class LogicCommandHandler {
 	private Command initEditCommand(ArrayList<String> parsedUserInput) {
 		Command editCommandObject = new EditCommand(Command.Type.EDIT,storageComponent,historySubComponent);
 		editCommandObject.setCommandField(parsedUserInput.get(0));
-		editCommandObject.setTaskName(parsedUserInput.get(1));
 		switch (parsedUserInput.get(0)) {
 			case ("set") :
+				editCommandObject.setTaskName(parsedUserInput.get(1));
 				editCommandObject.setDescription(parsedUserInput.get(2));
 				editCommandObject.setPriority(parsedUserInput.get(3));
 				editCommandObject.setReminder(parsedUserInput.get(4));
 				editCommandObject.setCategory(parsedUserInput.get(5));
 				break;
 			case ("setT") :
+				editCommandObject.setTaskName(parsedUserInput.get(1));
 				editCommandObject.setDescription(parsedUserInput.get(2));
 				editCommandObject.setEndDateAndTime(parsedUserInput.get(3));
 				editCommandObject.setPriority(parsedUserInput.get(4));
@@ -185,6 +186,7 @@ public class LogicCommandHandler {
 				editCommandObject.setCategory(parsedUserInput.get(6));
 				break;
 			case ("setE") :
+				editCommandObject.setTaskName(parsedUserInput.get(1));
 				editCommandObject.setDescription(parsedUserInput.get(2));
 				editCommandObject.setStartDateAndTime(parsedUserInput.get(3));
 //				System.out.println("setE StartTime/Date: "+ parsedUserInput.get(3));
@@ -195,29 +197,46 @@ public class LogicCommandHandler {
 				editCommandObject.setCategory(parsedUserInput.get(7));
 				break;
 			case ("deadline") :
+				editCommandObject.setTaskName(parsedUserInput.get(1));
 				editCommandObject.setEndDateAndTime(parsedUserInput.get(2));
 				break;
 			case ("event") :
+				editCommandObject.setTaskName(parsedUserInput.get(1));
 				editCommandObject.setStartDateAndTime(parsedUserInput.get(2));
 				editCommandObject.setEndDateAndTime(parsedUserInput.get(3));
 				break;
 			case ("description") :
+				editCommandObject.setTaskName(parsedUserInput.get(1));
 				editCommandObject.setDescription(parsedUserInput.get(2));
 			 	break;
 			case ("reminder") :
+				editCommandObject.setTaskName(parsedUserInput.get(1));
 				editCommandObject.setReminder(parsedUserInput.get(2));
 				break;
 			case ("setcat") : 
+				editCommandObject.setTaskName(parsedUserInput.get(1));
 				editCommandObject.setCategory(parsedUserInput.get(2));
 			 	break;	
 			case ("priority") :
+				editCommandObject.setTaskName(parsedUserInput.get(1));
 				editCommandObject.setPriority(parsedUserInput.get(2));
 				break;
 			case ("rename") :
+				editCommandObject.setTaskName(parsedUserInput.get(1));
 				editCommandObject.setNewName(parsedUserInput.get(2));
 				break;
 			case("reset") :
+				editCommandObject.setTaskName(parsedUserInput.get(1));
 				editCommandObject.setResetField(parsedUserInput.get(2));
+				break;
+			case("delete") :
+				editCommandObject.setTaskName(parsedUserInput.get(1));
+				break;
+			case("done") :
+				editCommandObject.setTaskName(parsedUserInput.get(1));
+				break;
+			case ("undone") :
+				editCommandObject.setTaskName(parsedUserInput.get(1));
 				break;
 		}
 		return editCommandObject;

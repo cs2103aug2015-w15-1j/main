@@ -300,7 +300,8 @@ public class EditCommand extends Command {
 	
 	private String deleteAll(EditCommand editCommand) {
 		taskList = storageComponent.load();
-		for(int taskId : taskList.keySet()) {
+		int numOfTasks = taskList.size();
+		for (int taskId = 0; taskId < numOfTasks; taskId++) {
 			taskList.remove(taskId);
 		}
 		storageComponent.save(taskList);

@@ -42,7 +42,7 @@ public class Parser {
 	private final ArrayList<String> COMMANDS_ONE_SHOT = new ArrayList<String>( 
 	Arrays.asList("add", "set") );	
 	
-	//Command fields that can be edited/resetted
+	//Command fields that can be edited/reset
 	private final ArrayList<String> COMMANDS_CAN_EDIT = new ArrayList<String>( 
 	Arrays.asList("all", "description", "deadline", "event", "priority", "reminder", "category") );	
 	
@@ -104,7 +104,7 @@ public class Parser {
 		} else if (isCommand(firstWord) && inputTokens.length == 1) {
 			result = makeErrorResult(result, "EmptyFieldError", firstWord);
 		} else if (!(isCommand(firstWord) || isNumber(firstWord))) {
-			result = makeErrorResult(result, "CommandOrIndexError", firstWordOriginal);
+			result = makeErrorResult(result, "InvalidWordError", firstWordOriginal);
 		} else if (isDominatingCommand(firstWord)) {
 			result.add(firstWord);
 			String content = mergeTokens(inputTokens, 1, inputTokens.length);
@@ -129,7 +129,7 @@ public class Parser {
 				if (isNumber(nextWord)) {
 					result.add(nextWord);
 				} else {
-					result = makeErrorResult(result, "IndexError", content);
+					result = makeErrorResult(result, "InvalidIndexError", content);
 				}
 			} 
 		} else {
@@ -137,10 +137,10 @@ public class Parser {
 				String secondWordOriginal = getSecond(inputTokens);
 				String secondWord = getDefaultCommand(secondWordOriginal);
 				if (secondWord.isEmpty()) {
-					result = makeErrorResult(result, "NoCommandError", secondWordOriginal);
+					result = makeErrorResult(result, "NoCommandError", firstWord);
 					return result;
 				} else if (!(isCommand(secondWord))) {
-					result = makeErrorResult(result, "CommandError", secondWordOriginal);
+					result = makeErrorResult(result, "InvalidCommandError", secondWordOriginal);
 					return result;
 				}
 			}
@@ -317,17 +317,17 @@ public class Parser {
 		result.add("error");
 		fieldContent.put("command", "ERROR");
 		switch (error) {
-			case "CommandOrIndexError":
+			case "InvalidWordError":
 				result.add(error + ": '" + token + "' is not recognised as a command or index");
 				break;
-			case "IndexError":
+			case "InvalidIndexError":
 				result.add(error + ": '" + token + "' is not recognised as an index");
 				break;
-			case "CommandError":
+			case "InvalidCommandError":
 				result.add(error + ": '" + token + "' is not recognised as a command");
 				break;
 			case "NoCommandError":
-				result.add(error + ": please enter a command after the task index");
+				result.add(error + ": please enter a command after the task index '" + token + "'");
 				break;
 			case "DuplicateCommandError":
 				result.add(error + ": duplicate command '" + token + "'");
@@ -357,7 +357,7 @@ public class Parser {
 				result.add(error + ": '" + token + "' is not 'deadline', 'name' or 'priority'");
 				break;
 			case "InvalidResetError":
-				result.add(error + ": '" + token + "' is not a field that can be resetted");
+				result.add(error + ": '" + token + "' is not a field that can be reset");
 				break;
 			default:
 				break; 
@@ -394,15 +394,6 @@ public class Parser {
 						if (!isValidDayOfMonth(newField)) {
 							result = makeErrorResult(result, "InvalidDayOfMonthError", newField);
 						} else {
-							/*if (newField.endsWith("1")) {
-								newField += "st";
-							} else if (newField.endsWith("2")) {
-								newField += "nd";
-							} else if (newField.endsWith("3")) {
-								newField += "rd";
-							} else {
-								newField += "th";
-							}*/
 							newField += " of month";
 							result.addAll( Arrays.asList(command, name, newField) );
 						}
@@ -557,9 +548,7 @@ public class Parser {
 				eventEnd = startDate + "23:59";
 			} else if (hasNoDate(eventEnd)) {
 				String endTime = eventEnd;
-				long startTimeLong = getTimeLong(startTime);
-				long endTimeLong = getTimeLong(endTime);
-				if (endTimeLong <= startTimeLong) {
+				if (startTimeIsAfterEndTime(startTime, endTime)) {
 					startDate = plusOneDay(startDate);
 				} 
 				eventEnd = startDate + " " + endTime;	
@@ -571,6 +560,10 @@ public class Parser {
 			eventStart = parseDate("eventStart", removeEndSpaces(eventStart));
 			eventEnd = parseDate("eventEnd", removeEndSpaces(eventEnd));
 			
+			if (startDateIsAfterEndDate(eventStart, eventEnd)) {
+				eventEnd = plusOneYear(eventEnd);
+			}
+			
 			fieldContent.put("eventStart", eventStart);
 			fieldContent.put("eventEnd", eventEnd);
 		}
@@ -581,25 +574,21 @@ public class Parser {
 		return result;
 	}
 
-	/*private long plusOneDay(long dateMilli) {
-		dateMilli += (1000 * 60 * 60 * 24);
-		return dateMilli;
-	}*/
 	private String plusOneDay(String dateString) {
 		dateString = parseDate("event", dateString);
-		SimpleDateFormat sdfDate = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
-		SimpleDateFormat sdfDateNoMinute = new SimpleDateFormat("EEE, dd MMM yy, hha");
+		SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
+		SimpleDateFormat sdfNoMinute = new SimpleDateFormat("EEE, dd MMM yy, hha");
 		Date date = null;
 		if (hasMinute(dateString)) {
 			try {
-				date = sdfDate.parse(dateString);
+				date = sdf.parse(dateString);
 			} catch (ParseException e) {
 				System.out.println("parseError");
 				e.printStackTrace();
 			}
 		} else {
 			try {
-				date = sdfDateNoMinute.parse(dateString);
+				date = sdfNoMinute.parse(dateString);
 			} catch (ParseException e) {
 				System.out.println("parseError");
 				e.printStackTrace();
@@ -612,37 +601,115 @@ public class Parser {
 		return date.toString().substring(4, 10);
 	}
 
-	private long getTimeLong(String time){
-		time = parseDate("event", time);
-		SimpleDateFormat sdfDate = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
-		SimpleDateFormat sdfDateNoMinute = new SimpleDateFormat("EEE, dd MMM yy, hha");
-	    Date parseTime = null;
-	    if (hasMinute(time)) {
+	private boolean startDateIsAfterEndDate(String start, String end){
+		SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
+		SimpleDateFormat sdfNoMinute = new SimpleDateFormat("EEE, dd MMM yy, hha");
+		Date startDate = null;
+		Date endDate = null;
+		if (hasMinute(start)) {
 			try {
-				parseTime = sdfDate.parse(time);
+				startDate = sdf.parse(start);
 			} catch (ParseException e) {
 				System.out.println("parseError");
 				e.printStackTrace();
 			}
 		} else {
 			try {
-				parseTime = sdfDateNoMinute.parse(time);
+				startDate = sdfNoMinute.parse(start);
 			} catch (ParseException e) {
 				System.out.println("parseError");
 				e.printStackTrace();
 			}
 		}
-	    return parseTime.getTime();
+		if (hasMinute(end)) {
+			try {
+				endDate = sdf.parse(end);
+			} catch (ParseException e) {
+				System.out.println("parseError");
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				endDate = sdfNoMinute.parse(end);
+			} catch (ParseException e) {
+				System.out.println("parseError");
+				e.printStackTrace();
+			}
+		}
+		return startDate.after(endDate);
+	}
+	
+	private boolean startTimeIsAfterEndTime(String start, String end){
+		if (isAM(start) && isPM(end)) {
+			return false;
+		} else if (isPM(start) && isAM(end)) {
+			return true;
+		} else  {
+			String startHour;
+			String endHour;
+			String startMinute;
+			String endMinute;
+			if (isAM(start) && isAM(end)){
+				startHour = getFirst(start.toLowerCase().split("am"));
+				endHour = getFirst(end.toLowerCase().split("am"));
+			} else {
+				startHour = getFirst(start.toLowerCase().split("pm"));
+				endHour = getFirst(end.toLowerCase().split("pm"));
+			}
+			String startTemp[] = startHour.toLowerCase().split(":");
+			String endTemp[] = endHour.toLowerCase().split(":");		
+			startHour = getFirst(startTemp);
+			endHour = getFirst(endTemp);
+			startMinute = getSecond(startTemp);
+			endMinute = getSecond(endTemp);
+			int startHourNum = 0;
+			int endHourNum = 0;
+			try {
+				startHourNum = Integer.parseInt(startHour); 
+				endHourNum = Integer.parseInt(endHour); 
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
+			if (startHourNum > endHourNum){
+				return true;
+			} else if (startHourNum < endHourNum){
+				return false;
+			} else {
+				if (startMinute.isEmpty() && !endMinute.isEmpty()) {
+					return false;
+				} else if (startMinute.isEmpty() && endMinute.isEmpty()) {
+					return true;
+				} else if (!startMinute.isEmpty() && endMinute.isEmpty()) {
+					return true;
+				} else {
+					int startMinuteNum = 0;
+					int endMinuteNum = 0;
+					try {
+						startMinuteNum = Integer.parseInt(startMinute); 
+						endMinuteNum = Integer.parseInt(endMinute); 
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					}
+					return (startMinuteNum >= endMinuteNum);
+				}
+			}
+		}
 	}
 
+	private boolean isAM(String time){
+		return time.toLowerCase().endsWith("am");
+	}
+	
+	private boolean isPM(String time){
+		return time.toLowerCase().endsWith("pm");
+	}
+	
 	private boolean hasNoDate(String eventEnd) {
-		//System.out.println(eventEnd);
 		if (eventEnd.split("/").length > 1 || eventEnd.split("-").length > 1) {
 			return false;
 		} else {
 			String[] tokens = eventEnd.split(" ");
 			for (String token: tokens) {
-				//System.out.println(token);
 				if (MONTHS.contains(token.toLowerCase())) {
 					return false;
 				}
@@ -758,7 +825,6 @@ public class Parser {
 		}
 		
 		if (dateMilli != -1 && dateMilli < nowMilli) {
-			//System.out.println(dateString);
 			String[] dateStringTokens = dateString.split(" ");
 			long dayMonth = getDateLong(dateStringTokens[1] + " " + dateStringTokens[2]);
 			int year = Integer.parseInt(getLast(dateStringTokens));
@@ -772,7 +838,6 @@ public class Parser {
 				}
 				dateString += year;
 			}
-			//System.out.println(dateString);
 			
 			try {
 				dateMilli = formatter.parse(dateString).getTime();
@@ -782,7 +847,6 @@ public class Parser {
 			}
 			if (year == currYear) {
 				if (dayMonth < nowMilli) {
-					//dateMilli = plusOneDay(dateMilli);
 					if (dateMilli < nowMilli){
 						date = plusOneYear(date);
 						dateString = date.toString();
@@ -791,7 +855,6 @@ public class Parser {
 					}
 				}
 			}
-			//System.out.println(dateString);
 		}
 		return dateString;
 	}
@@ -819,15 +882,7 @@ public class Parser {
 			String[] dateTokens = dateString.split(" ");
 			String time = getLast(dateTokens);
 			if (dateTokens.length > 1) {
-				//String year = dateTokens[dateTokens.length-2];
 				result += mergeTokens(dateTokens, 0, dateTokens.length-1) + " ";
-				/*if (!result.isEmpty()) {
-					result += " ";
-				}
-				if (year.length() == 4) {
-					year = year.substring(2, year.length());
-				}
-				result += year + " ";*/
 			}
 			
 			String[] timeTokens = time.split(":", 2);
@@ -903,6 +958,28 @@ public class Parser {
 		c.add(Calendar.YEAR, 1);
 		date = c.getTime();
 		return date;
+	}
+	private String plusOneYear(String dateString) {
+		SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
+		SimpleDateFormat sdfNoMinute = new SimpleDateFormat("EEE, dd MMM yy, hha");
+		Date date = null;
+		if (hasMinute(dateString)) {
+			try {
+				date = sdf.parse(dateString);
+			} catch (ParseException e) {
+				System.out.println("parseError");
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				date = sdfNoMinute.parse(dateString);
+			} catch (ParseException e) {
+				System.out.println("parseError");
+				e.printStackTrace();
+			}
+		}
+		date = plusOneYear(date);
+		return removeMinuteIfZero(changeDateFormat(date.toString()));
 	}
 
 	private long getDateLong(String date){

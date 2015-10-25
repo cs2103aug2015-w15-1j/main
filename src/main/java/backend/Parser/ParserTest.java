@@ -637,6 +637,36 @@ public class ParserTest {
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
+	    //Testing for when end date is before start date (should set it to one day or one year later)
+	    input = "4 event 15 Sep 10am to 14 Sep";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10am", "Thu, 14 Sep 17, 10am") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    input = "4 event 15 Sep 10:30am to 10am";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10:30am", "Fri, 16 Sep 16, 10am") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    input = "4 event 15 Sep 10:30am to 10:10am";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10:30am", "Fri, 16 Sep 16, 10:10am") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    input = "4 event 15 Sep 10am to 10am";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10am", "Fri, 16 Sep 16, 10am") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
 	    //Testing for event with end time but not date (should set end date to be the same day or the next day depending on time)
 	    input = "4 event 15/09 10am to 2pm";
 	    parsed = parser.parseInput(input);
@@ -655,6 +685,20 @@ public class ParserTest {
 	    input = "4 event 15/09 2am to 4am";
 	    parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 2am", "Thu, 15 Sep 16, 4am") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    input = "4 event 15/09 12pm to 12pm";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 12pm", "Fri, 16 Sep 16, 12pm") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    input = "4 event 15 Sep 10:30am to 10:45am";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10:30am", "Thu, 15 Sep 16, 10:45am") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -882,14 +926,14 @@ public class ParserTest {
 		//Parser should generate error if first word is not a command keyword or index
 	    input = "addd Project Proposal";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "CommandOrIndexError: 'addd' is not recognised as a command or index") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidWordError: 'addd' is not recognised as a command or index") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 		input = "Project Proposal done";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "CommandOrIndexError: 'Project' is not recognised as a command or index") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidWordError: 'Project' is not recognised as a command or index") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -898,14 +942,14 @@ public class ParserTest {
 	    //Parser should generate error if task index is not followed by a command keyword
 		input = "1 bla";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "CommandError: 'bla' is not recognised as a command") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidCommandError: 'bla' is not recognised as a command") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 		input = "1";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "NoCommandError: please enter a command after the task index") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "NoCommandError: please enter a command after the task index '1'") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -914,7 +958,7 @@ public class ParserTest {
 	    //Parser should generate error when a command is expecting an index, but the next word(s) is not an index
 	    input = "delete Project Proposal";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "IndexError: 'Project Proposal' is not recognised as an index") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidIndexError: 'Project Proposal' is not recognised as an index") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -1023,9 +1067,9 @@ public class ParserTest {
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
-	    input = "1 deadline 30 Dec 23:59 priority bla";
+	    input = "1 deadline 30 Dec 23:59 priority 0";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidPriorityError: 'bla' is not between 1 to 5") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidPriorityError: '0' is not between 1 to 5") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
@@ -1066,7 +1110,7 @@ public class ParserTest {
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
-	    input = "1 event asdfghjkl to 30 Dec 2pm 2015";
+	    input = "1 event asdfghjkl to 30 Dec 2pm";
 	    parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDateError: 'asdfghjkl' is not an acceptable date format") );
 	    System.out.println("Input:    " + input);
@@ -1137,7 +1181,7 @@ public class ParserTest {
 	    assertEquals(expected, parsed);  
 	    input = "1 reset aaaaaaaaaa";
 	    parsed = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidResetError: 'aaaaaaaaaa' is not a field that can be resetted") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidResetError: 'aaaaaaaaaa' is not a field that can be reset") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());

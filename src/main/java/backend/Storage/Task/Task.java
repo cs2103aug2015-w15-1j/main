@@ -222,7 +222,7 @@ public class Task implements Comparable<Task> {
 			sb.append(end + System.getProperty("line.separator"));
 		}
 		if (reminder!=""){
-			sb.append("reminder: "+ reminder + System.getProperty("line.separator"));
+			sb.append("Reminder: "+ reminder + System.getProperty("line.separator"));
 		}
 		return sb.toString();
 	}

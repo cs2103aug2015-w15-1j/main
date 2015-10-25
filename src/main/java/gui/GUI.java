@@ -20,7 +20,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -28,11 +27,9 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import main.java.backend.Storage.Task.Task;
-import main.java.backend.Util.HotkeyHelp;
 
 public class GUI extends Application{
 	
@@ -52,6 +49,8 @@ public class GUI extends Application{
 	private static final String COMMAND_EXIT = "exit";
 	private final KeyCombination undo = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
 	private final KeyCombination redo = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);
+	private final KeyCombination shiftUp = new KeyCodeCombination(KeyCode.UP, KeyCombination.SHIFT_DOWN);
+	private final KeyCombination shiftDown= new KeyCodeCombination(KeyCode.DOWN, KeyCombination.SHIFT_DOWN);
 	private static final Logger GUILOG= Logger.getLogger(GUI.class.getName());;
 	
 	private static final int SCENE_MAIN = 1;
@@ -85,7 +84,7 @@ public class GUI extends Application{
 	private static Label floating;
 
 	private static ListView<Label> listFloat;
-	private static ListView<String> listCate;
+	private static ListView<Label> listCate;
 	private static ListView<Label> listTasks;
 	private static ListView<Label> listEvents;
 	private static ListView<Label> listOverdue;
@@ -120,7 +119,7 @@ public class GUI extends Application{
 	}
 
 	private static void redirectOutput(PrintStream stream){
-		//System.setOut(stream);
+		System.setOut(stream);
 		//System.setErr(stream);
 	}
 
@@ -336,8 +335,8 @@ public class GUI extends Application{
 		ObservableList<Label> tasks = FXCollections.observableArrayList();
 		for (int i=0;i<list.size();i++){
 			Label newlabel = new Label();
-			newlabel.setMinWidth(200.0);
-			newlabel.setPrefWidth(200.0);
+			newlabel.setMinWidth(1.0);
+			newlabel.setPrefWidth(1.0);
 			newlabel.setMaxWidth(10000.0);
 			newlabel.setWrapText(true);
 			newlabel.setText(list.get(i).toString());
@@ -347,10 +346,19 @@ public class GUI extends Application{
 		return listTask;
 	}
 
-	private static ListView<String> getStringList(ArrayList<String> list){
+	private static ListView<Label> getStringList(ArrayList<String> list){
 		assert list!=null;
-		ObservableList<String> tasks = FXCollections.observableArrayList(list);
-		ListView<String> listString = new ListView<String>(tasks);
+		ObservableList<Label> tasks = FXCollections.observableArrayList();
+		for (int i=0;i<list.size();i++){
+			Label newlabel = new Label();
+			newlabel.setMinWidth(1.0);
+			newlabel.setPrefWidth(1.0);
+			newlabel.setMaxWidth(10000.0);
+			newlabel.setWrapText(true);
+			newlabel.setText(list.get(i));
+			tasks.add(newlabel);
+		}
+		ListView<Label> listString = new ListView<Label>(tasks);
 		return listString;
 	}
 
@@ -467,8 +475,7 @@ public class GUI extends Application{
 				} else if (ke.getCode().equals(KeyCode.ESCAPE)){
 				
 					controller.executeCommand("exit");
-				}
-					if (ke.getCode().equals(KeyCode.UP)){
+				} else 	if (shiftUp.match(ke)){
 						if (!recentCommands.isEmpty()){
 							userInput.setText(recentCommands.get(commandIndex));
 							commandIndex--;
@@ -476,15 +483,7 @@ public class GUI extends Application{
 								commandIndex = 0;
 							}
 						}
-						if (currentScene==SCENE_FOCUS){
-							try {
-								eventUp();
-							} catch (IOException | JSONException | ParseException e) {
-								e.printStackTrace();
-							}
-						}
-
-					} else if (ke.getCode().equals(KeyCode.DOWN)){
+					} else if (shiftDown.match(ke)){
 						if (!recentCommands.isEmpty()){
 							commandIndex++;
 							if (commandIndex>recentCommands.size()-1){
@@ -510,7 +509,7 @@ public class GUI extends Application{
 
 						refresh();
 
-						/*if (ke.getCode().equals(KeyCode.DOWN))
+						if (ke.getCode().equals(KeyCode.DOWN))
 						{	
 							try {
 								eventDown();
@@ -524,7 +523,7 @@ public class GUI extends Application{
 							} catch (IOException | JSONException | ParseException e) {
 								e.printStackTrace();
 							}
-						}*/
+						}
 						if (ke.getCode().equals(KeyCode.LEFT)){
 							try {
 								eventLeft();

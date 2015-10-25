@@ -23,12 +23,12 @@ public class GUIControllerTest {
 		//add overdue
 		assertEquals("Task overdue has been added", controller.executeCommand("add overdue deadline 10 oct"));
 		
-		//add date does not exist(don't know)
+		//add date does not exist
 		//date becomes 1st march
-		//assertEquals("Invalid Command. Please try again.", controller.executeCommand("add email deadline 29 feb"));
+		assertEquals("Task email has been added", controller.executeCommand("add email deadline 29 feb"));
 		
 		//date is years ahead
-		//assertEquals("Task taskname has been added",controller.executeCommand("add taskname deadline 1 jan 2020"));
+		assertEquals("Task taskname has been added",controller.executeCommand("add taskname deadline 1 jan 2020"));
 		
 		//delete
 		//task that exists
@@ -46,11 +46,11 @@ public class GUIControllerTest {
 		//changing dates
 		//date exist
 		controller.executeCommand("add submit proposal deadline 31 dec 7 pm");
-		assertEquals("Task 1 deadline has been set to Sun, 20 Dec 15 7pm",controller.executeCommand("1 deadline 20 dec 7 pm"));
+		assertEquals("Task 1 deadline has been set to Sun, 20 Dec 15, 7pm",controller.executeCommand("1 deadline 20 dec 7 pm"));
 		
-		//date dne (fails. date becomes 1st dec...?)
-		//assertEquals("Task 1 deadline has been set to Sun, 20 Dec 07:00PM",controller.executeCommand("1 deadline 32 dec 7 pm"));
-		//date is blank (becomes a floating task)
+		//date dne
+		assertEquals("Task 1 deadline has been set to Wed, 02 Mar 16, 7pm",controller.executeCommand("1 deadline 30 feb 7 pm"));
+		//date is blank
 		assertEquals("Invalid Command. Please try again.",controller.executeCommand("1 deadline "));
 		
 		//Description
@@ -62,46 +62,8 @@ public class GUIControllerTest {
 		//reminder
 		//reminder date after deadline/event dates
 		//reminder before deadline/event dates
-		assertEquals("Reminder for Task 1 has been set to be at Sun, 20 Dec 15 12pm",controller.executeCommand("1 reminder 20 dec"));
+		assertEquals("Reminder for Task 1 has been set to be at Sun, 20 Dec 15, 12pm",controller.executeCommand("1 reminder 20 dec"));
 		//change name
 		
 	}
-
-	@Test
-	public void testGetTasksList() {
-		
-		controller.executeCommand("delete 1");
-		controller.retrieveAllData();
-		assertEquals("[]",controller.getTasksList().toString());
-		
-		controller.executeCommand("add taskname deadline 31 dec 7pm");
-		controller.retrieveAllData();
-		StringBuilder sb = new StringBuilder();
-		sb.append("1. taskname "+System.getProperty("line.separator"));
-		sb.append("Thu, 31 Dec 07:00PM 2015"+System.getProperty("line.separator"));
-		String expected =sb.toString();
-		assertEquals("["+expected+"]",controller.getTasksList().toString());
-	}
-
-/*	@Test
-	public void testGetEventsList() {
-		//no task is completed
-		assertEquals("[]",controller.getEventsList().toString());
-		
-	}
-
-	@Test
-	public void testGetOverdueList() {
-		//no task is completed
-		assertEquals("[]",controller.getOverdueList().toString());
-		
-	}
-
-	@Test
-	public void testGetFloatList() {
-		//no task is completed
-		assertEquals("[]",controller.getFloatList().toString());
-		
-	}
-*/
 }

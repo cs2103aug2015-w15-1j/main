@@ -5,7 +5,7 @@
 	-fx-font-size: 15px;
 }
 
-.label{
+#mylabel{
 	-fx-background-insets: 0,1;
     -fx-padding: 5px;
     -fx-background-radius: 3px;

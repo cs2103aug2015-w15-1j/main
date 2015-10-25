@@ -84,16 +84,16 @@ public class GUI extends Application{
 	private static Label events;
 	private static Label floating;
 
-	private static ListView<Task> listFloat;
+	private static ListView<Label> listFloat;
 	private static ListView<String> listCate;
-	private static ListView<Task> listTasks;
-	private static ListView<Task> listEvents;
-	private static ListView<Task> listOverdue;
+	private static ListView<Label> listTasks;
+	private static ListView<Label> listEvents;
+	private static ListView<Label> listOverdue;
 
 	private static Label focusHeading;
 	private static Label detailsHeading;
 	private static TextArea detailField;
-	private static ListView<Task> listFocus;
+	private static ListView<Label> listFocus;
 
 	public static void main(String[] args){
 		try {
@@ -120,7 +120,7 @@ public class GUI extends Application{
 	}
 
 	private static void redirectOutput(PrintStream stream){
-		System.setOut(stream);
+		//System.setOut(stream);
 		//System.setErr(stream);
 	}
 
@@ -231,13 +231,16 @@ public class GUI extends Application{
 		gridPane.getChildren().removeAll(floating, tasks, events);
 		//Categories Heading
 		floating = new Label(LIST_FLOATING);
+		floating.setId("mylabel");
 		GridPane.setConstraints(floating, 3, 0);
 		//Task Heading
 		tasks = new Label(LIST_TASKS);
+		tasks.setId("mylabel");
 		GridPane.setColumnSpan(tasks, 2);
 		GridPane.setConstraints(tasks, 0, 0);
 		//Events Heading
 		events = new Label(LIST_EVENTS);
+		events.setId("mylabel");
 		GridPane.setConstraints(events, 2, 0);
 
 		gridPane.getChildren().addAll(floating, tasks, events);
@@ -248,6 +251,7 @@ public class GUI extends Application{
 		gridPane.getChildren().removeAll(listTasks,listEvents,listOverdue,listCate);
 		//tasks		
 		listTasks = getList(controller.getTasksList());
+		//System.out.println(listTasks);
 		GridPane.setColumnSpan(listTasks, 2);
 		listTasks.setFocusTraversable( false );
 		GridPane.setConstraints(listTasks, 0, 1);
@@ -291,8 +295,10 @@ public class GUI extends Application{
 	private static void setUpFocusHeadings(){
 		gridPane.getChildren().removeAll(focusHeading, detailsHeading);
 		focusHeading = new Label(LIST_TASKS);
+		focusHeading.setId("mylabel");
 		GridPane.setConstraints(focusHeading, 0, 0);
 		detailsHeading = new Label("Details");
+		detailsHeading.setId("mylabel");
 		GridPane.setConstraints(detailsHeading,1,0);
 		GridPane.setColumnSpan(detailsHeading, 3);
 		gridPane.getChildren().addAll(focusHeading,detailsHeading);
@@ -325,10 +331,19 @@ public class GUI extends Application{
 		gridPane.getChildren().add(detailField);
 	}
 
-	private static ListView<Task> getList(ArrayList<Task> list){
+	private static ListView<Label> getList(ArrayList<Task> list){
 		assert list != null;
-		ObservableList<Task> tasks = FXCollections.observableArrayList(list);
-		ListView<Task> listTask = new ListView<Task>(tasks);
+		ObservableList<Label> tasks = FXCollections.observableArrayList();
+		for (int i=0;i<list.size();i++){
+			Label newlabel = new Label();
+			newlabel.setMinWidth(200.0);
+			newlabel.setPrefWidth(200.0);
+			newlabel.setMaxWidth(10000.0);
+			newlabel.setWrapText(true);
+			newlabel.setText(list.get(i).toString());
+			tasks.add(newlabel);
+		}
+		ListView<Label> listTask = new ListView<Label>(tasks);
 		return listTask;
 	}
 

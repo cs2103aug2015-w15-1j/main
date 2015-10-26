@@ -179,7 +179,7 @@ public class GUI extends Application{
 		alert.setHeaderText(null);
 		ArrayList<Task> reminders = controller.getReminderList();
 		for (int i=0;i<reminders.size();i++){
-			content+=(i+1)+ ". "+reminders.get(i).reminderPrint();
+			content+=reminders.get(i).reminderPrint();
 		}
 		alert.setContentText(content);
 

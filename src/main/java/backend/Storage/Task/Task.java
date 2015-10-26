@@ -247,7 +247,7 @@ public class Task implements Comparable<Task> {
 	
 	public String reminderPrint() {
 		StringBuilder sb = new StringBuilder();
-		//sb.append(indexForPrinting+". ");
+		sb.append(indexForPrinting+". ");
 		if(name!=""){
 			sb.append(name + " ");
 		}

@@ -245,6 +245,34 @@ public class Task implements Comparable<Task> {
 		return sb.toString();
 	}
 	
+	public String reminderPrint() {
+		StringBuilder sb = new StringBuilder();
+		//sb.append(indexForPrinting+". ");
+		if(name!=""){
+			sb.append(name + " ");
+		}
+		if(priority !=-1){
+			for (int i=0;i<priority;i++){
+			sb.append("*");
+			}
+		}
+		sb.append(System.getProperty("line.separator"));
+		if(start !=""){
+			sb.append("From: "+start + System.getProperty("line.separator"));
+		}
+		if (end!=""){
+			if(start!=""){
+				sb.append ("To: ");
+			}
+			else{
+				sb.append("Deadline: ");
+			}
+			sb.append(end + System.getProperty("line.separator"));
+		}
+			
+		return sb.toString();
+	}
+	
 	@Override
 	public int compareTo(Task o) {
 		

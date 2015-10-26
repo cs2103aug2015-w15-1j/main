@@ -27,6 +27,7 @@ public class GUIController {
 	private ArrayList<Task> getCompletedEvents;
 	private ArrayList<Task> getCompletedFloat;
 	private ArrayList<Task> getSearch;
+	private ArrayList<Task> getReminders;
 
 	
 	public GUIController() {
@@ -138,14 +139,14 @@ public class GUIController {
 		return getSearch;
 	}
 
-	public boolean getNoti() {
-		try {
-			Thread.sleep(5000);
-			return true;
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	boolean getNoti() {
+		getReminders = logicComponent.retrieveTaskData("reminder");
+		if (getReminders.isEmpty()){
+			return false;
 		}
-		return false;
+		return true;
+	}
+	ArrayList<Task> getReminderList(){
+		return getReminders;
 	}
 }

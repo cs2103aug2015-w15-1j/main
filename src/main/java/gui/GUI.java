@@ -146,11 +146,11 @@ public class GUI extends Application{
 		primaryStage.setScene(mainScene);
 		primaryStage.show();
 		determineEvents();
-//		reminders();
+		reminders();
 		
 		
 	}
-/*	private void reminders(){
+	private void reminders(){
 		new Timer().schedule(
 			    new TimerTask() {
 
@@ -160,6 +160,7 @@ public class GUI extends Application{
 
 			    			@Override
 			    			public void run() {
+			    				noti = controller.getNoti();
 			    				 System.out.println("reminder check");
 						           if (noti){
 						            	runNoti();
@@ -172,13 +173,18 @@ public class GUI extends Application{
 	}
 
 	protected void runNoti() {
+		String content = "";
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("REMINDER!");
 		alert.setHeaderText(null);
-		alert.setContentText("THIS IS A REMINDER!");
+		ArrayList<Task> reminders = controller.getReminderList();
+		for (int i=0;i<reminders.size();i++){
+			content+=(i+1)+ ". "+reminders.get(i).reminderPrint();
+		}
+		alert.setContentText(content);
 
 		alert.showAndWait();
-	}*/
+	}
 
 	private void setUpDefault() throws IOException, JSONException, ParseException{
 		setUpGrid(); //general info

@@ -13,17 +13,15 @@ public class GUIController {
 	private final int NUM_EVENTS = 2;
 	private final int NUM_OVERDUE = 3;
 	private final int NUM_FLOAT = 4;
-	private final int NUM_TODAY_TASKS = 5;
-	private final int NUM_TODAY_EVENTS = 6;
-	private final int NUM_SEARCH = 7;
+	private final int NUM_TODAY_TASKS_EVENTS = 5;
+	private final int NUM_SEARCH = 6;
 	
 	private ArrayList<Task> getTasks;
 	private ArrayList<Task> getEvents;
 	private ArrayList<Task> getOverdue;
 	private ArrayList<Task> getFloat;
 	private ArrayList<String> getCate;
-	private ArrayList<Task> getTodayTasks;
-	private ArrayList<Task> getTodayEvents;
+	private ArrayList<Task> getTodayTasksEvents;
 	private ArrayList<Task> getFocusList;
 	private ArrayList<Task> getCompletedTasks;
 	private ArrayList<Task> getCompletedEvents;
@@ -66,26 +64,15 @@ public class GUIController {
 	}
 	
 	void retrieveTodays() {
-		getTodayTasks = logicComponent.retrieveTaskData("todayToDos");
-		getTodayEvents = logicComponent.retrieveTaskData("todayEvents");
+		//TO-DO
+		getTodayTasksEvents = logicComponent.retrieveTaskData("todayToDos");
+		//getTodayEvents = logicComponent.retrieveTaskData("todayEvents");
 	}
 	
 	ArrayList<Task> retrieveTask() { //default view for most initialization
 		ArrayList<Task> list = logicComponent.retrieveTaskData("upcomingToDo");
 		assert list!= null;
 		return list;
-	}
-	
-	ArrayList<Task> getCompletedTasks() {
-		return getCompletedTasks;
-	}
-	
-	ArrayList<Task> getCompletedEvents() {
-		return getCompletedEvents;
-	}
-	
-	ArrayList<Task> getCompletedFloat() {
-		return getCompletedFloat;
 	}
 	
 	void determineList(int currentList) {
@@ -97,18 +84,28 @@ public class GUIController {
 			getFocusList = getEventsList();
 		} else if (currentList==NUM_FLOAT) {
 			getFocusList = getFloatList();
-		} else if (currentList==NUM_TODAY_TASKS) {
-			getFocusList = getTodayTasks;
-		}else if (currentList==NUM_TODAY_EVENTS) {
-			getFocusList = getTodayEvents;
+		} else if (currentList==NUM_TODAY_TASKS_EVENTS) {
+			getFocusList = getTodayTasksEvents;
 		} else if (currentList == NUM_SEARCH){
 			getFocusList = getSearch;
 		}
 	}
-	
+
 	String executeCommand(String userInput) {
 		String feedback = logicComponent.execute(userInput);
 		return feedback;
+	}
+
+	ArrayList<Task> getCompletedTasks() {
+		return getCompletedTasks;
+	}
+	
+	ArrayList<Task> getCompletedEvents() {
+		return getCompletedEvents;
+	}
+	
+	ArrayList<Task> getCompletedFloat() {
+		return getCompletedFloat;
 	}
 	
 	ArrayList<Task> getTasksList() {
@@ -134,15 +131,22 @@ public class GUIController {
 		return getFocusList;
 	}
 	
-	ArrayList<Task> getTodayT() {
-		return getTodayTasks;
-	}
-	
-	ArrayList<Task> getTodayE() {
-		return getTodayEvents;
+	ArrayList<Task> getToday() {
+		return getTodayTasksEvents;
 	}
 	
 	ArrayList<Task> getSearchList(){
 		return getSearch;
+	}
+
+	public boolean getNoti() {
+		try {
+			Thread.sleep(5000);
+			return true;
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 }

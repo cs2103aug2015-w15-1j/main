@@ -32,6 +32,9 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import main.java.backend.Storage.Task.Task;
 
@@ -53,6 +56,8 @@ public class GUI extends Application{
 	private static final String COMMAND_SHOW_FLOAT = "show float";
 	private static final String COMMAND_SEARCH = "search";
 	private static final String COMMAND_EXIT = "exit";
+	private static final double WIDTH_SHORT = 200.0;
+	private static final double WIDTH_LONG = 335.0;
 	private final KeyCombination undo = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
 	private final KeyCombination redo = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);
 	private final KeyCombination shiftUp = new KeyCodeCombination(KeyCode.UP, KeyCombination.SHIFT_DOWN);
@@ -89,16 +94,16 @@ public class GUI extends Application{
 	private static Label events;
 	private static Label floating;
 
-	private static ListView<Label> listFloat;
-	private static ListView<Label> listCate;
-	private static ListView<Label> listTasks;
-	private static ListView<Label> listEvents;
-	private static ListView<Label> listOverdue;
+	private static ListView<TextFlow> listFloat;
+	private static ListView<TextFlow> listCate;
+	private static ListView<TextFlow> listTasks;
+	private static ListView<TextFlow> listEvents;
+	private static ListView<TextFlow> listOverdue;
 
 	private static Label focusHeading;
 	private static Label detailsHeading;
 	private static TextArea detailField;
-	private static ListView<Label> listFocus;
+	private static ListView<TextFlow> listFocus;
 
 	public static void main(String[] args){
 		try {
@@ -125,7 +130,7 @@ public class GUI extends Application{
 	}
 
 	private static void redirectOutput(PrintStream stream){
-		//System.setOut(stream);
+		System.setOut(stream);
 		//System.setErr(stream);
 	}
 
@@ -215,9 +220,9 @@ public class GUI extends Application{
 		ColumnConstraints column1 = new ColumnConstraints();
 		column1.setPercentWidth(24);
 		ColumnConstraints column2 = new ColumnConstraints();
-		column2.setPercentWidth(14);
+		column2.setPercentWidth(13);
 		ColumnConstraints column3 = new ColumnConstraints();
-		column3.setPercentWidth(38);
+		column3.setPercentWidth(39);
 		ColumnConstraints column4 = new ColumnConstraints();
 		column4.setPercentWidth(24);
 		gridPane.getColumnConstraints().addAll(column1, column2, column3,column4);
@@ -360,37 +365,40 @@ public class GUI extends Application{
 		gridPane.getChildren().add(detailField);
 	}
 
-	private static ListView<Label> getList(ArrayList<Task> list){
+	private static ListView<TextFlow> getList(ArrayList<Task> list){
 		assert list != null;
-		ObservableList<Label> tasks = FXCollections.observableArrayList();
+		ObservableList<TextFlow> tasks = FXCollections.observableArrayList();
 		for (int i=0;i<list.size();i++){
-			Label newlabel = new Label();
-			newlabel.setMaxHeight(10000.0);
-			newlabel.setMinWidth(1.0);
-			newlabel.setPrefWidth(1.0);
-			newlabel.setMaxWidth(10000.0);
-			newlabel.setWrapText(true);
+			TextFlow flow = new TextFlow();
+			Text newlabel = new Text();
 			newlabel.setText(list.get(i).toString());
-			tasks.add(newlabel);
-			//System.out.println(list.get(i).toString());
+			if (i%2 == 1){
+				newlabel.setFill(Color.WHITE);;
+			}
+			flow.getChildren().add(newlabel);
+			flow.setMinWidth(1.0);
+			flow.setPrefWidth(1.0);
+			flow.setMaxWidth(10000.0);
+			tasks.add(flow);
 		}
-		ListView<Label> listTask = new ListView<Label>(tasks);
+		ListView<TextFlow> listTask = new ListView<TextFlow>(tasks);
 		return listTask;
 	}
 
-	private static ListView<Label> getStringList(ArrayList<String> list){
+	private static ListView<TextFlow> getStringList(ArrayList<String> list){
 		assert list!=null;
-		ObservableList<Label> tasks = FXCollections.observableArrayList();
+		ObservableList<TextFlow> tasks = FXCollections.observableArrayList();
 		for (int i=0;i<list.size();i++){
-			Label newlabel = new Label();
-			newlabel.setMinWidth(1.0);
-			newlabel.setPrefWidth(1.0);
-			newlabel.setMaxWidth(10000.0);
-			newlabel.setWrapText(true);
+			TextFlow flow = new TextFlow();
+			Text newlabel = new Text();
 			newlabel.setText(list.get(i));
-			tasks.add(newlabel);
+			flow.getChildren().add(newlabel);
+			flow.setMinWidth(1.0);
+			flow.setPrefWidth(1.0);
+			flow.setMaxWidth(10000.0);
+			tasks.add(flow);
 		}
-		ListView<Label> listString = new ListView<Label>(tasks);
+		ListView<TextFlow> listString = new ListView<TextFlow>(tasks);
 		return listString;
 	}
 

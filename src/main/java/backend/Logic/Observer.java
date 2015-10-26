@@ -58,13 +58,17 @@ public class Observer {
 		for(Integer taskId : taskList.keySet()) {
 			Task task = taskList.get(taskId);
 
-			if(!task.getRecurrenceType().equals(RecurrenceType.NONE)) {
+			// Only reset date when todo/event is over
+			if(!task.getRecurrenceType().equals(RecurrenceType.NONE)
+					&& stringToMillisecond(replace(task.getEnd())) 
+					<= getCurrentTime()) {
+				
 				//delete(command);
 				if(task.getTaskType().equals(TaskType.EVENT)) {
-					task.setStart(getUpcomingDate(task, task.getStart()));
+					task.setStart(getUpcomingDate(task, replace(task.getStart())));
 				}
 				if(!task.getTaskType().equals(TaskType.FLOATING)) {
-					task.setEnd(getUpcomingDate(task, task.getEnd()));
+					task.setEnd(getUpcomingDate(task, replace(task.getEnd())));
 				}
 				taskList.put(taskId, task);
 				storage.save(taskList);
@@ -104,6 +108,39 @@ public class Observer {
 		return upcomingDate;
 	}
 	
+	public String getUpcomingDate(Task task, RecurrenceType recurring, String currentDate) {
+		
+		String upcomingDate = new String();
+		long currentDateMilliseconds = stringToMillisecond(currentDate);
+		System.out.println("HEY: " + getDate(currentDateMilliseconds));
+		int factor = task.getRecurrenceNumber();
+		Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(currentDateMilliseconds);
+		
+		switch(recurring) {
+			case NONE:
+				break;
+			case DAY:
+				date.add(Calendar.DATE, factor);
+	            upcomingDate = getDate(date.getTimeInMillis());
+				break;
+			case WEEK:
+				factor *= 7;
+				date.add(Calendar.DATE, factor);
+	            upcomingDate = getDate(date.getTimeInMillis());
+				break;
+			case MONTH:
+				date.add(Calendar.MONTH, factor);
+	            upcomingDate = getDate(date.getTimeInMillis());
+				break;
+			case YEAR:
+				date.add(Calendar.YEAR, factor);
+	            upcomingDate = getDate(date.getTimeInMillis());
+				break;
+		}
+		return upcomingDate;
+	}
+	
 	private String getDate(long milliSeconds) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(milliSeconds);
@@ -114,6 +151,7 @@ public class Observer {
 		
 		long dateTimeMillisecond = -1;
 		Date tempDateTime = new Date();
+		dateTime = replace(dateTime);
 		
 		try {
 			if(dateTime.contains(":")) {
@@ -158,10 +196,10 @@ public class Observer {
 		ArrayList<Task> upcomingTasks = new ArrayList<Task> ();
 
 		for(Task task : allTasks) {
-			if(taskType == TaskType.TODO && stringToMillisecond(task.getEnd()) 
+			if(taskType == TaskType.TODO && stringToMillisecond(replace(task.getEnd())) 
 					> getCurrentTime() && !task.getDone()) {
 				upcomingTasks.add(task);
-			} else if(taskType == TaskType.EVENT && stringToMillisecond(task.getStart()) 
+			} else if(taskType == TaskType.EVENT && stringToMillisecond(replace(task.getStart())) 
 					> getCurrentTime() && !task.getDone()) {
 				upcomingTasks.add(task);
 			}
@@ -246,9 +284,9 @@ public class Observer {
 		ArrayList<Task> todayToDos = new ArrayList<Task> ();
 
 		for(Task task : allToDos) {
-			if(stringToMillisecond(task.getEnd()) 
+			if(stringToMillisecond(replace(task.getEnd())) 
 					>= getTodayStartTime()
-					&& stringToMillisecond(task.getEnd()) 
+					&& stringToMillisecond(replace(task.getEnd())) 
 					< getTodayEndTime()) {
 				todayToDos.add(task);
 			}
@@ -263,9 +301,9 @@ public class Observer {
 		ArrayList<Task> todayEvents = new ArrayList<Task> ();
 
 		for(Task task : allEvents) {
-			if(stringToMillisecond(task.getStart()) 
+			if(stringToMillisecond(replace(task.getStart())) 
 					>= getTodayStartTime()
-					&& stringToMillisecond(task.getStart()) 
+					&& stringToMillisecond(replace(task.getStart())) 
 					< getTodayEndTime()) {
 				todayEvents.add(task);
 			}
@@ -366,6 +404,23 @@ public class Observer {
 		}
 		return data;
 	}
+	
+	private ArrayList<Task> getAllReminder() {
+		
+		ArrayList<Task> remindTaskList = new ArrayList<Task> ();
+		ArrayList<Task> taskList = getFloatingTasks();
+		taskList.addAll(getToDos());
+		taskList.addAll(getEvents());
+		
+		for(Task task : taskList) {
+			if(!task.getDone() && stringToMillisecond(
+					replace(task.getReminder())) == getCurrentTime()) {
+				remindTaskList.add(task);
+			}
+		}
+	
+		return remindTaskList;
+	}
 
 	/*
 	public ArrayList<Category> retrieveCategoryData(String dataType) {
@@ -421,6 +476,9 @@ public class Observer {
 				break;
 			case ("upcomingEvents") :
 				data = getUpcomingEvents();
+				break;
+			case ("reminder") :
+				data = getAllReminder();
 				break;
 		}
 		return data;

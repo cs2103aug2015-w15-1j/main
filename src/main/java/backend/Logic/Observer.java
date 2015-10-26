@@ -4,11 +4,13 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TreeMap;
 
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
+import main.java.backend.Storage.Task.Task.RecurrenceType;
 import main.java.backend.Storage.Task.Task.TaskType;
 
 public class Observer {
@@ -47,6 +49,65 @@ public class Observer {
 
 	private Observer(Storage storage) {
 		this.storage = storage;
+	}
+	
+	private void resetRecurring() {
+
+		TreeMap<Integer, Task> taskList = storage.load();
+
+		for(Integer taskId : taskList.keySet()) {
+			Task task = taskList.get(taskId);
+
+			if(!task.getRecurrenceType().equals(RecurrenceType.NONE)) {
+				//delete(command);
+				if(task.getTaskType().equals(TaskType.EVENT)) {
+					task.setStart(getUpcomingDate(task, task.getStart()));
+				}
+				if(!task.getTaskType().equals(TaskType.FLOATING)) {
+					task.setEnd(getUpcomingDate(task, task.getEnd()));
+				}
+				taskList.put(taskId, task);
+				storage.save(taskList);
+			}
+		}
+	}
+	
+	private String getUpcomingDate(Task task, String currentDate) {
+		
+		String upcomingDate = new String();
+		long currentDateMilliseconds = stringToMillisecond(currentDate);
+		int factor = task.getRecurrenceNumber();
+		Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(currentDateMilliseconds);
+		
+		switch(task.getRecurrenceType()) {
+			case NONE:
+				break;
+			case DAY:
+				date.add(Calendar.DATE, factor);
+	            upcomingDate = getDate(date.getTimeInMillis());
+				break;
+			case WEEK:
+				factor *= 7;
+				date.add(Calendar.DATE, factor);
+	            upcomingDate = getDate(date.getTimeInMillis());
+				break;
+			case MONTH:
+				date.add(Calendar.MONTH, factor);
+	            upcomingDate = getDate(date.getTimeInMillis());
+				break;
+			case YEAR:
+				date.add(Calendar.YEAR, factor);
+	            upcomingDate = getDate(date.getTimeInMillis());
+				break;
+		}
+		return upcomingDate;
+	}
+	
+	private String getDate(long milliSeconds) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(milliSeconds);
+		return standardFormat.format(calendar.getTime());
 	}
 	
 	private long stringToMillisecond(String dateTime) {
@@ -322,6 +383,8 @@ public class Observer {
 	public ArrayList<Task> retrieveTaskData(String dataType) {
 		
 		ArrayList<Task> data = new ArrayList<Task>();
+		resetRecurring();
+		
 		switch(dataType) {
 			case ("today") :
 				data = getAllToday();

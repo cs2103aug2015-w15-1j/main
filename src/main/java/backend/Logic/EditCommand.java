@@ -16,6 +16,7 @@ public class EditCommand extends Command {
 	private static final String EXECUTION_SET_SUCCESSFUL = "Fields have been updated";
 	private static final String EXECUTION_DELETE_SUCCESSFUL = "Task %1$s has been deleted";
 	private static final String EXECUTION_SET_DEADLINE_SUCCESSFUL = "Task %1$s deadline has been set to %2$s";
+	private static final String EXECUTION_SET_RECURRING_SUCCESSFUL = "Task %1$s recurring has been set to %2$s";
 	private static final String EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL = "Event %1$s has been setted to %2$s till %3$s";
 	private static final String EXECUTION_SET_DESCRIPTION_SUCCESSFUL = "Description for task %1$s has been set";
 	private static final String EXECUTION_SET_REMINDER_SUCCESSFUL = "Reminder for Task %1$s has been set to be at %2$s";
@@ -24,6 +25,12 @@ public class EditCommand extends Command {
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
 	private static final String EXECUTION_UNDONE_COMMAND_SUCCESSFUL = "Task %1$s is completed";
 	private static final String EXECUTION_DONE_COMMAND_SUCCESSFUL = "Task %1$s is not completed";
+	
+	private static final String RECURRING_DAY = "day";
+	private static final String RECURRING_WEEK = "week";
+	private static final String RECURRING_MONTH = "month";
+	private static final String RECURRING_YEAR = "year";
+	
 	private static Logger logicEditorLogger = Logger.getGlobal();	
 	private FileHandler logHandler;
 	
@@ -100,6 +107,9 @@ public class EditCommand extends Command {
 			case ("deadline") :
 				feedbackString = setDeadline(this);
 				break;
+			case ("recurring") :
+				feedbackString = setRecurring(this);
+				break;	
 			case ("rename"):
 				feedbackString = rename(this);
 				break;
@@ -233,6 +243,21 @@ public class EditCommand extends Command {
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
+	}
+	
+	private Task.RecurrenceType getRecurrenceType(String recurrenceType) {
+
+		if(recurrenceType.equals(RECURRING_DAY)) {
+			return Task.RecurrenceType.DAY;
+		} if(recurrenceType.equals(RECURRING_WEEK)) {
+			return Task.RecurrenceType.WEEK;
+		} if(recurrenceType.equals(RECURRING_MONTH)) {
+			return Task.RecurrenceType.MONTH;
+		} if(recurrenceType.equals(RECURRING_YEAR)) {
+			return Task.RecurrenceType.YEAR;
+		} else {
+			return Task.RecurrenceType.NONE;
+		} 
 	}
 	
 	private Task.TaskType getTaskType(Task task) {
@@ -467,6 +492,29 @@ public class EditCommand extends Command {
 			storageComponent.save(taskList);
 			
 			return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskIndex, end);
+		} catch (NumberFormatException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
+	}
+	
+	private String setRecurring(Command commandObject) {
+		try {
+			taskList = storageComponent.load();
+			int taskIndex = Integer.parseInt(commandObject.getTaskName());
+			String recurrenceNumber = commandObject.getRecurrenceNumber();
+			String recurrenceType = commandObject.getRecurrenceType();
+			int taskId = getTaskId(taskIndex);
+			Task task = taskList.get(taskId);
+
+			Command command = new Command();
+			command.setTaskName(Integer.toString(taskIndex));
+			delete(command);
+			task.setRecurrenceNumber(Integer.parseInt(recurrenceNumber));
+			task.setRecurrenceType(getRecurrenceType(recurrenceType));
+			taskList.put(taskId, task);
+			storageComponent.save(taskList);
+			
+			return String.format(EXECUTION_SET_RECURRING_SUCCESSFUL, taskIndex, recurrenceType);
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}

@@ -4,6 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.json.JSONException;
 import org.json.simple.parser.ParseException;
 import java.util.logging.*;
@@ -15,6 +18,8 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
@@ -28,7 +33,6 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
-
 import main.java.backend.Storage.Task.Task;
 
 public class GUI extends Application{
@@ -40,6 +44,8 @@ public class GUI extends Application{
 	private static final String LIST_TASKS = "ToDo:";
 	private static final String LIST_EVENTS = "Events:";
 	private static final String LIST_FLOATING = "Floating:";
+	private static final String LIST_TODAY = "Today's: ";
+	private static final String LIST_SEARCH = "Search Results:";
 	private static final String MESSAGE_COMMAND_HELP = "Press F1 to see a list of commands";
 	private static final String COMMAND_SHOW_TASKS = "show todo";
 	private static final String COMMAND_SHOW_EVENTS = "show events";
@@ -59,13 +65,13 @@ public class GUI extends Application{
 	private static final int NUM_EVENTS = 2;
 	private static final int NUM_OVERDUE = 3;
 	private static final int NUM_FLOAT = 4;
-	private static final int NUM_TODAY_TASKS = 5;
-	private static final int NUM_TODAY_EVENTS = 6;
+	private static final int NUM_TODAY_TASKS_EVENTS = 6;
 	private static final int NUM_SEARCH = 7;
 	private static int currentList = 1;
 	private static int currentPosition = 0;
 	private static int currentScene = 1;
 	private static boolean toggleCate = false;
+	private static boolean noti = false;
 
 	private static GUIController controller;
 	private static HelpView help;
@@ -135,15 +141,39 @@ public class GUI extends Application{
 		primaryStage.setScene(mainScene);
 		primaryStage.show();
 		determineEvents();
+		reminders();
+		
+		
 	}
-		/*if (reminder()!=null){
-			System.out.println("hello");
-		}
+	private void reminders(){
+		new Timer().schedule(
+			    new TimerTask() {
+
+			        @Override
+			        public void run() {
+			        	Platform.runLater(new Runnable(){
+
+			    			@Override
+			    			public void run() {
+			    				 System.out.println("reminder check");
+						           if (noti){
+						            	runNoti();
+						            }
+			    			}
+			    			});
+			           
+			        }
+			    }, 500L, 60000L);
 	}
-	private String reminder(){
-			if ()
-		return null;
-	}*/
+
+	protected void runNoti() {
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("REMINDER!");
+		alert.setHeaderText(null);
+		alert.setContentText("THIS IS A REMINDER!");
+
+		alert.showAndWait();
+	}
 
 	private void setUpDefault() throws IOException, JSONException, ParseException{
 		setUpGrid(); //general info
@@ -335,6 +365,9 @@ public class GUI extends Application{
 		ObservableList<Label> tasks = FXCollections.observableArrayList();
 		for (int i=0;i<list.size();i++){
 			Label newlabel = new Label();
+			newlabel.setMinHeight(1.0);
+			newlabel.setPrefHeight(1.0);
+			newlabel.setMaxHeight(10000.0);
 			newlabel.setMinWidth(1.0);
 			newlabel.setPrefWidth(1.0);
 			newlabel.setMaxWidth(10000.0);
@@ -415,12 +448,10 @@ public class GUI extends Application{
 		else if (headNum == NUM_FLOAT){
 			focusHeading.setText(LIST_FLOATING);
 		}
-		else if (headNum == NUM_TODAY_TASKS){
-			focusHeading.setText("TODAY'S TASKS: ");
-		} else if (headNum == NUM_TODAY_EVENTS){
-			focusHeading.setText("TODAY'S EVENTS: ");
+		else if (headNum == NUM_TODAY_TASKS_EVENTS){
+			focusHeading.setText(LIST_TODAY);
 		} else if (headNum == NUM_SEARCH){
-			focusHeading.setText("Search Result: ");
+			focusHeading.setText(LIST_SEARCH);
 		}
 		
 		assert controller.getFocusList()!=null;
@@ -467,10 +498,8 @@ public class GUI extends Application{
 						e.printStackTrace();
 					}
 				} else if(ke.getCode().equals(KeyCode.F3)){
-					showTodayTasks();
+					showTodayTasksEvents();
 				} else if(ke.getCode().equals(KeyCode.F4)){
-					showTodayEvents();
-				} else if(ke.getCode().equals(KeyCode.F5)){
 					showCompleted();
 				} else if (ke.getCode().equals(KeyCode.ESCAPE)){
 				
@@ -569,14 +598,8 @@ public class GUI extends Application{
 		
 	}
 
-	private void showTodayTasks() {
-		currentList = NUM_TODAY_TASKS;
-		setUpFocus();
-		refreshingFocus(currentList);
-		currentScene = SCENE_FOCUS;
-	}
-	private void showTodayEvents() {
-		currentList = NUM_TODAY_EVENTS;
+	private void showTodayTasksEvents() {
+		currentList = NUM_TODAY_TASKS_EVENTS;
 		setUpFocus();
 		refreshingFocus(currentList);
 		currentScene = SCENE_FOCUS;

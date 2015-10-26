@@ -98,13 +98,13 @@ public class AddCommand extends Command {
 	private RecurrenceType getRecurrence(String recurrence) {
 		
 		if(recurrence.equals("day")) {
-			return RecurrenceType.DAILY;
+			return RecurrenceType.DAY;
 		} else if(recurrence.equals("week")) {
-			return RecurrenceType.WEEKLY;
+			return RecurrenceType.WEEK;
 		} else if(recurrence.equals("month")) {
-			return RecurrenceType.MONTHLY;
+			return RecurrenceType.MONTH;
 		} else if(recurrence.equals("year")) {
-			return RecurrenceType.YEARLY;
+			return RecurrenceType.YEAR;
 		}
 		
 		return RecurrenceType.NONE;

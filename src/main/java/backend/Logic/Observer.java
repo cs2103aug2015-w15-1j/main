@@ -323,7 +323,7 @@ public class Observer {
 		
 		ArrayList<Task> data = new ArrayList<Task>();
 		switch(dataType) {
-			case ("todayTasks") :
+			case ("today") :
 				data = getAllToday();
 				break;
 			case ("todayToDos") :

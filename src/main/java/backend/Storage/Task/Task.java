@@ -9,7 +9,7 @@ public class Task implements Comparable<Task> {
 	}
 	
 	public enum RecurrenceType {
-		NONE, DAILY, WEEKLY, MONTHLY, YEARLY;
+		NONE, DAY, WEEK, MONTH, YEAR;
 	}
 	
 	private TaskType taskType;
@@ -197,6 +197,11 @@ public class Task implements Comparable<Task> {
 		if(reminder!=""){
 			sb.append("Reminder has been set." + System.getProperty("line.separator"));
 		}
+		if(!recurrenceType.equals(recurrenceType.NONE)) {
+			sb.append("Recurring every: " + recurrenceNumber 
+					+ " " + recurrenceType.toString().toLowerCase()
+					+ System.getProperty("line.separator"));
+		}
 		return sb.toString();
 	}
 	
@@ -230,6 +235,13 @@ public class Task implements Comparable<Task> {
 		if (reminder!=""){
 			sb.append("Reminder: "+ reminder + System.getProperty("line.separator"));
 		}
+		
+		if(!recurrenceType.equals(recurrenceType.NONE)) {
+			sb.append("Recurring every: " + recurrenceNumber 
+					+ " " + recurrenceType.toString().toLowerCase()
+					+ System.getProperty("line.separator"));
+		}
+		
 		return sb.toString();
 	}
 	

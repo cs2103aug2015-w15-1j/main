@@ -70,8 +70,8 @@ public class GUI extends Application{
 	private static final int NUM_EVENTS = 2;
 	private static final int NUM_OVERDUE = 3;
 	private static final int NUM_FLOAT = 4;
-	private static final int NUM_TODAY_TASKS_EVENTS = 6;
-	private static final int NUM_SEARCH = 7;
+	private static final int NUM_TODAY_TASKS_EVENTS = 5;
+	private static final int NUM_SEARCH = 6;
 	private static int currentList = 1;
 	private static int currentPosition = 0;
 	private static int currentScene = 1;
@@ -291,7 +291,6 @@ public class GUI extends Application{
 		gridPane.getChildren().removeAll(listTasks,listEvents,listOverdue,listCate);
 		//tasks		
 		listTasks = getList(controller.getTasksList());
-		//System.out.println(listTasks);
 		GridPane.setColumnSpan(listTasks, 2);
 		listTasks.setFocusTraversable( false );
 		GridPane.setConstraints(listTasks, 0, 1);

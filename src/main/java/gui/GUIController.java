@@ -58,6 +58,7 @@ public class GUIController {
 		getSearch = logicComponent.retrieveSearchData();
 		assert getSearch!=null;
 	}
+	
 	void retrieveCompletes() {
 		getCompletedTasks = logicComponent.retrieveTaskData("completedToDo");
 		getCompletedEvents = logicComponent.retrieveTaskData("pastEvents");

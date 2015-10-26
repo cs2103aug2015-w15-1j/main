@@ -16,7 +16,8 @@ public class EditCommand extends Command {
 	private static final String EXECUTION_SET_SUCCESSFUL = "Fields have been updated";
 	private static final String EXECUTION_DELETE_SUCCESSFUL = "Task %1$s has been deleted";
 	private static final String EXECUTION_SET_DEADLINE_SUCCESSFUL = "Task %1$s deadline has been set to %2$s";
-	private static final String EXECUTION_SET_RECURRING_SUCCESSFUL = "Task %1$s recurring has been set to %2$s";
+	private static final String EXECUTION_SET_RECURRINGNUMBER_SUCCESSFUL = "Task %1$s recurring number has been set to %2$s";
+	private static final String EXECUTION_SET_RECURRINGTYPE_SUCCESSFUL = "Task %1$s recurring type has been set to %2$s";
 	private static final String EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL = "Event %1$s has been setted to %2$s till %3$s";
 	private static final String EXECUTION_SET_DESCRIPTION_SUCCESSFUL = "Description for task %1$s has been set";
 	private static final String EXECUTION_SET_REMINDER_SUCCESSFUL = "Reminder for Task %1$s has been set to be at %2$s";
@@ -107,9 +108,12 @@ public class EditCommand extends Command {
 			case ("deadline") :
 				feedbackString = setDeadline(this);
 				break;
-			case ("recurring") :
-				feedbackString = setRecurring(this);
+			case ("recurringNum") :
+				feedbackString = setRecurringNumber(this);
 				break;	
+			case ("recurringType") :
+				feedbackString = setRecurringType(this);
+				break;
 			case ("rename"):
 				feedbackString = rename(this);
 				break;
@@ -497,11 +501,31 @@ public class EditCommand extends Command {
 		}
 	}
 	
-	private String setRecurring(Command commandObject) {
+	private String setRecurringNumber(Command commandObject) {
 		try {
 			taskList = storageComponent.load();
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
-			String recurrenceNumber = commandObject.getRecurrenceNumber();
+			int recurrenceNumber = Integer.parseInt(commandObject.getRecurrenceNumber());
+			int taskId = getTaskId(taskIndex);
+			Task task = taskList.get(taskId);
+
+			Command command = new Command();
+			command.setTaskName(Integer.toString(taskIndex));
+			delete(command);
+			task.setRecurrenceNumber(recurrenceNumber);
+			taskList.put(taskId, task);
+			storageComponent.save(taskList);
+			
+			return String.format(EXECUTION_SET_RECURRINGNUMBER_SUCCESSFUL, taskIndex, recurrenceNumber);
+		} catch (NumberFormatException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
+	}
+	
+	private String setRecurringType(Command commandObject) {
+		try {
+			taskList = storageComponent.load();
+			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			String recurrenceType = commandObject.getRecurrenceType();
 			int taskId = getTaskId(taskIndex);
 			Task task = taskList.get(taskId);
@@ -509,12 +533,11 @@ public class EditCommand extends Command {
 			Command command = new Command();
 			command.setTaskName(Integer.toString(taskIndex));
 			delete(command);
-			task.setRecurrenceNumber(Integer.parseInt(recurrenceNumber));
 			task.setRecurrenceType(getRecurrenceType(recurrenceType));
 			taskList.put(taskId, task);
 			storageComponent.save(taskList);
 			
-			return String.format(EXECUTION_SET_RECURRING_SUCCESSFUL, taskIndex, recurrenceType);
+			return String.format(EXECUTION_SET_RECURRINGTYPE_SUCCESSFUL, taskIndex, recurrenceType);
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}

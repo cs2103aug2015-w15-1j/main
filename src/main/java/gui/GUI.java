@@ -125,7 +125,7 @@ public class GUI extends Application{
 	}
 
 	private static void redirectOutput(PrintStream stream){
-		System.setOut(stream);
+		//System.setOut(stream);
 		//System.setErr(stream);
 	}
 
@@ -141,11 +141,11 @@ public class GUI extends Application{
 		primaryStage.setScene(mainScene);
 		primaryStage.show();
 		determineEvents();
-		reminders();
+//		reminders();
 		
 		
 	}
-	private void reminders(){
+/*	private void reminders(){
 		new Timer().schedule(
 			    new TimerTask() {
 
@@ -173,7 +173,7 @@ public class GUI extends Application{
 		alert.setContentText("THIS IS A REMINDER!");
 
 		alert.showAndWait();
-	}
+	}*/
 
 	private void setUpDefault() throws IOException, JSONException, ParseException{
 		setUpGrid(); //general info
@@ -365,8 +365,6 @@ public class GUI extends Application{
 		ObservableList<Label> tasks = FXCollections.observableArrayList();
 		for (int i=0;i<list.size();i++){
 			Label newlabel = new Label();
-			newlabel.setMinHeight(1.0);
-			newlabel.setPrefHeight(1.0);
 			newlabel.setMaxHeight(10000.0);
 			newlabel.setMinWidth(1.0);
 			newlabel.setPrefWidth(1.0);
@@ -374,6 +372,7 @@ public class GUI extends Application{
 			newlabel.setWrapText(true);
 			newlabel.setText(list.get(i).toString());
 			tasks.add(newlabel);
+			//System.out.println(list.get(i).toString());
 		}
 		ListView<Label> listTask = new ListView<Label>(tasks);
 		return listTask;

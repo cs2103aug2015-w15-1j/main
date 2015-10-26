@@ -65,8 +65,7 @@ public class GUIController {
 	
 	void retrieveTodays() {
 		//TO-DO
-		getTodayTasksEvents = logicComponent.retrieveTaskData("todayToDos");
-		//getTodayEvents = logicComponent.retrieveTaskData("todayEvents");
+		getTodayTasksEvents = logicComponent.retrieveTaskData("today");
 	}
 	
 	ArrayList<Task> retrieveTask() { //default view for most initialization

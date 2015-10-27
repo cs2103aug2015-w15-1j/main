@@ -1032,7 +1032,6 @@ public class ParserTest {
 	    assertEquals(expected, parsed);
 	   
 	    //Parser should generate error when duplicate commands are detected
-
 		input = "1 deadline 30 October 12:34 deadline 30 December 23:59";
 	    parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("error", "DuplicateCommandError: duplicate command 'deadline'") );

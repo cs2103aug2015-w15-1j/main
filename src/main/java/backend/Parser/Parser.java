@@ -27,23 +27,23 @@ public class Parser {
 	"addcat", "delete", "done", "every", "reset", "search", "setcol", "show", "showcat", "sort", "undone") );
 	
 	//Commands that create a new item
-	private final ArrayList<String> COMMANDS_ADD_STUFF = new ArrayList<String>( Arrays.asList(
-	"add", "addcat") );
+	private final ArrayList<String> COMMANDS_NO_FIELD = new ArrayList<String>( Arrays.asList(
+	"add", "addcat", "delete", "done") );
 	
 	//Commands that can accept any amount of words
 	private final ArrayList<String> COMMANDS_NEED_WORDS = new ArrayList<String>( 
 	Arrays.asList("add", "addcat", "category", "description", "search") );
 	
-	//Commands that only accept an index
-	private final ArrayList<String> COMMANDS_NEED_INDEX = new ArrayList<String>( 
-	Arrays.asList("delete", "done", "reset", "undone", "showcat") );
+	//Commands that cannot be part of a one-shot command
+	private final ArrayList<String> COMMANDS_NOT_ONE_SHOT = new ArrayList<String>( 
+	Arrays.asList("delete", "done", "reset", "showcat", "undone") );
 	
 	//Command words that indicate that the command is one-shot
 	private final ArrayList<String> COMMANDS_ONE_SHOT = new ArrayList<String>( 
 	Arrays.asList("add", "set") );	
 	
 	//Command fields that can be edited/reset
-	private final ArrayList<String> COMMANDS_CAN_EDIT = new ArrayList<String>( 
+	private final ArrayList<String> COMMANDS_CAN_RESET = new ArrayList<String>( 
 	Arrays.asList("all", "description", "deadline", "event", "priority", "reminder", "category") );	
 	
 	//The default list of fields and the order in which their contents are put into result
@@ -54,7 +54,7 @@ public class Parser {
 	private final ArrayList<String> RECUR_FREQUENCY = new ArrayList<String>( Arrays.asList(
 	"day", "week", "month", "year") );
 	
-	//List of months and their shortforms
+	//List of months and their short-forms
 	private final ArrayList<String> MONTHS = new ArrayList<String>( Arrays.asList(
 	"january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december", 
 	"jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "oct", "nov", "dec") );
@@ -72,7 +72,7 @@ public class Parser {
 	private HashMap<String, String> fieldContent = new HashMap<String, String>(){
 		private static final long serialVersionUID = 1L; {
         put("command",""); put("name", ""); put("description", ""); put("deadline", ""); put("event", ""); 
-        put("priority",""); put("reminder", ""); put("category", ""); put("every", ""); put("rename", "");
+        put("priority",""); put("reminder", ""); put("category", ""); put("every", ""); put("rename", ""); put("reset", "");
     }};
     
     //Contains the variants or short forms of some of the commands
@@ -92,265 +92,337 @@ public class Parser {
 	 * This method parses the user input and returns an ArrayList of string tokens
 	 */
 	public ArrayList<String> parseInput(String input){
-		ArrayList<String> result = new ArrayList<String>(); 
-		
 		String[] inputTokens = input.split(" ");
+		ArrayList<String> firstTwoWordsParsed = parseFirstTwoWords(inputTokens);
+		
+		if (getFirst(firstTwoWordsParsed).equals("PARSING NOT DONE YET")) {
+			return parseRemaining(inputTokens);	
+		} else {
+			return firstTwoWordsParsed;
+		}
+	}
+
+	private ArrayList<String> parseFirstTwoWords(String[] inputTokens) {
 		String firstWordOriginal = getFirst(inputTokens);
 		String firstWord = getDefaultCommand(firstWordOriginal);
+		String secondWordOriginal = getSecond(inputTokens);
+		String secondWord = getDefaultCommand(secondWordOriginal);
+		int inputWordCount = inputTokens.length;
 		
-		if (noNeedContent(firstWord)) {
-			result.add(firstWord);
-			return result;
-		} else if (isCommand(firstWord) && inputTokens.length == 1) {
-			result = makeErrorResult(result, "EmptyFieldError", firstWord);
-		} else if (!(isCommand(firstWord) || isNumber(firstWord))) {
-			result = makeErrorResult(result, "InvalidWordError", firstWordOriginal);
-		} else if (isDominatingCommand(firstWord)) {
-			result.add(firstWord);
+		if (isCommandAndNoNeedContent(firstWord)) {
+			return makeCommandOnlyResult(firstWord);
+		}
+		if (isCommandButHasNoContent(firstWord, inputWordCount)) {
+			return makeErrorResult("EmptyFieldError", firstWord);
+		}
+		if (isNotCommandOrIndex(firstWord)) {
+			return makeErrorResult("InvalidWordError", firstWordOriginal);
+		} 
+		if (isDominatingCommand(firstWord)) {
 			String content = mergeTokens(inputTokens, 1, inputTokens.length);
-			if (firstWord.equals("show")) {
-				String taskType = getTaskType(content);
-				if (taskType.equals("ERROR")) {
-					result = makeErrorResult(result, "InvalidTaskTypeError", content);
-				} else {
-					result.set(0, firstWord+taskType);
+			ArrayList<String> dominantResult = makeDominantResult(firstWord, secondWord, content); 
+			if (!getFirst(dominantResult).equals("PARSING NOT DONE YET")) {
+				return dominantResult;
+			}
+		}
+		if (isCommandThatCantBeInOneShot(secondWord)) {
+			String content = mergeTokens(inputTokens, 1, inputTokens.length);
+			ArrayList<String> dominantResult = makeDominantResult(secondWord, firstWord, content); 
+			if (!getFirst(dominantResult).equals("PARSING NOT DONE YET")) {
+				return dominantResult;
+			}
+		}
+		if (isNumber(firstWord)) {
+			if (secondWord.isEmpty()) {
+				return makeErrorResult("NoCommandError", firstWord);
+			} else if (!(isCommand(secondWord))) {
+				return makeErrorResult("InvalidCommandError", secondWordOriginal);
+			}
+		}
+		return new ArrayList<String>( Arrays.asList( "PARSING NOT DONE YET" ));
+	}
+
+	private ArrayList<String> parseRemaining(String[] inputTokens) {
+		int inputWordCount = inputTokens.length;
+		boolean hasQuote = containsQuotes(inputTokens);
+		boolean quoteStart = false;
+		for (int i = 0; i < inputWordCount; i++) {
+			String token = inputTokens[i];
+			String originalToken = token;
+			token = getDefaultCommand(token);
+			if (hasQuote && token.startsWith("\"")) {
+				quoteStart = true;
+			}
+			
+			if (quoteStart == true) {
+				appendToken(originalToken);
+				if (token.endsWith("\"")) {
+					quoteStart = false;
 				}
-			} else if (firstWord.equals("sort")) {
-				String field = getSortField(getDefaultCommand(content));
-				if (field.equals("ERROR")) {
-					result = makeErrorResult(result, "InvalidSortFieldError", content);
+			} else if (isNotCommand(token) || isCommandRepressed(token)){
+				appendToken(originalToken);	
+			} else {
+				putToken();
+				String lastCommandSeen = getLast(seenCommands);
+				
+				if (isLastWord(i, inputWordCount) && isCommandThatNeedWords(lastCommandSeen)) {
+					appendToken(originalToken);
+				} else if (isLastWord(i, inputWordCount) && !isDominatingCommand(originalToken)){
+					return makeErrorResult("EmptyFieldError", originalToken);
+				} else if (isSeenCommand(token)) {
+					if (isCommandThatNeedWords(lastCommandSeen)) {
+						addToFieldContent(lastCommandSeen, originalToken);
+					} else {
+						return makeErrorResult("DuplicateCommandError", originalToken);
+					}
 				} else {
-					result.set(0, firstWord+field);
-				}
-			} else if (needWords(firstWord)) { //if first word is addcat or search
-				result.add(content);
-			} else if (needIndex(firstWord)) { //if first word is delete, done, or undone 
-				String nextWord = getFirst(content);
-				if (isNumber(nextWord)) {
-					result.add(nextWord);
-				} else {
-					result = makeErrorResult(result, "InvalidIndexError", content);
+					if (isCommandRepressed(token)) {
+						appendToken(originalToken);
+					} else {
+						if (!lastCommandSeen.isEmpty()) {
+							String contentOfLastCommand = getContentOfLastCommand(lastCommandSeen);
+							if (contentOfLastCommand.isEmpty()) {
+								return makeErrorResult("EmptyFieldError", lastCommandSeen);
+							}
+						}
+						putCommand(token);
+					}
 				}
 			} 
-		} else {
-			if (isNumber(firstWord)) { //first word is task index
-				String secondWordOriginal = getSecond(inputTokens);
-				String secondWord = getDefaultCommand(secondWordOriginal);
-				if (secondWord.isEmpty()) {
-					result = makeErrorResult(result, "NoCommandError", firstWord);
-					return result;
-				} else if (!(isCommand(secondWord))) {
-					result = makeErrorResult(result, "InvalidCommandError", secondWordOriginal);
-					return result;
-				}
-			}
-			boolean quoteStart = false;
-			for (int i = 0; i < inputTokens.length; i++) {
-				String token = inputTokens[i];
-				String originalToken = token;
-				token = getDefaultCommand(token);
-				if (token.startsWith("\"")) {
-					if (containsQuote(inputTokens)) {
-						quoteStart = true;
-						System.out.println(quoteStart);
-					}
-				}
-				if (quoteStart == true) {
-					appendToken(originalToken);
-					if (token.endsWith("\"")) {
-						quoteStart = false;
-					}
-				} else if (isCommand(token) && !noNeedContent(token)) {
-					putToken();			
-					String lastCommand = getLast(seenCommands);
-					if (i == inputTokens.length-1) {
-						if (needWords(lastCommand)) {
-							appendToken(originalToken);
-							continue;
-						} else if (!isDominatingCommand(originalToken)){
-							result = makeErrorResult(result, "EmptyFieldError", originalToken);
-							return result;
-						}
-					}
-					if (isSeenCommand(token)) {
-						if (needWords(lastCommand)) {
-							addToFieldContent(lastCommand, originalToken);
-						} else {
-							result = makeErrorResult(result, "DuplicateCommandError", originalToken);
-							break;
-						}
-
-					} else {
-						String command = fieldContent.get("command");
-						if (!command.isEmpty() && isDominatingCommand(token)) {
-							appendToken(originalToken);
-						} else {
-							if (!lastCommand.isEmpty()) {
-								String content;
-								if (isAddStuff(lastCommand)) {
-									content = fieldContent.get("name");
-								} else {
-									content = fieldContent.get(lastCommand);
-								}
-								if (content.isEmpty()) {
-									result = makeErrorResult(result, "EmptyFieldError", lastCommand);
-									break;
-								}
-							}
-							putCommand(token);
-							//if command is delete, done or reset, ends here
-							if (isDominatingCommand(token) && !token.equals("every")) { 
-								if (token.equals("reset")) {
-									if (isLast(inputTokens, token)) {
-										result = makeErrorResult(result, "EmptyFieldError", token);
-									} else {
-										String content = mergeTokens(inputTokens, i+1, inputTokens.length);
-										String field = getDefaultCommand(content);
-										if (isLast(inputTokens, content) && canEdit(field)) {
-											fieldContent.put("reset", field);
-										} else {
-											result = makeErrorResult(result, "InvalidResetError", content);
-										}
-									}
-								}
-								break;
-							}
-						}
-					}
-					
-				} else {
-					appendToken(originalToken);
-				}
-			}
-			putToken();
-			
-			String command = fieldContent.get("command");
-			result = makeResult(result, command);
-			
-		}	
-		seenCommands.clear();
-		fields = new ArrayList<String>(FIELDS_DEFAULT);
-		fieldContent.replaceAll((field,content) -> "");
-		return result;
-	}
-
-	private void appendToken(String token) {
-		growingToken += token + " ";
-	}
-	
-	/**
-	 * This methods checks if token is a command variant (if yes, convert it to the default command)
-	 */
-	private String getDefaultCommand(String token) {
-		for (String command: COMMANDS) {
-			if (token.equalsIgnoreCase(command)){
-				return command;
-			}
 		}
-    	for (String command: command_families.keySet()) {
-    		ArrayList<String> family = command_families.get(command);
-			if (family.contains(token)) {
-				return command;
-			}
-		}
-    	return token;
-	}
-	
-	private boolean containsQuote(String[] inputTokens){
-		/*String[] tokens = input.split("\"");
-		System.out.println("Length " + tokens.length);
-		return tokens.length > 1 && tokens.length % 2 == 0;*/
-		int quoteCommaCount = 0;
-		for (String token: inputTokens) {
-			if (token.startsWith("\"")) {
-				quoteCommaCount++;
-			}
-			if (token.endsWith("\"")) {
-				quoteCommaCount++;
-			}
-		}
-		return quoteCommaCount > 1 && quoteCommaCount % 2 == 0;
-	}
-	
-	/**
-	 * This method marks the command as seen and stores it as the main command (if there isn't one) 
-	 */
-	private void putCommand(String token) {
+		putToken();
 		String command = fieldContent.get("command");
-		seenCommands.add(token);
+		if (isOneShot(command)) {
+			return makeMultiFieldResult();
+		} else {
+			return makeSingleFieldResult();
+		}
+	}
 
-		if (command.isEmpty()) {
-			fieldContent.put("command", token);
-		} else if (!isAddStuff(command)) {
-			fieldContent.put("command", "set");
+	private ArrayList<String> makeCommandOnlyResult(String command){
+		return new ArrayList<String>( Arrays.asList( command ) );
+	}
+
+	private ArrayList<String> makeCommandAndContentResult(String command, String content){
+		return new ArrayList<String>( Arrays.asList( command, content ) );
+	}
+
+	private ArrayList<String> makeDominantResult(String firstWord, String secondWord, String content) {
+		String command = firstWord;
+		String index = secondWord;
+		System.out.println("content " + content);
+		if (command.equals("show")) {
+			return makeShowResult(command, content);
+		}
+		if (command.equals("sort")) {
+			return makeSortResult(command, content);
+		}
+		if (command.equals("reset")) {
+			return makeResetResult(command, index, content);
+		}
+		if (isCommandThatNeedWords(command)) { //if first word is addcat or search
+			return makeCommandAndContentResult(command, content);
+		}
+		if (isCommandThatCantBeInOneShot(command)) { //if first word is delete, done, or undone 
+			if (isNumber(index)) {
+				return makeCommandAndContentResult(command, index);
+			} else {
+				return makeErrorResult("InvalidIndexError", content);
+			}
+		}
+		return new ArrayList<String>( Arrays.asList( "PARSING NOT DONE YET" ));
+	}
+
+	private ArrayList<String> makeShowResult(String command, String content) {
+		String taskType = getTaskType(content);
+		if (taskType.equals("ERROR")) {
+			return makeErrorResult("InvalidTaskTypeError", content);
+		} else {
+			return new ArrayList<String>( Arrays.asList( command+taskType ) );
 		}
 	}
 	
-	/**
-	 * This method stores the growingToken under its rightful field or appends it to an existing field content
-	 */
-	private void putToken() {
-		if (!growingToken.isEmpty()) {
-			growingToken = removeEndSpaces(growingToken);
-			growingToken = removeQuotes(growingToken);
-			String lastCommand = getLast(seenCommands);
-			String field;
-			
-			if (lastCommand.isEmpty() || isAddStuff(lastCommand)) {
-				field = "name";
+	private ArrayList<String> makeSortResult(String command, String content) {
+		String field = getSortField(getDefaultCommand(content));
+		if (field.equals("ERROR")) {
+			return makeErrorResult("InvalidSortFieldError", content);
+		} else {
+			return new ArrayList<String>( Arrays.asList( command+field ) );
+		}
+	}
+	
+	private ArrayList<String> makeResetResult(String command, String index, String content) {
+		appendAndPutToken(index);
+		putCommand(command);
+		String[] contentTokens = content.split(" ");
+		content = mergeTokens(contentTokens, 1, contentTokens.length);
+		if (content.isEmpty()) {
+			return makeErrorResult("EmptyFieldError", command);
+		} else {
+			String fieldToReset = getDefaultCommand(content);
+			if (canReset(fieldToReset)) {
+				appendAndPutToken(fieldToReset);
+				return makeSingleFieldResult();
 			} else {
-				field = lastCommand;
+				return makeErrorResult("InvalidResetError", content);
 			}
-			
-			String content = fieldContent.get(field);
-			if (content.isEmpty()) {
-				fieldContent.put(field, growingToken);
-			} else {
-				fieldContent.put(field, content + " " + growingToken);
-			}
-			
-			growingToken = "";
 		}
 	}
 
 	/**
-	 * This method directly adds or appends a token to a field's content
+	 * This method creates a short result (for non one-shot commands)
 	 */
-	private void addToFieldContent(String command, String token){
-		String content;
-		String field;
-		if (isAddStuff(command)) {
-			field = "name";
-			content = fieldContent.get(command);
-		} else {
-			field = command;
-			content = fieldContent.get(command);
+	private ArrayList<String> makeSingleFieldResult() {
+		String command = fieldContent.get("command");
+		String name = fieldContent.get("name");
+		String content = fieldContent.get(command);
+		resetTempContent();
+		
+		if (command.equals("every")) {
+			return makeRecurringResult(command, name, content);
+		} 	
+		if (command.equals("event")) {
+			if (content.endsWith("to")) {
+				return makeErrorResult("NoEndDateError", content);
+			}
+			return makeEventResult(command, name, content);
 		}
-		if (content != null) {
-			fieldContent.put(field, removeEndSpaces(content + " " + token));
-		} else {
-			fieldContent.put(field, removeEndSpaces(token));
+		
+		if (command.equals("deadline") || command.equals("reminder")) {
+			String date = parseDate(command, content);
+			if (date.equals("ERROR")) {
+				return makeErrorResult("InvalidDateError", content);
+			}
+			content = date;
 		}
+		if (command.equals("priority") && isNotValidPriority(content)) {
+			return makeErrorResult("InvalidPriorityError", content);
+		}
+		return new ArrayList<String>( Arrays.asList(command, name, content) );
 	}
 
-	private ArrayList<String> makeResult(ArrayList<String> result, String command) {
-		if (command.equals("ERROR")) {
-			return result;
-		} else if (canBeOneShot(command)) {
-			result = makeLongResult(result);
-		} else {
-			result = makeShortResult(result);
+	private ArrayList<String> makeEventResult(String command, String name, String event) {
+		String[] eventStartEnd = getStartAndEnd(event);
+		String eventStart = getFirst(eventStartEnd);
+		String eventEnd = getLast(eventStartEnd);
+		if (eventStart.equals("ERROR") ) {
+			eventStart = removeEndSpaces(getFirst(event.split(" to ")));
+			return makeErrorResult("InvalidDateError", eventStart);
+		} 
+		if (eventEnd.equals("ERROR") ){
+			eventEnd = removeEndSpaces(getLast(event.split(" to ")));
+			return makeErrorResult("InvalidDateError", eventEnd);
 		}
+		return new ArrayList<String>( Arrays.asList(command, name, eventStart, eventEnd) );
+	}
+
+	private ArrayList<String> makeRecurringResult(String command, String name, String newField){
+		String freq = "";
+		String[] fieldTokens = newField.split(" ");
+		freq = getFirst(newField);
+		if (isNotValidFrequency(freq)) {
+			return makeErrorResult("InvalidFrequencyError", freq);
+		} 
+		newField = mergeTokens(fieldTokens, 1, fieldTokens.length);
+		if (freq.equals("month")) {
+			String dayOfMonth = getNumber(newField);
+			if (isNotValidDayOfMonth(dayOfMonth)) {
+				return makeErrorResult("InvalidDayOfMonthError", dayOfMonth);
+			} else {
+				dayOfMonth += " of month";
+				return new ArrayList<String> ( Arrays.asList(command, name, dayOfMonth) );
+			}
+		}
+		String date = parseDate(command, newField);
+		if (date.equals("ERROR")) {
+			return makeErrorResult("InvalidDateError", newField);
+		}
+		
+		date = changeToRecurFormat(freq, date);
+		return new ArrayList<String> ( Arrays.asList(command, name, date) );
+	}
+	
+	/**
+	 * This method creates a long result (for one-shot commands)
+	 */
+	private ArrayList<String> makeMultiFieldResult() {
+		String command = fieldContent.get("command");
+		String deadline = fieldContent.get("deadline");
+		String event = fieldContent.get("event");
+		String reminder = fieldContent.get("reminder");
+		String priority = fieldContent.get("priority");
+		ArrayList<String> result = new ArrayList<String>();
+		
+		if (command.equals("add")) {
+			fields.remove("rename");
+		}
+		
+		if (!priority.isEmpty() && isNotValidPriority(priority)) {
+			return makeErrorResult("InvalidPriorityError", priority);
+		} else {
+			if (!reminder.isEmpty()) {
+				String date = parseDate("reminder", reminder);
+				if (date.equals("ERROR")) {
+					return makeErrorResult("InvalidDateError", reminder);
+				} else {
+					reminder = date;
+				}
+				fieldContent.put("reminder", reminder);
+			}
+			if (!deadline.isEmpty()) {
+				command += "T";
+				fields.remove("eventStart");
+				fields.remove("eventEnd");
+				String date = parseDate("deadline", deadline);
+				if (date.equals("ERROR")) {
+					return makeErrorResult("InvalidDateError", deadline);
+				} else {
+					deadline = date;
+				}
+				fieldContent.put("deadline", deadline);
+			} else if (!event.isEmpty()) {
+				command += "E";
+				fields.remove("deadline");
+				if (event.endsWith("to")) {
+					return makeErrorResult("NoEndDateError", event);
+				} else {
+					String[] eventStartEnd = getStartAndEnd(event);
+					String eventStart = getFirst(eventStartEnd);
+					String eventEnd = getLast(eventStartEnd);
+					if (eventStart.equals("ERROR") ) {
+						eventStart = removeEndSpaces(getFirst(event.split(" to ")));
+						return makeErrorResult("InvalidDateError", eventStart);
+					} else if (eventEnd.equals("ERROR") ){
+						eventEnd = removeEndSpaces(getLast(event.split(" to ")));
+						return makeErrorResult("InvalidDateError", eventEnd);
+					}
+				}
+			} else {
+				if (command.equals("add")) {
+					command += "F";
+				}
+				fields.remove("deadline");
+				fields.remove("eventStart");
+				fields.remove("eventEnd");
+			}
+			fieldContent.put("command", command);
+			
+			for (String field: fields) {
+				String para = fieldContent.get(field);
+				result.add(para);
+			}
+		}
+		resetTempContent();
 		return result;
 	}
-	
-	/**
-	 * This method makes a result that indicates an error in the command
-	 */
-	private ArrayList<String> makeErrorResult(ArrayList<String> result, String error, String token) {
-		result.clear();
+
+	private ArrayList<String> makeErrorResult(String error, String token) {
+		fields = new ArrayList<String>(FIELDS_DEFAULT);
+		resetTempContent();
+		ArrayList<String> result = new ArrayList<String>(); 
 		result.add("error");
-		fieldContent.put("command", "ERROR");
+		//fieldContent.put("command", "ERROR");
+		
 		switch (error) {
 			case "InvalidWordError":
 				result.add(error + ": '" + token + "' is not recognised as a command or index");
@@ -399,159 +471,150 @@ public class Parser {
 		}
 		return result;
 	}
-
+	
 	/**
-	 * This method creates a short result (for non one-shot commands)
+	 * This methods checks if token is a command variant (if yes, convert it to the default command)
 	 */
-	private ArrayList<String> makeShortResult(ArrayList<String> result) {
-		String command = fieldContent.get("command");
-		String name = fieldContent.get("name");
-		String newField = fieldContent.get(command);
-		if (name.isEmpty()) {
-			result = makeErrorResult(result, "EmptyFieldError", command);
-		} else if (!needIndex(command) && newField.isEmpty()){
-			result = makeErrorResult(result, "EmptyFieldError", command);
-		} else if (newField == null) {
-			result.addAll( Arrays.asList(command, name) );
-		} else {
-			if (command.equals("deadline") || command.equals("reminder") || command.equals("every")) {
-				String freq = "";
-				if (command.equals("every")) {
-					String[] tokens = newField.split(" ");
-					freq = getFirst(tokens);
-					if (!isValidFrequency(freq)) {
-						result = makeErrorResult(result, "InvalidFrequencyError", freq);
-						return result;
-					} 
-					newField = mergeTokens(tokens, 1, tokens.length);
-					if (freq.equals("month")) {
-						newField = getNumber(newField);
-						if (!isValidDayOfMonth(newField)) {
-							result = makeErrorResult(result, "InvalidDayOfMonthError", newField);
-						} else {
-							newField += " of month";
-							result.addAll( Arrays.asList(command, name, newField) );
-						}
-						return result;
-					}
-				} 		
-				String date = parseDate(command, newField);
-
-				if (date.equals("ERROR")) {
-					result = makeErrorResult(result, "InvalidDateError", newField);
-					return result;
-				} else if (command.equals("every")){
-					date = changeToRecurFormat(freq, date);
-				}
-				newField = date;
-			}
-			if (command.equals("priority") && !isValidPriority(newField)) {
-				result = makeErrorResult(result, "InvalidPriorityError", newField);
-			} else if (command.equals("event")) {
-				if (newField.endsWith("to")) {
-					result = makeErrorResult(result, "NoEndDateError", newField);
-					return result;
-				} else {
-					String[] eventStartEnd = getStartAndEnd(newField);
-					String eventStart = getFirst(eventStartEnd);
-					String eventEnd = getLast(eventStartEnd);
-					if (eventStart.equals("ERROR") ) {
-						eventStart = removeEndSpaces(getFirst(newField.split(" to ")));
-						result = makeErrorResult(result, "InvalidDateError", eventStart);
-						return result;
-					} else if (eventEnd.equals("ERROR") ){
-						eventEnd = removeEndSpaces(getLast(newField.split(" to ")));
-						result = makeErrorResult(result, "InvalidDateError", eventEnd);
-						return result;
-					}
-					result.addAll( Arrays.asList(command, name, eventStart, eventEnd) );
-				}
-			} else {
-				result.addAll( Arrays.asList(command, name, newField) );
+	private String getDefaultCommand(String token) {
+		for (String command: COMMANDS) {
+			if (token.equalsIgnoreCase(command)){
+				return command;
 			}
 		}
-		
-		return result;
+		for (String command: command_families.keySet()) {
+			ArrayList<String> family = command_families.get(command);
+			if (family.contains(token)) {
+				return command;
+			}
+		}
+		return token;
+	}
+
+	private String getContentOfLastCommand(String lastCommandSeen) {
+		String content;
+		if (isAddStuff(lastCommandSeen)) {
+			content = fieldContent.get("name");
+		} else {
+			content = fieldContent.get(lastCommandSeen);
+		}
+		return content;
 	}
 
 	/**
-	 * This method creates a long result (for one-shot commands)
+	 * This method marks the command as seen and stores it as the main command (if there isn't one) 
 	 */
-	private ArrayList<String> makeLongResult(ArrayList<String> result) {
+	private void putCommand(String token) {
 		String command = fieldContent.get("command");
-		String deadline = fieldContent.get("deadline");
-		String event = fieldContent.get("event");
-		String reminder = fieldContent.get("reminder");
-		String priority = fieldContent.get("priority");
-		
-		if (command.equals("add")) {
-			fields.remove("rename");
+		seenCommands.add(token);
+	
+		if (command.isEmpty()) {
+			fieldContent.put("command", token);
+		} else if (!isAddStuff(command)) {
+			fieldContent.put("command", "set");
 		}
-		
-		if (!priority.isEmpty() && !isValidPriority(priority)) {
-			result = makeErrorResult(result, "InvalidPriorityError", priority);
-		} else {
-			if (!reminder.isEmpty()) {
-				String date = parseDate("reminder", reminder);
-				if (date.equals("ERROR")) {
-					result = makeErrorResult(result, "InvalidDateError", reminder);
-					return result;
-				} else {
-					reminder = date;
-				}
-				fieldContent.put("reminder", reminder);
-			}
-			if (!deadline.isEmpty()) {
-				command += "T";
-				fields.remove("eventStart");
-				fields.remove("eventEnd");
-				String date = parseDate("deadline", deadline);
-				if (date.equals("ERROR")) {
-					result = makeErrorResult(result, "InvalidDateError", deadline);
-					return result;
-				} else {
-					deadline = date;
-				}
-				fieldContent.put("deadline", deadline);
-			} else if (!event.isEmpty()) {
-				command += "E";
-				fields.remove("deadline");
-				if (event.endsWith("to")) {
-					result = makeErrorResult(result, "NoEndDateError", event);
-					return result;
-				} else {
-					String[] eventStartEnd = getStartAndEnd(event);
-					String eventStart = getFirst(eventStartEnd);
-					String eventEnd = getLast(eventStartEnd);
-					if (eventStart.equals("ERROR") ) {
-						eventStart = removeEndSpaces(getFirst(event.split(" to ")));
-						result = makeErrorResult(result, "InvalidDateError", eventStart);
-						return result;
-					} else if (eventEnd.equals("ERROR") ){
-						eventEnd = removeEndSpaces(getLast(event.split(" to ")));
-						result = makeErrorResult(result, "InvalidDateError", eventEnd);
-						return result;
-					}
-				}
+	}
+
+	private void appendToken(String token) {
+		growingToken += token + " ";
+	}
+
+	/**
+	 * This method stores the growingToken under its rightful field or appends it to an existing field content
+	 */
+	private void putToken() {
+		if (!growingToken.isEmpty()) {
+			//System.out.println("grow " + growingToken);
+			growingToken = removeEndSpaces(growingToken);
+			growingToken = removeQuotes(growingToken);
+			String lastCommand = getLast(seenCommands);
+			String field;
+			//System.out.println("last: " + lastCommand);
+			if (fieldContent.get("name").isEmpty()) {
+				field = "name";
+			} else if (lastCommand.isEmpty() || isAddStuff(lastCommand)) {
+				field = "name";
 			} else {
-				if (command.equals("add")) {
-					command += "F";
-				}
-				fields.remove("deadline");
-				fields.remove("eventStart");
-				fields.remove("eventEnd");
+				field = lastCommand;
 			}
-			fieldContent.put("command", command);
 			
-			for (String field: fields) {
-				String para = fieldContent.get(field);
-				result.add(para);
+			String content = fieldContent.get(field);
+			if (content.isEmpty()) {
+				fieldContent.put(field, growingToken);
+			} else {
+				fieldContent.put(field, content + " " + growingToken);
 			}
+			//System.out.println(field + " " + fieldContent.get(field));
+			growingToken = "";
 		}
-
-		return result;
 	}
 
+	private void appendAndPutToken(String firstWord) {
+		appendToken(firstWord);
+		putToken();
+	}
+	
+	/**
+	 * This method directly adds or appends a token to a field's content
+	 */
+	private void addToFieldContent(String command, String token){
+		String content;
+		String field;
+		if (isAddStuff(command)) {
+			field = "name";
+			content = fieldContent.get(command);
+		} else {
+			field = command;
+			content = fieldContent.get(command);
+		}
+		if (content != null) {
+			fieldContent.put(field, removeEndSpaces(content + " " + token));
+		} else {
+			fieldContent.put(field, removeEndSpaces(token));
+		}
+	}
+
+	private void resetTempContent() {
+		seenCommands.clear();
+		fields = new ArrayList<String>(FIELDS_DEFAULT);
+		for (String key: fieldContent.keySet()){
+			fieldContent.put(key, "");
+		}
+	}
+
+	private boolean isNotCommand(String token){
+		return !isCommand(token);
+	}
+
+	private boolean isNotCommandOrIndex(String token) {
+		return isNotCommand(token) && !isNumber(token);
+	}
+	
+	private boolean isCommandButHasNoContent(String token, int inputWordCount) {
+		return isCommand(token) && inputWordCount == 1;
+	}
+	
+	private boolean isCommandRepressed(String token) {
+		String mainCommand = fieldContent.get("command");
+		return !mainCommand.isEmpty() && (isDominatingCommand(token) || isCommandAndNoNeedContent(token));
+	}
+
+	private boolean isLastWord(int i, int inputWordCount) {
+		return i == inputWordCount-1;
+	}
+
+	private boolean containsQuotes(String[] inputTokens){
+		int quoteCommaCount = 0;
+		for (String token: inputTokens) {
+			if (token.startsWith("\"")) {
+				quoteCommaCount++;
+			}
+			if (token.endsWith("\"")) {
+				quoteCommaCount++;
+			}
+		}
+		return quoteCommaCount > 1 && quoteCommaCount % 2 == 0;
+	}
+	
 	/**
 	 * This method gets the individual start and end date/time of an event and put them into separate fields
 	 * @return the start and end date/time in an array
@@ -1089,32 +1152,32 @@ public class Parser {
 		return COMMANDS_DOMINATING.contains(token);
 	}
 	
-	private boolean noNeedContent(String token){
+	private boolean isCommandAndNoNeedContent(String token){
 		return COMMANDS_NO_CONTENT.contains(token);
 	}
 	
 	private boolean isAddStuff(String token){
-		return COMMANDS_ADD_STUFF.contains(token);
+		return COMMANDS_NO_FIELD.contains(token);
 	}
 	
 	private boolean isSeenCommand(String token) {
 		return seenCommands.contains(token);
 	}
 	
-	private boolean needWords(String token) {
+	private boolean isCommandThatNeedWords(String token) {
 		return COMMANDS_NEED_WORDS.contains(token);
 	}
 	
-	private boolean needIndex(String token) {
-		return COMMANDS_NEED_INDEX.contains(token);
+	private boolean isCommandThatCantBeInOneShot(String token) {
+		return COMMANDS_NOT_ONE_SHOT.contains(token) || COMMANDS_NO_CONTENT.contains(token);
 	}
 	
-	private boolean canBeOneShot(String token) {
+	private boolean isOneShot(String token) {
 		return COMMANDS_ONE_SHOT.contains(token);
 	}
 	
-	private boolean canEdit(String token) {
-		return COMMANDS_CAN_EDIT.contains(token);
+	private boolean canReset(String token) {
+		return COMMANDS_CAN_RESET.contains(token);
 	}
 	
 	private boolean isNumber(String token) {
@@ -1126,31 +1189,31 @@ public class Parser {
 		}
 	}
 	
-	private boolean isValidPriority(String token){
+	private boolean isNotValidPriority(String token){
 		int[] priorityLevels = {1,2,3,4,5};
 		if (isNumber(token)) {
 			int intToken = Integer.parseInt(token);
 			for (int i = 0; i < priorityLevels.length; i++) {
 				if (intToken == priorityLevels[i]) {
-					return true;
+					return false;
 				}
 			}
-			return false;
+			return true;
 		}
-		return false;
+		return true;
 	}
 	
-	private boolean isValidFrequency(String token){
-		return RECUR_FREQUENCY.contains(token);
+	private boolean isNotValidFrequency(String token){
+		return !RECUR_FREQUENCY.contains(token);
 	}
 	
-	private boolean isValidDayOfMonth(String token){
+	private boolean isNotValidDayOfMonth(String token){
 		if (isNumber(token)){
 			if (Integer.parseInt(token) <= 31) {
-				return true;
+				return false;
 			}
 		}
-		return false;
+		return true;
 	}
 	
 	private String getTaskType(String token){
@@ -1225,10 +1288,10 @@ public class Parser {
 		return firstWord.equals(token);
 	}*/
 	
-	private boolean isLast(String[] array, String token) {
+	/*private boolean isLast(String[] array, String token) {
 		String lastWord = getLast(array);
 		return lastWord.equals(token);
-	}
+	}*/
 
 	/*private boolean isLast(ArrayList<String> list, String token) {
 		String lastWord = getLast(list);
@@ -1243,12 +1306,12 @@ public class Parser {
 		return str.split(" ")[0];
 	}
 	
+	private String getFirst(ArrayList<String> arrayList){
+		return arrayList.get(0);
+	}
+	
 	/*private String getSecond(String[] array){
 		return array[1];
-	}*/
-	
-	/*private String getFirst(ArrayList<String> arrayList){
-		return arrayList.get(0);
 	}*/
 	
 	private String getSecond(String[] array){
@@ -1256,6 +1319,10 @@ public class Parser {
 			return "";
 		}
 		return array[1];
+	}
+	
+	private String getSecond(String str){
+		return str.split(" ")[1];
 	}
 	
 	private String getLast(String[] array){

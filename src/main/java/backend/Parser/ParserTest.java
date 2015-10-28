@@ -131,6 +131,14 @@ public class ParserTest {
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
+	    input = "1 BY 12 Feb 3pm";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Fri, 12 Feb 16, 3pm") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
 	    input = "3 from 4 Apr 4pm to 5 May 5:30pm";
 	    parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("event", "3", "Mon, 04 Apr 16, 4pm", "Thu, 05 May 16, 5:30pm") );
@@ -796,6 +804,49 @@ public class ParserTest {
 	    System.out.println("Actual:   " + parsed.toString());
 	    assertEquals(expected, parsed);
 	    
+	    //Testing for when time was entered before date
+		input = "1 deadline 3pm 30 Dec";
+		parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 15, 3pm") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    input = "4 event 10am 15/09 to 16/09";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10am", "Fri, 16 Sep 16, 10am") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    input = "4 event 10am 15 Sep to 14 Sep";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10am", "Thu, 14 Sep 17, 10am") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    input = "4 event 10:30am 15 Sep to 10am";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10:30am", "Fri, 16 Sep 16, 10am") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    input = "4 event 10am 15/09 to 8am";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10am", "Fri, 16 Sep 16, 8am") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    input = "2 event 10am 15/09";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 15 Sep 16, 10am", "Thu, 15 Sep 16, 11:59pm") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
 	    //Testing event in one-shot commands (some with year specified, some without)
 	    input = "2 description i must reach there early event 30/12 11am to 3pm reminder 29/12/15 12:00";
 	    parsed = parser.parseInput(input);
@@ -1194,6 +1245,37 @@ public class ParserTest {
 	    input = "5 every week zzzzz";
 	    parsed = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDateError: 'zzzzz' is not an acceptable date format") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
+	    //Parser should not allow a task to have both deadline and event date
+	    input = "1 deadline 15 Dec 8pm event 30 Dec 2pm to 6pm";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "ConflictingDatesError: Task cannot have both deadline and event date") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    input = "1 des conflicting dates deadline 15 Dec 8pm pri 4 event 30 Dec 2pm to 6pm";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "ConflictingDatesError: Task cannot have both deadline and event date") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    
+	    input = "1 event 30 Dec 2pm to";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "NoEndDateError: please enter an end date after the command word 'to'") );
+	    System.out.println("Input:    " + input);
+	    System.out.println("Expected: " + expected.toString());
+	    System.out.println("Actual:   " + parsed.toString());
+	    assertEquals(expected, parsed);
+	    input = "1 event 30 Dec 2pm to rem 23 Dec 2pm";
+	    parsed = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "NoEndDateError: please enter an end date after the command word 'to'") );
 	    System.out.println("Input:    " + input);
 	    System.out.println("Expected: " + expected.toString());
 	    System.out.println("Actual:   " + parsed.toString());

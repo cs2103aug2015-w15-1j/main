@@ -162,6 +162,11 @@ public class EditCommand extends Command {
 		try {
 			int taskId = Integer.parseInt(commandObject.getTaskName());
 			logicEditorLogger.info("taskId: "+taskId);
+//			System.out.println("New name: "+commandObject.getNewName());
+			if(!commandObject.getNewName().equals("")) {
+//				System.out.println("New name: "+commandObject.getNewName());
+				rename(commandObject);
+			}
 			if (!commandObject.getDescription().equals("")) {
 				logicEditorLogger.info("Description: "+ commandObject.getDescription());
 				setDescription(commandObject);
@@ -193,6 +198,10 @@ public class EditCommand extends Command {
 		try {
 			int taskId = Integer.parseInt(commandObject.getTaskName());
 			logicEditorLogger.info("taskId: "+taskId);
+			if(!commandObject.getNewName().equals("")) {
+//				System.out.println("New name: "+commandObject.getNewName());
+				rename(commandObject);
+			}
 			if (!commandObject.getDescription().equals("")) {
 				logicEditorLogger.info("Description: "+ commandObject.getDescription());
 				setDescription(commandObject);
@@ -226,6 +235,11 @@ public class EditCommand extends Command {
 		try {
 			int taskId = Integer.parseInt(commandObject.getTaskName());
 			logicEditorLogger.info("taskId: "+taskId);
+//			System.out.println("New name: "+commandObject.getNewName());
+			if(!commandObject.getNewName().equals("")) {
+//				System.out.println("New name: "+commandObject.getNewName());
+				rename(commandObject);
+			}
 			if (!commandObject.getDescription().equals("")) {
 				logicEditorLogger.info("Description: "+ commandObject.getDescription());
 				setDescription(commandObject);
@@ -357,11 +371,12 @@ public class EditCommand extends Command {
 		}
 	}
 	
-	private String rename(EditCommand commandObject) {
+	private String rename(Command commandObject) {
 		taskList = storageComponent.load();
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
 		int taskId = getTaskId(taskIndex);
 		String newName = commandObject.getNewName();
+//		System.out.println(newName);
 		taskList.get(taskId).setName(newName);
 		storageComponent.save(taskList);
 		return String.format("Task %1$s has been renamed to %2$s", taskIndex, newName);

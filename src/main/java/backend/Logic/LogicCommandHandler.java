@@ -38,7 +38,7 @@ public class LogicCommandHandler {
 	}
 
 	public Command parse(ArrayList<String> parsedUserInput) {
-		System.out.println("Command from parser: "+parsedUserInput.get(0));
+//		System.out.println("Command from parser: "+parsedUserInput.get(0));
 		String determinedCommandType = determineCommandType(parsedUserInput.get(0));
 //		System.out.println("determined Command Type: "+determinedCommandType);
 		Command commandObject = new Command();
@@ -131,8 +131,8 @@ public class LogicCommandHandler {
 	}
 
 	private Command initSearchCommand(ArrayList<String> parsedUserInput) {
-		System.out.println("setCommandField: "+parsedUserInput.get(0));
-		System.out.println("setKeywords: "+parsedUserInput.get(1));
+//		System.out.println("setCommandField: "+parsedUserInput.get(0));
+//		System.out.println("setKeywords: "+parsedUserInput.get(1));
 		Command searchCommandObject = new SearchCommand(Command.Type.SEARCH,storageComponent);
 		searchCommandObject.setCommandField(parsedUserInput.get(0));
 		searchCommandObject.setKeywords(parsedUserInput.get(1));
@@ -140,8 +140,8 @@ public class LogicCommandHandler {
 	}
 
 	private Command initSortCommand(ArrayList<String> parsedUserInput) {
-		Command sortCommandObject = new Command(Command.Type.SORT);
-		sortCommandObject.setCommandField(parsedUserInput.get(0));
+		SortCommand sortCommandObject = new SortCommand(Command.Type.SORT,storageComponent);
+		sortCommandObject.setSortField(parsedUserInput.get(0));
 		return sortCommandObject;
 	}
 
@@ -176,6 +176,7 @@ public class LogicCommandHandler {
 				editCommandObject.setPriority(parsedUserInput.get(3));
 				editCommandObject.setReminder(parsedUserInput.get(4));
 				editCommandObject.setCategory(parsedUserInput.get(5));
+				editCommandObject.setNewName(parsedUserInput.get(6));
 				break;
 			case ("setT") :
 				editCommandObject.setTaskName(parsedUserInput.get(1));
@@ -184,6 +185,7 @@ public class LogicCommandHandler {
 				editCommandObject.setPriority(parsedUserInput.get(4));
 				editCommandObject.setReminder(parsedUserInput.get(5));
 				editCommandObject.setCategory(parsedUserInput.get(6));
+				editCommandObject.setNewName(parsedUserInput.get(7));
 				break;
 			case ("setE") :
 				editCommandObject.setTaskName(parsedUserInput.get(1));
@@ -195,6 +197,7 @@ public class LogicCommandHandler {
 				editCommandObject.setPriority(parsedUserInput.get(5));
 				editCommandObject.setReminder(parsedUserInput.get(6));
 				editCommandObject.setCategory(parsedUserInput.get(7));
+				editCommandObject.setNewName(parsedUserInput.get(8));
 				break;
 			case ("deadline") :
 				editCommandObject.setTaskName(parsedUserInput.get(1));

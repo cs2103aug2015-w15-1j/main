@@ -91,6 +91,7 @@ public class LogicFacade {
 				case SEARCH:
 					feedbackString = commandObject.execute();
 					searchResults = commandObject.getSearchResults();
+					//System.out.println(searchResults);
 					break;
 				case EXIT:
 					System.exit(0);
@@ -99,7 +100,7 @@ public class LogicFacade {
 					historyStack.push(commandObject);
 			}
 			getterSubComponent.updateIndex();
-			System.out.println("feedbackString: "+feedbackString);
+//			System.out.println("feedbackString: "+feedbackString);
 //			System.out.println("History stack size after command execution: "+historyStack.size());
 			return feedbackString;
 		} catch (NullPointerException | EmptyStackException e) {

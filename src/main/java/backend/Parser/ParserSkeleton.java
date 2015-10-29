@@ -1,9 +1,60 @@
 package main.java.backend.Parser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class ParserSkeleton {
 
+	static DateParser dateParser = new DateParser();
+	
+	//List of all command words accepted by the program
+	final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList(
+	"add", "addcat", "category", "deadline", "description", "delete", "deleteAll", "done", "event", "every", 
+	"exit", "priority", "redo", "reminder", "rename", "reset", "search", "setcol", "showcat",   
+	"show", "showE", "showF", "showO", "showT", "sort", "sortD", "sortN", "sortP", "undo", "undone") );
+	
+	//Commands that work just by typing the command word (without additional content)
+	final ArrayList<String> COMMANDS_NO_CONTENT = new ArrayList<String>( Arrays.asList(
+	"deleteAll", "exit", "redo", "showE", "showF", "showO", "showT", "sortD", "sortN", "sortP", "undo") );
+	
+	//Commands that if appear first, will prevent other command keywords from having effect
+	final ArrayList<String> COMMANDS_DOMINATING = new ArrayList<String>( Arrays.asList(
+	"addcat", "delete", "done", "every", "reset", "search", "setcol", "show", "showcat", "sort", "undone") );
+	
+	//Commands that create a new item
+	final ArrayList<String> COMMANDS_NO_FIELD = new ArrayList<String>( Arrays.asList(
+	"add", "addcat", "delete", "done") );
+	
+	//Commands that can accept any amount of words
+	final ArrayList<String> COMMANDS_NEED_WORDS = new ArrayList<String>( 
+	Arrays.asList("add", "addcat", "category", "description", "search") );
+	
+	//Commands that cannot be part of a one-shot command
+	final ArrayList<String> COMMANDS_NOT_ONE_SHOT = new ArrayList<String>( 
+	Arrays.asList("delete", "done", "reset", "showcat", "undone") );
+	
+	//Command words that indicate that the command is one-shot
+	final ArrayList<String> COMMANDS_ONE_SHOT = new ArrayList<String>( 
+	Arrays.asList("add", "set") );	
+	
+	//Command fields that can be edited/reset
+	final ArrayList<String> COMMANDS_CAN_RESET = new ArrayList<String>( 
+	Arrays.asList("all", "description", "deadline", "event", "priority", "reminder", "category") );	
+	
+	//Contains the variants or short forms of some of the commands
+    HashMap<String, ArrayList<String>> command_families = new HashMap<String, ArrayList<String>>(){
+		static final long serialVersionUID = 1L; {
+		put("category", new ArrayList<String>( Arrays.asList("cat")));
+		put("deadline", new ArrayList<String>( Arrays.asList("by", "dea")));
+		put("delete", new ArrayList<String>( Arrays.asList("del")));
+        put("description", new ArrayList<String>( Arrays.asList("des")));
+        put("event", new ArrayList<String>( Arrays.asList("from"))); 
+        put("every", new ArrayList<String>( Arrays.asList("recur"))); 
+        put("priority", new ArrayList<String>( Arrays.asList("pri")));
+        put("reminder", new ArrayList<String>( Arrays.asList("rem")));
+    }};
+	
 	String getFirst(String[] array){
 		return array[0];
 	}
@@ -178,5 +229,60 @@ public class ParserSkeleton {
 				break; 
 		}
 		return result;
+	}
+
+	/**
+	 * This methods checks if token is a command variant (if yes, convert it to the default command)
+	 */
+	String convertVariantToDefault(String token) {
+		for (String command: COMMANDS) {
+			if (token.equalsIgnoreCase(command)){
+				return command;
+			}
+		}
+		token = token.toLowerCase();
+		for (String command: command_families.keySet()) {
+			ArrayList<String> family = command_families.get(command);
+			if (family.contains(token)) {
+				return command;
+			}
+		}
+		return token;
+	}
+	
+	boolean isCommand(String token){
+		return COMMANDS.contains(token);
+	}
+
+	boolean isCommandThatNoNeedContent(String token){
+		return COMMANDS_NO_CONTENT.contains(token);
+	}
+
+	boolean isDominatingCommand(String token){
+		return COMMANDS_DOMINATING.contains(token);
+	}
+
+	boolean isCommandThatAddStuff(String token){
+		return COMMANDS_NO_FIELD.contains(token);
+	}
+
+	boolean isCommandThatNeedWords(String token) {
+		return COMMANDS_NEED_WORDS.contains(token);
+	}
+
+	boolean isCommandThatCanBeReset(String token) {
+		return COMMANDS_CAN_RESET.contains(token);
+	}
+
+	boolean isCommandButCannotBeInOneShot(String token) {
+		return COMMANDS_NOT_ONE_SHOT.contains(token) || COMMANDS_NO_CONTENT.contains(token);
+	}
+
+	boolean isCommandButHasNoContent(String token, int inputWordCount) {
+		return isCommand(token) && inputWordCount == 1;
+	}
+
+	boolean isOneShotCommand(String token) {
+		return COMMANDS_ONE_SHOT.contains(token);
 	}
 }

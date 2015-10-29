@@ -704,9 +704,14 @@ public class ParserTest {
 	    assertEquals(expected, actual);
 	    
 	    //Test whether parser will change an old year to the current year
-	    input = "2 by 31 Dec 10am 1995";
+	    input = "2 by 31 Dec 1995 10am";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("deadline", "2", "Thu, 31 Dec 15, 10am") );
+	    printTestResult();
+	    assertEquals(expected, actual);
+		input = "1 deadline 12/3/2014 9pm";
+		actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Sat, 12 Mar 16, 9pm") );
 	    printTestResult();
 	    assertEquals(expected, actual);
 	    

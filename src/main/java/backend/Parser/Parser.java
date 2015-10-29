@@ -991,12 +991,11 @@ public class Parser {
 		if (isInThePast(date)) {
 			int year = getYear(date);
 			int currYear = getCurrentYear();
-			
-			if (year < currYear) {
+			if (year < currYear || year >= currYear + 5) {
 				date = setToCurrentYear(date);
 			}
 			
-			if (year == currYear) {
+			if (year <= currYear) {
 				String dayMonth = getDayAndMonth(date);
 				if (isInThePast(dayMonth)) {
 					date = plusOneYear(date);
@@ -1132,10 +1131,15 @@ public class Parser {
 	private String setToCurrentYear(String dateString) {
 		String currYear = Integer.toString(getCurrentYear());
 		String[] dateTokens = dateString.split(", ");
+		
 		String ddMMMyy = getSecond(dateTokens);
 		String[] ddMMMyyTokens = ddMMMyy.split(" ");
 		ddMMMyy = getFirst(ddMMMyyTokens) + " " + getSecond(ddMMMyyTokens) + " " + currYear;
-		return getFirst(dateTokens) + ", " + ddMMMyy + ", " + getLast(dateTokens);
+		
+		String ddMMM = getFirst(ddMMMyyTokens) + " " + getSecond(ddMMMyyTokens);
+		String EEE = getDayOfWeek(parseDate(ddMMM + " " + getLast(dateTokens)));
+		
+		return EEE + ", " + ddMMMyy + ", " + getLast(dateTokens);
 	}
 
 	private String getDateSymbol(String date) {

@@ -1,14 +1,10 @@
 package main.java.backend.Parser;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 
-public class Parser {
+public class Parser extends ParserSkeleton{
 	//List of all command words accepted by the program
 	private final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList(
 	"add", "addcat", "category", "deadline", "description", "delete", "deleteAll", "done", "event", "every", 
@@ -51,16 +47,6 @@ public class Parser {
 	private final ArrayList<String> RECUR_FREQUENCY = new ArrayList<String>( Arrays.asList(
 	"day", "week", "month", "year") );
 	
-	//List of months and their short-forms
-	private final ArrayList<String> MONTHS = new ArrayList<String>( Arrays.asList(
-	"january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december", 
-	"jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "oct", "nov", "dec") );
-	
-	//List of days in a week and their short-forms
-	private final ArrayList<String> DAYS_OF_WEEK = new ArrayList<String>( Arrays.asList(
-	"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
-	"mon", "tue", "wed", "thu", "fri", "sat", "sun") );
-	
 	//List of fields that are used in the current result
 	private ArrayList<String> fields = new ArrayList<String>(FIELDS_DEFAULT);
 	
@@ -90,12 +76,12 @@ public class Parser {
         put("reminder", new ArrayList<String>( Arrays.asList("rem")));
     }};
     
-    private com.joestelmach.natty.Parser dateParser = new com.joestelmach.natty.Parser();
+    private DateParser dateParser = new DateParser();
     
     public Parser(){
     	//Force Natty parser to initialize by running dateParser once
     	String pi = "31/4/15 9:26";
-    	parseDate(pi);
+    	dateParser.parseDate(pi);
     }
     
 	/**
@@ -288,7 +274,7 @@ public class Parser {
 			
 			if (fieldContent.get("task").isEmpty()) {
 				field = "task";
-			} else if (lastCommand.isEmpty() || isCommandThatAddStuff(lastCommand)) {
+			} else if (isCommandThatAddStuff(lastCommand)) {
 				field = "task";
 			} else {
 				field = lastCommand;
@@ -299,74 +285,6 @@ public class Parser {
 				fieldContent.put(field, token);
 			} else {
 				fieldContent.put(field, content + " " + token);
-			}
-		}
-	}
-
-	private String getFirst(String[] array){
-		return array[0];
-	}
-
-	private String getFirst(String str){
-		return str.split(" ")[0];
-	}
-
-	private String getFirst(ArrayList<String> arrayList){
-		return arrayList.get(0);
-	}
-
-	private String getSecond(String[] array){
-		if (array.length < 2) {
-			return "";
-		}
-		return array[1];
-	}
-
-	private String getPrevious(ArrayList<String> list, String token) {
-		if (list.size() > 1 && list.indexOf(token) != 0) {
-			return list.get( list.indexOf(token)-1 );
-		}
-		return null;
-	}
-	
-	private String getPrevious(String[] list, int count) {
-		if (count != 0) {
-			return list[count - 1];
-		}
-		return null;
-	}
-
-	private String getLast(String[] array){
-		if (array.length == 0) {
-			return "";
-		}
-		return array[array.length-1];
-	}
-
-	private String getLast(ArrayList<String> arrayList){
-		if (arrayList.isEmpty()) {
-			return "";
-		}
-		return arrayList.get(arrayList.size()-1);
-	}
-
-	private String getNumber(String token){
-		if (isNumber(token)){
-			return token;
-		} else {
-			String c;
-			String number = "";
-			for (int i = 0; i < token.length(); i++) {
-				c = token.substring(i, i+1);
-				if (!isNumber(c)) {
-					break;
-				}
-				number += c;
-			}
-			if (!number.isEmpty()) {
-				return number;
-			} else {
-				return token;
 			}
 		}
 	}
@@ -410,10 +328,6 @@ public class Parser {
 		default:
 			return "error";
 		}
-	}
-
-	private String getStatus(ArrayList<String> parseResult) {
-		return getFirst(parseResult);
 	}
 
 	private boolean isCommand(String token){
@@ -469,31 +383,10 @@ public class Parser {
 		return seenCommands.contains(token);
 	}
 
-	private boolean isNumber(String token) {
-		try {
-			Integer.parseInt(token);
-			return true;
-		} catch (NumberFormatException e) {
-			return false;
-		}
-	}
-
 	private boolean isLastWord(int i, int inputWordCount) {
 		return i == inputWordCount-1;
 	}
 
-	private boolean isError(String content) {
-		return content.equals("error");
-	}
-
-	private boolean isErrorStatus(ArrayList<String> result) {
-		return isError(getStatus(result));
-	}
-	
-	private boolean isIncompleteStatus(ArrayList<String> result) {
-		return getStatus(result).equals("incomplete");
-	}
-	
 	private boolean isNotValidPriority(String token){
 		int priorityLevelMin = 1;
 		int priorityLevelMax = 5;
@@ -532,33 +425,6 @@ public class Parser {
 			}
 		}
 		return quoteCommaCount > 1 && quoteCommaCount % 2 == 0;
-	}
-
-	/**
-	 * This method merges all the tokens between the startIndex (including) and endIndex (excluding)
-	 * @return the merged tokens as a string
-	 */
-	private String mergeTokens(String[] tokens, int startIndex, int endIndex) {
-		String merged = "";
-		for (int i = startIndex; i < endIndex; i++) {
-			String token = tokens[i];
-			merged += token + " ";
-		}
-		return removeEndSpaces(merged);
-	}
-
-	/**
-	 * This method removes any spaces that are in front or at the back of the token
-	 */
-	private String removeEndSpaces(String token) {
-		if (token.startsWith(" ")) {
-			token =  token.substring(1, token.length());
-		} 	
-		if (token.endsWith(" ")) {
-			return token.substring(0, token.length()-1);
-		} else {
-			return token;
-		}
 	}
 
 	private String removeQuotes(String token){
@@ -667,17 +533,17 @@ public class Parser {
 	}
 
 	private ArrayList<String> makeDateResult(String command, String date){
-		if (isInvalidDate(date)) {
+		if (dateParser.isInvalidDate(date)) {
 			return makeErrorResult("InvalidDateError", date);
 		}
-		if (hasNoTime(date)) {
+		if (dateParser.hasNoTime(date)) {
 			if (command.equals("deadline")) {
 				date += " 23:59";
 			} else if (command.equals("reminder")){
 				date += " 12:00";
 			}
 		}
-		String parsedDate = parseDate(date);
+		String parsedDate = dateParser.parseDate(date);
 		fieldContent.put(command, parsedDate);
 		return new ArrayList<String>( Arrays.asList("OK", parsedDate));
 	}
@@ -686,7 +552,7 @@ public class Parser {
 		if (event.endsWith("to")) {
 			return makeErrorResult("NoEndDateError", event);
 		}
-		ArrayList<String> parsedEvent = getEventStartAndEnd(event);
+		ArrayList<String> parsedEvent = dateParser.getEventStartAndEnd(event);
 		if (isErrorStatus(parsedEvent)) {
 			return parsedEvent;
 		}
@@ -716,14 +582,14 @@ public class Parser {
 				return new ArrayList<String> ( Arrays.asList(command, name, dayOfMonth) );
 			}
 		}
-		if (isInvalidDate(content)) {
+		if (dateParser.isInvalidDate(content)) {
 			return makeErrorResult("InvalidDateError", content);
 		}
-		if (hasNoTime(content)) {
+		if (dateParser.hasNoTime(content)) {
 			content += " 12:00";
 		}
-		String date = parseDate(content);
-		date = changeToRecurFormat(freq, date);
+		String date = dateParser.parseDate(content);
+		date = dateParser.changeToRecurFormat(freq, date);
 		return new ArrayList<String> ( Arrays.asList(command, name, date) );
 	}
 	
@@ -794,63 +660,6 @@ public class Parser {
 		}
 		return putFieldContentInResult();
 	}
-	
-	private ArrayList<String> makeErrorResult(String error, String token) {
-		fields = new ArrayList<String>(FIELDS_DEFAULT);
-		ArrayList<String> result = new ArrayList<String>(); 
-		result.add("error");
-		
-		switch (error) {
-			case "InvalidWordError":
-				result.add(error + ": '" + token + "' is not recognised as a command or index");
-				break;
-			case "InvalidIndexError":
-				result.add(error + ": '" + token + "' is not recognised as an index");
-				break;
-			case "InvalidCommandError":
-				result.add(error + ": '" + token + "' is not recognised as a command");
-				break;
-			case "NoCommandError":
-				result.add(error + ": please enter a command after the task index '" + token + "'");
-				break;
-			case "DuplicateCommandError":
-				result.add(error + ": duplicate command '" + token + "'");
-				break;
-			case "EmptyFieldError":
-				result.add(error + ": please enter content for the command '" + token + "'");
-				break;
-			case "NoEndDateError":
-				result.add(error + ": please enter an end date after the command word 'to'");
-				break;
-			case "InvalidPriorityError":
-				result.add(error + ": '" + token + "' is not between 1 to 5");
-				break;
-			case "InvalidDateError":
-				result.add(error + ": '" + token + "' is not an acceptable date format");
-				break;
-			case "ConflictingDatesError":
-				result.add(error + ": Task cannot have both deadline and event date");
-				break;
-			case "InvalidFrequencyError":
-				result.add(error + ": please enter 'day'/'week'/'month'/'year' after 'every' to indicate the frequency");
-				break;
-			case "InvalidDayOfMonthError":
-				result.add(error + ": '" + token + "' is not between 1 to 31");
-				break;
-			case "InvalidTaskTypeError":
-				result.add(error + ": '" + token + "' is not 'todo', 'event' or 'floating'");
-				break;
-			case "InvalidSortFieldError":
-				result.add(error + ": '" + token + "' is not 'deadline', 'name' or 'priority'");
-				break;
-			case "InvalidResetError":
-				result.add(error + ": '" + token + "' is not a field that can be reset");
-				break;
-			default:
-				break; 
-		}
-		return result;
-	}
 
 	private ArrayList<String> putFieldContentInResult() {
 		ArrayList<String> result = new ArrayList<String>();
@@ -867,554 +676,5 @@ public class Parser {
 		for (String key: fieldContent.keySet()){
 			fieldContent.put(key, "");
 		}
-	}
-
-	/**
-	 * This method checks that a date string is valid and parses it into the default date format 
-	 */
-	private String parseDate(String date) {
-		if (date.isEmpty()) {
-			return date;
-		}
-		if (isInvalidDate(date)) {
-			return "error";
-		}
-		date = swapDayAndMonth(date);
-		
-		String parsedDate = dateParser.parse(date).get(0).getDates().toString();
-		parsedDate = parsedDate.substring(1, parsedDate.length()-1); //remove brackets
-		parsedDate = standardizeDateFormat(parsedDate);
-		parsedDate = confirmDateIsInFuture(parsedDate);
-		parsedDate = removeMinuteIfZero(parsedDate);
-		
-		return parsedDate;
-	}
-
-	private String standardizeDateFormat(String dateString) {
-		SimpleDateFormat nattyFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM yy, h:mma");
-		Date tempDate = convertStringToDate(dateString, nattyFormat);
-		dateString = standardFormat.format(tempDate);
-		return dateString;
-	}
-
-	private Date convertStringToDate(String dateString, SimpleDateFormat sdf){
-		Date date = null;
-		try {
-			date = sdf.parse(dateString);
-		} catch (ParseException e) {
-			System.out.println("DateParsingError: problem parsing date string '"  + dateString + "' ");
-			e.printStackTrace();
-		}
-		return date;
-	}
-
-	private Date convertStandardDateString(String dateString){
-		SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
-		SimpleDateFormat sdfNoMinute = new SimpleDateFormat("EEE, dd MMM yy, hha");
-		
-		Date date;
-		if (hasMinute(dateString)) {
-			date = convertStringToDate(dateString, sdf);
-		} else {
-			date = convertStringToDate(dateString, sdfNoMinute);
-		}
-		
-		return date;
-	}
-
-	private Date convertStandardTimeString(String timeString){
-		SimpleDateFormat stf = new SimpleDateFormat("hh:mma");
-		SimpleDateFormat stfNoMinute = new SimpleDateFormat("hha");
-		
-		Date time;
-		if (hasMinute(timeString)) {
-			time = convertStringToDate(timeString, stf);
-		} else {
-			time = convertStringToDate(timeString, stfNoMinute);
-		}
-		
-		return time;
-	}
-	
-	private int convertTimeStringToInt(String timeString){
-		try {
-			return Integer.parseInt(timeString); 
-		} catch (NumberFormatException e) {
-			System.out.println("TimeParsingError: problem converting time '" + timeString + "' to integer");
-			e.printStackTrace();
-			return -1;
-		}
-	}
-
-	/**
-	 * This method swaps the position of day and month (so that it will work correctly for the natty parser)
-	 */
-	private String swapDayAndMonth(String date) {
-		String[] dateTokens = date.split(" ");
-		String dateSymbol = getDateSymbol(date);
-		if (dateSymbol.isEmpty()) {
-			return date;
-		}
-		String[] ddmmyyDate = {};
-		String mmddyyDate = "";
-		
-		for (String token: dateTokens) {
-			if (token.contains(dateSymbol)) {
-				ddmmyyDate = token.split(dateSymbol);
-				
-				if (ddmmyyDate.length >= 2) {
-					String day = ddmmyyDate[0];
-					String month = ddmmyyDate[1];
-					String year = "";
-					mmddyyDate += month + "/" + day;
-					if (ddmmyyDate.length == 3) {
-						year = ddmmyyDate[2];
-						mmddyyDate += "/" + year;
-					} 
-					mmddyyDate += " ";
-				}
-				
-			} else {
-				mmddyyDate += token + " ";
-			}
-		}
-		
-		mmddyyDate = removeEndSpaces(mmddyyDate);
-		return mmddyyDate;
-	}
-
-	/**
-	 * This method confirms that the date set by the parser is in the future
-	 */
-	private String confirmDateIsInFuture(String date) {
-		if (isInThePast(date)) {
-			int year = getYear(date);
-			int currYear = getCurrentYear();
-			if (year < currYear || year >= currYear + 5) {
-				date = setToCurrentYear(date);
-			}
-			
-			if (year <= currYear) {
-				String dayMonth = getDayAndMonth(date);
-				if (isInThePast(dayMonth)) {
-					date = plusOneYear(date);
-				}
-			}
-		}
-		return date;
-	}
-
-	private String removeMinuteIfZero(String dateString) {
-		if (dateString.contains(":")) {
-			String time = getTime(dateString);
-			int hour = getHour(time);
-			int minute = getMinute(time);
-			String period = getPeriod(time);
-			
-			if (minute == 0) {
-				time = hour + period;
-			} else {
-				time = hour + ":" + minute + period;
-			}
-			
-			String[] dateTokens = dateString.split(", ");
-			return getFirst(dateTokens) + ", " + getSecond(dateTokens) + ", " + time;
-		} 
-		return dateString;
-	}
-
-	private String changeToRecurFormat(String freq, String dateString) {
-		/*SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
-		SimpleDateFormat recurDayFormat = new SimpleDateFormat("hh:mma");
-		SimpleDateFormat recurWeekFormat = new SimpleDateFormat("EEE hh:mma");
-		SimpleDateFormat recurYearFormat = new SimpleDateFormat("dd MMM");*/
-		
-		switch (freq) {
-			case "day":
-				dateString = getTime(dateString);
-				break;
-			case "week":
-				dateString = getDayOfWeek(dateString) + " " + getTime(dateString);
-				break;
-			case "year":
-				dateString = getDayAndMonth(dateString);
-				break;
-			default:
-				break;
-		}
-		
-		return dateString;
-	}
-
-	private ArrayList<String> parseEventStart(String eventStart) {
-		if (isInvalidDate(eventStart)) {
-			return makeErrorResult("InvalidDateError", eventStart);
-		}
-		
-		String parsedStart = parseDate(eventStart);
-		if (hasNoTime(eventStart)) {
-			eventStart = getDayMonthAndYear(parsedStart) + ", 12pm";
-		} else {
-			eventStart = parsedStart;
-		}
-		return new ArrayList<String>( Arrays.asList("OK", eventStart));
-	}
-
-	private ArrayList<String> parseEventEnd(String eventEnd) {
-		if (isInvalidDate(eventEnd)) {
-			return makeErrorResult("InvalidDateError", eventEnd);
-		}
-		String parsedEnd = parseDate(eventEnd);
-		if (hasNoDate(eventEnd)) {
-			eventEnd = getTime(parsedEnd);
-		} else if (hasNoTime(eventEnd)) {
-			eventEnd = getDayMonthAndYear(parsedEnd);
-		} else {
-			eventEnd = parsedEnd;
-		}
-		return new ArrayList<String>( Arrays.asList("OK", eventEnd));
-	}
-
-	private String makeEventEndComplete(String eventStart, String eventEnd) {
-		String startDate = getDayMonthAndYear(eventStart);
-		String startTime = getTime(eventStart);
-		
-		if (eventEnd.isEmpty()) {
-			eventEnd = startDate + ", 11:59pm";
-		} else if (hasNoDate(eventEnd)) {
-			String endTime = eventEnd;
-			if (startTimeIsNotBeforeEndTime(startTime, endTime)) {
-				startDate = plusOneDay(startDate);
-			} 
-			eventEnd = startDate + ", " + endTime;	
-		} else if (hasNoTime(eventEnd)) {
-			String endDate = eventEnd;
-			eventEnd = endDate + ", " + startTime;
-		}
-		return eventEnd;
-	}
-
-	private boolean startDateIsAfterEndDate(String startDateString, String endDateString){
-		Date startDate = convertStandardDateString(startDateString);
-		Date endDate = convertStandardDateString(endDateString);
-		return startDate.after(endDate);
-	}
-
-	private boolean startTimeIsNotBeforeEndTime(String startTime, String endTime){
-		Date startTimeDate = convertStandardTimeString(startTime);
-		Date endTimeDate = convertStandardTimeString(endTime);
-		return !startTimeDate.before(endTimeDate);
-	}
-
-	private String plusOneDay(String dateString) {
-		SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yy");
-		Date date = convertStringToDate(dateString, sdf);
-		
-		Calendar c = Calendar.getInstance(); 
-		c.setTime(date); 
-		c.add(Calendar.DATE, 1);
-		Date newDate = c.getTime();
-		
-		return sdf.format(newDate);
-	}
-
-	private String plusOneYear(String dateString) {
-		Date date = convertStandardDateString(dateString);
-		Calendar c = Calendar.getInstance();
-		c.setTime(date);
-		c.add(Calendar.YEAR, 1);
-		date = c.getTime();
-		return removeMinuteIfZero(standardizeDateFormat(date.toString()));
-	}
-
-	private String setToCurrentYear(String dateString) {
-		String currYear = Integer.toString(getCurrentYear());
-		String[] dateTokens = dateString.split(", ");
-		
-		String ddMMMyy = getSecond(dateTokens);
-		String[] ddMMMyyTokens = ddMMMyy.split(" ");
-		ddMMMyy = getFirst(ddMMMyyTokens) + " " + getSecond(ddMMMyyTokens) + " " + currYear;
-		
-		String ddMMM = getFirst(ddMMMyyTokens) + " " + getSecond(ddMMMyyTokens);
-		String EEE = getDayOfWeek(parseDate(ddMMM + " " + getLast(dateTokens)));
-		
-		return EEE + ", " + ddMMMyy + ", " + getLast(dateTokens);
-	}
-
-	private String getDateSymbol(String date) {
-		if (date.contains("/")){
-			return "/";
-		} else if (date.contains("-")) {
-			return "-";
-		} else {
-			return "";
-		}
-	}
-
-	private String getDayOfWeek(String dateString) {
-		String[] dateTokens = dateString.split(", ");
-		return getFirst(dateTokens);
-	}
-	
-	private String getDayAndMonth(String dateString) {
-		String[] dateTokens = dateString.split(", ");
-		String ddMMMyy = getSecond(dateTokens);
-		String[] ddMMMyyTokens = ddMMMyy.split(" ");
-		return getFirst(ddMMMyyTokens) + " " + getSecond(ddMMMyyTokens);
-	}
-
-	private int getYear(String dateString) {
-		String[] dateTokens = dateString.split(", ");
-		String ddMMMyy = getSecond(dateTokens);
-		String[] ddMMMyyTokens = ddMMMyy.split(" ");
-		return Integer.parseInt(getLast(ddMMMyyTokens));
-	}
-
-	private String getDayMonthAndYear(String dateString) {
-		String[] dateTokens = dateString.split(", ");
-		return getFirst(dateTokens) + ", " + getSecond(dateTokens);
-	}
-
-	private String getTime(String dateString) {
-		String[] dateTokens = dateString.split(", ");
-		return getLast(dateTokens);
-	}
-
-	private int getHour(String timeString) {
-		String[] timeTokens;
-		timeTokens = timeString.split(":");
-		
-		if (timeTokens.length == 1) {
-			if (isAM(timeString)) {
-				timeTokens = timeString.split("am");
-			} else {
-				timeTokens = timeString.split("pm");
-			}
-		}
-		
-		int hour = convertTimeStringToInt(getFirst(timeTokens));
-		return hour;
-	}
-
-	private int getMinute(String timeString) {
-		String[] timeTokens;
-		timeTokens = timeString.split(":");
-		if (timeTokens.length > 1) {
-			String minuteWithPeriod = getSecond(timeTokens);
-			String[] minuteToken;
-			if (isAM(timeString)) {
-				minuteToken = minuteWithPeriod.split("am");
-				if (getFirst(minuteToken).equals(minuteWithPeriod)) {
-					minuteToken = getSecond(timeTokens).split("AM");
-				}
-			} else {
-				minuteToken = getSecond(timeTokens).split("pm");
-				if (getFirst(minuteToken).equals(minuteWithPeriod)) {
-					minuteToken = getSecond(timeTokens).split("PM");
-				}
-			}
-			return convertTimeStringToInt(getFirst(minuteToken));
-		} else {
-			return 0;
-		}
-	}
-
-	private String getPeriod(String timeString){
-		if (isAM((timeString))) {
-			return "am";
-		}
-		if (isPM((timeString))) {
-			return "pm";
-		}
-		return "error";
-	}
-	
-	private Date getCurrentDate() {
-		Date now = new Date();
-		return now;
-	}
-
-	private int getCurrentYear() {
-		SimpleDateFormat sdfDate = new SimpleDateFormat("yy");
-	    Date now = new Date();
-	    String strDate = sdfDate.format(now);
-		return Integer.parseInt(strDate);
-	}
-
-	/**
-	 * This method gets the individual start and end date/time of an event and put them into separate fields
-	 * @return the start and end date/time in an array
-	 */
-	private ArrayList<String> getEventStartAndEnd(String event) {
-		String[] eventTokens = event.split(" to ", 2);
-		String eventStart = getFirst(eventTokens);
-		String eventEnd = "";
-		if (eventTokens.length > 1) {
-			eventEnd = removeEndSpaces(getLast(eventTokens));
-		}
-		
-		ArrayList<String> parsedStartResult = parseEventStart(eventStart);
-		if (isErrorStatus(parsedStartResult)) {
-			return parsedStartResult;
-		}
-		eventStart = getLast(parsedStartResult);
-		
-		ArrayList<String> parsedEndResult = parseEventEnd(eventEnd);
-		if (isErrorStatus(parsedEndResult)) {
-			return parsedEndResult;
-		}
-		eventEnd = getLast(parsedEndResult);
-		
-		eventEnd = makeEventEndComplete(eventStart, eventEnd);
-		
-		if (startDateIsAfterEndDate(eventStart, eventEnd)) {
-			eventEnd = plusOneYear(eventEnd);
-		}
-		
-		return new ArrayList<String>( Arrays.asList(eventStart, eventEnd));
-	}
-
-	private boolean hasNoDate(String eventString) {
-		if (eventString.split("/").length > 1 || eventString.split("-").length > 1) {
-			return false;
-		} else {
-			ArrayList<String> tokens = new ArrayList<String>( Arrays.asList(eventString.split(" ") ));
-			for (String token: tokens) {
-				if (isMonth(token) || isDayOfWeek(token)) {
-					return false;
-				}
-				if (isDateKeyword(token, tokens)) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * This method checks if the user have included the time in the date string
-	 */
-	private boolean hasNoTime(String eventString){
-		String[] eventTokens;
-		eventTokens = eventString.split(" ");
-		for (String token: eventTokens){
-			if (isValid12HourTime(token)){
-				return false;
-			}
-			if (isValid24HourTime(token)){
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private boolean hasMinute(String time){
-		return time.split(":").length > 1;
-	}
-
-	private boolean isInvalidDate(String dateString){
-		if (dateString.isEmpty()) {
-			return false;
-		}
-		try {
-			dateParser.parse(dateString).get(0);
-			return false;
-		} catch (Exception e){
-			return true;
-		}
-	}
-
-	private boolean isAM(String time){
-		return time.toLowerCase().endsWith("am");
-	}
-
-	private boolean isPM(String time){
-		return time.toLowerCase().endsWith("pm");
-	}
-
-	private boolean isDayOfWeek(String token) {
-		return DAYS_OF_WEEK.contains(token.toLowerCase());
-	}
-
-	private boolean isMonth(String token) {
-		return MONTHS.contains(token.toLowerCase());
-	}
-
-	private boolean isDateKeyword(String token, ArrayList<String> tokenArray) {
-		//List of date keywords recognised by the date parser Natty
-		ArrayList<String> dateKeywords = new ArrayList<String>( Arrays.asList("today", "tomorrow", "tmr") );
-		if (dateKeywords.contains(token.toLowerCase())) {
-			return true;
-		} 
-		
-		//List of date keywords recognised by the Natty if it follows a number or the word 'next'
-		ArrayList<String> datePartialKeywords = new ArrayList<String>( Arrays.asList("day", "days", "week", "weeks") );
-		if (datePartialKeywords.contains(token.toLowerCase())) {
-			String previousToken = getPrevious(tokenArray, token);
-			if (previousToken != null) {
-				if (isNumber(previousToken) || previousToken.equalsIgnoreCase("next")) {
-					return true;
-				}
-			}
-		} 
-		
-		return false;
-	}
-
-	private boolean isInThePast(String dateString){
-		Date date = new Date();
-		if (dateString.split(" ").length == 2) {
-			SimpleDateFormat dayAndMonthFormat = new SimpleDateFormat("dd MMM");
-			date = convertStringToDate(dateString, dayAndMonthFormat);
-		} else
-			date = convertStandardDateString(dateString);
-		
-		Date now = getCurrentDate();
-		return now.after(date);
-	}
-
-	private boolean isValid12HourTime(String token) {
-		String period;
-		if (isAM(token)) {
-			period = "am";
-		} else if (isPM(token)) {
-			period = "pm";
-		} else {
-			return false;
-		}
-		
-		String[] timeTokens = token.split(period);
-		if (timeTokens.length == 1 && isNumber(getFirst(timeTokens))) {
-			return true;
-		}
-		return false;
-	}
-
-	private boolean isValid24HourTime(String token) {
-		String timeSymbol;
-		if (token.contains(":")) {
-			timeSymbol = ":";
-		} else if (token.contains(".")) {
-			timeSymbol = ".";
-		} else {
-			return false;
-		}
-		
-		String[] timeTokens = token.split(timeSymbol);
-		if (timeTokens.length == 2){
-			String hour = getFirst(timeTokens);
-			String minute = getLast(timeTokens);
-			if (isAM(token)) {
-				minute = getFirst(minute.split("am"));
-			}
-			if (isPM(token)) {
-				minute = getFirst(minute.split("pm"));
-			}
-			if (isNumber(hour) && isNumber(minute)) {
-				return true;
-			}
-		}
-		return false;
 	}
 }

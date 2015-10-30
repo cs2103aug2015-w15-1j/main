@@ -191,6 +191,7 @@ public class ParserVault extends ParserSkeleton{
 				date += " 12:00";
 			}
 		}
+		
 		String parsedDate = dateParser.parseDate(date);
 		getFieldContent().put(command, parsedDate);
 		return new ArrayList<String>( Arrays.asList("OK", parsedDate));

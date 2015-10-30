@@ -30,6 +30,7 @@ public class DateParser extends ParserSkeleton{
 		}
 	
 		date = swapDayAndMonth(date);
+		date = removeLater(date);
 		
 		String parsedDate = natty.parse(date).get(0).getDates().toString();
 		parsedDate = parsedDate.substring(1, parsedDate.length()-1); //remove brackets
@@ -38,6 +39,17 @@ public class DateParser extends ParserSkeleton{
 		parsedDate = removeMinuteIfZero(parsedDate);
 		
 		return parsedDate;
+	}
+
+	private String removeLater(String date) {
+		String[] dateTokens = date.split(" ");
+		date = "";
+		for (String token: dateTokens) {
+			if (!token.equalsIgnoreCase("later")) {
+				date += token + " ";
+			}
+		}
+		return removeEndSpaces(date);
 	}
 
 	String standardizeDateFormat(String dateString) {
@@ -417,11 +429,11 @@ public class DateParser extends ParserSkeleton{
 		return new ArrayList<String>( Arrays.asList(eventStart, eventEnd));
 	}
 
-	boolean hasNoDate(String eventString) {
-		if (eventString.split("/").length > 1 || eventString.split("-").length > 1) {
+	boolean hasNoDate(String dateString) {
+		if (dateString.split("/").length > 1 || dateString.split("-").length > 1) {
 			return false;
 		} else {
-			ArrayList<String> tokens = new ArrayList<String>( Arrays.asList(eventString.split(" ") ));
+			ArrayList<String> tokens = new ArrayList<String>( Arrays.asList(dateString.split(" ") ));
 			for (String token: tokens) {
 				if (isMonth(token) || isDayOfWeek(token)) {
 					return false;
@@ -437,9 +449,9 @@ public class DateParser extends ParserSkeleton{
 	/**
 	 * This method checks if the user have included the time in the date string
 	 */
-	boolean hasNoTime(String eventString){
+	boolean hasNoTime(String dateString){
 		String[] eventTokens;
-		eventTokens = eventString.split(" ");
+		eventTokens = dateString.split(" ");
 		for (String token: eventTokens){
 			if (isValid12HourTime(token)){
 				return false;

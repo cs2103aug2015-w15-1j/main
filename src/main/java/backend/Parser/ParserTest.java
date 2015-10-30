@@ -803,6 +803,23 @@ public class ParserTest {
 	    expected = new ArrayList<String>( Arrays.asList("every", "5", "01 Apr") );
 	    printTestResult();
 	    assertEquals(expected, actual);
+	    
+	    //Test if using 'next' or 'later' works
+	    input = "6 by 10 days later 2pm";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "01 Apr") );
+	    printTestResult();
+	    //assertEquals(expected, actual);
+	    input = "6 by next tue 3pm";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "01 Apr") );
+	    printTestResult();
+	    //assertEquals(expected, actual);
+	    input = "6 by 2 wed later 4pm";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "01 Apr") );
+	    printTestResult();
+	    //assertEquals(expected, actual);
 	}
 	
 	@Test

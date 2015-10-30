@@ -1,265 +1,170 @@
 package main.java.backend.Parser;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
 
-import com.joestelmach.natty.*;
-
-public class Parser {
-	//List of all command words accepted by the program
-	private final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList(
-	"add", "addcat", "category", "deadline", "description", "delete", "deleteAll", "done", "event", "every", 
-	"exit", "priority", "redo", "reminder", "rename", "reset", "search", "setcol", "showcat",   
-	"show", "showE", "showF", "showO", "showT", "sort", "sortD", "sortN", "sortP", "undo", "undone") );
-	
-	//Commands that work just by typing the command word (without additional content)
-	private final ArrayList<String> COMMANDS_NO_CONTENT = new ArrayList<String>( Arrays.asList(
-	"deleteAll", "exit", "redo", "showE", "showF", "showO", "showT", "sortD", "sortN", "sortP", "undo") );
-	
-	//Commands that if appear first, will prevent other command keywords from having effect
-	private final ArrayList<String> COMMANDS_DOMINATING = new ArrayList<String>( Arrays.asList(
-	"addcat", "delete", "done", "every", "reset", "search", "setcol", "show", "showcat", "sort", "undone") );
-	
-	//Commands that create a new item
-	private final ArrayList<String> COMMANDS_ADD_STUFF = new ArrayList<String>( Arrays.asList(
-	"add", "addcat") );
-	
-	//Commands that can accept any amount of words
-	private final ArrayList<String> COMMANDS_NEED_WORDS = new ArrayList<String>( 
-	Arrays.asList("add", "addcat", "category", "description", "search") );
-	
-	//Commands that only accept an index
-	private final ArrayList<String> COMMANDS_NEED_INDEX = new ArrayList<String>( 
-	Arrays.asList("delete", "done", "reset", "undone", "showcat") );
-	
-	//Command words that indicate that the command is one-shot
-	private final ArrayList<String> COMMANDS_ONE_SHOT = new ArrayList<String>( 
-	Arrays.asList("add", "set") );	
-	
-	//Command fields that can be edited/reset
-	private final ArrayList<String> COMMANDS_CAN_EDIT = new ArrayList<String>( 
-	Arrays.asList("all", "description", "deadline", "event", "priority", "reminder", "category") );	
-	
-	//The default list of fields and the order in which their contents are put into result
-	private final ArrayList<String> FIELDS_DEFAULT = new ArrayList<String>( Arrays.asList(
-	"command", "name", "description", "deadline", "eventStart", "eventEnd", "priority", "reminder", "category", "rename") );
-	
-	//How often a recurring task can recur
-	private final ArrayList<String> RECUR_FREQUENCY = new ArrayList<String>( Arrays.asList(
-	"day", "week", "month", "year") );
-	
-	//List of months and their shortforms
-	private final ArrayList<String> MONTHS = new ArrayList<String>( Arrays.asList(
-	"january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december", 
-	"jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "oct", "nov", "dec") );
-	
-	//List of fields that are used in the current result
-	private ArrayList<String> fields = new ArrayList<String>(FIELDS_DEFAULT);
-	
-	//Holds the merged tokens until they are stored into field content
-	private String growingToken = "";
-	
-	//List of commands that have appeared in the current input
-	private ArrayList<String> seenCommands = new ArrayList<String>();
-	
-	//Stores the fields and their respective contents
-	private HashMap<String, String> fieldContent = new HashMap<String, String>(){
-		private static final long serialVersionUID = 1L; {
-        put("command",""); put("name", ""); put("description", ""); put("deadline", ""); put("event", ""); 
-        put("priority",""); put("reminder", ""); put("category", ""); put("every", ""); put("rename", "");
-    }};
+public class Parser extends ParserSkeleton{
     
-    //Contains the variants or short forms of some of the commands
-    private HashMap<String, ArrayList<String>> command_families = new HashMap<String, ArrayList<String>>(){
-		private static final long serialVersionUID = 1L; {
-		put("category", new ArrayList<String>( Arrays.asList("cat")));
-		put("deadline", new ArrayList<String>( Arrays.asList("by", "dea")));
-		put("delete", new ArrayList<String>( Arrays.asList("del")));
-        put("description", new ArrayList<String>( Arrays.asList("des")));
-        put("event", new ArrayList<String>( Arrays.asList("from"))); 
-        put("every", new ArrayList<String>( Arrays.asList("recur"))); 
-        put("priority", new ArrayList<String>( Arrays.asList("pri")));
-        put("reminder", new ArrayList<String>( Arrays.asList("rem")));
-    }};
+	private ParserVault parserVault = new ParserVault();
+    
+	//Tokens are 'merged' into a growingToken until they are stored into field content
+	private String growingToken = "";
+    
+    public Parser(){
+    	//Force Natty parser to initialize by running dateParser once
+    	String pi = "31/4/15 9:26";
+    	dateParser.parseDate(pi);
+    }
     
 	/**
 	 * This method parses the user input and returns an ArrayList of string tokens
 	 */
 	public ArrayList<String> parseInput(String input){
-		ArrayList<String> result = new ArrayList<String>(); 
-		
+		parserVault.resetContents();
 		String[] inputTokens = input.split(" ");
-		String firstWordOriginal = getFirst(inputTokens);
-		String firstWord = getDefaultCommand(firstWordOriginal);
+		ArrayList<String> firstTwoWordsParsed = parseFirstTwoWords(inputTokens);
 		
-		if (noNeedContent(firstWord)) {
-			result.add(firstWord);
-			return result;
-		} else if (isCommand(firstWord) && inputTokens.length == 1) {
-			result = makeErrorResult(result, "EmptyFieldError", firstWord);
-		} else if (!(isCommand(firstWord) || isNumber(firstWord))) {
-			result = makeErrorResult(result, "InvalidWordError", firstWordOriginal);
-		} else if (isDominatingCommand(firstWord)) {
-			result.add(firstWord);
-			String content = mergeTokens(inputTokens, 1, inputTokens.length);
-			if (firstWord.equals("show")) {
-				String taskType = getTaskType(content);
-				if (taskType.equals("ERROR")) {
-					result = makeErrorResult(result, "InvalidTaskTypeError", content);
-				} else {
-					result.set(0, firstWord+taskType);
-				}
-			} else if (firstWord.equals("sort")) {
-				String field = getSortField(getDefaultCommand(content));
-				if (field.equals("ERROR")) {
-					result = makeErrorResult(result, "InvalidSortFieldError", content);
-				} else {
-					result.set(0, firstWord+field);
-				}
-			} else if (needWords(firstWord)) { //if first word is addcat or search
-				result.add(content);
-			} else if (needIndex(firstWord)) { //if first word is delete, done, or undone 
-				String nextWord = getFirst(content);
-				if (isNumber(nextWord)) {
-					result.add(nextWord);
-				} else {
-					result = makeErrorResult(result, "InvalidIndexError", content);
-				}
-			} 
+		if (isIncompleteStatus(firstTwoWordsParsed)) {
+			return parseRemaining(inputTokens);	
 		} else {
-			if (isNumber(firstWord)) { //first word is task index
-				String secondWordOriginal = getSecond(inputTokens);
-				String secondWord = getDefaultCommand(secondWordOriginal);
-				if (secondWord.isEmpty()) {
-					result = makeErrorResult(result, "NoCommandError", firstWord);
-					return result;
-				} else if (!(isCommand(secondWord))) {
-					result = makeErrorResult(result, "InvalidCommandError", secondWordOriginal);
-					return result;
-				}
-			}
-			boolean quoteStart = false;
-			for (int i = 0; i < inputTokens.length; i++) {
-				String token = inputTokens[i];
-				String originalToken = token;
-				token = getDefaultCommand(token);
-				if (token.startsWith("\"")) {
-					if (containsQuote(inputTokens)) {
-						quoteStart = true;
-						System.out.println(quoteStart);
-					}
-				}
-				if (quoteStart == true) {
-					appendToken(originalToken);
-					if (token.endsWith("\"")) {
-						quoteStart = false;
-					}
-				} else if (isCommand(token) && !noNeedContent(token)) {
-					putToken();			
-					String lastCommand = getLast(seenCommands);
-					if (i == inputTokens.length-1) {
-						if (needWords(lastCommand)) {
-							appendToken(originalToken);
-							continue;
-						} else if (!isDominatingCommand(originalToken)){
-							result = makeErrorResult(result, "EmptyFieldError", originalToken);
-							return result;
-						}
-					}
-					if (isSeenCommand(token)) {
-						if (needWords(lastCommand)) {
-							addToFieldContent(lastCommand, originalToken);
-						} else {
-							result = makeErrorResult(result, "DuplicateCommandError", originalToken);
-							break;
-						}
-
-					} else {
-						String command = fieldContent.get("command");
-						if (!command.isEmpty() && isDominatingCommand(token)) {
-							appendToken(originalToken);
-						} else {
-							if (!lastCommand.isEmpty()) {
-								String content;
-								if (isAddStuff(lastCommand)) {
-									content = fieldContent.get("name");
-								} else {
-									content = fieldContent.get(lastCommand);
-								}
-								if (content.isEmpty()) {
-									result = makeErrorResult(result, "EmptyFieldError", lastCommand);
-									break;
-								}
-							}
-							putCommand(token);
-							//if command is delete, done or reset, ends here
-							if (isDominatingCommand(token) && !token.equals("every")) { 
-								if (token.equals("reset")) {
-									if (isLast(inputTokens, token)) {
-										result = makeErrorResult(result, "EmptyFieldError", token);
-									} else {
-										String content = mergeTokens(inputTokens, i+1, inputTokens.length);
-										String field = getDefaultCommand(content);
-										if (isLast(inputTokens, content) && canEdit(field)) {
-											fieldContent.put("reset", field);
-										} else {
-											result = makeErrorResult(result, "InvalidResetError", content);
-										}
-									}
-								}
-								break;
-							}
-						}
-					}
-					
-				} else {
-					appendToken(originalToken);
-				}
-			}
-			putToken();
-			
-			String command = fieldContent.get("command");
-			result = makeResult(result, command);
-			
-		}	
-		seenCommands.clear();
-		fields = new ArrayList<String>(FIELDS_DEFAULT);
-		fieldContent.replaceAll((field,content) -> "");
-		return result;
+			return firstTwoWordsParsed;
+		}
 	}
-
-	private void appendToken(String token) {
+	
+	void growToken(String token) {
 		growingToken += token + " ";
 	}
-	
-	/**
-	 * This methods checks if token is a command variant (if yes, convert it to the default command)
-	 */
-	private String getDefaultCommand(String token) {
-		for (String command: COMMANDS) {
-			if (token.equalsIgnoreCase(command)){
-				return command;
+
+	private ArrayList<String> parseFirstTwoWords(String[] inputTokens) {
+		String firstWordOriginal = getFirst(inputTokens);
+		String firstWord = convertVariantToDefault(firstWordOriginal);
+		String secondWordOriginal = getSecond(inputTokens);
+		String secondWord = convertVariantToDefault(secondWordOriginal);
+		int inputWordCount = inputTokens.length;
+		
+		if (isCommandThatNoNeedContent(firstWord)) {
+			return parserVault.makeCommandOnlyResult(firstWord);
+		}
+		if (isCommandButHasNoContent(firstWord, inputWordCount)) {
+			return makeErrorResult("EmptyFieldError", firstWord);
+		}
+		if (isNotCommandOrIndex(firstWord)) {
+			return makeErrorResult("InvalidWordError", firstWordOriginal);
+		} 
+		if (isDominatingCommand(firstWord)) {
+			String content = mergeTokens(inputTokens, 1, inputTokens.length);
+			ArrayList<String> dominantResult = parserVault.makeDominantResult(firstWord, secondWord, content); 
+			if (!isIncompleteStatus(dominantResult)) {
+				return dominantResult;
 			}
 		}
-    	for (String command: command_families.keySet()) {
-    		ArrayList<String> family = command_families.get(command);
-			if (family.contains(token)) {
-				return command;
+		if (isCommandButCannotBeInOneShot(secondWord)) {
+			String content = mergeTokens(inputTokens, 1, inputTokens.length);
+			ArrayList<String> dominantResult = parserVault.makeDominantResult(secondWord, firstWord, content); 
+			if (!isIncompleteStatus(dominantResult)) {
+				return dominantResult;
 			}
 		}
-    	return token;
+		if (isNumber(firstWord)) {
+			if (secondWord.isEmpty()) {
+				return makeErrorResult("NoCommandError", firstWord);
+			} else if (!(isCommand(secondWord))) {
+				return makeErrorResult("InvalidCommandError", secondWordOriginal);
+			}
+		}
+		return new ArrayList<String>( Arrays.asList( "incomplete" ));
 	}
-	
-	private boolean containsQuote(String[] inputTokens){
-		/*String[] tokens = input.split("\"");
-		System.out.println("Length " + tokens.length);
-		return tokens.length > 1 && tokens.length % 2 == 0;*/
+
+	private ArrayList<String> parseRemaining(String[] inputTokens) {
+		int inputWordCount = inputTokens.length;
+		boolean hasQuote = hasQuotes(inputTokens);
+		boolean quoteStart = false;
+		
+		for (int i = 0; i < inputWordCount; i++) {
+			String token = inputTokens[i];
+			String originalToken = token;
+			token = convertVariantToDefault(token);
+			
+			quoteStart = checkForQuotes(hasQuote, quoteStart, originalToken, i, inputTokens); 
+			if (quoteStart) {
+				growToken(originalToken);
+				
+			} else {
+				ArrayList<String> parseResult = parseToken(token, originalToken, i, inputWordCount);
+				if (isErrorStatus(parseResult)) {
+					return parseResult;
+				}
+			}
+		}
+		
+		growingToken = parserVault.storeToken(growingToken);
+		String command = parserVault.getFieldContent().get("command");
+		if (isOneShotCommand(command)) {
+			return parserVault.makeMultiFieldResult();
+		} else {
+			return parserVault.makeSingleFieldResult();
+		}
+	}
+
+	private ArrayList<String> parseToken(String token, String originalToken, int count, int total) {
+		if (isNotCommand(token) || parserVault.isCommandButRepressed(token)){
+			growToken(originalToken);	
+		} else {
+			growingToken = parserVault.storeToken(growingToken);
+			String lastCommandSeen = getLast(parserVault.getSeenCommands());
+			
+			if (isLastWord(count, total) && isCommandThatNeedWords(lastCommandSeen)) {
+				growToken(originalToken);
+			} else if (isLastWord(count, total) && !parserVault.isCommandButRepressed(token)){
+				return makeErrorResult("EmptyFieldError", originalToken);
+			} else if (parserVault.isSeenCommand(token)) {
+				if (isCommandThatNeedWords(lastCommandSeen)) {
+					growingToken = parserVault.storeToken(originalToken);
+				} else {
+					return makeErrorResult("DuplicateCommandError", originalToken);
+				}
+			} else {
+				if (!lastCommandSeen.isEmpty()) {
+					String contentOfLastCommand = parserVault.getContentOfCommand(lastCommandSeen);
+					if (contentOfLastCommand.isEmpty()) {
+						return makeErrorResult("EmptyFieldError", lastCommandSeen);
+					}
+				}
+				parserVault.storeCommand(token);
+			}
+		}
+		return new ArrayList<String>( Arrays.asList( "OK" ));
+	}
+
+	private boolean checkForQuotes(boolean hasQuote, boolean quoteStart, String token, 
+			int count, String[] inputTokens) {
+		if (hasQuote && token.startsWith("\"")) {
+			quoteStart = true;
+		}
+		
+		if (quoteStart == true) {
+			String previousToken = getPrevious(inputTokens, count);
+			if (previousToken.endsWith("\"")) {
+				quoteStart = false;
+			}
+		}
+		
+		return quoteStart;
+	}
+
+	private boolean isNotCommand(String token){
+		return !isCommand(token);
+	}
+
+	private boolean isNotCommandOrIndex(String token) {
+		return isNotCommand(token) && !isNumber(token);
+	}
+
+	private boolean isLastWord(int i, int inputWordCount) {
+		return i == inputWordCount-1;
+	}
+
+	private boolean hasQuotes(String[] inputTokens){
 		int quoteCommaCount = 0;
 		for (String token: inputTokens) {
 			if (token.startsWith("\"")) {
@@ -271,1018 +176,4 @@ public class Parser {
 		}
 		return quoteCommaCount > 1 && quoteCommaCount % 2 == 0;
 	}
-	
-	/**
-	 * This method marks the command as seen and stores it as the main command (if there isn't one) 
-	 */
-	private void putCommand(String token) {
-		String command = fieldContent.get("command");
-		seenCommands.add(token);
-
-		if (command.isEmpty()) {
-			fieldContent.put("command", token);
-		} else if (!isAddStuff(command)) {
-			fieldContent.put("command", "set");
-		}
-	}
-	
-	/**
-	 * This method stores the growingToken under its rightful field or appends it to an existing field content
-	 */
-	private void putToken() {
-		if (!growingToken.isEmpty()) {
-			growingToken = removeEndSpaces(growingToken);
-			growingToken = removeQuotes(growingToken);
-			String lastCommand = getLast(seenCommands);
-			String field;
-			
-			if (lastCommand.isEmpty() || isAddStuff(lastCommand)) {
-				field = "name";
-			} else {
-				field = lastCommand;
-			}
-			
-			String content = fieldContent.get(field);
-			if (content.isEmpty()) {
-				fieldContent.put(field, growingToken);
-			} else {
-				fieldContent.put(field, content + " " + growingToken);
-			}
-			
-			growingToken = "";
-		}
-	}
-
-	/**
-	 * This method directly adds or appends a token to a field's content
-	 */
-	private void addToFieldContent(String command, String token){
-		String content;
-		String field;
-		if (isAddStuff(command)) {
-			field = "name";
-			content = fieldContent.get(command);
-		} else {
-			field = command;
-			content = fieldContent.get(command);
-		}
-		if (content != null) {
-			fieldContent.put(field, removeEndSpaces(content + " " + token));
-		} else {
-			fieldContent.put(field, removeEndSpaces(token));
-		}
-	}
-
-	private ArrayList<String> makeResult(ArrayList<String> result, String command) {
-		if (command.equals("ERROR")) {
-			return result;
-		} else if (canBeOneShot(command)) {
-			result = makeLongResult(result);
-		} else {
-			result = makeShortResult(result);
-		}
-		return result;
-	}
-	
-	/**
-	 * This method makes a result that indicates an error in the command
-	 */
-	private ArrayList<String> makeErrorResult(ArrayList<String> result, String error, String token) {
-		result.clear();
-		result.add("error");
-		fieldContent.put("command", "ERROR");
-		switch (error) {
-			case "InvalidWordError":
-				result.add(error + ": '" + token + "' is not recognised as a command or index");
-				break;
-			case "InvalidIndexError":
-				result.add(error + ": '" + token + "' is not recognised as an index");
-				break;
-			case "InvalidCommandError":
-				result.add(error + ": '" + token + "' is not recognised as a command");
-				break;
-			case "NoCommandError":
-				result.add(error + ": please enter a command after the task index '" + token + "'");
-				break;
-			case "DuplicateCommandError":
-				result.add(error + ": duplicate command '" + token + "'");
-				break;
-			case "EmptyFieldError":
-				result.add(error + ": please enter content for the command '" + token + "'");
-				break;
-			case "NoEndDateError":
-				result.add(error + ": please enter an end date after the command word 'to'");
-				break;
-			case "InvalidPriorityError":
-				result.add(error + ": '" + token + "' is not between 1 to 5");
-				break;
-			case "InvalidDateError":
-				result.add(error + ": '" + token + "' is not an acceptable date format");
-				break;
-			case "InvalidFrequencyError":
-				result.add(error + ": please enter 'day'/'week'/'month'/'year' after 'every' to indicate the frequency");
-				break;
-			case "InvalidDayOfMonthError":
-				result.add(error + ": '" + token + "' is not between 1 to 31");
-				break;
-			case "InvalidTaskTypeError":
-				result.add(error + ": '" + token + "' is not 'todo', 'event' or 'floating'");
-				break;
-			case "InvalidSortFieldError":
-				result.add(error + ": '" + token + "' is not 'deadline', 'name' or 'priority'");
-				break;
-			case "InvalidResetError":
-				result.add(error + ": '" + token + "' is not a field that can be reset");
-				break;
-			default:
-				break; 
-		}
-		return result;
-	}
-
-	/**
-	 * This method creates a short result (for non one-shot commands)
-	 */
-	private ArrayList<String> makeShortResult(ArrayList<String> result) {
-		String command = fieldContent.get("command");
-		String name = fieldContent.get("name");
-		String newField = fieldContent.get(command);
-		if (name.isEmpty()) {
-			result = makeErrorResult(result, "EmptyFieldError", command);
-		} else if (!needIndex(command) && newField.isEmpty()){
-			result = makeErrorResult(result, "EmptyFieldError", command);
-		} else if (newField == null) {
-			result.addAll( Arrays.asList(command, name) );
-		} else {
-			if (command.equals("deadline") || command.equals("reminder") || command.equals("every")) {
-				String freq = "";
-				if (command.equals("every")) {
-					String[] tokens = newField.split(" ");
-					freq = getFirst(tokens);
-					if (!isValidFrequency(freq)) {
-						result = makeErrorResult(result, "InvalidFrequencyError", freq);
-						return result;
-					} 
-					newField = mergeTokens(tokens, 1, tokens.length);
-					if (freq.equals("month")) {
-						newField = getNumber(newField);
-						if (!isValidDayOfMonth(newField)) {
-							result = makeErrorResult(result, "InvalidDayOfMonthError", newField);
-						} else {
-							newField += " of month";
-							result.addAll( Arrays.asList(command, name, newField) );
-						}
-						return result;
-					}
-				} 		
-				String date = parseDate(command, newField);
-
-				if (date.equals("ERROR")) {
-					result = makeErrorResult(result, "InvalidDateError", newField);
-					return result;
-				} else if (command.equals("every")){
-					date = changeToRecurFormat(freq, date);
-				}
-				newField = date;
-			}
-			if (command.equals("priority") && !isValidPriority(newField)) {
-				result = makeErrorResult(result, "InvalidPriorityError", newField);
-			} else if (command.equals("event")) {
-				if (newField.endsWith("to")) {
-					result = makeErrorResult(result, "NoEndDateError", newField);
-					return result;
-				} else {
-					String[] eventStartEnd = getStartAndEnd(newField);
-					String eventStart = getFirst(eventStartEnd);
-					String eventEnd = getLast(eventStartEnd);
-					if (eventStart.equals("ERROR") ) {
-						eventStart = removeEndSpaces(getFirst(newField.split(" to ")));
-						result = makeErrorResult(result, "InvalidDateError", eventStart);
-						return result;
-					} else if (eventEnd.equals("ERROR") ){
-						eventEnd = removeEndSpaces(getLast(newField.split(" to ")));
-						result = makeErrorResult(result, "InvalidDateError", eventEnd);
-						return result;
-					}
-					result.addAll( Arrays.asList(command, name, eventStart, eventEnd) );
-				}
-			} else {
-				result.addAll( Arrays.asList(command, name, newField) );
-			}
-		}
-		
-		return result;
-	}
-
-	/**
-	 * This method creates a long result (for one-shot commands)
-	 */
-	private ArrayList<String> makeLongResult(ArrayList<String> result) {
-		String command = fieldContent.get("command");
-		String deadline = fieldContent.get("deadline");
-		String event = fieldContent.get("event");
-		String reminder = fieldContent.get("reminder");
-		String priority = fieldContent.get("priority");
-		
-		if (command.equals("add")) {
-			fields.remove("rename");
-		}
-		
-		if (!priority.isEmpty() && !isValidPriority(priority)) {
-			result = makeErrorResult(result, "InvalidPriorityError", priority);
-		} else {
-			if (!reminder.isEmpty()) {
-				String date = parseDate("reminder", reminder);
-				if (date.equals("ERROR")) {
-					result = makeErrorResult(result, "InvalidDateError", reminder);
-					return result;
-				} else {
-					reminder = date;
-				}
-				fieldContent.put("reminder", reminder);
-			}
-			if (!deadline.isEmpty()) {
-				command += "T";
-				fields.remove("eventStart");
-				fields.remove("eventEnd");
-				String date = parseDate("deadline", deadline);
-				if (date.equals("ERROR")) {
-					result = makeErrorResult(result, "InvalidDateError", deadline);
-					return result;
-				} else {
-					deadline = date;
-				}
-				fieldContent.put("deadline", deadline);
-			} else if (!event.isEmpty()) {
-				command += "E";
-				fields.remove("deadline");
-				if (event.endsWith("to")) {
-					result = makeErrorResult(result, "NoEndDateError", event);
-					return result;
-				} else {
-					String[] eventStartEnd = getStartAndEnd(event);
-					String eventStart = getFirst(eventStartEnd);
-					String eventEnd = getLast(eventStartEnd);
-					if (eventStart.equals("ERROR") ) {
-						eventStart = removeEndSpaces(getFirst(event.split(" to ")));
-						result = makeErrorResult(result, "InvalidDateError", eventStart);
-						return result;
-					} else if (eventEnd.equals("ERROR") ){
-						eventEnd = removeEndSpaces(getLast(event.split(" to ")));
-						result = makeErrorResult(result, "InvalidDateError", eventEnd);
-						return result;
-					}
-				}
-			} else {
-				if (command.equals("add")) {
-					command += "F";
-				}
-				fields.remove("deadline");
-				fields.remove("eventStart");
-				fields.remove("eventEnd");
-			}
-			fieldContent.put("command", command);
-			
-			for (String field: fields) {
-				String para = fieldContent.get(field);
-				result.add(para);
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * This method gets the individual start and end date/time of an event and put them into separate fields
-	 * @return the start and end date/time in an array
-	 */
-	private String[] getStartAndEnd(String event) {
-		String[] eventTokens = event.split(" to ", 2);
-		String eventStart = getFirst(eventTokens);
-		String eventEnd = "";
-		if (eventTokens.length > 1) {
-			eventEnd = removeEndSpaces(getLast(eventTokens));
-		}
-		
-		if (parseDate("eventStart", eventStart).equals("ERROR")) {
-			eventStart = "ERROR";
-		} else if (parseDate("eventEnd", eventEnd).equals("ERROR")) {
-			eventEnd = "ERROR";
-		} else {
-			String startDate = "";
-			if (hasNoTime(eventStart)) {
-				eventStart += " 12:00";
-			}
-			String[] startTokens = eventStart.split(" ");
-			for (int i = 0; i < startTokens.length-1; i++) {
-				startDate += startTokens[i] + " ";
-			}
-			String startTime = getLast(startTokens);
-			
-			if (eventEnd.isEmpty()) {
-				eventEnd = startDate + "23:59";
-			} else if (hasNoDate(eventEnd)) {
-				String endTime = eventEnd;
-				if (startTimeIsAfterEndTime(startTime, endTime)) {
-					startDate = plusOneDay(startDate);
-				} 
-				eventEnd = startDate + " " + endTime;	
-			} else if (hasNoTime(eventEnd)) {
-				String endDate = eventEnd;
-				eventEnd = endDate + " " + startTime;
-			} 
-
-			eventStart = parseDate("eventStart", removeEndSpaces(eventStart));
-			eventEnd = parseDate("eventEnd", removeEndSpaces(eventEnd));
-			
-			if (startDateIsAfterEndDate(eventStart, eventEnd)) {
-				eventEnd = plusOneYear(eventEnd);
-			}
-			
-			fieldContent.put("eventStart", eventStart);
-			fieldContent.put("eventEnd", eventEnd);
-		}
-		
-		String[] result = new String[2];
-		result[0] = eventStart;
-		result[1] = eventEnd;
-		return result;
-	}
-
-	private String plusOneDay(String dateString) {
-		dateString = parseDate("event", dateString);
-		SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
-		SimpleDateFormat sdfNoMinute = new SimpleDateFormat("EEE, dd MMM yy, hha");
-		Date date = null;
-		if (hasMinute(dateString)) {
-			try {
-				date = sdf.parse(dateString);
-			} catch (ParseException e) {
-				System.out.println("parseError");
-				e.printStackTrace();
-			}
-		} else {
-			try {
-				date = sdfNoMinute.parse(dateString);
-			} catch (ParseException e) {
-				System.out.println("parseError");
-				e.printStackTrace();
-			}
-		}
-		Calendar c = Calendar.getInstance(); 
-		c.setTime(date); 
-		c.add(Calendar.DATE, 1);
-		date = c.getTime();
-		return date.toString().substring(4, 10);
-	}
-
-	private boolean startDateIsAfterEndDate(String start, String end){
-		SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
-		SimpleDateFormat sdfNoMinute = new SimpleDateFormat("EEE, dd MMM yy, hha");
-		Date startDate = null;
-		Date endDate = null;
-		if (hasMinute(start)) {
-			try {
-				startDate = sdf.parse(start);
-			} catch (ParseException e) {
-				System.out.println("parseError");
-				e.printStackTrace();
-			}
-		} else {
-			try {
-				startDate = sdfNoMinute.parse(start);
-			} catch (ParseException e) {
-				System.out.println("parseError");
-				e.printStackTrace();
-			}
-		}
-		if (hasMinute(end)) {
-			try {
-				endDate = sdf.parse(end);
-			} catch (ParseException e) {
-				System.out.println("parseError");
-				e.printStackTrace();
-			}
-		} else {
-			try {
-				endDate = sdfNoMinute.parse(end);
-			} catch (ParseException e) {
-				System.out.println("parseError");
-				e.printStackTrace();
-			}
-		}
-		return startDate.after(endDate);
-	}
-	
-	private boolean startTimeIsAfterEndTime(String start, String end){
-		if (isAM(start) && isPM(end)) {
-			return false;
-		} else if (isPM(start) && isAM(end)) {
-			return true;
-		} else  {
-			String startHour;
-			String endHour;
-			String startMinute;
-			String endMinute;
-			if (isAM(start) && isAM(end)){
-				startHour = getFirst(start.toLowerCase().split("am"));
-				endHour = getFirst(end.toLowerCase().split("am"));
-			} else {
-				startHour = getFirst(start.toLowerCase().split("pm"));
-				endHour = getFirst(end.toLowerCase().split("pm"));
-			}
-			String startTemp[] = startHour.toLowerCase().split(":");
-			String endTemp[] = endHour.toLowerCase().split(":");		
-			startHour = getFirst(startTemp);
-			endHour = getFirst(endTemp);
-			startMinute = getSecond(startTemp);
-			endMinute = getSecond(endTemp);
-			int startHourNum = 0;
-			int endHourNum = 0;
-			try {
-				startHourNum = Integer.parseInt(startHour); 
-				endHourNum = Integer.parseInt(endHour); 
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-			}
-			if (startHourNum > endHourNum){
-				return true;
-			} else if (startHourNum < endHourNum){
-				return false;
-			} else {
-				if (startMinute.isEmpty() && !endMinute.isEmpty()) {
-					return false;
-				} else if (startMinute.isEmpty() && endMinute.isEmpty()) {
-					return true;
-				} else if (!startMinute.isEmpty() && endMinute.isEmpty()) {
-					return true;
-				} else {
-					int startMinuteNum = 0;
-					int endMinuteNum = 0;
-					try {
-						startMinuteNum = Integer.parseInt(startMinute); 
-						endMinuteNum = Integer.parseInt(endMinute); 
-					} catch (NumberFormatException e) {
-						e.printStackTrace();
-					}
-					return (startMinuteNum >= endMinuteNum);
-				}
-			}
-		}
-	}
-
-	private boolean isAM(String time){
-		return time.toLowerCase().endsWith("am");
-	}
-	
-	private boolean isPM(String time){
-		return time.toLowerCase().endsWith("pm");
-	}
-	
-	private boolean hasNoDate(String eventEnd) {
-		if (eventEnd.split("/").length > 1 || eventEnd.split("-").length > 1) {
-			return false;
-		} else {
-			String[] tokens = eventEnd.split(" ");
-			for (String token: tokens) {
-				if (MONTHS.contains(token.toLowerCase())) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * This method checks that a date string is valid and parses it into the default date format 
-	 */
-	private String parseDate(String field, String date) {
-		if (date.isEmpty()) {
-			return date;
-		}
-		date = swapDayAndMonth(date);
-		
-		com.joestelmach.natty.Parser dateParser = new com.joestelmach.natty.Parser();
-		String dateString = "";
-		DateGroup group;
-		try {
-			group = dateParser.parse(date).get(0);
-		} catch (Exception e){
-			return "ERROR";
-		}
-		
-		if (hasNoTime(date)) {
-			if (field.equals("deadline")) {
-				date += " 23:59";
-			} else {
-				date += " 12:00";
-			}
-			group = dateParser.parse(date).get(0);
-		}
-		
-		List<Date> dates = group.getDates();
-		dateString = dates.toString();
-		dateString = dateString.substring(1, dateString.length()-1); //remove brackets
-		dateString = confirmDateIsInFuture(dateString);
-		dateString = changeDateFormat(dateString);
-		dateString = removeMinuteIfZero(dateString);
-		
-		return dateString;
-	}
-
-	/**
-	 * This method checks if the user have included the time in the date string
-	 */
-	private boolean hasNoTime(String date){
-		String[] temp;
-		String[] timeSymbols = {":", "."};
-		for (String sym: timeSymbols) {
-			temp = date.split(sym);
-			if (temp.length > 1) {
-				return false;
-			}
-		}
-		temp = date.split(" ");
-		for (String token: temp) {
-			if (token.toLowerCase().endsWith("am") || token.toLowerCase().endsWith("pm")) {
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	/**
-	 * This method swaps the position of day and month (so that it will work correctly for the natty parser)
-	 */
-	private String swapDayAndMonth(String date) {
-		String[] dateTokens = date.split(" ");
-		date = "";
-		for (String token: dateTokens) {
-			String[] ddmmyy = null;
-			if (token.contains("/")){
-				ddmmyy = token.split("/");
-			} else if (token.contains("-")) {
-				ddmmyy = token.split("-");
-			}
-			
-			if (ddmmyy != null && ddmmyy.length >= 2) {
-				String month = ddmmyy[0];
-				String day = ddmmyy[1];
-				String year = "";
-				date += day + "/" + month;
-				if (ddmmyy.length == 3) {
-					year = ddmmyy[2];
-					date += "/" + year;
-				} 
-				date += " ";
-			} else {
-				date += token + " ";
-			}
-		}
-		date = removeEndSpaces(date);
-		return date;
-	}
-
-	/**
-	 * This method confirms that the date set by the parser is in the future
-	 * If it's not, either add one year to the date
-	 */
-	private String confirmDateIsInFuture(String dateString) {
-		SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy"); 
-		long dateMilli = -1;
-		long nowMilli = getCurrentDateLong();
-		Date date = new Date();
-		try {
-			date = formatter.parse(dateString);
-			dateMilli = date.getTime();
-		} catch (ParseException e) {
-			System.out.println("parseError");
-		}
-		
-		if (dateMilli != -1 && dateMilli < nowMilli) {
-			String[] dateStringTokens = dateString.split(" ");
-			long dayMonth = getDateLong(dateStringTokens[1] + " " + dateStringTokens[2]);
-			int year = Integer.parseInt(getLast(dateStringTokens));
-			int currYear = getCurrentYear();
-			
-			if (year < currYear) {
-				year = currYear;
-				dateString = "";
-				for (int i = 0; i < dateStringTokens.length-1; i++) {
-					dateString += dateStringTokens[i] += " ";
-				}
-				dateString += year;
-			}
-			
-			try {
-				dateMilli = formatter.parse(dateString).getTime();
-			} catch (ParseException e) {
-				System.out.println("Parsing Error");
-				e.printStackTrace();
-			}
-			if (year == currYear) {
-				if (dayMonth < nowMilli) {
-					if (dateMilli < nowMilli){
-						date = plusOneYear(date);
-						dateString = date.toString();
-					} else {
-						dateString = formatter.format(dateMilli);
-					}
-				}
-			}
-		}
-		return dateString;
-	}
-
-	/**
-	 * This method sets the date to the standardized format
-	 */
-	private String changeDateFormat(String dateString) {
-		SimpleDateFormat nattyFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM yy, h:mma");
-		Date tempDate = null;
-		try {
-			tempDate = nattyFormat.parse(dateString);
-		} catch (Exception e) {
-			System.out.println("Parsing Error");
-			e.printStackTrace();
-		}
-		dateString = standardFormat.format(tempDate);
-		return dateString;
-	}
-
-	private String removeMinuteIfZero(String dateString) {
-		String result = "";
-		if (containLetter(dateString, ":")) {
-			String[] dateTokens = dateString.split(" ");
-			String time = getLast(dateTokens);
-			if (dateTokens.length > 1) {
-				result += mergeTokens(dateTokens, 0, dateTokens.length-1) + " ";
-			}
-			
-			String[] timeTokens = time.split(":", 2);
-			String hour = getFirst(timeTokens);
-			if (hour.charAt(0) == '0'){
-				result += hour.charAt(1);
-			} else {
-				result += hour;
-			}
-			
-			String minute = getLast(timeTokens);
-			if (minute.equals("00AM")) {
-				result += "am";
-			} else if (minute.equals("00PM")) {
-				result += "pm";
-			} else {
-				minute = minute.replace("AM", "am");
-				minute = minute.replace("PM", "pm");
-				result += ":" + minute;
-			}
-		} else {
-			result = dateString;
-		}
-		return result;
-	}
-
-	private String changeToRecurFormat(String freq, String dateString) {
-		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
-		SimpleDateFormat standardFormatNoMinute = new SimpleDateFormat("EEE, dd MMM yy, hha");
-		SimpleDateFormat recurDayFormat = new SimpleDateFormat("hh:mma");
-		SimpleDateFormat recurWeekFormat = new SimpleDateFormat("EEE hh:mma");
-		SimpleDateFormat recurYearFormat = new SimpleDateFormat("dd MMM");
-		Date tempDate = null;
-		
-		dateString = dateString.replace("am", "AM");
-		dateString = dateString.replace("pm", "PM");
-		if (containLetter(dateString, ":")) {
-			try {
-				tempDate = standardFormat.parse(dateString);
-			} catch (Exception e) {
-				System.out.println("Parsing Error");
-				e.printStackTrace();
-			}
-		} else {
-			try {
-				tempDate = standardFormatNoMinute.parse(dateString);
-			} catch (Exception e) {
-				System.out.println("Parsing Error");
-				e.printStackTrace();
-			}
-		}
-		switch (freq) {
-			case "day":
-				dateString = recurDayFormat.format(tempDate);
-				break;
-			case "week":
-				dateString = recurWeekFormat.format(tempDate);
-				break;
-			case "year":
-				dateString = recurYearFormat.format(tempDate);
-				break;
-			default:
-				dateString = standardFormat.format(tempDate);
-				break;
-		}
-		dateString = removeMinuteIfZero(dateString);
-		return dateString;
-	}
-	
-	private Date plusOneYear(Date date) {
-		Calendar c = Calendar.getInstance();
-		c.setTime(date);
-		c.add(Calendar.YEAR, 1);
-		date = c.getTime();
-		return date;
-	}
-	private String plusOneYear(String dateString) {
-		SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
-		SimpleDateFormat sdfNoMinute = new SimpleDateFormat("EEE, dd MMM yy, hha");
-		Date date = null;
-		if (hasMinute(dateString)) {
-			try {
-				date = sdf.parse(dateString);
-			} catch (ParseException e) {
-				System.out.println("parseError");
-				e.printStackTrace();
-			}
-		} else {
-			try {
-				date = sdfNoMinute.parse(dateString);
-			} catch (ParseException e) {
-				System.out.println("parseError");
-				e.printStackTrace();
-			}
-		}
-		date = plusOneYear(date);
-		return removeMinuteIfZero(changeDateFormat(date.toString()));
-	}
-
-	private long getDateLong(String date){
-		SimpleDateFormat sdfDate = new SimpleDateFormat("MMM dd");
-	    Date parseDate;
-		try {
-			parseDate = sdfDate.parse(date);
-			return parseDate.getTime();
-		} catch (ParseException e) {
-			System.out.println("parseError");
-			e.printStackTrace();
-		}
-		return 0;
-	}
-	
-	private boolean hasMinute(String time){
-		return time.split(":").length > 1;
-	}
-	
-	private long getCurrentDateLong() {
-		Date now = new Date();
-		long milli = now.getTime();
-		return milli;
-	}
-	
-	private int getCurrentYear() {
-		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy");
-	    Date now = new Date();
-	    String strDate = sdfDate.format(now);
-		return Integer.parseInt(strDate);
-	}
-	
-	/**
-	 * This method merges all the tokens between the startIndex (including) and endIndex (excluding)
-	 * @return the merged tokens as a string
-	 */
-	private String mergeTokens(String[] inputTokens, int startIndex, int endIndex) {
-		String merged = "";
-		for (int i = startIndex; i < endIndex; i++) {
-			String token = inputTokens[i];
-			merged += token + " ";
-		}
-		return removeEndSpaces(merged);
-	}
-
-	/**
-	 * This method removes any spaces that are in front or at the back of the token
-	 */
-	private String removeEndSpaces(String token) {
-		if (token.startsWith(" ")) {
-			token =  token.substring(1, token.length());
-		} 	
-		if (token.endsWith(" ")) {
-			return token.substring(0, token.length()-1);
-		} else {
-			return token;
-		}
-	}
-	
-	private String removeQuotes(String token){
-		if (token.startsWith("\"") && token.endsWith("\"")) {
-			token =  token.substring(1, token.length()-1);
-		} 
-		return token;
-	}
-
-	private boolean isCommand(String token){
-		return COMMANDS.contains(token);
-	}
-	
-	private boolean isDominatingCommand(String token){
-		return COMMANDS_DOMINATING.contains(token);
-	}
-	
-	private boolean noNeedContent(String token){
-		return COMMANDS_NO_CONTENT.contains(token);
-	}
-	
-	private boolean isAddStuff(String token){
-		return COMMANDS_ADD_STUFF.contains(token);
-	}
-	
-	private boolean isSeenCommand(String token) {
-		return seenCommands.contains(token);
-	}
-	
-	private boolean needWords(String token) {
-		return COMMANDS_NEED_WORDS.contains(token);
-	}
-	
-	private boolean needIndex(String token) {
-		return COMMANDS_NEED_INDEX.contains(token);
-	}
-	
-	private boolean canBeOneShot(String token) {
-		return COMMANDS_ONE_SHOT.contains(token);
-	}
-	
-	private boolean canEdit(String token) {
-		return COMMANDS_CAN_EDIT.contains(token);
-	}
-	
-	private boolean isNumber(String token) {
-		try {
-			Integer.parseInt(token);
-			return true;
-		} catch (NumberFormatException e) {
-			return false;
-		}
-	}
-	
-	private boolean isValidPriority(String token){
-		int[] priorityLevels = {1,2,3,4,5};
-		if (isNumber(token)) {
-			int intToken = Integer.parseInt(token);
-			for (int i = 0; i < priorityLevels.length; i++) {
-				if (intToken == priorityLevels[i]) {
-					return true;
-				}
-			}
-			return false;
-		}
-		return false;
-	}
-	
-	private boolean isValidFrequency(String token){
-		return RECUR_FREQUENCY.contains(token);
-	}
-	
-	private boolean isValidDayOfMonth(String token){
-		if (isNumber(token)){
-			if (Integer.parseInt(token) <= 31) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	private String getTaskType(String token){
-		switch (token.toLowerCase()) {
-		case "todo": 
-		case "todos":
-		case "t":
-			return "T";
-		case "event":
-		case "events":
-		case "e":
-			return "E";
-		case "floating":
-		case "floatings":
-		case "f":
-			return "F";
-		case "overdue":
-		case "o":
-			return "O";
-		default:
-			return "ERROR";
-		}
-	}
-	
-	private String getSortField(String token){
-		switch (token.toLowerCase()) {
-		case "deadline":
-		case "by deadline":
-		case "d":
-			return "D";
-		case "priority":
-		case "by priority":
-		case "p":
-			return "P";
-		case "name":
-		case "by name":
-		case "n":
-			return "N";
-		default:
-			return "ERROR";
-		}
-	}
-	
-	private String getNumber(String token){
-		if (isNumber(token)){
-			return token;
-		} else {
-			String c;
-			String number = "";
-			for (int i = 0; i < token.length(); i++) {
-				c = token.substring(i, i+1);
-				if (!isNumber(c)) {
-					break;
-				}
-				number += c;
-			}
-			if (!number.isEmpty()) {
-				return number;
-			} else {
-				return token;
-			}
-		}
-	}
-	
-	/*private boolean isFirst(String[] array, String token) {
-		String firstWord = getFirst(array);
-		return firstWord.equals(token);
-	}
-	
-	private boolean isFirst(ArrayList<String> list, String token) {
-		String firstWord = getFirst(list);
-		return firstWord.equals(token);
-	}*/
-	
-	private boolean isLast(String[] array, String token) {
-		String lastWord = getLast(array);
-		return lastWord.equals(token);
-	}
-
-	/*private boolean isLast(ArrayList<String> list, String token) {
-		String lastWord = getLast(list);
-		return lastWord.equals(token);
-	}*/
-	
-	private String getFirst(String[] array){
-		return array[0];
-	}
-	
-	private String getFirst(String str){
-		return str.split(" ")[0];
-	}
-	
-	/*private String getSecond(String[] array){
-		return array[1];
-	}*/
-	
-	/*private String getFirst(ArrayList<String> arrayList){
-		return arrayList.get(0);
-	}*/
-	
-	private String getSecond(String[] array){
-		if (array.length < 2) {
-			return "";
-		}
-		return array[1];
-	}
-	
-	private String getLast(String[] array){
-		if (array.length == 0) {
-			return "";
-		}
-		return array[array.length-1];
-	}
-	
-	private String getLast(ArrayList<String> arrayList){
-		if (arrayList.isEmpty()) {
-			return "";
-		}
-		return arrayList.get(arrayList.size()-1);
-	}
-	
-	/*private String getLast(String str){
-		String[] temp = str.split(" ");
-		return temp[temp.length-1];
-	}*/
-	
-	private boolean containLetter(String str, String letter){
-		return str.split(letter).length > 1;
-	}
-	
-	/*private String getPrevious(ArrayList<String> list, String token) {
-		return list.get( list.indexOf(token)-1 );
-	}*/
-	
 }

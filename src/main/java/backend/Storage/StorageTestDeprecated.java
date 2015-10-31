@@ -12,7 +12,7 @@ import main.java.backend.GeneralFunctions.GeneralFunctions;
 import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.Task;
 
-public class StorageTest {
+public class StorageTestDeprecated {
 
 	private static final String TEST_FILE_NAME = "test.txt";
 	private static final String TYPE_EVENT = "event";

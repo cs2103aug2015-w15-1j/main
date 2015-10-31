@@ -10,7 +10,7 @@ import main.java.backend.Storage.Task.Category;
 import main.java.backend.Storage.Task.SubTask;
 import main.java.backend.Storage.Task.Task;
 
-public class StorageStub {
+public class StorageDeprecated {
 
 	private static final String CATEGORY_DEFAULT = "default"; 
 	private static final String TYPE_TASK = "task";
@@ -25,7 +25,7 @@ public class StorageStub {
 	
 	private Data data;
 
-	public StorageStub(String fileName) { 
+	public StorageDeprecated(String fileName) { 
 		data = new Data(fileName);
 		allData = data.load();
 		System.out.println("Storage component initialised successfully");

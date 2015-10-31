@@ -1,5 +1,7 @@
 package main.java.backend.Storage.Task;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.TreeMap;
 
 public class Task implements Comparable<Task> {
@@ -274,15 +276,61 @@ public class Task implements Comparable<Task> {
 	}
 	
 	@Override
-	public int compareTo(Task o) {
+	public boolean equals(Object o) {
 		
-		if(this.taskId < o.getTaskId()) {
+		if (!(o instanceof Task)) {
+			return false;
+		}
+		
+		Task task = (Task) o;
+		return this.taskType.equals(task.getTaskType()) 
+				&& this.recurrenceType.equals(task.getRecurrenceType())
+				&& this.recurrenceNumber == task.getRecurrenceNumber()
+				&& this.taskId == task.getTaskId()
+				&& this.indexForPrinting == task.getIndex()
+				&& this.priority == task.getPriority()
+				&& this.isDone == task.getDone()
+				&& this.categoryName.equals(task.getCategoryName())
+				&& this.categoryColour.equals(task.getCategoryColour())
+				&& this.name.equals(task.getName())
+				&& this.description.equals(task.getDescription())
+				&& this.start.equals(task.getStart())
+				&& this.end.equals(task.getEnd())
+				&& this.reminder.equals(task.getReminder());
+	}
+	
+	@Override
+	public int compareTo(Task o) {
+		if(stringToMillisecond(getStart())
+				< stringToMillisecond(o.getStart())) {
 			return -1;
-		} else if(this.taskId > o.getTaskId()) {
+		} else if(stringToMillisecond(getStart()) 
+				> stringToMillisecond(o.getStart())) {
+			return 1;
+		} else if(stringToMillisecond(getEnd())
+				< stringToMillisecond(o.getEnd())) {
+			return -1;
+		} else if(stringToMillisecond(getEnd()) 
+				> stringToMillisecond(o.getEnd())) {
 			return 1;
 		} else {
 			return 0;
 		}
+	}
+	
+	private long stringToMillisecond(String dateTime) {
+		SimpleDateFormat formatterForDateTime = 
+				new SimpleDateFormat("EEE, dd MMM hh:mma");
+		try {
+			Date tempDateTime = formatterForDateTime.parse(dateTime);
+			long dateTimeMillisecond = tempDateTime.getTime();
+			return (dateTimeMillisecond);
+		} catch (java.text.ParseException e) {
+			
+		}
+
+		//Should not reach here
+		return -1;
 	}
 
 }

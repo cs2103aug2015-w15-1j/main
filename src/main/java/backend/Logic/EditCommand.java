@@ -2,6 +2,7 @@ package main.java.backend.Logic;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EmptyStackException;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
@@ -144,6 +145,20 @@ public class EditCommand extends Command {
 			return "Redo successfully";
 		} catch (EmptyStackException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
+	}
+	
+	private void setTaskId(ArrayList<Task> taskList) {
+		
+		ArrayList<Task> newTaskList = new ArrayList<Task> ();
+		Collections.sort(taskList);
+	
+		int newTaskId = 0;
+		
+		for(Task task : taskList) {
+			task.setTaskId(newTaskId);
+			newTaskList.add(task);
+			newTaskId++;
 		}
 	}
 
@@ -481,6 +496,7 @@ public class EditCommand extends Command {
 			task.setStart(start);
 			task.setEnd(end);
 			taskList.add(task);
+			setTaskId(taskList);
 			storageComponent.save(taskList);
 
 			return String.format(EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL, eventIndex,start,end);
@@ -503,6 +519,7 @@ public class EditCommand extends Command {
 			task.setEnd(end);
 			task.setTaskType(getTaskType(task));
 			taskList.add(task);
+			setTaskId(taskList);
 			storageComponent.save(taskList);
 			
 			return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskIndex, end);

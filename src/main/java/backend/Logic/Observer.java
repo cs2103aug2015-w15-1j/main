@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 
 import main.java.backend.Storage.Storage;
@@ -83,39 +84,6 @@ public class Observer {
         date.setTimeInMillis(currentDateMilliseconds);
 		
 		switch(task.getRecurrenceType()) {
-			case NONE:
-				break;
-			case DAY:
-				date.add(Calendar.DATE, factor);
-	            upcomingDate = getDate(date.getTimeInMillis());
-				break;
-			case WEEK:
-				factor *= 7;
-				date.add(Calendar.DATE, factor);
-	            upcomingDate = getDate(date.getTimeInMillis());
-				break;
-			case MONTH:
-				date.add(Calendar.MONTH, factor);
-	            upcomingDate = getDate(date.getTimeInMillis());
-				break;
-			case YEAR:
-				date.add(Calendar.YEAR, factor);
-	            upcomingDate = getDate(date.getTimeInMillis());
-				break;
-		}
-		return upcomingDate;
-	}
-	
-	public String getUpcomingDate(Task task, RecurrenceType recurring, String currentDate) {
-		
-		String upcomingDate = new String();
-		long currentDateMilliseconds = stringToMillisecond(currentDate);
-		System.out.println("HEY: " + getDate(currentDateMilliseconds));
-		int factor = task.getRecurrenceNumber();
-		Calendar date = Calendar.getInstance();
-        date.setTimeInMillis(currentDateMilliseconds);
-		
-		switch(recurring) {
 			case NONE:
 				break;
 			case DAY:
@@ -475,10 +443,12 @@ public class Observer {
 				data = getAllReminder();
 				break;
 		}
+		
+		Collections.sort(data);
 		return data;
 	}
 	
-	void retrieveAllData(){
+	private void retrieveAllData(){
 		getTasks = retrieveTaskData("upcomingToDo");
 		assert getTasks!=null;
 		getEvents = retrieveTaskData("upcomingEvents");
@@ -493,17 +463,17 @@ public class Observer {
 		retrieveCompletes();
 	}
 	
-	void retrieveCompletes(){
+	private void retrieveCompletes(){
 		getCompletedTasks = retrieveTaskData("completedToDo");
 		getCompletedEvents = retrieveTaskData("pastEvents");
 		getCompletedFloat= retrieveTaskData("completedFloats");
 	}
-	void retrieveTodays(){
+	private void retrieveTodays(){
 		getTodayTasks = retrieveTaskData("todayToDos");
 		getTodayEvents = retrieveTaskData("todayEvents");
 	}
 	
-	void updateIndex(){
+	void updateIndex() {
 		retrieveAllData();
 		int a = getTasks.size(), b = getEvents.size(),c = getOverdue.size(),
 				d = getFloat.size(), e = getCompletedTasks.size(), f = getCompletedEvents.size();
@@ -517,13 +487,13 @@ public class Observer {
 //		System.out.println("update Index a: "+a);
 	}
 	
-	void setIndex(ArrayList<Task> list, int taskIndex) {
-		for (int i=0;i<list.size();i++){ 
-			int taskId = list.get(i).getTaskId();
-			taskList = storage.load();
-			taskList.get(taskId).setIndex(++taskIndex);
-			storage.save(taskList);
+	private void setIndex(ArrayList<Task> list, int taskIndex) {
+		taskList = storage.load();
+		for (Task task : list) { 
+			task.setIndex(++taskIndex);
+			taskList.set(task.getTaskId(), task);	
 		}
+		storage.save(taskList);
 	}
 	
 }

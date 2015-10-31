@@ -9,6 +9,9 @@ import java.util.TimerTask;
 
 import org.json.JSONException;
 import org.json.simple.parser.ParseException;
+
+import com.sun.javafx.application.LauncherImpl;
+
 import java.util.logging.*;
 
 import javafx.application.Application;
@@ -63,6 +66,7 @@ public class GUI extends Application{
 	private final KeyCombination shiftUp = new KeyCodeCombination(KeyCode.UP, KeyCombination.SHIFT_DOWN);
 	private final KeyCombination shiftDown= new KeyCodeCombination(KeyCode.DOWN, KeyCombination.SHIFT_DOWN);
 	private static final Logger GUILOG= Logger.getLogger(GUI.class.getName());;
+	private static final int COUNT_LIMIT = 100000;
 	
 	private static final int SCENE_MAIN = 1;
 	private static final int SCENE_FOCUS = 2;
@@ -105,28 +109,29 @@ public class GUI extends Application{
 	private static TextArea detailField;
 	private static ListView<TextFlow> listFocus;
 
-	public static void main(String[] args){
-		try {
-			initGUI();
-		} catch (IOException | JSONException | ParseException e) {
-			e.printStackTrace();
-		}
-		launch(args);
-	//	Notification info = new Notification
-	}
+	public static void main(String[] args) {
+        LauncherImpl.launchApplication(GUI.class, GuiPreloader.class, args);
+    }
 
-	private static void initGUI() throws FileNotFoundException, IOException, JSONException, ParseException{
+	@Override
+    public void init() throws Exception, FileNotFoundException, IOException, JSONException, ParseException{
+
+        
 		controller = new GUIController();
 		help = new HelpView();
 		consoleText = new TextArea();
 		console = new Console(consoleText);
 		ps = new PrintStream(console, true);
 		recentCommands = new ArrayList<String>();
-		
+		for (int i = 0; i < COUNT_LIMIT; i++) {
+            double progress = (100 * i) / COUNT_LIMIT;
+            LauncherImpl.notifyPreloader(this, new GuiPreloader.ProgressNotification(progress));
+        }
 		redirectOutput(ps);
 		displayStringToScreen(MESSAGE_WELCOME);
 		displayStringToScreen(MESSAGE_COMMAND_HELP);
 		controller.retrieveAllData();
+		
 	}
 
 	private static void redirectOutput(PrintStream stream){
@@ -706,6 +711,7 @@ public class GUI extends Application{
 			currentPosition = controller.getFocusList().size()-1;  
 		}
 		changeFocusListDetails(currentList);
+		listFocus.scrollTo(currentPosition);
 
 	}
 
@@ -715,6 +721,7 @@ public class GUI extends Application{
 			currentPosition = 0;  
 		}
 		refreshingFocus(currentList);
+		listFocus.scrollTo(currentPosition);
 	}
 
 	private static void eventLeft() throws IOException, JSONException, ParseException{
@@ -724,15 +731,17 @@ public class GUI extends Application{
 			currentList=1;
 		}
 		refreshingFocus(currentList);
+		listFocus.scrollTo(currentPosition);
 	}
 
 	private static void eventRight() throws IOException, JSONException, ParseException{
 		currentList++;
 		currentPosition=0;
-		if(currentList>7){
-			currentList=7;
+		if(currentList>6){
+			currentList=6;
 		}
 		refreshingFocus(currentList);
+		listFocus.scrollTo(currentPosition);
 	}
 
 	private static void toggleCategory() throws IOException, JSONException, ParseException{

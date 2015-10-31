@@ -1,19 +1,14 @@
 package main.java.backend.Logic;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
-import java.util.TreeMap;
 
 import main.java.backend.Storage.Task.Task;
 
 public class LogicSorter {
 	
 	private static LogicSorter logicSorterObject;
-	private static final SimpleDateFormat formatterForDateTime = 
-			new SimpleDateFormat("EEE, dd MMM hh:mma");
 	
 	public LogicSorter() {
 		
@@ -65,11 +60,11 @@ public class LogicSorter {
 		Collections.sort(taskList, new Comparator<Task> () {
 			@Override
 			public int compare(Task left, Task right) {
-				if(stringToMillisecond(left.getStart())
-						< stringToMillisecond(right.getStart())) {
+				if(Constant.stringToMillisecond(left.getStart())
+						< Constant.stringToMillisecond(right.getStart())) {
 					return -1;
-				} else if(stringToMillisecond(left.getStart()) 
-						> stringToMillisecond(right.getStart())) {
+				} else if(Constant.stringToMillisecond(left.getStart()) 
+						> Constant.stringToMillisecond(right.getStart())) {
 					return 1;
 				} else {
 					return 0;
@@ -84,11 +79,11 @@ public class LogicSorter {
 		Collections.sort(taskList, new Comparator<Task> () {
 			@Override
 			public int compare(Task left, Task right) {
-				if(stringToMillisecond(left.getEnd())
-						< stringToMillisecond(right.getEnd())) {
+				if(Constant.stringToMillisecond(left.getEnd())
+						< Constant.stringToMillisecond(right.getEnd())) {
 					return -1;
-				} else if(stringToMillisecond(left.getEnd()) 
-						> stringToMillisecond(right.getEnd())) {
+				} else if(Constant.stringToMillisecond(left.getEnd()) 
+						> Constant.stringToMillisecond(right.getEnd())) {
 					return 1;
 				} else {
 					return 0;
@@ -110,26 +105,13 @@ public class LogicSorter {
 				sortedTaskList = sortPriority(taskList);
 				break;
 			case "sortS":
-				sortedTaskList =sortStart(taskList);
+				sortedTaskList = sortStart(taskList);
 				break;
 			case "sortD":
 				sortedTaskList = sortDeadline(taskList);
 				break;
 		}
 		return sortedTaskList;
-	}
-	
-	private long stringToMillisecond(String dateTime) {
-		try {
-			Date tempDateTime = formatterForDateTime.parse(dateTime);
-			long dateTimeMillisecond = tempDateTime.getTime();
-			return (dateTimeMillisecond);
-		} catch (java.text.ParseException e) {
-			e.printStackTrace();
-		}
-
-		//Should not reach here
-		return -1;
 	}
 
 }

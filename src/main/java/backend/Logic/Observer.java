@@ -17,8 +17,6 @@ public class Observer {
 	
 	private static final SimpleDateFormat standardFormat = 
 			new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
-	private static final SimpleDateFormat standardFormatNoMinute = 
-			new SimpleDateFormat("EEE, dd MMM yy, hha");
 	
 	private static final long DAY_IN_MILLISECOND = 86400000L;
 
@@ -59,15 +57,15 @@ public class Observer {
 
 			// Only reset date when todo/event is over
 			if(!task.getRecurrenceType().equals(RecurrenceType.NONE)
-					&& stringToMillisecond(replace(task.getEnd())) 
+					&& Constant.stringToMillisecond(task.getEnd()) 
 					<= getCurrentTime()) {
 				
 				//delete(command);
 				if(task.getTaskType().equals(TaskType.EVENT)) {
-					task.setStart(getUpcomingDate(task, replace(task.getStart())));
+					task.setStart(getUpcomingDate(task, task.getStart()));
 				}
 				if(!task.getTaskType().equals(TaskType.FLOATING)) {
-					task.setEnd(getUpcomingDate(task, replace(task.getEnd())));
+					task.setEnd(getUpcomingDate(task, task.getEnd()));
 				}
 				taskList.add(task);
 				storage.save(taskList);
@@ -78,7 +76,7 @@ public class Observer {
 	private String getUpcomingDate(Task task, String currentDate) {
 		
 		String upcomingDate = new String();
-		long currentDateMilliseconds = stringToMillisecond(currentDate);
+		long currentDateMilliseconds = Constant.stringToMillisecond(currentDate);
 		int factor = task.getRecurrenceNumber();
 		Calendar date = Calendar.getInstance();
         date.setTimeInMillis(currentDateMilliseconds);
@@ -112,33 +110,13 @@ public class Observer {
 		calendar.setTimeInMillis(milliSeconds);
 		return standardFormat.format(calendar.getTime());
 	}
-	
-	private long stringToMillisecond(String dateTime) {
-		
-		long dateTimeMillisecond = -1;
-		Date tempDateTime = new Date();
-		dateTime = replace(dateTime);
-		
-		try {
-			if(dateTime.contains(":")) {
-				tempDateTime = standardFormat.parse(dateTime);
-			} else {
-				tempDateTime = standardFormatNoMinute.parse(dateTime);
-			}
-			dateTimeMillisecond = tempDateTime.getTime();
-		} catch (java.text.ParseException e) {
-			//e.printStackTrace();
-		}
-
-		return dateTimeMillisecond;
-	}
 
 	private long getCurrentTime() {
 
 		long currentMilliseconds = System.currentTimeMillis();
 		Date resultdate = new Date(currentMilliseconds);
 
-		return stringToMillisecond(standardFormat.format(resultdate));
+		return Constant.stringToMillisecond(standardFormat.format(resultdate));
 	}
 	
 	private long getTodayStartTime() {
@@ -148,7 +126,7 @@ public class Observer {
 		Date resultDate = Date.from(midnight
 				.atZone(ZoneId.systemDefault()).toInstant());
 
-		return stringToMillisecond(
+		return Constant.stringToMillisecond(
 				standardFormat.format(resultDate));
 	}
 
@@ -162,10 +140,10 @@ public class Observer {
 		ArrayList<Task> upcomingTasks = new ArrayList<Task> ();
 
 		for(Task task : allTasks) {
-			if(taskType == TaskType.TODO && stringToMillisecond(replace(task.getEnd())) 
+			if(taskType == TaskType.TODO && Constant.stringToMillisecond(task.getEnd()) 
 					> getCurrentTime() && !task.getDone()) {
 				upcomingTasks.add(task);
-			} else if(taskType == TaskType.EVENT && stringToMillisecond(replace(task.getStart())) 
+			} else if(taskType == TaskType.EVENT && Constant.stringToMillisecond(task.getStart())
 					> getCurrentTime() && !task.getDone()) {
 				upcomingTasks.add(task);
 			}
@@ -186,22 +164,16 @@ public class Observer {
 		
 		return completedTasks;
 	}
-	
-	private String replace(String taskDate) {
-		taskDate = taskDate.replace("am", "AM");
-		taskDate = taskDate.replace("pm", "PM");
-		return taskDate;
-	}
 
 	private ArrayList<Task> getOverdue(ArrayList<Task> allTasks, TaskType taskType) {
 
 		ArrayList<Task> overdueTasks = new ArrayList<Task> ();
 
 		for(Task task : allTasks) {
-			if(taskType == TaskType.TODO && stringToMillisecond(replace(task.getEnd())) 
+			if(taskType == TaskType.TODO && Constant.stringToMillisecond(task.getEnd())
 					<= getCurrentTime() && !task.getDone()) {
 				overdueTasks.add(task);
-			} else if(taskType == TaskType.EVENT && stringToMillisecond(replace(task.getStart())) 
+			} else if(taskType == TaskType.EVENT && Constant.stringToMillisecond(task.getStart())
 					<= getCurrentTime() && !task.getDone()) {
 				overdueTasks.add(task);
 			}
@@ -248,9 +220,9 @@ public class Observer {
 		ArrayList<Task> todayToDos = new ArrayList<Task> ();
 
 		for(Task task : allToDos) {
-			if(stringToMillisecond(replace(task.getEnd())) 
+			if(Constant.stringToMillisecond(task.getEnd())
 					>= getTodayStartTime()
-					&& stringToMillisecond(replace(task.getEnd())) 
+					&& Constant.stringToMillisecond(task.getEnd())
 					< getTodayEndTime()) {
 				todayToDos.add(task);
 			}
@@ -265,9 +237,9 @@ public class Observer {
 		ArrayList<Task> todayEvents = new ArrayList<Task> ();
 
 		for(Task task : allEvents) {
-			if(stringToMillisecond(replace(task.getStart())) 
+			if(Constant.stringToMillisecond(task.getStart()) 
 					>= getTodayStartTime()
-					&& stringToMillisecond(replace(task.getStart())) 
+					&& Constant.stringToMillisecond(task.getStart()) 
 					< getTodayEndTime()) {
 				todayEvents.add(task);
 			}
@@ -375,8 +347,8 @@ public class Observer {
 		taskList.addAll(getEvents());
 		
 		for(Task task : taskList) {
-			if(!task.getDone() && stringToMillisecond(
-					replace(task.getReminder())) == getCurrentTime()) {
+			if(!task.getDone() && Constant.stringToMillisecond(
+					task.getReminder()) == getCurrentTime()) {
 				remindTaskList.add(task);
 			}
 		}

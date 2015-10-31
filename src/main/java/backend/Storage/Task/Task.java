@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TreeMap;
 
+import main.java.backend.Logic.Constant;
+
 public class Task implements Comparable<Task> {
 	
 	public enum TaskType {
@@ -301,36 +303,21 @@ public class Task implements Comparable<Task> {
 	
 	@Override
 	public int compareTo(Task o) {
-		if(stringToMillisecond(getStart())
-				< stringToMillisecond(o.getStart())) {
+		if(Constant.stringToMillisecond(getStart())
+				< Constant.stringToMillisecond(o.getStart())) {
 			return -1;
-		} else if(stringToMillisecond(getStart()) 
-				> stringToMillisecond(o.getStart())) {
+		} else if(Constant.stringToMillisecond(getStart()) 
+				> Constant.stringToMillisecond(o.getStart())) {
 			return 1;
-		} else if(stringToMillisecond(getEnd())
-				< stringToMillisecond(o.getEnd())) {
+		} else if(Constant.stringToMillisecond(getEnd())
+				< Constant.stringToMillisecond(o.getEnd())) {
 			return -1;
-		} else if(stringToMillisecond(getEnd()) 
-				> stringToMillisecond(o.getEnd())) {
+		} else if(Constant.stringToMillisecond(getEnd()) 
+				> Constant.stringToMillisecond(o.getEnd())) {
 			return 1;
 		} else {
 			return 0;
 		}
-	}
-	
-	private long stringToMillisecond(String dateTime) {
-		SimpleDateFormat formatterForDateTime = 
-				new SimpleDateFormat("EEE, dd MMM hh:mma");
-		try {
-			Date tempDateTime = formatterForDateTime.parse(dateTime);
-			long dateTimeMillisecond = tempDateTime.getTime();
-			return (dateTimeMillisecond);
-		} catch (java.text.ParseException e) {
-			
-		}
-
-		//Should not reach here
-		return -1;
 	}
 
 }

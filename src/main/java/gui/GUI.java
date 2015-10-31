@@ -59,14 +59,11 @@ public class GUI extends Application{
 	private static final String COMMAND_SHOW_FLOAT = "show float";
 	private static final String COMMAND_SEARCH = "search";
 	private static final String COMMAND_EXIT = "exit";
-	private static final double WIDTH_SHORT = 200.0;
-	private static final double WIDTH_LONG = 335.0;
 	private final KeyCombination undo = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
 	private final KeyCombination redo = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);
 	private final KeyCombination shiftUp = new KeyCodeCombination(KeyCode.UP, KeyCombination.SHIFT_DOWN);
 	private final KeyCombination shiftDown= new KeyCodeCombination(KeyCode.DOWN, KeyCombination.SHIFT_DOWN);
-	private static final Logger GUILOG= Logger.getLogger(GUI.class.getName());;
-	private static final int COUNT_LIMIT = 100000;
+	private static final int COUNT_LIMIT = 10000;
 	
 	private static final int SCENE_MAIN = 1;
 	private static final int SCENE_FOCUS = 2;
@@ -364,7 +361,6 @@ public class GUI extends Application{
 		detailField.setEditable(false);
 		detailField.setDisable(true);
 		detailField.setId("custom");
-		//detailField.getStyleClass().add("custom");
 		detailField.getStyleClass().add("txtarea");
 		detailField.getStyleClass().add("txtarea .scroll-pane");
 		detailField.getStyleClass().add("text-area .scroll-bar");

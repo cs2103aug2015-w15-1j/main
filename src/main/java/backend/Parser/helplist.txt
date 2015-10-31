@@ -1,17 +1,20 @@
 List of Command Keywords in TankTask:
+Adding Tasks
 
 add
 	Format: add [Task Name]
 		Example: add Feed the fish
-
-delete (Alternate form: del)
-	Format 1: del [Task Index]
-		Example: del 1
 		
-	Format 2: [Task Index] del
-		Example: 1 del
+Add ToDo
+	Format: add [Task Name] by [Deadline]
+		Example: add Feed the fish by today
+
+Add Event
+	Format: add [Task Name] from [Start] to [End]
+		Example: add Feed the fish from today 6pm to 6:15pm
 break
 List of Command Keywords in TankTask:
+Managing your Tasks
 
 done
 	Format 1: done [Task Index]
@@ -28,36 +31,82 @@ undone
 		Example: 1 undone
 break
 List of Command Keywords in TankTask:
+Managing your Tasks
 
+delete (Alternate form: del)
+	Format 1: del [Task Index]
+		Example: del 1
+		
+	Format 2: [Task Index] del
+		Example: 1 del
+		
 undo
 	Format: undo
 
 redo
 	Format: redo
 
+break
+List of Command Keywords in TankTask:
+Managing your Tasks 
+
 search
 	Format: search [Search Term(s)]
 		Example: search fish
+		
+show (Alternate form: showT, showE, showF, showO)
+	Format 1: show [Task Type (Todo/Event/Floating/Overdue)]
+		Example: show event
+		
+	Format 2: show[X]
+		Example: showE
+
+sort (Alternate form: sortD, sortN, sortP)
+	Format 1: sort [Field (Deadline/Name/Priority)]
+		Example: sort priority
+		
+	Format 2: sort[X]
+		Example: sortP
 break
 List of Command Keywords in TankTask:
+Managing your Tasks
+
+every
+	Format: every [Frequency (day/week/month/year)] [Date/Time]
+		Example: every day 3pm
+		Example: every week fri 11am
+		Example: every month 15th
+		Example: every year Apr 1
+
+reset
+	Format: [Task Index] reset [Field (all/dea/event/des/pri/rem/cat)]
+		Example: 1 reset all
+		Example: 1 reset des
+
+exit
+	Format: exit
+break
+List of Command Keywords in TankTask:
+Editing your Tasks
 
 rename
 	Format: [Task Index] rename [New Task Name]
 		Example: 1 rename Kill the fish
 
-deadline (Alternate form: by, dea)
+deadline (Alternate form: 'by', 'dea')
 	Format: [Task Index] by [Deadline]
 		Example: 1 by 20 Oct 3pm
 		Example: 1 by tmr
 		Example: 1 by next tues
 
-event (Alternate form: from)
+event (Alternate form: 'from')
 	Format: [Task Index] from [Start] to [End]
 		Example: 1 from 20 Oct 3pm
 		Example: 1 from 20 Oct 3pm to 5pm
 		Example: 1 from 20 Oct 3pm to 21 Oct 8am
 break
 List of Command Keywords in TankTask:
+Editing your Tasks
 
 description (Alternate form: des)
 	Format: [Task Index] des [Description]
@@ -77,48 +126,15 @@ category (Alternate form: cat)
 break
 List of Command Keywords in TankTask:
 
-show (Alternate form: showT, showE, showF, showO)
-	Format 1: show [Task Type (Todo/Event/Floating/Overdue)]
-		Example: show event
-		
-	Format 2: show[X]
-		Example: showE
-
-sort (Alternate form: sortD, sortN, sortP)
-	Format 1: sort [Field (Deadline/Name/Priority)]
-		Example: sort priority
-		
-	Format 2: sort[X]
-		Example: sortP
-break
-List of Command Keywords in TankTask:
-
-every
-	Format: every [Frequency (day/week/month/year)] [Date/Time]
-		Example: every day 3pm
-		Example: every week fri 11am
-		Example: every month 15th
-		Example: every year Apr 1
-
-reset
-	Format: [Task Index] reset [Field (all/dea/event/des/pri/rem/cat)]
-		Example: 1 reset all
-		Example: 1 reset des
-
-exit
-	Format: exit
-break
-List of Command Keywords in TankTask:
-
 One-shot Command Examples:
 
-Add ToDo
-	Format: add [Task Name] by [Deadline]
-		Example: add Feed the fish by today
+Add ToDo (with description and priority)
+	Format: add [Task Name] by [Deadline] des [Description] pri [Priority]
+		Example: add Feed the fish by today des slightly less than the usual amount pri 4
 
-Add Event
-	Format: add [Task Name] from [Start] to [End]
-		Example: add Feed the fish from today 6pm to 6:15pm
+Add Event (with reminder)
+	Format: add [Task Name] from [Start] to [End] rem [Reminder]
+		Example: add Feed the fish from today 6pm to 6:15pm rem 6pm today
 
 Set/Edit Information
 Format [Task Index] [command1] [command1's content] [command 2] [command2's content]...

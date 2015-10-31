@@ -33,6 +33,7 @@ public class HelpView {
 	GridPane pane;
 	VBox comp;
 	VBox comp2;
+	VBox content;
 	ListView<String> showList;
 	int currentView;
 	ArrayList<ArrayList<String>> fullList;
@@ -52,6 +53,7 @@ public class HelpView {
 		textList = command.getSplitNaming();
 		assert fullList!=null && !fullList.isEmpty();
 		assert textList!=null && !textList.isEmpty();
+		
 	}
 	
 	public void helpPopUp() {
@@ -60,27 +62,31 @@ public class HelpView {
 		pane = new GridPane();
 		comp = new VBox();
 		comp2 = new VBox();
+		content = new VBox();
 		HBox leftNavi = new HBox();
 		HBox rightNavi = new HBox();
 		leftNavi.setAlignment(Pos.TOP_LEFT);
 		rightNavi.setAlignment(Pos.TOP_RIGHT);
 		ColumnConstraints column1 = new ColumnConstraints();
-		column1.setPercentWidth(70);
+		column1.setPercentWidth(30);
 		ColumnConstraints column2 = new ColumnConstraints();
-		column2.setPercentWidth(30);
-
+		column2.setPercentWidth(70);
+		
 		pane.getColumnConstraints().addAll(column1, column2);
 		RowConstraints row1 = new RowConstraints();
 		row1.setPercentHeight(95);
 		pane.getRowConstraints().addAll(row1);
+		content.setPadding(new Insets(20,20,20,20));
 		comp.setPadding(new Insets(20,20,20,20));
 		comp2.setPadding(new Insets(20,20,20,20));
 		pop.setTitle("help");
 		
+		content();
 		hotKey(comp,comp2, pane);
 		leftSide(leftNavi);
 		rightSide(rightNavi);
 		
+		GridPane.setConstraints(content,0,0);
 		GridPane.setConstraints(comp,0,0);
 		GridPane.setConstraints(comp2,0,0);
 		GridPane.setConstraints(leftNavi,0,1);
@@ -100,6 +106,33 @@ public class HelpView {
 		
 		determineEvents(pop, stageScene);
 	}
+	
+	private void content(){
+		Text contentText = new Text();
+		contentText.setText("Help contents: \n");
+		contentText.getStyleClass().add("customHeading");
+		content.getChildren().add(contentText);
+		for (int i =1 ; i<textList.size()-1;i++){
+			Text newText = new Text();
+			newText.getStyleClass().add("custom");
+			Text titleText = new Text();
+			titleText.getStyleClass().add("customTitle");
+			if (i == 1){
+			titleText.setText("Adding Tasks: ");
+			content.getChildren().add(titleText);
+			}else if (i == 2){
+			titleText.setText("\nManaging your tasks: ");
+			content.getChildren().add(titleText);
+			}else if (i==6){
+			titleText.setText("\nEditing your tasks: ");
+			content.getChildren().add(titleText);
+			}
+			newText.setText("	"+i+". "+textList.get(i));
+			content.getChildren().add(newText);
+		}
+		pane.getChildren().add(content);
+	}
+	
 	private void leftSide(HBox leftNavi) {
 		Image image = new Image(GUI.class.getResourceAsStream("Resources/left.png"));
 		ImageView imageview = new ImageView();
@@ -125,19 +158,44 @@ public class HelpView {
 			public void handle(KeyEvent event) {
 				if (event.getCode().equals(KeyCode.F1)){
 					pop.close();
-				}
-				if (event.getCode().equals(KeyCode.RIGHT)){
+				} else if (event.getCode().equals(KeyCode.RIGHT)){
 					currentView++;
 					if (currentView>=fullList.size()){
 						currentView = fullList.size()-1;
 					}
 					changeContents();
-				}
-				if (event.getCode().equals(KeyCode.LEFT)){
+				} else if (event.getCode().equals(KeyCode.LEFT)){
 					currentView--;
-					if (currentView<-2){
-						currentView = -2;
+					if (currentView<-3){
+						currentView = -3;
 					}
+					changeContents();
+				} else if (event.getCode().equals(KeyCode.DIGIT0)){
+					currentView = -3;
+					changeContents();
+				} else if (event.getCode().equals(KeyCode.DIGIT1)){
+					currentView = 0;
+					changeContents();
+				} else if (event.getCode().equals(KeyCode.DIGIT2)){
+					currentView = 1;
+					changeContents();
+				} else if (event.getCode().equals(KeyCode.DIGIT3)){
+					currentView = 2;
+					changeContents();
+				} else if (event.getCode().equals(KeyCode.DIGIT4)){
+					currentView = 3;
+					changeContents();
+				} else if (event.getCode().equals(KeyCode.DIGIT5)){
+					currentView = 4;
+					changeContents();
+				} else if (event.getCode().equals(KeyCode.DIGIT6)){
+					currentView = 5;
+					changeContents();
+				} else if (event.getCode().equals(KeyCode.DIGIT7)){
+					currentView = 6;
+					changeContents();
+				} else if (event.getCode().equals(KeyCode.DIGIT8)){
+					currentView = 7;
 					changeContents();
 				}
 
@@ -147,10 +205,15 @@ public class HelpView {
 	}
 	private void changeContents() {
 		
-		pane.getChildren().removeAll(showList,comp,comp2);
-		if (currentView==-2){
-			pane.getChildren().addAll(comp);
+		pane.getChildren().removeAll(content,showList,comp,comp2);
+		if (currentView==-3){
+			pane.getChildren().add(content);
 			leftText.setText("");
+			rightText.setText("1-key shortcuts");
+			
+		} else if (currentView==-2){
+			pane.getChildren().addAll(comp);
+			leftText.setText("Content Page");
 			rightText.setText("2-keys shortcuts");
 		}else if(currentView==-1){
 			pane.getChildren().addAll(comp2);
@@ -208,8 +271,5 @@ public class HelpView {
 			}
 			
 		}
-		
-		pane.getChildren().addAll(comp);
 	}
 }
-

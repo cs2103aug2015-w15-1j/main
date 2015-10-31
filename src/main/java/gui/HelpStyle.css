@@ -31,3 +31,18 @@
 .list-cell:empty {
 	-fx-background-color:transparent;
 }
+.customHeading{
+	-fx-font-size: 20px;
+	-fx-font-weight:bold;
+	-fx-font-family: "arial";
+}
+
+.customTitle{
+	-fx-font-size: 18px;
+	-fx-font-weight:bold;
+	-fx-font-family: "arial";
+}
+.custom{
+	-fx-font-size: 14px;
+	-fx-font-family: "arial";
+}

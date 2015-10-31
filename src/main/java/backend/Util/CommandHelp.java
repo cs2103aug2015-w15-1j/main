@@ -25,57 +25,64 @@ public class CommandHelp {
 	}
 	
 	private void split(){
-		ArrayList<String> addDelete = new ArrayList<String>();
+		ArrayList<String> add = new ArrayList<String>();
 		ArrayList<String> doneUndone= new ArrayList<String>();
 		ArrayList<String> undoSearch= new ArrayList<String>();
-		ArrayList<String> renameEvent= new ArrayList<String>();
-		ArrayList<String> desCate= new ArrayList<String>();
 		ArrayList<String> showSort= new ArrayList<String>();
 		ArrayList<String> everyExit= new ArrayList<String>();
+		ArrayList<String> renameEvent= new ArrayList<String>();
+		ArrayList<String> desCate= new ArrayList<String>();
 		ArrayList<String> oneShot= new ArrayList<String>();
 		int index =0;
 			while(!list.get(index).equals("break")){
-			addDelete.add(list.get(index));
+			add.add(list.get(index));
 			index++;
 			}
-			fullList.add(addDelete);
+			fullList.add(add);
 			index++;
+			
 			while(!list.get(index).equals("break")){
 				doneUndone.add(list.get(index));
 				index++;
 			}
 			fullList.add(doneUndone);
 			index++;
+			
 			while(!list.get(index).equals("break")){
 				undoSearch.add(list.get(index));
 				index++;
 			}
 			fullList.add(undoSearch);
 			index++;
-			while(!list.get(index).equals("break")){
-				renameEvent.add(list.get(index));
-				index++;
-			}
-			fullList.add(renameEvent);
-			index++;
-			while(!list.get(index).equals("break")){
-				desCate.add(list.get(index));
-				index++;
-			}
-			fullList.add(desCate);
-			index++;
+			
 			while(!list.get(index).equals("break")){
 				showSort.add(list.get(index));
 				index++;
 			}
 			fullList.add(showSort);
 			index++;
+			
 			while(!list.get(index).equals("break")){
 				everyExit.add(list.get(index));
 				index++;
 			}
 			fullList.add(everyExit);
 			index++;
+			
+			while(!list.get(index).equals("break")){
+				renameEvent.add(list.get(index));
+				index++;
+			}
+			fullList.add(renameEvent);
+			index++;
+			
+			while(!list.get(index).equals("break")){
+				desCate.add(list.get(index));
+				index++;
+			}
+			fullList.add(desCate);
+			index++;
+			
 			while(!list.get(index).equals("break")){
 				oneShot.add(list.get(index));
 				index++;
@@ -86,13 +93,13 @@ public class CommandHelp {
 	private void listNames(){
 		names = new ArrayList<String>();
 		names.add("");
-		names.add("adding/deleteing");
-		names.add("done/undone");
-		names.add("Undo/Redo/Search");
-		names.add("Rename task/ Edit deadline & event dates");
+		names.add("Adding tasks");
+		names.add("Done, undone");
+		names.add("Delete, Undo, Redo");
+		names.add("Search, Show, Sort");
+		names.add("Recurring, Reset, exit");
+		names.add("Rename task, Edit deadline & event dates");
 		names.add("Edit description & priority & reminders & category");
-		names.add("Show/ Sort");
-		names.add("Recurring/ Reset/ exit");
 		names.add("Advance features: One Shot");
 		names.add("");
 	}

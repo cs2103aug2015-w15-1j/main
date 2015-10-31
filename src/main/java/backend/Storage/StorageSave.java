@@ -4,7 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.TreeMap;
+import java.util.ArrayList;
 
 import main.java.backend.Storage.Task.Task;
 
@@ -57,7 +57,7 @@ public class StorageSave extends StorageOperation {
 		textFile.renameTo(newFile);
 	}
 	
-	public TreeMap<Integer, Task> execute(TreeMap<Integer, Task> allData) {
+	public ArrayList<Task> execute(ArrayList<Task> allData) {
 		
 		try {
 			initializeWriter();

@@ -1,9 +1,9 @@
 package main.java.backend.Logic;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.Stack;
-import java.util.TreeMap;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -12,8 +12,8 @@ import main.java.backend.Storage.Task.Task;
 
 public class History {
 	
-	Stack<TreeMap<Integer, Task>> stateUndo = new Stack<TreeMap<Integer, Task>>();
-	Stack<TreeMap<Integer, Task>> stateRedo = new Stack<TreeMap<Integer, Task>>();
+	Stack<ArrayList<Task>> stateUndo = new Stack<ArrayList<Task>>();
+	Stack<ArrayList<Task>> stateRedo = new Stack<ArrayList<Task>>();
 	
 	private static Logger historyLogger = Logger.getGlobal();	
 	private static History historyObject;
@@ -46,7 +46,7 @@ public class History {
 		}
 	}
 
-	public void push(TreeMap<Integer, Task> currentState) {
+	public void push(ArrayList<Task> currentState) {
 		
 		historyLogger.info("Received current state "+ currentState);
 		stateUndo.push(currentState);
@@ -54,7 +54,7 @@ public class History {
 		historyLogger.info("History stack size after push: "+stateUndo.size());
 	}
 
-	public TreeMap<Integer, Task> undo() {
+	public ArrayList<Task> undo() {
 		
 		if (stateUndo.isEmpty() || stateUndo.peek() == null) {
 			return null;
@@ -73,7 +73,7 @@ public class History {
 		return stateUndo.peek();
 	}
 	
-	public TreeMap<Integer, Task> redo() {
+	public ArrayList<Task> redo() {
 		
 		if (stateRedo.isEmpty() || stateRedo.peek() == null) {
 			return null;

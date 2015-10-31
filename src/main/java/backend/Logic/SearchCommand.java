@@ -10,7 +10,7 @@ public class SearchCommand extends Command {
 	
 	private ArrayList<Task> searchResults;
 	private Storage storageComponent;
-	private static TreeMap<Integer, Task> taskList;
+	private static ArrayList<Task> taskList;
 
 	public SearchCommand(Type typeInput, Storage storage) {
 		super(typeInput);
@@ -28,8 +28,7 @@ public class SearchCommand extends Command {
 		String[] tokenize = this.getKeywords().toLowerCase().split(" ");
 		int wordSize = tokenize.length;
 			
-		for(int taskId : taskList.keySet()) {
-			Task task = taskList.get(taskId);
+		for(Task task : taskList) {
 			int passed = 0;
 			for(String word : tokenize)
 				if(task.getName().toLowerCase().contains(word)

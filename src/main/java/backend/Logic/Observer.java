@@ -6,7 +6,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TreeMap;
 
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
@@ -25,7 +24,7 @@ public class Observer {
 	private static Observer logicGetterObject;
 	private Storage storage;
 	
-	private TreeMap<Integer, Task> taskList;
+	private ArrayList<Task> taskList;
 	private ArrayList<Task> getTasks;
 	private ArrayList<Task> getEvents;
 	private ArrayList<Task> getOverdue;
@@ -53,10 +52,9 @@ public class Observer {
 	
 	private void resetRecurring() {
 
-		TreeMap<Integer, Task> taskList = storage.load();
+		ArrayList<Task> taskList = storage.load();
 
-		for(Integer taskId : taskList.keySet()) {
-			Task task = taskList.get(taskId);
+		for(Task task : taskList) {
 
 			// Only reset date when todo/event is over
 			if(!task.getRecurrenceType().equals(RecurrenceType.NONE)
@@ -70,7 +68,7 @@ public class Observer {
 				if(!task.getTaskType().equals(TaskType.FLOATING)) {
 					task.setEnd(getUpcomingDate(task, replace(task.getEnd())));
 				}
-				taskList.put(taskId, task);
+				taskList.add(task);
 				storage.save(taskList);
 			}
 		}
@@ -267,9 +265,7 @@ public class Observer {
 		ArrayList<Task> tasks = new ArrayList<Task> ();
 		taskList = storage.load();
 		
-		for(int taskId : taskList.keySet()) {
-			
-			Task task = taskList.get(taskId);
+		for(Task task : taskList) {
 			if(task.getTaskType().equals(taskType)) {
 				tasks.add(task);
 			}
@@ -348,9 +344,7 @@ public class Observer {
 		ArrayList<Task> tasks = new ArrayList<Task> ();
 		taskList = storage.load();
 		
-		for(int taskId : taskList.keySet()) {
-			
-			Task task = taskList.get(taskId);
+		for(Task task : taskList) {
 			if(task.getTaskType().equals(TaskType.FLOATING) && !task.getDone()) {
 				tasks.add(task);
 			}

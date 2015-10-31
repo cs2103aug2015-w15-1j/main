@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 import main.java.backend.Storage.Task.Task;
@@ -100,9 +101,9 @@ public class StorageLoad extends StorageOperation {
 		return plainText;
 	}
 
-	public TreeMap<Integer, Task> execute(TreeMap<Integer, Task> nullData) {
+	public ArrayList<Task> execute(ArrayList<Task> nullData) {
 		
-		TreeMap<Integer, Task> allData = new TreeMap<Integer, Task> ();
+		ArrayList<Task> allData = new ArrayList<Task> ();
 		
 		try {
 			if(!isFileEmpty()) {

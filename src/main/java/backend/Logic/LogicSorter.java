@@ -98,37 +98,25 @@ public class LogicSorter {
 		return taskList;
 	}
 	
-	public TreeMap<Integer, Task> sort(String field, TreeMap<Integer, Task> taskList) {
+	public ArrayList<Task> sort(String field, ArrayList<Task> taskList) {
 		
-		TreeMap<Integer, Task> sortedTaskList = new TreeMap<Integer, Task> ();
+		ArrayList<Task> sortedTaskList = new ArrayList<Task> ();
 		
 		switch (field) {
 			case "sortN":
-				sortedTaskList = arrayListToTreeMap(sortName(new ArrayList<Task> (taskList.values())));
+				sortedTaskList = sortName(taskList);
 				break;
 			case "sortP":
-				sortedTaskList = arrayListToTreeMap(sortPriority(new ArrayList<Task> (taskList.values())));
+				sortedTaskList = sortPriority(taskList);
 				break;
 			case "sortS":
-				sortedTaskList = arrayListToTreeMap(sortStart(new ArrayList<Task> (taskList.values())));
+				sortedTaskList =sortStart(taskList);
 				break;
 			case "sortD":
-				sortedTaskList = arrayListToTreeMap(sortDeadline(new ArrayList<Task> (taskList.values())));
+				sortedTaskList = sortDeadline(taskList);
 				break;
 		}
 		return sortedTaskList;
-	}
-	
-	private TreeMap<Integer, Task> arrayListToTreeMap(ArrayList<Task> taskList) {
-		
-		TreeMap<Integer, Task> allData = new TreeMap<Integer, Task> ();
-		int index = 0;
-		
-		for(Task task : taskList) {
-			allData.put(index++, task);
-		}
-		
-		return allData;
 	}
 	
 	private long stringToMillisecond(String dateTime) {

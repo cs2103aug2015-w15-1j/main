@@ -25,7 +25,7 @@ public class LogicFacade {
 	private static LogicCommandHandler logicCommandHandler;
 	private static Stack<Command> historyStack;
 	private static Stack<Command> futureStack;
-	TreeMap<Integer, Task> currentState;
+	private ArrayList<Task> currentState;
 	private static ArrayList<Task> searchResults = new ArrayList<Task>();
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
 	private static final String DEFAULT_FILENAME = "default.txt";

@@ -1,7 +1,7 @@
 package main.java.backend.Storage;
 
 import java.io.IOException;
-import java.util.TreeMap;
+import java.util.ArrayList;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -16,7 +16,7 @@ public class StorageFormat {
 
 	}
 
-	public String serialize(TreeMap<Integer, Task> allData) throws StorageException {
+	public String serialize(ArrayList<Task> allData) throws StorageException {
 		
 		String plaintext = new String();
 		try {
@@ -30,15 +30,15 @@ public class StorageFormat {
 		return plaintext;
 	}
 
-	public TreeMap<Integer, Task> deserialize(String plaintext) throws StorageException {
+	public ArrayList<Task> deserialize(String plaintext) throws StorageException {
 
-		TreeMap<Integer, Task> allData = new TreeMap<Integer, Task>();
+		ArrayList<Task> allData = new ArrayList<Task>();
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 		try {
 			allData = mapper.readValue(plaintext, 
-					new TypeReference<TreeMap<Integer, Task>>() {});
+					new TypeReference<ArrayList<Task>>() {});
 		} catch (IOException e) {
 			throw new StorageException();
 		}

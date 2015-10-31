@@ -1,8 +1,8 @@
 package main.java.backend.Logic;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.EmptyStackException;
-import java.util.TreeMap;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -35,8 +35,8 @@ public class EditCommand extends Command {
 	private static Logger logicEditorLogger = Logger.getGlobal();	
 	private FileHandler logHandler;
 	
-	private TreeMap<Integer, Task> taskList;
-	private TreeMap<Integer, Task> currentState;
+	private ArrayList<Task> taskList;
+	private ArrayList<Task> currentState;
 
 	private Storage storageComponent;
 	private History historySubComponent;
@@ -127,7 +127,7 @@ public class EditCommand extends Command {
 
 	public String undo() {
 		try {
-			TreeMap<Integer, Task> historyState = historySubComponent.undo();
+			ArrayList<Task> historyState = historySubComponent.undo();
 //			System.out.println("Future state: "+futureState);
 //			System.out.println("Current state: "+currentState);
 			storageComponent.save(historyState);
@@ -139,7 +139,7 @@ public class EditCommand extends Command {
 	
 	public String redo() {
 		try {
-			TreeMap<Integer, Task> futureState = historySubComponent.redo();
+			ArrayList<Task> futureState = historySubComponent.redo();
 			storageComponent.save(futureState);
 			return "Redo successfully";
 		} catch (EmptyStackException e) {
@@ -289,8 +289,7 @@ public class EditCommand extends Command {
 	
 	private int getTaskId(int taskIndex) {
 		
-		for(Integer taskId : taskList.keySet()) {
-			Task task = taskList.get(taskId);
+		for(Task task : taskList) {
 			
 			if(task.getIndex() == taskIndex) {
 				return task.getTaskId();
@@ -303,17 +302,13 @@ public class EditCommand extends Command {
 
 	private String delete(Command commandObject) {
 		try{
-			taskList = storageComponent.load();
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			int taskId = getTaskId(taskIndex);
 
-			if(taskList.containsKey(taskId)) {
-				taskList.remove(taskId);
-			} else {
-				return EXECUTION_COMMAND_UNSUCCESSFUL;
-			}
-
+			taskList = storageComponent.load();
+			taskList.remove(taskId);
 			storageComponent.save(taskList);
+			
 			return String.format(EXECUTION_DELETE_SUCCESSFUL, taskIndex);
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
@@ -485,7 +480,7 @@ public class EditCommand extends Command {
 			task.setTaskType(Task.TaskType.EVENT);
 			task.setStart(start);
 			task.setEnd(end);
-			taskList.put(taskId, task);
+			taskList.add(task);
 			storageComponent.save(taskList);
 
 			return String.format(EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL, eventIndex,start,end);
@@ -507,7 +502,7 @@ public class EditCommand extends Command {
 			delete(command);
 			task.setEnd(end);
 			task.setTaskType(getTaskType(task));
-			taskList.put(taskId, task);
+			taskList.add(task);
 			storageComponent.save(taskList);
 			
 			return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskIndex, end);
@@ -528,7 +523,7 @@ public class EditCommand extends Command {
 			command.setTaskName(Integer.toString(taskIndex));
 			delete(command);
 			task.setRecurrenceNumber(recurrenceNumber);
-			taskList.put(taskId, task);
+			taskList.add(task);
 			storageComponent.save(taskList);
 			
 			return String.format(EXECUTION_SET_RECURRINGNUMBER_SUCCESSFUL, taskIndex, recurrenceNumber);
@@ -549,7 +544,7 @@ public class EditCommand extends Command {
 			command.setTaskName(Integer.toString(taskIndex));
 			delete(command);
 			task.setRecurrenceType(getRecurrenceType(recurrenceType));
-			taskList.put(taskId, task);
+			taskList.add(task);
 			storageComponent.save(taskList);
 			
 			return String.format(EXECUTION_SET_RECURRINGTYPE_SUCCESSFUL, taskIndex, recurrenceType);

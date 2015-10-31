@@ -1,6 +1,6 @@
 package main.java.backend.Storage;
 
-import java.util.TreeMap;
+import java.util.ArrayList;
 
 import main.java.backend.Storage.Task.Task;
 
@@ -21,11 +21,11 @@ public class StorageFacade implements Storage {
 		save = new StorageSave(filePath);
 	}
 	
-	public TreeMap<Integer, Task> load() {
+	public ArrayList<Task> load() {
 		return load.execute(null);
 	}
 	
-	public void save(TreeMap<Integer, Task> allData) {
+	public void save(ArrayList<Task> allData) {
 		save.execute(allData);
 	}
 	

@@ -1,7 +1,7 @@
 package main.java.backend.Logic;
 
+import java.util.ArrayList;
 import java.util.EmptyStackException;
-import java.util.TreeMap;
 
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
@@ -16,8 +16,8 @@ public class AddCommand extends Command {
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
 	private static final String CATEGORY_DEFAULT = "default";
 	
-	private TreeMap<Integer, Task> taskList;
-	private TreeMap<Integer, Task> currentState;
+	private ArrayList<Task> taskList;
+	private ArrayList<Task> currentState;
 
 	private Storage storageComponent;
 	private History historySubComponent;
@@ -59,7 +59,7 @@ public class AddCommand extends Command {
 	
 	public String undo() {
 		try {
-			TreeMap<Integer, Task> historyState = historySubComponent.undo();
+			ArrayList<Task> historyState = historySubComponent.undo();
 //			System.out.println("Future state: "+futureState);
 //			System.out.println("Current state: "+currentState);
 			storageComponent.save(historyState);
@@ -71,7 +71,7 @@ public class AddCommand extends Command {
 	
 	public String redo() {
 		try {
-			TreeMap<Integer, Task> futureState = historySubComponent.redo();
+			ArrayList<Task> futureState = historySubComponent.redo();
 			storageComponent.save(futureState);
 			return "Redo successfully";
 		} catch (EmptyStackException e) {
@@ -79,16 +79,15 @@ public class AddCommand extends Command {
 		}
 	}
 	
-	private TreeMap<Integer, Task> generateTaskId() {
+	private ArrayList<Task> generateTaskId() {
 		
-		TreeMap<Integer, Task> taskList = storageComponent.load();
-		TreeMap<Integer, Task> newTaskList = new TreeMap<Integer, Task> ();
+		ArrayList<Task> taskList = storageComponent.load();
+		ArrayList<Task> newTaskList = new ArrayList<Task> ();
 		int newTaskId = 0;
 		
-		for(Integer taskId : taskList.keySet()) {
-			Task task = taskList.get(taskId);
+		for(Task task : taskList) {
 			task.setTaskId(newTaskId);
-			newTaskList.put(newTaskId, task);
+			newTaskList.add(task);
 			newTaskId++;
 		}
 		
@@ -165,7 +164,7 @@ public class AddCommand extends Command {
 		if(execution.equals(EXECUTION_COMMAND_SUCCESSFUL)) {
 			taskList = generateTaskId();
 			newTask.setTaskId(taskList.size());
-			taskList.put(taskList.size(), newTask);
+			taskList.add(newTask);
 			storageComponent.save(taskList);
 		}
 		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, newTask.getName());

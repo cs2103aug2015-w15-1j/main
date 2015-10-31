@@ -17,6 +17,7 @@ public class Observer {
 	
 	private static final SimpleDateFormat standardFormat = 
 			new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
+	private static final String RESET = "";
 	
 	private static final long DAY_IN_MILLISECOND = 86400000L;
 
@@ -77,7 +78,7 @@ public class Observer {
 		
 		String upcomingDate = new String();
 		long currentDateMilliseconds = Constant.stringToMillisecond(currentDate);
-		int factor = task.getRecurrenceNumber();
+		int factor = task.getRecurrenceFrequency();
 		Calendar date = Calendar.getInstance();
         date.setTimeInMillis(currentDateMilliseconds);
 		
@@ -342,17 +343,21 @@ public class Observer {
 	private ArrayList<Task> getAllReminder() {
 		
 		ArrayList<Task> remindTaskList = new ArrayList<Task> ();
+		ArrayList<Task> allData = storage.load();
 		ArrayList<Task> taskList = getFloatingTasks();
 		taskList.addAll(getToDos());
 		taskList.addAll(getEvents());
 		
 		for(Task task : taskList) {
-			if(!task.getDone() && Constant.stringToMillisecond(
-					task.getReminder()) == getCurrentTime()) {
+			long reminder = Constant.stringToMillisecond(task.getReminder());
+			if(!task.getDone() && reminder != -1 && reminder <= getCurrentTime()) {
 				remindTaskList.add(task);
+				task.setReminder(RESET);
+				allData.set(task.getTaskId(), task);
 			}
 		}
 	
+		storage.save(allData);
 		return remindTaskList;
 	}
 

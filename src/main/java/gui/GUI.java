@@ -145,6 +145,7 @@ public class GUI extends Application{
 
 		primaryStage.setScene(mainScene);
 		primaryStage.show();
+		
 		determineEvents();
 		reminders();
 		
@@ -193,7 +194,7 @@ public class GUI extends Application{
 		setUpGrid(); //general info
 		initGrid(); //setting up individual sizing
 		setUpGridContents();//setting up contents;
-		mainScene = new Scene(gridPane);
+		mainScene = new Scene(gridPane,1000,600);
 		mainScene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 	}
 
@@ -453,17 +454,13 @@ public class GUI extends Application{
 
 		if (headNum == NUM_OVERDUE){
 			focusHeading.setText(LIST_OVERDUE);
-		}
-		else if (headNum == NUM_TASKS){
+		} else if (headNum == NUM_TASKS){
 			focusHeading.setText(LIST_TASKS);
-		}
-		else if (headNum == NUM_EVENTS){
+		} else if (headNum == NUM_EVENTS){
 			focusHeading.setText(LIST_EVENTS);
-		}
-		else if (headNum == NUM_FLOAT){
+		} else if (headNum == NUM_FLOAT){
 			focusHeading.setText(LIST_FLOATING);
-		}
-		else if (headNum == NUM_TODAY_TASKS_EVENTS){
+		} else if (headNum == NUM_TODAY_TASKS_EVENTS){
 			focusHeading.setText(LIST_TODAY);
 		} else if (headNum == NUM_SEARCH){
 			focusHeading.setText(LIST_SEARCH);
@@ -484,6 +481,8 @@ public class GUI extends Application{
 			@Override
 			public void handle(KeyEvent ke)
 			{	
+				//System.out.println(ke.getCode().toString());
+				controller.retrieveAllData();
 				if (ke.getCode().equals(KeyCode.ENTER))
 				{
 					userInputCommands();	
@@ -643,51 +642,54 @@ public class GUI extends Application{
 	private static void userInputCommands(){
 		if (!userInput.getText().isEmpty()){
 			userCommands = userInput.getText();
-			recentCommands.add(userCommands);
-			commandIndex = recentCommands.size()-1;
-			userInput.clear();
-			System.out.println("Command: "+ userCommands);
-			String display = controller.executeCommand(userCommands);
-			if (display.equals("change")){
-				changeScene();
-			}
-			else if(display.equals(COMMAND_SHOW_OVERDUE)||display.equals("showO")){
-				currentPosition = 0;
-				currentList = NUM_OVERDUE;
-				setUpFocus();
-				refreshingFocus(currentList);
-				currentScene = SCENE_FOCUS;
-			}
-			else if(display.equals(COMMAND_SHOW_TASKS)||display.equals("showT")){
-				currentPosition = 0;
-				currentList = NUM_TASKS;
-				setUpFocus();
-				refreshingFocus(currentList);
-				currentScene = SCENE_FOCUS;
-			}else if(display.equals(COMMAND_SHOW_EVENTS)||display.equals("showE")){
-				currentPosition = 0;
-				currentList = NUM_EVENTS;
-				setUpFocus();
-				refreshingFocus(currentList);
-				currentScene = SCENE_FOCUS;
-			}else if(display.equals(COMMAND_SHOW_FLOAT)||display.equals("showF")){
-				currentPosition = 0;
-				currentList = NUM_FLOAT;
-				setUpFocus();
-				refreshingFocus(currentList);
-				currentScene = SCENE_FOCUS;
-			} else if(display.equals(COMMAND_SEARCH)){
-				currentPosition = 0;
-				currentList = NUM_SEARCH;
-				setUpFocus();
-				refreshingFocus(currentList);
-				currentScene = SCENE_FOCUS;
-			} else if(display.equals(COMMAND_EXIT)){
-				exit();
-			} else {
-				refresh();
-				displayStringToScreen(display);
+			userCommands = userCommands.trim();
+			if (userCommands.length()!=0){
+				recentCommands.add(userCommands);
+				commandIndex = recentCommands.size()-1;
+				userInput.clear();
+				System.out.println("Command: "+ userCommands);
+				String display = controller.executeCommand(userCommands);
+				if (display.equals("change")){
+					changeScene();
+				}
+				else if(display.equals(COMMAND_SHOW_OVERDUE)||display.equals("showO")){
+					currentPosition = 0;
+					currentList = NUM_OVERDUE;
+					setUpFocus();
+					refreshingFocus(currentList);
+					currentScene = SCENE_FOCUS;
+				}
+				else if(display.equals(COMMAND_SHOW_TASKS)||display.equals("showT")){
+					currentPosition = 0;
+					currentList = NUM_TASKS;
+					setUpFocus();
+					refreshingFocus(currentList);
+					currentScene = SCENE_FOCUS;
+				}else if(display.equals(COMMAND_SHOW_EVENTS)||display.equals("showE")){
+					currentPosition = 0;
+					currentList = NUM_EVENTS;
+					setUpFocus();
+					refreshingFocus(currentList);
+					currentScene = SCENE_FOCUS;
+				}else if(display.equals(COMMAND_SHOW_FLOAT)||display.equals("showF")){
+					currentPosition = 0;
+					currentList = NUM_FLOAT;
+					setUpFocus();
+					refreshingFocus(currentList);
+					currentScene = SCENE_FOCUS;
+				} else if(display.equals(COMMAND_SEARCH)){
+					currentPosition = 0;
+					currentList = NUM_SEARCH;
+					setUpFocus();
+					refreshingFocus(currentList);
+					currentScene = SCENE_FOCUS;
+				} else if(display.equals(COMMAND_EXIT)){
+					exit();
+				} else {
+					refresh();
+					displayStringToScreen(display);
 
+				}
 			}
 		}
 	}

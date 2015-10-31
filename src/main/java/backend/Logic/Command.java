@@ -15,7 +15,7 @@ public class Command {
 	private String commandField = "";
 	private String taskName = "";
 	private String recurrenceType = "";
-	private String recurrenceNumber = "";
+	private String recurrenceFrequency = "";
 	private String description = "";
 	private String priority = "";
 	private String reminder = ""; 
@@ -57,8 +57,8 @@ public class Command {
 		this.recurrenceType = recurrenceType;
 	}
 
-	public void setRecurrenceNumber(String recurrenceNumber) {
-		this.recurrenceNumber = recurrenceNumber;
+	public void setRecurrenceFrequency(String recurrenceFrequency) {
+		this.recurrenceFrequency = recurrenceFrequency;
 	}
 	
 	public void setDescription(String descriptionInput) {
@@ -129,8 +129,8 @@ public class Command {
 		return this.recurrenceType;
 	}
 
-	public String getRecurrenceNumber() {
-		return this.recurrenceNumber;
+	public String getRecurrenceFrequency() {
+		return this.recurrenceFrequency;
 	}
 	
 	public String getDescription() {

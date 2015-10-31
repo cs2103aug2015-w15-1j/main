@@ -143,7 +143,7 @@ public class AddCommand extends Command {
 	private Task getTask(TaskType taskType, Command command) {
 		
 		RecurrenceType recurrenceType = getRecurrence(command.getRecurrenceType());
-		int recurrenceNumber = stringToInteger(command.getRecurrenceNumber());
+		int recurrenceNumber = stringToInteger(command.getRecurrenceFrequency());
 		int priority = stringToInteger(command.getPriority());
 		String categoryName = getCategoryName(command.getCategory());
 		String taskName = command.getTaskName();

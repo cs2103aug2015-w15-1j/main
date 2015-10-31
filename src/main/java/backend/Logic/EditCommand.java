@@ -110,7 +110,7 @@ public class EditCommand extends Command {
 				feedbackString = setDeadline(this);
 				break;
 			case ("recurringNum") :
-				feedbackString = setRecurringNumber(this);
+				feedbackString = setRecurringFrequency(this);
 				break;	
 			case ("recurringType") :
 				feedbackString = setRecurringType(this);
@@ -528,22 +528,22 @@ public class EditCommand extends Command {
 		}
 	}
 	
-	private String setRecurringNumber(Command commandObject) {
+	private String setRecurringFrequency(Command commandObject) {
 		try {
 			taskList = storageComponent.load();
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
-			int recurrenceNumber = Integer.parseInt(commandObject.getRecurrenceNumber());
+			int recurrenceFrequency = Integer.parseInt(commandObject.getRecurrenceFrequency());
 			int taskId = getTaskId(taskIndex);
 			Task task = taskList.get(taskId);
 
 			Command command = new Command();
 			command.setTaskName(Integer.toString(taskIndex));
 			delete(command);
-			task.setRecurrenceNumber(recurrenceNumber);
+			task.setRecurrenceFrequency(recurrenceFrequency);
 			taskList.add(task);
 			storageComponent.save(taskList);
 			
-			return String.format(EXECUTION_SET_RECURRINGNUMBER_SUCCESSFUL, taskIndex, recurrenceNumber);
+			return String.format(EXECUTION_SET_RECURRINGNUMBER_SUCCESSFUL, taskIndex, recurrenceFrequency);
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}

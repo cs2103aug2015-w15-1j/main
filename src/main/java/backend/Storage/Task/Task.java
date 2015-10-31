@@ -1,7 +1,5 @@
 package main.java.backend.Storage.Task;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.TreeMap;
 
 import main.java.backend.Logic.Constant;
@@ -18,12 +16,13 @@ public class Task implements Comparable<Task> {
 	
 	private TaskType taskType;
 	private RecurrenceType recurrenceType;
-	private int recurrenceNumber;
+	private int recurrenceFrequency;
 	private int taskId;
 	private int indexForPrinting;
 	private int priority;
 	
 	private boolean isDone;
+	private boolean isReminded;
 	
 	private String categoryName;
 	private String categoryColour;
@@ -39,7 +38,7 @@ public class Task implements Comparable<Task> {
 		
 	}
 	
-	public Task(TaskType taskType, RecurrenceType recurrenceType, int recurrenceNumber, 
+	public Task(TaskType taskType, RecurrenceType recurrenceType, int recurrenceFrequency, 
 			int priority, String categoryName, String name, String description, 
 			String start, String end, String reminder) {
 		
@@ -48,7 +47,7 @@ public class Task implements Comparable<Task> {
 		
 		this.taskType = taskType;
 		this.recurrenceType = recurrenceType;
-		this.recurrenceNumber = recurrenceNumber;
+		this.recurrenceFrequency = recurrenceFrequency;
 		this.priority = priority;
 		this.isDone = false;
 		this.categoryName = categoryName;
@@ -76,12 +75,12 @@ public class Task implements Comparable<Task> {
 		this.recurrenceType = recurrenceType;
 	}
 	
-	public int getRecurrenceNumber() {
-		return recurrenceNumber;
+	public int getRecurrenceFrequency() {
+		return recurrenceFrequency;
 	}
 
-	public void setRecurrenceNumber(int recurrenceNumber) {
-		this.recurrenceNumber = recurrenceNumber;
+	public void setRecurrenceFrequency(int recurrenceFrequency) {
+		this.recurrenceFrequency = recurrenceFrequency;
 	}
 	
 	public int getTaskId() {
@@ -202,7 +201,7 @@ public class Task implements Comparable<Task> {
 			sb.append("Reminder has been set." + System.getProperty("line.separator"));
 		}
 		if(!recurrenceType.equals(recurrenceType.NONE)) {
-			sb.append("Recurring every: " + recurrenceNumber 
+			sb.append("Recurring every: " + recurrenceFrequency 
 					+ " " + recurrenceType.toString().toLowerCase()
 					+ System.getProperty("line.separator"));
 		}
@@ -241,7 +240,7 @@ public class Task implements Comparable<Task> {
 		}
 		
 		if(!recurrenceType.equals(recurrenceType.NONE)) {
-			sb.append("Recurring every: " + recurrenceNumber 
+			sb.append("Recurring every: " + recurrenceFrequency 
 					+ " " + recurrenceType.toString().toLowerCase()
 					+ System.getProperty("line.separator"));
 		}
@@ -287,7 +286,7 @@ public class Task implements Comparable<Task> {
 		Task task = (Task) o;
 		return this.taskType.equals(task.getTaskType()) 
 				&& this.recurrenceType.equals(task.getRecurrenceType())
-				&& this.recurrenceNumber == task.getRecurrenceNumber()
+				&& this.recurrenceFrequency == task.getRecurrenceFrequency()
 				&& this.taskId == task.getTaskId()
 				&& this.indexForPrinting == task.getIndex()
 				&& this.priority == task.getPriority()

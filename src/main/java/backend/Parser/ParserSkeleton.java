@@ -82,16 +82,11 @@ abstract class ParserSkeleton {
 			String number = "";
 			for (int i = 0; i < token.length(); i++) {
 				c = token.substring(i, i+1);
-				if (!isNumber(c)) {
-					break;
+				if (isNumber(c)) {
+					number += c;
 				}
-				number += c;
 			}
-			if (!number.isEmpty()) {
-				return number;
-			} else {
-				return token;
-			}
+			return number;
 		}
 	}
 	
@@ -147,6 +142,10 @@ abstract class ParserSkeleton {
 		}
 	}
 
+	boolean isSplitSuccessful(String token, String[] splitTokens) {
+		return splitTokens.length == 1 && !token.equals(getFirst(splitTokens));
+	}
+	
 	String getStatus(ArrayList<String> parseResult) {
 		return getFirst(parseResult);
 	}
@@ -159,8 +158,8 @@ abstract class ParserSkeleton {
 		return isError(getStatus(result));
 	}
 
-	boolean isIncompleteStatus(ArrayList<String> result) {
-		return getStatus(result).equals("incomplete");
+	boolean isParsingCompleted(ArrayList<String> result) {
+		return !getStatus(result).equals("incomplete");
 	}
 	
 	ArrayList<String> makeErrorResult(String error, String token) {

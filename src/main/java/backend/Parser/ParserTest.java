@@ -677,6 +677,57 @@ public class ParserTest {
 	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Sat, 02 Jan 16, 12pm", "Sat, 02 Jan 16, 11:59pm") );
 	    executeTest();
 	    
+	    //Test whether extra spaces affect date parser
+	    input = "2 by 2 Jan 10 am";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "2", "Sat, 02 Jan 16, 10am") );
+	    executeTest();
+	    
+	    input = "2 from 2 Jan 10 am to 10 pm ";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Sat, 02 Jan 16, 10am", "Sat, 02 Jan 16, 10pm") );
+	    executeTest();
+	    
+	    input = "2 from 2 Jan 10 am to 3/1 10 pm ";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Sat, 02 Jan 16, 10am", "Sun, 03 Jan 16, 10pm") );
+	    executeTest();
+	    
+	    input = "2 by Jan 2 10:30 am";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "2", "Sat, 02 Jan 16, 10:30am") );
+	    executeTest();
+	    
+	    input = "2 from Jan 2 10:24 am to 3 Feb 7:39 pm";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Sat, 02 Jan 16, 10:24am", "Wed, 03 Feb 16, 7:39pm") );
+	    executeTest();
+	    
+	    //Test whether lack of spaces affect date parser
+	    input = "2 by 2Jan 10am";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "2", "Sat, 02 Jan 16, 10am") );
+	    executeTest();
+	    
+	    input = "2 by 30Jun 10am";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "2", "Thu, 30 Jun 16, 10am") );
+	    executeTest();
+	    
+	    input = "2 by Jan2 10am";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "2", "Sat, 02 Jan 16, 10am") );
+	    executeTest();
+	    
+	    input = "2 from Jan2 10am to 5Jun 10pm";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Sat, 02 Jan 16, 10am", "Sun, 05 Jun 16, 10pm") );
+	    executeTest();
+	    
+	    input = "2 from 2January 10am to June5 10pm";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Sat, 02 Jan 16, 10am", "Sun, 05 Jun 16, 10pm") );
+	    executeTest();
 	    
 	    //Test whether shortform for deadline works
 	    input = "3 by today";

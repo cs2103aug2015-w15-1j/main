@@ -6,10 +6,12 @@ import java.util.HashMap;
 
 public class ParserVault extends ParserSkeleton{
 	
-	private DateParser dateParser;
+	private DateParser dateParser = new DateParser();
 
-	ParserVault(DateParser parser) {
-		dateParser = parser;
+	ParserVault() {
+		//Force Natty parser to be initialized by running dateParser once
+    	String pi = "31/4/15 9:26";
+    	dateParser.parseDate(pi);
 	}
 
 	//The default list of fields and the order in which their contents are put into result
@@ -371,7 +373,7 @@ public class ParserVault extends ParserSkeleton{
 		if (freq.equals("month")) {
 			String dayOfMonth = getNumber(content);
 			if (isNotValidDayOfMonth(dayOfMonth)) {
-				return makeErrorResult("InvalidDayOfMonthError", dayOfMonth);
+				return makeErrorResult("InvalidDayOfMonthError", content);
 			} else {
 				dayOfMonth += " of month";
 				return new ArrayList<String> ( Arrays.asList(command, name, dayOfMonth) );

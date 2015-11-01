@@ -31,6 +31,7 @@ public class DateParser extends ParserSkeleton{
 	
 		date = swapDayAndMonth(date);
 		date = removeLater(date);
+		date = addSpaceBetweenDayAndMonth(date);
 		
 		String parsedDate = parseDateWithNatty(date);
 		parsedDate = standardizeDateFormat(parsedDate);
@@ -101,14 +102,29 @@ public class DateParser extends ParserSkeleton{
 		return true;
 	}
 
+	private String addSpaceBetweenDayAndMonth(String dateString) {
+		String[] dateTokens = dateString.split(" ");
+		findMonth:
+		for (int i = 0; i < dateTokens.length; i++) {
+			String token = dateTokens[i];
+			token = token.toLowerCase();
+			for (String month: MONTHS) {
+				if (containsMonth(token, month) && !getNumber(token).isEmpty()){
+					dateTokens[i] = getNumber(token) + " " + month;
+					break findMonth;
+				}
+			}
+		}
+		return mergeTokens(dateTokens, 0, dateTokens.length);
+	}
+
 	/**
 	 * This method checks if the user have included the time in the date string
 	 */
 	boolean hasNoTime(String dateString){
-		String[] eventTokens;
-		eventTokens = dateString.split(" ");
+		ArrayList<String> eventTokens = new ArrayList<String>( Arrays.asList(dateString.split(" ")));
 		for (String token: eventTokens){
-			if (isValid12HourTime(token)){
+			if (isValid12HourTime(token, eventTokens)){
 				return false;
 			}
 			if (isValid24HourTime(token)){
@@ -464,7 +480,21 @@ public class DateParser extends ParserSkeleton{
 	}
 
 	private boolean isMonth(String token) {
-		return MONTHS.contains(token.toLowerCase());
+		token = token.toLowerCase();
+		if (MONTHS.contains(token)){
+			return true;
+		}
+		for (String month: MONTHS) {
+			if (containsMonth(token, month)) {
+				return true;
+			}
+		}
+		return false;
+		//return MONTHS.contains(token.toLowerCase());
+	}
+	
+	private boolean containsMonth (String token, String month){
+		return (token.startsWith(month) || token.endsWith(month));
 	}
 
 	private boolean isDateKeyword(String token, ArrayList<String> tokenArray) {
@@ -508,7 +538,7 @@ public class DateParser extends ParserSkeleton{
 		return time.toLowerCase().endsWith("pm");
 	}
 
-	private boolean isValid12HourTime(String token) {
+	private boolean isValid12HourTime(String token, ArrayList<String> tokens) {
 		String period;
 		if (isAM(token)) {
 			period = "am";
@@ -520,6 +550,9 @@ public class DateParser extends ParserSkeleton{
 		
 		String[] timeTokens = token.split(period);
 		if (timeTokens.length == 1 && isNumber(getFirst(timeTokens))) {
+			return true;
+		}
+		if (timeTokens.length == 0 && isNumber(getPrevious(tokens, token))) {
 			return true;
 		}
 		return false;

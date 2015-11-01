@@ -22,7 +22,6 @@ public class Task implements Comparable<Task> {
 	private int priority;
 	
 	private boolean isDone;
-	private boolean isReminded;
 	
 	private String categoryName;
 	private String categoryColour;

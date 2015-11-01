@@ -230,7 +230,7 @@ public class Observer {
 		ArrayList<Task> todayToDos = new ArrayList<Task> ();
 
 		for(Task task : allToDos) {
-			if(Constant.stringToMillisecond(task.getEnd())
+			if(!task.getDone() && Constant.stringToMillisecond(task.getEnd())
 					>= getTodayStartTime()
 					&& Constant.stringToMillisecond(task.getEnd())
 					< getTodayEndTime()) {
@@ -247,7 +247,7 @@ public class Observer {
 		ArrayList<Task> todayEvents = new ArrayList<Task> ();
 
 		for(Task task : allEvents) {
-			if(Constant.stringToMillisecond(task.getStart()) 
+			if(!task.getDone() && Constant.stringToMillisecond(task.getStart()) 
 					>= getTodayStartTime()
 					&& Constant.stringToMillisecond(task.getStart()) 
 					< getTodayEndTime()) {

@@ -31,6 +31,20 @@ public class SortCommand extends Command {
 		return "All items sorted";
 	}
 	
+	private ArrayList<Task> generateTaskId(ArrayList<Task> taskList) {
+
+		ArrayList<Task> newTaskList = new ArrayList<Task> ();
+		int newTaskId = 0;
+
+		for(Task task : taskList) {
+			task.setTaskId(newTaskId);
+			newTaskList.add(task);
+			newTaskId++;
+		}
+
+		return newTaskList;
+	}
+	
 	private ArrayList<Task> sortName(ArrayList<Task> taskList) {
 		
 		Collections.sort(taskList, new Comparator<Task> () {
@@ -45,7 +59,8 @@ public class SortCommand extends Command {
 				}
 			}
 		});
-		return taskList;
+		
+		return generateTaskId(taskList);
 	}
 
 	private ArrayList<Task> sortPriority(ArrayList<Task> taskList) {
@@ -62,7 +77,8 @@ public class SortCommand extends Command {
 				}
 			}
 		});
-		return taskList;
+		
+		return generateTaskId(taskList);
 	}
 	
 	private ArrayList<Task> sortStart(ArrayList<Task> taskList) {
@@ -76,12 +92,19 @@ public class SortCommand extends Command {
 				} else if(Constant.stringToMillisecond(left.getStart()) 
 						> Constant.stringToMillisecond(right.getStart())) {
 					return 1;
+				} else if(Constant.stringToMillisecond(left.getEnd())
+						< Constant.stringToMillisecond(right.getEnd())) {
+					return -1;
+				} else if(Constant.stringToMillisecond(left.getEnd()) 
+						> Constant.stringToMillisecond(right.getEnd())) {
+					return 1;
 				} else {
 					return 0;
 				}
 			}
 		});
-		return taskList;
+		
+		return generateTaskId(taskList);
 	}
 	
 	private ArrayList<Task> sortDeadline(ArrayList<Task> taskList) {
@@ -100,7 +123,8 @@ public class SortCommand extends Command {
 				}
 			}
 		});
-		return taskList;
+		
+		return generateTaskId(taskList);
 	}
 	
 	private ArrayList<Task> sort(String field, ArrayList<Task> taskList) {

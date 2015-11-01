@@ -430,7 +430,6 @@ public class Observer {
 				break;
 		}
 		
-		Collections.sort(data);
 		return data;
 	}
 	

@@ -9,11 +9,11 @@ abstract class ParserSkeleton {
 	final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList(
 	"add", "addcat", "category", "deadline", "description", "delete", "deleteAll", "done", "event", "every", 
 	"exit", "priority", "redo", "reminder", "rename", "reset", "search", "setcol", "showcat",   
-	"show", "showE", "showF", "showO", "showT", "sort", "sortD", "sortN", "sortP", "undo", "undone") );
+	"show", "showE", "showF", "showO", "showT", "showToday", "sort", "sortD", "sortN", "sortP", "undo", "undone") );
 	
 	//Commands that work just by typing the command word (without additional content)
 	final ArrayList<String> COMMANDS_NO_CONTENT = new ArrayList<String>( Arrays.asList(
-	"deleteAll", "exit", "redo", "showE", "showF", "showO", "showT", "sortD", "sortN", "sortP", "undo") );
+	"deleteAll", "exit", "redo", "showE", "showF", "showO", "showT", "showToday", "sortD", "sortN", "sortP", "undo") );
 	
 	//Commands that if appear first, will prevent other command keywords from having effect
 	final ArrayList<String> COMMANDS_DOMINATING = new ArrayList<String>( Arrays.asList(
@@ -44,6 +44,10 @@ abstract class ParserSkeleton {
 			return "";
 		}
 		return array[1];
+	}
+	
+	String getSecond(String str){
+		return str.split(" ")[1];
 	}
 
 	String getPrevious(ArrayList<String> list, String token) {

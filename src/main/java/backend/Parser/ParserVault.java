@@ -364,20 +364,34 @@ public class ParserVault extends ParserSkeleton{
 	}
 
 	private ArrayList<String> makeRecurringResult(String command, String name, String content){
+		String interval = "";
 		String freq = "";
 		String[] fieldTokens = content.split(" ");
-		freq = getFirst(content);
+		if (isNumber(getFirst(content))) {
+			interval = getFirst(content);
+			freq = getSecond(content);
+			content = mergeTokens(fieldTokens, 2, fieldTokens.length);
+		} else {
+			interval = "1";
+			if (dateParser.isDayOfWeek(getFirst(content))) {
+				freq = "week";
+			} else {
+				freq = getFirst(content);
+				content = mergeTokens(fieldTokens, 1, fieldTokens.length);
+			}
+		}
+
 		if (isNotValidFrequency(freq)) {
 			return makeErrorResult("InvalidFrequencyError", freq);
-		} 
-		content = mergeTokens(fieldTokens, 1, fieldTokens.length);
+		}
+		freq = convertToDefaultFrequency(freq);
 		if (freq.equals("month")) {
 			String dayOfMonth = getNumber(content);
 			if (isNotValidDayOfMonth(dayOfMonth)) {
 				return makeErrorResult("InvalidDayOfMonthError", content);
 			} else {
-				dayOfMonth += " of month";
-				return new ArrayList<String> ( Arrays.asList(command, name, dayOfMonth) );
+				//dayOfMonth += " of month";
+				return new ArrayList<String> ( Arrays.asList(command, name, interval, freq, dayOfMonth) );
 			}
 		}
 		ArrayList<String> dateValidity = dateParser.isInvalidDate(content);
@@ -389,7 +403,7 @@ public class ParserVault extends ParserSkeleton{
 		}
 		String date = dateParser.parseDate(content);
 		date = dateParser.changeToRecurFormat(freq, date);
-		return new ArrayList<String> ( Arrays.asList(command, name, date) );
+		return new ArrayList<String> ( Arrays.asList(command, name, interval, freq, date) );
 	}
 
 	private ArrayList<String> makeMultiFieldResultWithDeadline(String command, String deadline) {
@@ -439,7 +453,16 @@ public class ParserVault extends ParserSkeleton{
 	}
 
 	private boolean isNotValidFrequency(String token){
+		token = convertToDefaultFrequency(token);
 		return !RECUR_FREQUENCY.contains(token);
+	}
+
+	private String convertToDefaultFrequency(String freq) {
+		freq = freq.toLowerCase();
+		if (freq.endsWith("s")) {
+			freq = freq.substring(0, freq.length()-1);
+		}
+		return freq;
 	}
 
 	private boolean isNotValidDayOfMonth(String token){
@@ -469,6 +492,8 @@ public class ParserVault extends ParserSkeleton{
 		case "overdue":
 		case "o":
 			return "O";
+		case "today":
+			return "Today";
 		default:
 			return "error";
 		}

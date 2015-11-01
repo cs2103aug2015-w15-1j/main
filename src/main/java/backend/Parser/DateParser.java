@@ -17,8 +17,8 @@ public class DateParser extends ParserSkeleton{
 	
 	//List of days in a week and their short-forms
 	private final ArrayList<String> DAYS_OF_WEEK = new ArrayList<String>( Arrays.asList(
-	"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
-	"mon", "tue", "wed", "thu", "fri", "sat", "sun") );
+	"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday" ) );
+	//"mon", "tue", "wed", "thu", "fri", "sat", "sun") );
 	
 	private final ArrayList<String> MONTHS_WITH_31_DAYS = new ArrayList<String>( Arrays.asList(
 	"january", "march", "may", "july", "august", "october", "december") );
@@ -169,14 +169,17 @@ public class DateParser extends ParserSkeleton{
 		SimpleDateFormat recurWeekFormat = new SimpleDateFormat("EEE hh:mma");
 		SimpleDateFormat recurYearFormat = new SimpleDateFormat("dd MMM");*/
 		
-		switch (freq) {
+		switch (freq.toLowerCase()) {
 			case "day":
+			case "days":
 				dateString = getTime(dateString);
 				break;
 			case "week":
+			case "weeks":
 				dateString = getDayOfWeek(dateString) + " " + getTime(dateString);
 				break;
 			case "year":
+			case "years":
 				dateString = getDayAndMonth(dateString);
 				break;
 			default:
@@ -514,9 +517,25 @@ public class DateParser extends ParserSkeleton{
 		return time.split(":").length > 1;
 	}
 
-	private boolean isDayOfWeek(String token) {
-		return DAYS_OF_WEEK.contains(token.toLowerCase());
+	
+	boolean isDayOfWeek(String token) {
+		token = token.toLowerCase();
+		if (DAYS_OF_WEEK.contains(token)){
+			return true;
+		}
+		if (token.length() >= 3) {
+			for (String day: DAYS_OF_WEEK){
+				if (day.startsWith(token)) {
+					//System.out.println("t");
+					return true;
+				}
+			}
+		}
+		return false;
 	}
+	/*private boolean isDayOfWeek(String token) {
+		return DAYS_OF_WEEK.contains(token.toLowerCase());
+	}*/
 
 	private boolean isMonth(String token) {
 		if (isNumber(token) && getDateSymbol(token).isEmpty() && addSpaceBetweenDayAndMonth(token).split(" ").length == 1) {

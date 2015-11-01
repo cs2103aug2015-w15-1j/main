@@ -67,6 +67,7 @@ public class LogicFacade {
 		try {
 //			System.out.println("History stack size before command execution: "+historyStack.size());
 			ArrayList<String> parsedUserInput = parserComponent.parseInput(userInput);
+//			System.out.println(parsedUserInput);
 			Command commandObject = logicCommandHandler.parse(parsedUserInput);
 //			System.out.println("CommandObject type: "+commandObject.getType());
 			String feedbackString = "";

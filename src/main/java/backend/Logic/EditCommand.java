@@ -109,7 +109,7 @@ public class EditCommand extends Command {
 			case ("deadline") :
 				feedbackString = setDeadline(this);
 				break;
-			case ("recurring") :
+			case ("every") :
 				feedbackString = setRecurring(this);
 				break;	
 			case ("rename"):
@@ -531,8 +531,11 @@ public class EditCommand extends Command {
 			taskList = storageComponent.load();
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			int recurrenceFrequency = Integer.parseInt(commandObject.getRecurrenceFrequency());
+			System.out.println("Recurrence Frequency: "+recurrenceFrequency);
 			String recurrenceType = commandObject.getRecurrenceType();
+			System.out.println("Recurrence Type: "+recurrenceType);
 			String date = commandObject.getStartDateAndTime();
+			System.out.println("StartDateAndTime: "+date);
 			int taskId = getTaskId(taskIndex);
 			Task task = taskList.get(taskId);
 
@@ -547,7 +550,6 @@ public class EditCommand extends Command {
 			} else if(task.getTaskType().equals(TaskType.EVENT)) {
 				task.setStart(date);
 			} 
-			
 			//taskList.add(task);
 			setTaskId(taskList);
 			storageComponent.save(taskList);

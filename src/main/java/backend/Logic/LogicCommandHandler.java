@@ -21,7 +21,7 @@ public class LogicCommandHandler {
 			"addE", "adds", "addcat"};
 	private static final String[] editKeywords = new String[] {"set", "setT", 
 			"setE", "deadline", "event", "description", "reminder", "done", "undone",
-			"category","setCol","delete", "deleteAll", "priority", "reset", "rename"};
+			"category","setCol","delete", "deleteAll", "priority", "reset", "rename","every"};
 	private static final String[] sortKeywords = new String[] {"sortN", "sortP","sortS","sortD"};
 	private static final String[] viewKeywords = new String[] {"showCat", "show floating",
 			"show todo", "show events", "show overdue", "showT", "showE", "showO","showF"};
@@ -240,6 +240,15 @@ public class LogicCommandHandler {
 				break;
 			case ("undone") :
 				editCommandObject.setTaskName(parsedUserInput.get(1));
+				break;
+			case ("every") :
+				editCommandObject.setTaskName(parsedUserInput.get(1));
+//				System.out.println("Recurrence Frequency: "+parsedUserInput.get(2));
+				editCommandObject.setRecurrenceFrequency(parsedUserInput.get(2));
+//				System.out.println("Recurrence Type: "+parsedUserInput.get(3));
+				editCommandObject.setRecurrenceType(parsedUserInput.get(3));
+//				System.out.println("StartDateAndTime: "+parsedUserInput.get(4));
+				editCommandObject.setStartDateAndTime(parsedUserInput.get(4));
 				break;
 		}
 		return editCommandObject;

@@ -113,6 +113,16 @@ abstract class ParserSkeleton {
 			return false;
 		}
 	}
+	
+	int convertStringToInt(String str){
+		try {
+			return Integer.parseInt(str);
+		} catch (Exception e) {
+			System.out.println("DateParsingError: problem converting string '" + str + "' to int");
+			//e.printStackTrace();
+			return -1;
+		}
+	}
 
 	String removeFrontZero(String token){
 		if (token.startsWith("0")) {

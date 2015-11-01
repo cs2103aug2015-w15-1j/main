@@ -49,14 +49,8 @@ Search:
 Error:
 ("error", Error Message)
 
-Recurring every day:
-("every", Task Index, Time)
-Recurring every week:
-("every", Task Index, Dayoftheweek & Time)
-Recurring every month:
-("every", Task Index, Dayofthemonth)
-Recurring every year:
-("every", Task Index, Day & Month)
+Recurring Tasks:
+("every", Task Index, Interval, Frequency, Date of first occurrence)
 
 Show Floating:
 ("showF")

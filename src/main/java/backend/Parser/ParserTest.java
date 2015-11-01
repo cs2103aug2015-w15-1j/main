@@ -748,86 +748,106 @@ public class ParserTest {
 	    //Test whether daily recurring task works
 	    input = "5 every day 8am";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "day", "8am") );
-	    executeTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "day", "Mon, 02 Nov 15, 8am") );
+	    printTest();
 	    
 	    input = "5 every day 10am";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "day", "10am") );
-	    executeTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "day", "Mon, 02 Nov 15, 10am") );
+	    printTest();
 	    
 	    input = "5 every 3 days 1pm";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "3", "day", "1pm") );
-	    executeTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "3", "day", "Mon, 02 Nov 15, 1pm") );
+	    printTest();
 	    	    
 	    //Test whether weekly recurring task works
 	    input = "5 every 1 week Tuesday 10am";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "week", "Tue 10am") );
-	    executeTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "week", "Tue, 03 Nov 15, 10am") );
+	    printTest();
 	    
 	    input = "5 every week Wed 10.30";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "week", "Wed 10:30am") );
-	    executeTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "week", "Wed, 04 Nov 15, 10:30am") );
+	    printTest();
 	    
 	    input = "5 every week Tue";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "week", "Tue 12pm") );
-	    executeTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "week", "Tue, 03 Nov 15, 12pm") );
+	    printTest();
 	    
 	    input = "5 every 2 WEEKS Tue 3pm";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "2", "week", "Tue 3pm") );
-	    executeTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "2", "week", "Tue, 03 Nov 15, 3pm") );
+	    printTest();
 	    
 	    input = "5 every saturday 6am";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "week", "Sat 6am") );
-	    executeTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "week", "Sat, 07 Nov 15, 6am") );
+	    printTest();
 	    
 	    input = "5 every thurs 7am";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "week", "Thu 7am") );
-	    executeTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "week", "Thu, 05 Nov 15, 7am") );
+	    printTest();
+	    
+	    input = "5 every sun 6pm";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "week", "08 Nov 15, 6pm") );
+	    printTest();
+	    
+	    input = "5 every sun 11:30pm";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "week", "01 Nov 15, 11:30pm") );
+	    printTest();
 	    
 	    //Test whether monthly recurring task works
 	    input = "5 every month 15";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "month", "15") );
-	    executeTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "month", "Sun, 15 Nov 15, 3pm") );
+	    printTest();
 	    
 	    input = "5 every month 1";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "month", "1") );
-	    executeTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "month", "Tue, 01 Dec 15, 3pm") );
+	    printTest();
 	    
-	    input = "5 every month 15th";
+	    input = "5 every month 18th";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "month", "15") );
-	    executeTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "month", "Wed, 18 Nov 15, 3pm") );
+	    printTest();
 	    
-	    input = "5 every month 1th";
+	    input = "5 every month 6th";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "month", "1") );
-	    executeTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "month", "Fri, 06 Nov 15, 3pm") );
+	    printTest();
 	    
-	    input = "5 every 3 month 15";
+	    input = "5 every 3 month 22";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "3", "month", "15") );
-	    executeTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "3", "month", "Sun, 22 Nov 15, 3pm") );
+	    printTest();
+	    
+	    input = "5 every 3 month 31";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "3", "month", "Thu, 31 Dec 15, 3pm") );
+	    printTest();
 	    
 	    //Test whether yearly recurring task works
 	    input = "5 every year April 1";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "year", "01 Apr") );
-	    executeTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "year", "Fri, 01 Apr 16, 12pm") );
+	    printTest();
 	    
 	    input = "5 every 10 years 7 Jul";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "10", "year", "07 Jul") );
-	    executeTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "10", "year", "Thu, 07 Jul 16, 12pm") );
+	    printTest();
+	    
+	    input = "5 every 100 years 2/11";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "10", "year", "Mon, 02 Nov 15, 12pm") );
+	    printTest();
 	    
 	    //Test if using 'next' or 'later' works
 	    input = "6 by 10 days later 2pm";

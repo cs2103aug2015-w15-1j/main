@@ -389,10 +389,13 @@ public class ParserVault extends ParserSkeleton{
 			String dayOfMonth = getNumber(content);
 			if (isNotValidDayOfMonth(dayOfMonth)) {
 				return makeErrorResult("InvalidDayOfMonthError", content);
-			} else {
-				//dayOfMonth += " of month";
-				return new ArrayList<String> ( Arrays.asList(command, name, interval, freq, dayOfMonth) );
 			}
+			int day = convertStringToInt(dayOfMonth);
+			String date = dateParser.getNextNearestDate(day);
+			/*if (dateParser.noSuchDayInMonth(day, month)) {
+				month = dateParser.plusOneMonth(month);
+			}*/
+			return new ArrayList<String> ( Arrays.asList(command, name, interval, freq, date) );
 		}
 		ArrayList<String> dateValidity = dateParser.isInvalidDate(content);
 		if (isErrorStatus(dateValidity)){
@@ -402,7 +405,7 @@ public class ParserVault extends ParserSkeleton{
 			content += " 12:00";
 		}
 		String date = dateParser.parseDate(content);
-		date = dateParser.changeToRecurFormat(freq, date);
+		date = dateParser.convertToRecurFormat(freq, date);
 		return new ArrayList<String> ( Arrays.asList(command, name, interval, freq, date) );
 	}
 

@@ -163,7 +163,7 @@ public class DateParser extends ParserSkeleton{
 		return true;
 	}
 
-	String changeToRecurFormat(String freq, String dateString) {
+	String convertToRecurFormat(String freq, String dateString) {
 		/*SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
 		SimpleDateFormat recurDayFormat = new SimpleDateFormat("hh:mma");
 		SimpleDateFormat recurWeekFormat = new SimpleDateFormat("EEE hh:mma");
@@ -172,15 +172,23 @@ public class DateParser extends ParserSkeleton{
 		switch (freq.toLowerCase()) {
 			case "day":
 			case "days":
-				dateString = getTime(dateString);
+				//dateString = getTime(dateString);
+				dateString = minusOneYear(dateString);
+				if (isInThePast(dateString)) {
+					dateString = removeMinuteIfZero(plusOneDay(dateString, null));
+				}
 				break;
 			case "week":
 			case "weeks":
-				dateString = getDayOfWeek(dateString) + " " + getTime(dateString);
+				//dateString = getDayOfWeek(dateString) + " " + getTime(dateString);
+				String oneWeekBefore = minusOneWeek(dateString);
+				if (!isInThePast(oneWeekBefore)) {
+					dateString = oneWeekBefore;
+				}
 				break;
 			case "year":
 			case "years":
-				dateString = getDayAndMonth(dateString);
+				//dateString = getDayAndMonth(dateString);
 				break;
 			default:
 				break;
@@ -225,6 +233,23 @@ public class DateParser extends ParserSkeleton{
 		}
 		
 		return date;
+	}
+	
+	private String formatStandardDateString(Date date){
+		SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
+		SimpleDateFormat sdfNoMinute = new SimpleDateFormat("EEE, dd MMM yy, hha");
+		
+		String dateString = "";
+		try {
+			dateString = sdf.format(date);
+		} catch (Exception e) {
+			try {
+				dateString = sdfNoMinute.format(date);
+			} catch (Exception e2) {
+				e.printStackTrace();
+			}
+		} 
+		return dateString;
 	}
 
 	private Date convertStandardTimeString(String timeString){
@@ -348,7 +373,8 @@ public class DateParser extends ParserSkeleton{
 		} else if (hasNoDate(eventEnd)) {
 			String endTime = eventEnd;
 			if (startTimeIsNotBeforeEndTime(startTime, endTime)) {
-				startDate = plusOneDay(startDate);
+				SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yy");
+				startDate = plusOneDay(startDate, sdf);
 			} 
 			eventEnd = startDate + ", " + endTime;	
 		} else if (hasNoTime(eventEnd)) {
@@ -374,18 +400,45 @@ public class DateParser extends ParserSkeleton{
 		return !startTimeDate.before(endTimeDate);
 	}
 
-	private String plusOneDay(String dateString) {
-		SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yy");
-		Date date = convertStringToDate(dateString, sdf);
+	private String plusOneDay(String dateString, SimpleDateFormat sdf) {
+		Date date = new Date();
+		if (sdf == null) {
+			date = convertStandardDateString(dateString);
+		} else {
+			date = convertStringToDate(dateString, sdf);
+		}
+		System.out.println(date.toString());
 		
 		Calendar c = Calendar.getInstance(); 
 		c.setTime(date); 
 		c.add(Calendar.DATE, 1);
 		Date newDate = c.getTime();
 		
-		return sdf.format(newDate);
+		if (sdf == null) {
+			return formatStandardDateString(newDate);
+		} else {
+			return sdf.format(newDate);
+		}
 	}
 
+	private String plusXDays(String dateString, int day) {
+		Date date = convertStandardDateString(dateString);
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		c.add(Calendar.DATE, day);
+		date = c.getTime();
+		return removeMinuteIfZero(standardizeDateFormat(date.toString()));
+	}
+	
+	public String plusOneMonth(String month) {
+		Date date = convertStandardDateString(month);
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		c.add(Calendar.MONTH, 1);
+		date = c.getTime();
+		return removeMinuteIfZero(standardizeDateFormat(date.toString()));
+	}
+	
 	private String plusOneYear(String dateString) {
 		Date date = convertStandardDateString(dateString);
 		Calendar c = Calendar.getInstance();
@@ -394,7 +447,42 @@ public class DateParser extends ParserSkeleton{
 		date = c.getTime();
 		return removeMinuteIfZero(standardizeDateFormat(date.toString()));
 	}
+	
+	private String minusOneYear(String dateString) {
+		Date date = convertStandardDateString(dateString);
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		c.add(Calendar.YEAR, -1);
+		date = c.getTime();
+		return removeMinuteIfZero(standardizeDateFormat(date.toString()));
+	}
+	
+	private String minusOneWeek(String dateString) {
+		Date date = convertStandardDateString(dateString);
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		c.add(Calendar.WEEK_OF_MONTH, -1);
+		date = c.getTime();
+		return removeMinuteIfZero(standardizeDateFormat(date.toString()));
+	}
 
+	String getNextNearestDate(int day){
+		String currDate = parseDate(getTomorrowDate() + " 9am"); 
+		int currDay;
+		/*if (isInThePast(currDate)) {
+			currDate = plusOneDay(currDate, null);
+		}*/
+		while ((currDay = getDayOfMonth(currDate)) != day) {
+			if (currDay < day) {
+				currDate = plusXDays(currDate, day-currDay);
+			} else {
+				String currMonth = getCurrentMonth();
+				currDate = plusXDays(currDate, getMaxDay(currMonth)-currDay+day);
+			}
+		}
+		return currDate;
+	}
+	
 	private String setToCurrentYear(String dateString) {
 		String currYear = Integer.toString(getCurrentYear());
 		String[] dateTokens = dateString.split(", ");
@@ -424,6 +512,13 @@ public class DateParser extends ParserSkeleton{
 		return getFirst(dateTokens);
 	}
 
+	private int getDayOfMonth(String dateString) {
+		String[] dateTokens = dateString.split(", ");
+		String ddMMMyy = getSecond(dateTokens);
+		String[] ddMMMyyTokens = ddMMMyy.split(" ");
+		return convertStringToInt(getFirst(ddMMMyyTokens));
+	}
+	
 	private String getDayAndMonth(String dateString) {
 		String[] dateTokens = dateString.split(", ");
 		String ddMMMyy = getSecond(dateTokens);
@@ -503,15 +598,28 @@ public class DateParser extends ParserSkeleton{
 		Date now = new Date();
 		return now;
 	}
+	
+	private String getTomorrowDate() {
+		Date now = new Date();
+		Calendar c = Calendar.getInstance();
+		c.setTime(now);
+		c.add(Calendar.DATE, 1);
+		now = c.getTime();
+		return removeMinuteIfZero(standardizeDateFormat(now.toString()));
+	}
 
+	String getCurrentMonth() {
+		SimpleDateFormat sdfDate = new SimpleDateFormat("MMM");
+	    Date now = new Date();
+	    return sdfDate.format(now);
+	}
+	
 	private int getCurrentYear() {
 		SimpleDateFormat sdfDate = new SimpleDateFormat("yy");
 	    Date now = new Date();
 	    String strDate = sdfDate.format(now);
 		return Integer.parseInt(strDate);
 	}
-
-
 
 	private boolean hasMinute(String time){
 		return time.split(":").length > 1;
@@ -750,7 +858,7 @@ public class DateParser extends ParserSkeleton{
 		return token;
 	}
 	
-	private boolean noSuchDayInMonth(int day, String month) {
+	boolean noSuchDayInMonth(int day, String month) {
 		month = removeFrontZero(month.toLowerCase());
 		if (has31Days(month)) {
 			return day > 31;
@@ -788,16 +896,6 @@ public class DateParser extends ParserSkeleton{
 			return 29;
 		}
 		return -1;
-	}
-	
-	private int convertStringToInt(String str){
-		try {
-			return Integer.parseInt(str);
-		} catch (Exception e) {
-			System.out.println("DateParsingError: problem converting string '" + str + "' to int");
-			//e.printStackTrace();
-			return -1;
-		}
 	}
 	
 	private boolean isddmmFormat(String token) {
@@ -880,7 +978,6 @@ public class DateParser extends ParserSkeleton{
 				result.add(error + ": '" + token + "' is not an acceptable time format");
 				break;
 			case "InvalidDayOfMonthError":
-				
 				String month = getMonthfromDateString(token);
 				String defaultMonth = convertMonthToDefault(month);
 				result.add(error + ": The date '" + token + "' does not exist "

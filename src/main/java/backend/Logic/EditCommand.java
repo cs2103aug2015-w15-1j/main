@@ -10,6 +10,7 @@ import java.util.logging.SimpleFormatter;
 
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
+import main.java.backend.Storage.Task.Task.TaskType;
 
 public class EditCommand extends Command {
 	
@@ -338,6 +339,23 @@ public class EditCommand extends Command {
 				taskList.get(taskId).setDescription("");
 				break;
 			case "reminder" :
+				taskList.get(taskId).setReminder("");
+				break;
+			case "deadline" :
+				taskList.get(taskId).setTaskType(TaskType.FLOATING);
+				taskList.get(taskId).setEnd("");
+				break;
+			case "event" :
+				taskList.get(taskId).setTaskType(TaskType.FLOATING);
+				taskList.get(taskId).setStart("");
+				taskList.get(taskId).setEnd("");
+				break;
+			case "all" :
+				taskList.get(taskId).setTaskType(TaskType.FLOATING);
+				taskList.get(taskId).setStart("");
+				taskList.get(taskId).setEnd("");
+				taskList.get(taskId).setPriority(0);
+				taskList.get(taskId).setDescription("");
 				taskList.get(taskId).setReminder("");
 				break;
 		}

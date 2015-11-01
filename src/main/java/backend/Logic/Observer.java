@@ -16,7 +16,7 @@ import main.java.backend.Storage.Task.Task.TaskType;
 public class Observer {
 	
 	private static final SimpleDateFormat standardFormat = 
-			new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
+			new SimpleDateFormat("EEE, d MMM yy, h:mma");
 	private static final String RESET = "";
 	
 	private static final long DAY_IN_MILLISECOND = 86400000L;
@@ -37,6 +37,7 @@ public class Observer {
 	private ArrayList<Task> getCompletedTasks;
 	private ArrayList<Task> getCompletedEvents;
 	private ArrayList<Task> getCompletedFloat;
+	private static ArrayList<Task> searchResults = new ArrayList<Task>();
 	
 	public static Observer getInstance(Storage storageComponent) {
 		
@@ -50,6 +51,16 @@ public class Observer {
 		this.storage = storage;
 	}
 	
+	private String reformatDate(String date) {
+		
+		String newDate = date
+				.replace(":00", "")
+				.replace("AM", "am")
+				.replace("PM", "");
+		
+		return newDate;
+	}
+	
 	private void resetRecurring() {
 
 		ArrayList<Task> taskList = storage.load();
@@ -61,17 +72,16 @@ public class Observer {
 					&& Constant.stringToMillisecond(task.getEnd()) 
 					<= getCurrentTime()) {
 				
-				//delete(command);
 				if(task.getTaskType().equals(TaskType.EVENT)) {
-					task.setStart(getUpcomingDate(task, task.getStart()));
-				}
-				if(!task.getTaskType().equals(TaskType.FLOATING)) {
 					task.setEnd(getUpcomingDate(task, task.getEnd()));
 				}
-				taskList.add(task);
-				storage.save(taskList);
+				if(!task.getTaskType().equals(TaskType.FLOATING)) {
+					task.setStart(getUpcomingDate(task, task.getStart()));
+				}
+				taskList.set(task.getTaskId(), task);
 			}
 		}
+		storage.save(taskList);
 	}
 	
 	private String getUpcomingDate(Task task, String currentDate) {
@@ -103,7 +113,7 @@ public class Observer {
 	            upcomingDate = getDate(date.getTimeInMillis());
 				break;
 		}
-		return upcomingDate;
+		return reformatDate(upcomingDate);
 	}
 	
 	private String getDate(long milliSeconds) {
@@ -197,8 +207,12 @@ public class Observer {
 	*/
 	
 
-	private ArrayList<Task> getSearchResultsList() {
-		return null;
+	public ArrayList<Task> getSearchResultsList() {
+		return this.searchResults;
+	}
+	
+	public void updateSearchResultsList(ArrayList<Task> searchList) {
+		this.searchResults = searchList;
 	}
 	
 	private ArrayList<Task> getTasks(TaskType taskType) {
@@ -221,7 +235,7 @@ public class Observer {
 		ArrayList<Task> todayToDos = new ArrayList<Task> ();
 
 		for(Task task : allToDos) {
-			if(Constant.stringToMillisecond(task.getEnd())
+			if(!task.getDone() && Constant.stringToMillisecond(task.getEnd())
 					>= getTodayStartTime()
 					&& Constant.stringToMillisecond(task.getEnd())
 					< getTodayEndTime()) {
@@ -238,7 +252,7 @@ public class Observer {
 		ArrayList<Task> todayEvents = new ArrayList<Task> ();
 
 		for(Task task : allEvents) {
-			if(Constant.stringToMillisecond(task.getStart()) 
+			if(!task.getDone() && Constant.stringToMillisecond(task.getStart()) 
 					>= getTodayStartTime()
 					&& Constant.stringToMillisecond(task.getStart()) 
 					< getTodayEndTime()) {
@@ -421,7 +435,6 @@ public class Observer {
 				break;
 		}
 		
-		Collections.sort(data);
 		return data;
 	}
 	

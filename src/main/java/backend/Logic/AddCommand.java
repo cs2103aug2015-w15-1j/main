@@ -1,6 +1,7 @@
 package main.java.backend.Logic;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EmptyStackException;
 
 import main.java.backend.Storage.Storage;
@@ -118,19 +119,6 @@ public class AddCommand extends Command {
 		}
 	}
 	
-	private String priorityChecker(String priority) {
-		
-		if (!priority.isEmpty()) {
-			int priorityInt = Integer.parseInt(priority);
-			
-			if (priorityInt < 1 || priorityInt > 5) {
-				return EXECUTION_COMMAND_UNSUCCESSFUL;
-			}
-		} 
-		
-		return EXECUTION_COMMAND_SUCCESSFUL;
-	}
-	
 	private String getCategoryName(String categoryName) {
 		
 		if(categoryName.isEmpty()) {
@@ -157,16 +145,15 @@ public class AddCommand extends Command {
 	}
 
 	private String addTask(TaskType taskType, Command command) {
-		
-		String execution = priorityChecker(command.getPriority());
+
 		Task newTask = getTask(taskType, command);
-		
-		if(execution.equals(EXECUTION_COMMAND_SUCCESSFUL)) {
-			taskList = generateTaskId();
-			newTask.setTaskId(taskList.size());
-			taskList.add(newTask);
-			storageComponent.save(taskList);
-		}
+
+		taskList = generateTaskId();
+		newTask.setTaskId(taskList.size());
+		taskList.add(newTask);
+		Collections.sort(taskList);
+		storageComponent.save(taskList);
+
 		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, newTask.getName());
 	}
 

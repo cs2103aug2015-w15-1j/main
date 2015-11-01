@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.Stack;
-import java.util.TreeMap;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -25,8 +24,8 @@ public class LogicFacade {
 	private static LogicCommandHandler logicCommandHandler;
 	private static Stack<Command> historyStack;
 	private static Stack<Command> futureStack;
+	private static Stack<Command> searchStack;
 	private ArrayList<Task> currentState;
-	private static ArrayList<Task> searchResults = new ArrayList<Task>();
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
 	private static final String DEFAULT_FILENAME = "default.txt";
 	
@@ -40,6 +39,7 @@ public class LogicFacade {
 		getterSubComponent = Observer.getInstance(storageComponent);
 		historyStack = new Stack<Command>();
 		futureStack = new Stack<Command>();
+		searchStack = new Stack<Command>();
 		currentState = storageComponent.load();
 		historySubComponent.push(currentState);
 	}
@@ -76,7 +76,6 @@ public class LogicFacade {
 					Command undoableCommand = historyStack.pop();
 					feedbackString = undoableCommand.undo();
 					futureStack.push(undoableCommand);
-//					futureStack.push(historyStack.pop());
 					break;
 				case REDO:
 					feedbackString = futureStack.peek().redo();
@@ -90,14 +89,20 @@ public class LogicFacade {
 					break;
 				case SEARCH:
 					feedbackString = commandObject.execute();
-					searchResults = commandObject.getSearchResults();
-					//System.out.println(searchResults);
+					ArrayList<Task> searchResults = commandObject.getSearchResults();
+					getterSubComponent.updateSearchResultsList(searchResults);
+					searchStack.push(commandObject);
 					break;
 				case EXIT:
 					System.exit(0);
 				default:
 					feedbackString = commandObject.execute();
 					historyStack.push(commandObject);
+					futureStack = new Stack<Command>();
+			}
+			if(!searchStack.isEmpty()) {
+//				System.out.println("is search stack empty? "+searchStack.empty());
+				searchStack.peek().execute();
 			}
 			getterSubComponent.updateIndex();
 //			System.out.println("feedbackString: "+feedbackString);
@@ -112,30 +117,12 @@ public class LogicFacade {
 		return getterSubComponent.retrieveStringData(dataType);
 	}
 	
-	/*
-	public ArrayList<Task> retrieveCategoryData(String dataType) {
-		return getterSubComponent.retrieveCategoryData(dataType);
-	}
-	*/
-	
 	public ArrayList<Task> retrieveTaskData(String dataType) {
 		return getterSubComponent.retrieveTaskData(dataType);
 	}
 	
-//	public void updateTaskNumbering(ArrayList<Task> list, int i, int taskIndex) {
-//		getterSubComponent.setIndex(list, i, taskIndex);
-//	}
-	
-//	public ArrayList<String> retrieveStringData(String dataType){
-//		return getterSubComponent.retrieveStringData(dataType);
-//}
-	
-	private void updateCurrentState() {
-		storageComponent.load();
-	}
-	
 	public ArrayList<Task> retrieveSearchData() {
-		return this.searchResults;
+		return getterSubComponent.getSearchResultsList();
 	}
 
 }

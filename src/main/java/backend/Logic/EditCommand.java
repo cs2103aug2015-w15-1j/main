@@ -10,6 +10,7 @@ import java.util.logging.SimpleFormatter;
 
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
+import main.java.backend.Storage.Task.Task.TaskType;
 
 public class EditCommand extends Command {
 	
@@ -17,8 +18,7 @@ public class EditCommand extends Command {
 	private static final String EXECUTION_SET_SUCCESSFUL = "Fields have been updated";
 	private static final String EXECUTION_DELETE_SUCCESSFUL = "Task %1$s has been deleted";
 	private static final String EXECUTION_SET_DEADLINE_SUCCESSFUL = "Task %1$s deadline has been set to %2$s";
-	private static final String EXECUTION_SET_RECURRINGNUMBER_SUCCESSFUL = "Task %1$s recurring number has been set to %2$s";
-	private static final String EXECUTION_SET_RECURRINGTYPE_SUCCESSFUL = "Task %1$s recurring type has been set to %2$s";
+	private static final String EXECUTION_SET_RECURRING_SUCCESSFUL = "Task %1$s recurring has been set to %2$s";
 	private static final String EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL = "Event %1$s has been setted to %2$s till %3$s";
 	private static final String EXECUTION_SET_DESCRIPTION_SUCCESSFUL = "Description for task %1$s has been set";
 	private static final String EXECUTION_SET_REMINDER_SUCCESSFUL = "Reminder for Task %1$s has been set to be at %2$s";
@@ -109,12 +109,9 @@ public class EditCommand extends Command {
 			case ("deadline") :
 				feedbackString = setDeadline(this);
 				break;
-			case ("recurringNum") :
-				feedbackString = setRecurringFrequency(this);
+			case ("recurring") :
+				feedbackString = setRecurring(this);
 				break;	
-			case ("recurringType") :
-				feedbackString = setRecurringType(this);
-				break;
 			case ("rename"):
 				feedbackString = rename(this);
 				break;
@@ -150,25 +147,14 @@ public class EditCommand extends Command {
 	
 	private void setTaskId(ArrayList<Task> taskList) {
 		
-		ArrayList<Task> newTaskList = new ArrayList<Task> ();
 		Collections.sort(taskList);
 	
 		int newTaskId = 0;
 		
 		for(Task task : taskList) {
 			task.setTaskId(newTaskId);
-			newTaskList.add(task);
 			newTaskId++;
 		}
-	}
-
-	private String priorityChecker(int priority) {
-		
-		if (priority > 5 || priority < 1) {
-			return EXECUTION_COMMAND_UNSUCCESSFUL;
-		}
-		
-		return null;
 	}
 	
 	private String setMultipleFieldsForTask(Command commandObject) {
@@ -304,15 +290,16 @@ public class EditCommand extends Command {
 	
 	private int getTaskId(int taskIndex) {
 		
+		ArrayList<Task> taskList = storageComponent.load();
+		
+		int taskId = -1;
 		for(Task task : taskList) {
-			
 			if(task.getIndex() == taskIndex) {
-				return task.getTaskId();
+				taskId = task.getTaskId();
 			}
 		}
 		
-		// Should not reach here
-		return -1;
+		return taskId;
 	}
 
 	private String delete(Command commandObject) {
@@ -322,6 +309,7 @@ public class EditCommand extends Command {
 
 			taskList = storageComponent.load();
 			taskList.remove(taskId);
+			setTaskId(taskList);
 			storageComponent.save(taskList);
 			
 			return String.format(EXECUTION_DELETE_SUCCESSFUL, taskIndex);
@@ -346,6 +334,23 @@ public class EditCommand extends Command {
 			case "reminder" :
 				taskList.get(taskId).setReminder("");
 				break;
+			case "deadline" :
+				taskList.get(taskId).setTaskType(TaskType.FLOATING);
+				taskList.get(taskId).setEnd("");
+				break;
+			case "event" :
+				taskList.get(taskId).setTaskType(TaskType.FLOATING);
+				taskList.get(taskId).setStart("");
+				taskList.get(taskId).setEnd("");
+				break;
+			case "all" :
+				taskList.get(taskId).setTaskType(TaskType.FLOATING);
+				taskList.get(taskId).setStart("");
+				taskList.get(taskId).setEnd("");
+				taskList.get(taskId).setPriority(0);
+				taskList.get(taskId).setDescription("");
+				taskList.get(taskId).setReminder("");
+				break;
 		}
 		storageComponent.save(taskList);
 		return String.format("Field %1$s has been reset", resetField);
@@ -353,11 +358,7 @@ public class EditCommand extends Command {
 	
 	private String deleteAll(EditCommand editCommand) {
 		taskList = storageComponent.load();
-		int numOfTasks = taskList.size();
-		for (int taskId = 0; taskId < numOfTasks; taskId++) {
-			taskList.remove(taskId);
-		}
-		storageComponent.save(taskList);
+		storageComponent.save(null);
 		return "Everything has been deleted";
 	}
 
@@ -367,10 +368,6 @@ public class EditCommand extends Command {
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			int priority = Integer.parseInt(commandObject.getPriority());
 			int taskId = getTaskId(taskIndex);
-
-			if (priorityChecker(priority) != null) {
-				return priorityChecker(priority);
-			}
 			
 			taskList.get(taskId).setPriority(priority);
 			storageComponent.save(taskList);	
@@ -491,11 +488,11 @@ public class EditCommand extends Command {
 
 			Command command = new Command();
 			command.setTaskName(Integer.toString(eventIndex));
-			delete(command);
+			//delete(command);
 			task.setTaskType(Task.TaskType.EVENT);
 			task.setStart(start);
 			task.setEnd(end);
-			taskList.add(task);
+			//taskList.add(task);
 			setTaskId(taskList);
 			storageComponent.save(taskList);
 
@@ -515,10 +512,11 @@ public class EditCommand extends Command {
 
 			Command command = new Command();
 			command.setTaskName(Integer.toString(taskIndex));
-			delete(command);
+			//delete(command);
+			task.setStart("");
 			task.setEnd(end);
 			task.setTaskType(getTaskType(task));
-			taskList.add(task);
+			//taskList.add(task);
 			setTaskId(taskList);
 			storageComponent.save(taskList);
 			
@@ -528,47 +526,28 @@ public class EditCommand extends Command {
 		}
 	}
 	
-	private String setRecurringFrequency(Command commandObject) {
+	private String setRecurring(Command commandObject) {
 		try {
 			taskList = storageComponent.load();
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			int recurrenceFrequency = Integer.parseInt(commandObject.getRecurrenceFrequency());
-			int taskId = getTaskId(taskIndex);
-			Task task = taskList.get(taskId);
-
-			Command command = new Command();
-			command.setTaskName(Integer.toString(taskIndex));
-			delete(command);
-			task.setRecurrenceFrequency(recurrenceFrequency);
-			taskList.add(task);
-			storageComponent.save(taskList);
-			
-			return String.format(EXECUTION_SET_RECURRINGNUMBER_SUCCESSFUL, taskIndex, recurrenceFrequency);
-		} catch (NumberFormatException e) {
-			return EXECUTION_COMMAND_UNSUCCESSFUL;
-		}
-	}
-	
-	private String setRecurringType(Command commandObject) {
-		try {
-			taskList = storageComponent.load();
-			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			String recurrenceType = commandObject.getRecurrenceType();
 			int taskId = getTaskId(taskIndex);
 			Task task = taskList.get(taskId);
 
 			Command command = new Command();
 			command.setTaskName(Integer.toString(taskIndex));
-			delete(command);
+			//delete(command);
+			task.setRecurrenceFrequency(recurrenceFrequency);
 			task.setRecurrenceType(getRecurrenceType(recurrenceType));
-			taskList.add(task);
+			//taskList.add(task);
+			setTaskId(taskList);
 			storageComponent.save(taskList);
 			
-			return String.format(EXECUTION_SET_RECURRINGTYPE_SUCCESSFUL, taskIndex, recurrenceType);
+			return String.format(EXECUTION_SET_RECURRING_SUCCESSFUL, taskIndex, recurrenceFrequency + " " + recurrenceType);
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-	
 
 }

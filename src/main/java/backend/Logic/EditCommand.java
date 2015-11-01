@@ -532,6 +532,7 @@ public class EditCommand extends Command {
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			int recurrenceFrequency = Integer.parseInt(commandObject.getRecurrenceFrequency());
 			String recurrenceType = commandObject.getRecurrenceType();
+			String date = commandObject.getStartDateAndTime();
 			int taskId = getTaskId(taskIndex);
 			Task task = taskList.get(taskId);
 
@@ -540,6 +541,13 @@ public class EditCommand extends Command {
 			//delete(command);
 			task.setRecurrenceFrequency(recurrenceFrequency);
 			task.setRecurrenceType(getRecurrenceType(recurrenceType));
+			
+			if(task.getTaskType().equals(TaskType.TODO)) {
+				task.setEnd(date);
+			} else if(task.getTaskType().equals(TaskType.EVENT)) {
+				task.setStart(date);
+			} 
+			
 			//taskList.add(task);
 			setTaskId(taskList);
 			storageComponent.save(taskList);

@@ -1,6 +1,7 @@
 package main.java.backend.Logic;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EmptyStackException;
 
 import main.java.backend.Storage.Storage;
@@ -150,6 +151,7 @@ public class AddCommand extends Command {
 		taskList = generateTaskId();
 		newTask.setTaskId(taskList.size());
 		taskList.add(newTask);
+		Collections.sort(taskList);
 		storageComponent.save(taskList);
 
 		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, newTask.getName());

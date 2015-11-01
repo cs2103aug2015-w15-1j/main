@@ -150,14 +150,12 @@ public class EditCommand extends Command {
 	
 	private void setTaskId(ArrayList<Task> taskList) {
 		
-		ArrayList<Task> newTaskList = new ArrayList<Task> ();
 		Collections.sort(taskList);
 	
 		int newTaskId = 0;
 		
 		for(Task task : taskList) {
 			task.setTaskId(newTaskId);
-			newTaskList.add(task);
 			newTaskId++;
 		}
 	}
@@ -308,20 +306,19 @@ public class EditCommand extends Command {
 	}
 
 	private String delete(Command commandObject) {
-		//try{
+		try{
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			int taskId = getTaskId(taskIndex);
 
 			taskList = storageComponent.load();
-			//System.out.println("taskId to remove is: " + taskId + " / " + taskList.remove(taskId).getIndex());
 			taskList.remove(taskId);
 			setTaskId(taskList);
 			storageComponent.save(taskList);
 			
 			return String.format(EXECUTION_DELETE_SUCCESSFUL, taskIndex);
-		//} catch (NumberFormatException e) {
-			//return EXECUTION_COMMAND_UNSUCCESSFUL;
-		//}
+		} catch (NumberFormatException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
 	}
 	
 	private String reset(Command commandObject) {

@@ -42,8 +42,9 @@ public class DateParser extends ParserSkeleton{
 	}
 
 	ArrayList<String> parseEventStart(String eventStart) {
-		if (isInvalidDate(eventStart)) {
-			return makeErrorResult("InvalidDateError", eventStart);
+		ArrayList<String> eventStartValidity = isInvalidDate(eventStart);
+		if (isErrorStatus(eventStartValidity)){
+			return eventStartValidity;
 		}
 		
 		String parsedStart = parseDate(eventStart);
@@ -56,8 +57,9 @@ public class DateParser extends ParserSkeleton{
 	}
 
 	ArrayList<String> parseEventEnd(String eventStart, String eventEnd) {
-		if (isInvalidDate(eventEnd)) {
-			return makeErrorResult("InvalidDateError", eventEnd);
+		ArrayList<String> eventEndValidity = isInvalidDate(eventEnd);
+		if (isErrorStatus(eventEndValidity)){
+			return eventEndValidity;
 		}
 		String parsedEnd = parseDate(eventEnd);
 		if (hasNoDate(eventEnd)) {
@@ -73,15 +75,27 @@ public class DateParser extends ParserSkeleton{
 		return new ArrayList<String>( Arrays.asList("OK", eventEnd));
 	}
 
-	boolean isInvalidDate(String dateString){
+	ArrayList<String> isInvalidDate(String dateString){
 		if (dateString.isEmpty()) {
-			return false;
+			return new ArrayList<String>(Arrays.asList( "OK" ));
 		}
+		
+		ArrayList<String> dateBoundCheck = checkDateBound(dateString);
+		if (isErrorStatus(dateBoundCheck)) {
+			return dateBoundCheck;
+		}
+		
 		try {
-			NATTY.parse(dateString).get(0);
-			return false;
+			String parsedTime = getTime(parseDate(dateString));
+			String timeString = getTimeFromString(dateString);
+			if (isNotMatchingTimes(parsedTime, timeString)) {
+				return makeErrorResult("InvalidTimeError", timeString);
+			}
+			
+			return new ArrayList<String>(Arrays.asList( "OK" ));
+			
 		} catch (Exception e){
-			return true;
+			return makeErrorResult("InvalidDateError", dateString);
 		}
 	}
 
@@ -100,22 +114,6 @@ public class DateParser extends ParserSkeleton{
 			}
 		}
 		return true;
-	}
-
-	private String addSpaceBetweenDayAndMonth(String dateString) {
-		String[] dateTokens = dateString.split(" ");
-		findMonth:
-		for (int i = 0; i < dateTokens.length; i++) {
-			String token = dateTokens[i];
-			token = token.toLowerCase();
-			for (String month: MONTHS) {
-				if (containsMonth(token, month) && !getNumber(token).isEmpty()){
-					dateTokens[i] = getNumber(token) + " " + month;
-					break findMonth;
-				}
-			}
-		}
-		return mergeTokens(dateTokens, 0, dateTokens.length);
 	}
 
 	/**
@@ -537,6 +535,10 @@ public class DateParser extends ParserSkeleton{
 	private boolean isPM(String time){
 		return time.toLowerCase().endsWith("pm");
 	}
+	
+	private boolean isTimeFormat(String time){
+		return isAM(time) || isPM(time) || time.contains(":"); 
+	}
 
 	private boolean isValid12HourTime(String token, ArrayList<String> tokens) {
 		String period;
@@ -549,11 +551,18 @@ public class DateParser extends ParserSkeleton{
 		}
 		
 		String[] timeTokens = token.split(period);
-		if (timeTokens.length == 1 && isNumber(getFirst(timeTokens))) {
-			return true;
-		}
-		if (timeTokens.length == 0 && isNumber(getPrevious(tokens, token))) {
-			return true;
+		if (timeTokens.length <= 1) {
+			String time = "";
+			if (timeTokens.length == 1){
+				time = getFirst(timeTokens);
+			} else if (timeTokens.length == 0){
+				time = getPrevious(tokens, token);
+			}
+			if (isTimeFormat(time)) {
+				return isValid24HourTime(time);
+			} else {
+				return isValidHour(time);
+			}
 		}
 		return false;
 	}
@@ -578,13 +587,97 @@ public class DateParser extends ParserSkeleton{
 			if (isPM(token)) {
 				minute = getFirst(minute.split("pm"));
 			}
-			if (isNumber(hour) && isNumber(minute)) {
+			if (isValidHour(hour) && isValidMinute(minute)) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
+	private boolean isValidHour(String hour){
+		try {
+			int min = Integer.parseInt(hour);
+			return min >= 0 && min <= 23;
+		} catch (NumberFormatException e) {
+			System.out.println("TimeParsingError: problem converting hour '" + hour + "' to integer");
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	private boolean isValidMinute(String minute){
+		try {
+			int min = Integer.parseInt(minute);
+			return min >= 0 && min <= 60;
+		} catch (NumberFormatException e) {
+			System.out.println("TimeParsingError: problem converting minute '" + minute + "' to integer");
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	private String addSpaceBetweenDayAndMonth(String dateString) {
+		String[] dateTokens = dateString.split(" ");
+		findMonth:
+		for (int i = 0; i < dateTokens.length; i++) {
+			String token = dateTokens[i];
+			token = token.toLowerCase();
+			for (String month: MONTHS) {
+				if (containsMonth(token, month) && !getNumber(token).isEmpty()){
+					dateTokens[i] = getNumber(token) + " " + month;
+					break findMonth;
+				}
+			}
+		}
+		return mergeTokens(dateTokens, 0, dateTokens.length);
+	}
+
+	private ArrayList<String> checkDateBound(String dateString) {
+		String[] dateTokens = dateString.split(" ");
+		for (String token: dateTokens) {
+			if (isddmmFormat(token)) {
+				int day = getDayfromDateString(token);
+				//String month = getMonthfromDateString(token);
+				if (day > 31) {
+					return makeErrorResult("InvalidDayOfMonthError", Integer.toString(day));
+				}
+			}
+		}
+		return new ArrayList<String>( Arrays.asList("OK"));
+	}
+
+	private boolean isddmmFormat(String token) {
+		return !getDateSymbol(token).isEmpty() && !getNumber(token).isEmpty();
+	}
+
+	private int getDayfromDateString(String token) {
+		try {
+			return Integer.parseInt(getFirst(token.split(getDateSymbol(token))));
+		} catch (NumberFormatException e) {
+			System.out.println("DateParsingError: problem converting day '" + getFirst(token.split(getDateSymbol(token))) + "' to integer");
+			e.printStackTrace();
+			return -1;
+		}
+	}
+	
+	private String getMonthfromDateString(String token) {
+		return getSecond(token.split(getDateSymbol(token)));
+	}
+	
+	private String getTimeFromString(String dateString) {
+		String[] dateTokens = dateString.split(" ");
+		for (String token: dateTokens) {
+			if (isTimeFormat(token)) {
+				return token;
+			}
+		}
+		return "";
+	}
+
+	private boolean isNotMatchingTimes(String parsedTime, String timeString) {
+		return !hasMinute(parsedTime) && (hasMinute(timeString) && !timeString.endsWith("00"));
+	}
+
 	@Override
 	ArrayList<String> makeErrorResult(String error, String token) {
 		ArrayList<String> result = new ArrayList<String>(); 
@@ -593,6 +686,12 @@ public class DateParser extends ParserSkeleton{
 		switch (error) {
 			case "InvalidDateError":
 				result.add(error + ": '" + token + "' is not an acceptable date format");
+				break;
+			case "InvalidTimeError":
+				result.add(error + ": '" + token + "' is not an acceptable time format");
+				break;
+			case "InvalidDayOfMonthError":
+				result.add(error + ": '" + token + "' is not between 1 to 31");
 				break;
 			default:
 				break; 

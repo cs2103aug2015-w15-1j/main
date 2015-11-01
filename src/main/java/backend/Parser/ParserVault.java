@@ -196,7 +196,7 @@ public class ParserVault extends ParserSkeleton{
 		if (command.equals("deadline") || command.equals("reminder")) {
 			ArrayList<String> parseResult = makeDateResult(command, content);
 			if (isErrorStatus(parseResult)) {
-				return makeErrorResult("InvalidDateError", content);
+				return parseResult;
 			}
 			String parsedDate = getLast(parseResult);
 			content = parsedDate;
@@ -329,8 +329,9 @@ public class ParserVault extends ParserSkeleton{
 	}
 
 	private ArrayList<String> makeDateResult(String command, String date){
-		if (dateParser.isInvalidDate(date)) {
-			return makeErrorResult("InvalidDateError", date);
+		ArrayList<String> dateValidity = dateParser.isInvalidDate(date);
+		if (isErrorStatus(dateValidity)){
+			return dateValidity;
 		}
 		if (dateParser.hasNoTime(date)) {
 			if (command.equals("deadline")) {
@@ -379,8 +380,9 @@ public class ParserVault extends ParserSkeleton{
 				return new ArrayList<String> ( Arrays.asList(command, name, dayOfMonth) );
 			}
 		}
-		if (dateParser.isInvalidDate(content)) {
-			return makeErrorResult("InvalidDateError", content);
+		ArrayList<String> dateValidity = dateParser.isInvalidDate(content);
+		if (isErrorStatus(dateValidity)){
+			return dateValidity;
 		}
 		if (dateParser.hasNoTime(content)) {
 			content += " 12:00";

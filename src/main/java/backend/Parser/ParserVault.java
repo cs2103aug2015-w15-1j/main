@@ -337,7 +337,7 @@ public class ParserVault extends ParserSkeleton{
 			if (command.equals("deadline")) {
 				date += " 23:59";
 			} else if (command.equals("reminder")){
-				date += " 12:00";
+				date += " 9am";
 			}
 		}
 		
@@ -402,7 +402,7 @@ public class ParserVault extends ParserSkeleton{
 			return dateValidity;
 		}
 		if (dateParser.hasNoTime(content)) {
-			content += " 12:00";
+			content += " 9am";
 		}
 		String date = dateParser.parseDate(content);
 		date = dateParser.convertToRecurFormat(freq, date);

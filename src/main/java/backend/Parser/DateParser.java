@@ -77,7 +77,7 @@ public class DateParser extends ParserSkeleton{
 		
 		String parsedStart = parseDate(eventStart);
 		if (hasNoTime(eventStart)) {
-			eventStart = getDayMonthAndYear(parsedStart) + ", 12pm";
+			eventStart = getDayMonthAndYear(parsedStart) + ", 9am";
 		} else {
 			eventStart = parsedStart;
 		}
@@ -369,7 +369,7 @@ public class DateParser extends ParserSkeleton{
 		String startTime = getTime(eventStart);
 		
 		if (eventEnd.isEmpty()) {
-			eventEnd = startDate + ", 11:59pm";
+			eventEnd = startDate + ", 9pm";
 		} else if (hasNoDate(eventEnd)) {
 			String endTime = eventEnd;
 			if (startTimeIsNotBeforeEndTime(startTime, endTime)) {

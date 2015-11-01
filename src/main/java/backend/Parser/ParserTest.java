@@ -567,18 +567,18 @@ public class ParserTest {
 	    //Testing for event with no end date/time (should set end date to be same as start date, time to be 11:59pm)
 	    input = "2 event 15/09 10am";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 15 Sep 16, 10am", "Thu, 15 Sep 16, 11:59pm") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 15 Sep 16, 10am", "Thu, 15 Sep 16, 9pm") );
 	    executeTest();
 	    
 	    input = "2 event 15 Sep 10am";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 15 Sep 16, 10am", "Thu, 15 Sep 16, 11:59pm") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 15 Sep 16, 10am", "Thu, 15 Sep 16, 9pm") );
 	    executeTest();
 	    
-	    //Testing for event with no start or end time (set both to 12pm)
+	    //Testing for event with no start or end time (set both to 9am)
 	    input = "2 event 15 Sep to 16 Sep";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 15 Sep 16, 12pm", "Fri, 16 Sep 16, 12pm") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 15 Sep 16, 9am", "Fri, 16 Sep 16, 9am") );
 	    executeTest();
 	   
 	    //Testing for when time was entered before date
@@ -608,7 +608,7 @@ public class ParserTest {
 	    executeTest();
 	    input = "2 event 10am 15/09";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 15 Sep 16, 10am", "Thu, 15 Sep 16, 11:59pm") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 15 Sep 16, 10am", "Thu, 15 Sep 16, 9pm") );
 	    executeTest();
 	   
 	    //Testing event in one-shot commands (some with year specified, some without)
@@ -668,18 +668,18 @@ public class ParserTest {
 	    //Test when year is not specified, whether parser can set the date to always be the nearest one in the future
 	    input = "2 event 31 Dec 10am";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 31 Dec 15, 10am", "Thu, 31 Dec 15, 11:59pm") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 31 Dec 15, 10am", "Thu, 31 Dec 15, 9pm") );
 	    executeTest();
 	    
 	    input = "2 event 2 Jan 10am";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Sat, 02 Jan 16, 10am", "Sat, 02 Jan 16, 11:59pm") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Sat, 02 Jan 16, 10am", "Sat, 02 Jan 16, 9pm") );
 	    executeTest();
 	   
 	    //Test when only event start date is specified, whether parser can set start time to default 12pm, and end date/time to default too
 	    input = "2 event 2 Jan";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Sat, 02 Jan 16, 12pm", "Sat, 02 Jan 16, 11:59pm") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Sat, 02 Jan 16, 9am", "Sat, 02 Jan 16, 9pm") );
 	    executeTest();
 	    
 	    //Test whether extra spaces affect date parser

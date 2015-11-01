@@ -80,6 +80,7 @@ public class EditCommand extends Command {
 				feedbackString = setMultipleFieldsForFloats(this);
 				break;
 			case ("delete") :
+				System.out.println("EXECUTE DELETE");
 				feedbackString = delete(this);
 				break;
 			case ("deleteAll"):
@@ -160,15 +161,6 @@ public class EditCommand extends Command {
 			newTaskList.add(task);
 			newTaskId++;
 		}
-	}
-
-	private String priorityChecker(int priority) {
-		
-		if (priority > 5 || priority < 1) {
-			return EXECUTION_COMMAND_UNSUCCESSFUL;
-		}
-		
-		return null;
 	}
 	
 	private String setMultipleFieldsForTask(Command commandObject) {
@@ -304,30 +296,33 @@ public class EditCommand extends Command {
 	
 	private int getTaskId(int taskIndex) {
 		
+		ArrayList<Task> taskList = storageComponent.load();
+		
+		int taskId = -1;
 		for(Task task : taskList) {
-			
 			if(task.getIndex() == taskIndex) {
-				return task.getTaskId();
+				taskId = task.getTaskId();
 			}
 		}
 		
-		// Should not reach here
-		return -1;
+		return taskId;
 	}
 
 	private String delete(Command commandObject) {
-		try{
+		//try{
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			int taskId = getTaskId(taskIndex);
 
 			taskList = storageComponent.load();
+			//System.out.println("taskId to remove is: " + taskId + " / " + taskList.remove(taskId).getIndex());
 			taskList.remove(taskId);
+			setTaskId(taskList);
 			storageComponent.save(taskList);
 			
 			return String.format(EXECUTION_DELETE_SUCCESSFUL, taskIndex);
-		} catch (NumberFormatException e) {
-			return EXECUTION_COMMAND_UNSUCCESSFUL;
-		}
+		//} catch (NumberFormatException e) {
+			//return EXECUTION_COMMAND_UNSUCCESSFUL;
+		//}
 	}
 	
 	private String reset(Command commandObject) {
@@ -353,11 +348,7 @@ public class EditCommand extends Command {
 	
 	private String deleteAll(EditCommand editCommand) {
 		taskList = storageComponent.load();
-		int numOfTasks = taskList.size();
-		for (int taskId = 0; taskId < numOfTasks; taskId++) {
-			taskList.remove(taskId);
-		}
-		storageComponent.save(taskList);
+		storageComponent.save(null);
 		return "Everything has been deleted";
 	}
 
@@ -367,10 +358,6 @@ public class EditCommand extends Command {
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			int priority = Integer.parseInt(commandObject.getPriority());
 			int taskId = getTaskId(taskIndex);
-
-			if (priorityChecker(priority) != null) {
-				return priorityChecker(priority);
-			}
 			
 			taskList.get(taskId).setPriority(priority);
 			storageComponent.save(taskList);	
@@ -516,6 +503,7 @@ public class EditCommand extends Command {
 			Command command = new Command();
 			command.setTaskName(Integer.toString(taskIndex));
 			delete(command);
+			task.setStart("");
 			task.setEnd(end);
 			task.setTaskType(getTaskType(task));
 			taskList.add(task);
@@ -541,6 +529,7 @@ public class EditCommand extends Command {
 			delete(command);
 			task.setRecurrenceFrequency(recurrenceFrequency);
 			taskList.add(task);
+			setTaskId(taskList);
 			storageComponent.save(taskList);
 			
 			return String.format(EXECUTION_SET_RECURRINGNUMBER_SUCCESSFUL, taskIndex, recurrenceFrequency);

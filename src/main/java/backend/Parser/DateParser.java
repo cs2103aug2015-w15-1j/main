@@ -91,6 +91,9 @@ public class DateParser extends ParserSkeleton{
 			if (isNotMatchingTimes(parsedTime, timeString)) {
 				return makeErrorResult("InvalidTimeError", timeString);
 			}
+			if (!isValidHour(getHourFromTimeString(timeString))) {
+				return makeErrorResult("InvalidTimeError", timeString);
+			}
 			
 			return new ArrayList<String>(Arrays.asList( "OK" ));
 			
@@ -414,6 +417,16 @@ public class DateParser extends ParserSkeleton{
 		return getLast(dateTokens);
 	}
 
+	private String getTimeSymbol(String timeString) {
+		if (timeString.contains(":")){
+			return ":";
+		} else if (timeString.contains(".")) {
+			return "\\.";
+		} else {
+			return "";
+		}
+	}
+
 	private int getHour(String timeString) {
 		String[] timeTokens;
 		timeTokens = timeString.split(":");
@@ -537,7 +550,7 @@ public class DateParser extends ParserSkeleton{
 	}
 	
 	private boolean isTimeFormat(String time){
-		return isAM(time) || isPM(time) || time.contains(":"); 
+		return isAM(time) || isPM(time) || !getTimeSymbol(time).isEmpty();
 	}
 
 	private boolean isValid12HourTime(String token, ArrayList<String> tokens) {
@@ -595,6 +608,9 @@ public class DateParser extends ParserSkeleton{
 	}
 	
 	private boolean isValidHour(String hour){
+		if (hour.isEmpty()) {
+			return true;
+		}
 		try {
 			int min = Integer.parseInt(hour);
 			return min >= 0 && min <= 23;
@@ -665,15 +681,40 @@ public class DateParser extends ParserSkeleton{
 	}
 	
 	private String getTimeFromString(String dateString) {
-		String[] dateTokens = dateString.split(" ");
+		ArrayList<String> dateTokens = new ArrayList<String>( Arrays.asList(dateString.split(" ")));
 		for (String token: dateTokens) {
 			if (isTimeFormat(token)) {
+				if (token.equalsIgnoreCase("am") || token.equalsIgnoreCase("pm")) {
+					return getPrevious(dateTokens, token) + " " + token;
+				}
 				return token;
 			}
 		}
 		return "";
 	}
 
+	private String getHourFromTimeString(String timeString){
+		String sym = getTimeSymbol(timeString);
+		if (!sym.isEmpty()){
+			return getFirst(timeString.split(sym));
+		}
+		if (isAM(timeString)) {
+			String hour = getFirst(timeString.split("am"));
+			if (hour.equals(timeString)) {
+				hour = getFirst(timeString.split("AM"));
+			}
+			return removeEndSpacesOrBrackets(hour);
+		}
+		if (isPM(timeString)) {
+			String hour = getFirst(timeString.split("pm"));
+			if (hour.equals(timeString)) {
+				hour = getFirst(timeString.split("PM"));
+			}
+			return removeEndSpacesOrBrackets(hour);
+		}
+		return timeString;
+	}
+	
 	private boolean isNotMatchingTimes(String parsedTime, String timeString) {
 		return !hasMinute(parsedTime) && (hasMinute(timeString) && !timeString.endsWith("00"));
 	}

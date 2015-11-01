@@ -1039,6 +1039,21 @@ public class ParserTest {
 	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidTimeError: '3:99am' is not an acceptable time format") );
 	    executeTest();
 	    
+	    input = "4 by 20 Dec 25pm";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidTimeError: '25pm' is not an acceptable time format") );
+	    executeTest();
+	    
+	    input = "4 by 20 Dec 24pm";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidTimeError: '24pm' is not an acceptable time format") );
+	    executeTest();
+	    
+	    input = "4 by 20 Dec 36:32";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidTimeError: '36:32' is not an acceptable time format") );
+	    executeTest();
+	    
 	    //Test invalid date
 	    input = "5 by 32/3 10am";
 	    actual = parser.parseInput(input);

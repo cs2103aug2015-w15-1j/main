@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 
 public class DateParser extends ParserSkeleton{
 
@@ -18,6 +19,33 @@ public class DateParser extends ParserSkeleton{
 	private final ArrayList<String> DAYS_OF_WEEK = new ArrayList<String>( Arrays.asList(
 	"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
 	"mon", "tue", "wed", "thu", "fri", "sat", "sun") );
+	
+	private final ArrayList<String> MONTHS_WITH_31_DAYS = new ArrayList<String>( Arrays.asList(
+	"january", "march", "may", "july", "august", "october", "december") );
+	//"jan", "mar", "jul", "aug", "oct", "dec"
+	//"1", "3", "5", "7", "8", "10", "12") );
+	
+	private final ArrayList<String> MONTHS_WITH_30_DAYS = new ArrayList<String>( Arrays.asList(
+	"april", "june", "september", "november") );
+	//"apr", "jun", "sep", "nov", "4", "6", "9", "11") );
+	
+	private final String FEBRUARY = "february";
+	
+    private HashMap<String, ArrayList<String>> month_families = new HashMap<String, ArrayList<String>>(){
+		static final long serialVersionUID = 1L; {
+		put("january", new ArrayList<String>( Arrays.asList("jan", "1")));
+		put("february", new ArrayList<String>( Arrays.asList("feb", "2")));
+		put("march", new ArrayList<String>( Arrays.asList("mar", "3")));
+        put("april", new ArrayList<String>( Arrays.asList("apr", "4")));
+        put("may", new ArrayList<String>( Arrays.asList("may", "5"))); 
+        put("june", new ArrayList<String>( Arrays.asList("jun", "6")));
+        put("july", new ArrayList<String>( Arrays.asList("jul", "7")));
+        put("august", new ArrayList<String>( Arrays.asList("aug", "8")));        
+        put("september", new ArrayList<String>( Arrays.asList("sep", "9"))); 
+        put("october", new ArrayList<String>( Arrays.asList("oct", "10")));
+        put("november", new ArrayList<String>( Arrays.asList("nov", "11")));
+        put("december", new ArrayList<String>( Arrays.asList("dec", "12")));
+    }};
 	
 	private final com.joestelmach.natty.Parser NATTY = new com.joestelmach.natty.Parser();
 	
@@ -71,7 +99,7 @@ public class DateParser extends ParserSkeleton{
 		}
 		
 		eventEnd = makeEventEndComplete(eventStart, eventEnd);
-		
+
 		return new ArrayList<String>( Arrays.asList("OK", eventEnd));
 	}
 
@@ -491,7 +519,11 @@ public class DateParser extends ParserSkeleton{
 	}
 
 	private boolean isMonth(String token) {
+		if (isNumber(token) && getDateSymbol(token).isEmpty() && addSpaceBetweenDayAndMonth(token).split(" ").length == 1) {
+			return false;
+		}
 		token = token.toLowerCase();
+		token = convertMonthToDefault(token);
 		if (MONTHS.contains(token)){
 			return true;
 		}
@@ -653,35 +685,98 @@ public class DateParser extends ParserSkeleton{
 		for (int i = 0; i < dateTokens.length; i++) {
 			String token = dateTokens[i];
 			int day = -1;
+			String month = "";
 			if (isddmmFormat(token)) {
 				day = getDayfromDateString(token);
-				//String month = getMonthfromDateString(token);
+				month = getMonthfromDateString(token);
+				if (noSuchDayInMonth(day, month)) {
+					return makeErrorResult("InvalidDayOfMonthError", Integer.toString(day) + "/" + month);
+				}
 			}
 			if (isMonth(token)) {
 				token = addSpaceBetweenDayAndMonth(token);
 				if (token.split(" ").length > 1) {
+	
 					day = convertStringToInt(getFirst(token));
-				}
-				String prev = getPrevious(dateTokens, i);
-				if (isNumber(prev)) {
-					day = convertStringToInt(prev);
+					month = getLast(token);
 				} else {
-					day = convertStringToInt(getNext(dateTokens, i));
+					String prev = getPrevious(dateTokens, i);
+					month = token;
+					if (isNumber(prev)) {
+						day = convertStringToInt(prev);
+						if (noSuchDayInMonth(day, month)) {
+							return makeErrorResult("InvalidDayOfMonthError", Integer.toString(day) + " " + month);
+						}
+					} else {
+						day = convertStringToInt(getNext(dateTokens, i));
+						if (noSuchDayInMonth(day, month)) {
+							return makeErrorResult("InvalidDayOfMonthError", month + " " + Integer.toString(day));
+						}
+					}
+					
 				}
-			}
-			if (day > 31) {
-				return makeErrorResult("InvalidDayOfMonthError", Integer.toString(day));
 			}
 		}
 		return new ArrayList<String>( Arrays.asList("OK"));
 	}
 
+	private String convertMonthToDefault(String token) {
+		token = token.toLowerCase();
+		for (String month: month_families.keySet()) {
+			ArrayList<String> family = month_families.get(month);
+			if (family.contains(token)) {
+				return month;
+			}
+		}
+		return token;
+	}
+	
+	private boolean noSuchDayInMonth(int day, String month) {
+		month = removeFrontZero(month.toLowerCase());
+		if (has31Days(month)) {
+			return day > 31;
+		}
+		if (has30Days(month)) {
+			return day > 30;
+		}
+		if (isFebruary(month)) {
+			return day > 29;
+		}
+		return true;
+	}
+
+	private boolean has31Days(String month){
+		return MONTHS_WITH_31_DAYS.contains(convertMonthToDefault(month));
+	}
+	
+	private boolean has30Days(String month){
+		return MONTHS_WITH_30_DAYS.contains(convertMonthToDefault(month));
+	}
+	
+	private boolean isFebruary(String month){
+		return FEBRUARY.equals(convertMonthToDefault(month));
+	}
+	
+	private int getMaxDay(String month){
+		month = month.toLowerCase();
+		if (has31Days(month)) {
+			return 31;
+		}
+		if (has30Days(month)) {
+			return 30;
+		}
+		if (isFebruary(month)) {
+			return 29;
+		}
+		return -1;
+	}
+	
 	private int convertStringToInt(String str){
 		try {
 			return Integer.parseInt(str);
 		} catch (Exception e) {
 			System.out.println("DateParsingError: problem converting string '" + str + "' to int");
-			e.printStackTrace();
+			//e.printStackTrace();
 			return -1;
 		}
 	}
@@ -701,7 +796,17 @@ public class DateParser extends ParserSkeleton{
 	}
 	
 	private String getMonthfromDateString(String token) {
-		return getSecond(token.split(getDateSymbol(token)));
+		String sym = getDateSymbol(token);
+		if (!sym.isEmpty()) {
+			return getSecond(token.split(getDateSymbol(token)));
+		} else {
+			String[] tokens = token.split(" ");
+			if (isNumber(getFirst(tokens))) {
+				return getSecond(tokens);
+			} else {
+				return getFirst(tokens);
+			}
+		}
 	}
 	
 	private String getTimeFromString(String dateString) {
@@ -756,7 +861,11 @@ public class DateParser extends ParserSkeleton{
 				result.add(error + ": '" + token + "' is not an acceptable time format");
 				break;
 			case "InvalidDayOfMonthError":
-				result.add(error + ": '" + token + "' is not between 1 to 31");
+				
+				String month = getMonthfromDateString(token);
+				String defaultMonth = convertMonthToDefault(month);
+				result.add(error + ": The date '" + token + "' does not exist "
+						+ "(" + capitalize(defaultMonth) + " only has " + getMaxDay(defaultMonth) + " days!)");
 				break;
 			default:
 				break; 

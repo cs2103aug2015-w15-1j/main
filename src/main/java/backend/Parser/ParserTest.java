@@ -1057,22 +1057,42 @@ public class ParserTest {
 	    //Test invalid date
 	    input = "5 by 32/3 10am";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDayOfMonthError: '32' is not between 1 to 31") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDayOfMonthError: The date '32/3' does not exist (March only has 31 days!)") );
 	    executeTest();
 	    
 	    input = "5 by 32 apr 10am";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDayOfMonthError: '32' is not between 1 to 31") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDayOfMonthError: The date '32 apr' does not exist (April only has 30 days!)") );
 	    executeTest();
 	    
 	    input = "5 by may 32 10am";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDayOfMonthError: '32' is not between 1 to 31") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDayOfMonthError: The date 'may 32' does not exist (May only has 31 days!)") );
 	    executeTest();
 	    
 	    input = "5 from may 2 10am to 42 jun 4pm";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDayOfMonthError: '42' is not between 1 to 31") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDayOfMonthError: The date '42 jun' does not exist (June only has 30 days!)") );
+	    executeTest();
+	    
+	    input = "5 from may 72 10am to 42 jun 4pm";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDayOfMonthError: The date 'may 72' does not exist (May only has 31 days!)") );
+	    executeTest();
+	    
+	    input = "5 by 31/4 10am";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDayOfMonthError: The date '31/4' does not exist (April only has 30 days!)") );
+	    executeTest();
+	    
+	    input = "5 by 31 June 10am";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDayOfMonthError: The date '31 June' does not exist (June only has 30 days!)") );
+	    executeTest();
+	    
+	    input = "5 by 30 Feb 10am";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDayOfMonthError: The date '30 Feb' does not exist (February only has 29 days!)") );
 	    executeTest();
 	}
 }

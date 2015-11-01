@@ -74,6 +74,10 @@ abstract class ParserSkeleton {
 		return array[array.length-1];
 	}
 
+	String getLast(String str){
+		return str.split(" ")[str.split(" ").length-1];
+	}
+	
 	String getLast(ArrayList<String> arrayList){
 		if (arrayList.isEmpty()) {
 			return "";
@@ -106,6 +110,17 @@ abstract class ParserSkeleton {
 		}
 	}
 
+	String removeFrontZero(String token){
+		if (token.startsWith("0")) {
+			return token.substring(1, token.length());
+		}
+		return token;
+	}
+	
+	String capitalize(String word) {
+		return Character.toUpperCase(word.charAt(0)) + word.substring(1);
+	}
+	
 	boolean isCommandThatNoNeedContent(String token){
 		return COMMANDS_NO_CONTENT.contains(token);
 	}

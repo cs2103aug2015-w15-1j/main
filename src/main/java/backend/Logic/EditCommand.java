@@ -80,7 +80,6 @@ public class EditCommand extends Command {
 				feedbackString = setMultipleFieldsForFloats(this);
 				break;
 			case ("delete") :
-				System.out.println("EXECUTE DELETE");
 				feedbackString = delete(this);
 				break;
 			case ("deleteAll"):

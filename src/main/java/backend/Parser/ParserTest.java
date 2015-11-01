@@ -1059,5 +1059,20 @@ public class ParserTest {
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDayOfMonthError: '32' is not between 1 to 31") );
 	    executeTest();
+	    
+	    input = "5 by 32 apr 10am";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDayOfMonthError: '32' is not between 1 to 31") );
+	    executeTest();
+	    
+	    input = "5 by may 32 10am";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDayOfMonthError: '32' is not between 1 to 31") );
+	    executeTest();
+	    
+	    input = "5 from may 2 10am to 42 jun 4pm";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDayOfMonthError: '42' is not between 1 to 31") );
+	    executeTest();
 	}
 }

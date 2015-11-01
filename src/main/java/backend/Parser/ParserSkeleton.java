@@ -59,6 +59,13 @@ abstract class ParserSkeleton {
 		}
 		return null;
 	}
+	
+	String getNext(String[] list, int count) {
+		if (count != list.length-1) {
+			return list[count + 1];
+		}
+		return null;
+	}
 
 	String getLast(String[] array){
 		if (array.length == 0) {

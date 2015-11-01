@@ -650,18 +650,42 @@ public class DateParser extends ParserSkeleton{
 
 	private ArrayList<String> checkDateBound(String dateString) {
 		String[] dateTokens = dateString.split(" ");
-		for (String token: dateTokens) {
+		for (int i = 0; i < dateTokens.length; i++) {
+			String token = dateTokens[i];
+			int day = -1;
 			if (isddmmFormat(token)) {
-				int day = getDayfromDateString(token);
+				day = getDayfromDateString(token);
 				//String month = getMonthfromDateString(token);
-				if (day > 31) {
-					return makeErrorResult("InvalidDayOfMonthError", Integer.toString(day));
+			}
+			if (isMonth(token)) {
+				token = addSpaceBetweenDayAndMonth(token);
+				if (token.split(" ").length > 1) {
+					day = convertStringToInt(getFirst(token));
 				}
+				String prev = getPrevious(dateTokens, i);
+				if (isNumber(prev)) {
+					day = convertStringToInt(prev);
+				} else {
+					day = convertStringToInt(getNext(dateTokens, i));
+				}
+			}
+			if (day > 31) {
+				return makeErrorResult("InvalidDayOfMonthError", Integer.toString(day));
 			}
 		}
 		return new ArrayList<String>( Arrays.asList("OK"));
 	}
 
+	private int convertStringToInt(String str){
+		try {
+			return Integer.parseInt(str);
+		} catch (Exception e) {
+			System.out.println("DateParsingError: problem converting string '" + str + "' to int");
+			e.printStackTrace();
+			return -1;
+		}
+	}
+	
 	private boolean isddmmFormat(String token) {
 		return !getDateSymbol(token).isEmpty() && !getNumber(token).isEmpty();
 	}

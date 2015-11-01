@@ -76,7 +76,6 @@ public class LogicFacade {
 					Command undoableCommand = historyStack.pop();
 					feedbackString = undoableCommand.undo();
 					futureStack.push(undoableCommand);
-//					futureStack.push(historyStack.pop());
 					break;
 				case REDO:
 					feedbackString = futureStack.peek().redo();
@@ -91,13 +90,13 @@ public class LogicFacade {
 				case SEARCH:
 					feedbackString = commandObject.execute();
 					searchResults = commandObject.getSearchResults();
-					//System.out.println(searchResults);
 					break;
 				case EXIT:
 					System.exit(0);
 				default:
 					feedbackString = commandObject.execute();
 					historyStack.push(commandObject);
+					futureStack = new Stack<Command>();
 			}
 			getterSubComponent.updateIndex();
 //			System.out.println("feedbackString: "+feedbackString);

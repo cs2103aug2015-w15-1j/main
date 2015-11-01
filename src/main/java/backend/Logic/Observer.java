@@ -37,6 +37,7 @@ public class Observer {
 	private ArrayList<Task> getCompletedTasks;
 	private ArrayList<Task> getCompletedEvents;
 	private ArrayList<Task> getCompletedFloat;
+	private static ArrayList<Task> searchResults = new ArrayList<Task>();
 	
 	public static Observer getInstance(Storage storageComponent) {
 		
@@ -206,8 +207,12 @@ public class Observer {
 	*/
 	
 
-	private ArrayList<Task> getSearchResultsList() {
-		return null;
+	public ArrayList<Task> getSearchResultsList() {
+		return this.searchResults;
+	}
+	
+	public void updateSearchResultsList(ArrayList<Task> searchList) {
+		this.searchResults = searchList;
 	}
 	
 	private ArrayList<Task> getTasks(TaskType taskType) {

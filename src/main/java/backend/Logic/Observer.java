@@ -116,6 +116,38 @@ public class Observer {
 		return reformatDate(upcomingDate);
 	}
 	
+	public String getUpcomingDate(Task task, RecurrenceType recur, String currentDate) {
+		
+		String upcomingDate = new String();
+		long currentDateMilliseconds = Constant.stringToMillisecond(currentDate);
+		int factor = task.getRecurrenceFrequency();
+		Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(currentDateMilliseconds);
+		
+		switch(recur) {
+			case NONE:
+				break;
+			case DAY:
+				date.add(Calendar.DATE, factor);
+	            upcomingDate = getDate(date.getTimeInMillis());
+				break;
+			case WEEK:
+				factor *= 7;
+				date.add(Calendar.DATE, factor);
+	            upcomingDate = getDate(date.getTimeInMillis());
+				break;
+			case MONTH:
+				date.add(Calendar.MONTH, factor);
+	            upcomingDate = getDate(date.getTimeInMillis());
+				break;
+			case YEAR:
+				date.add(Calendar.YEAR, factor);
+	            upcomingDate = getDate(date.getTimeInMillis());
+				break;
+		}
+		return reformatDate(upcomingDate);
+	}
+	
 	private String getDate(long milliSeconds) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(milliSeconds);
@@ -435,6 +467,7 @@ public class Observer {
 				break;
 		}
 		
+		Collections.sort(data);
 		return data;
 	}
 	

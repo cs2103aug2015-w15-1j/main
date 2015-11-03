@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 
 import main.java.backend.Storage.Storage;
@@ -58,20 +59,6 @@ public class Observer {
 				.replace("PM", "");
 		
 		return newDate;
-	}
-	
-	private ArrayList<Task> generateTaskId(ArrayList<Task> taskList) {
-		
-		ArrayList<Task> newTaskList = new ArrayList<Task> ();
-		int newTaskId = 0;
-		
-		for(Task task : taskList) {
-			task.setTaskId(newTaskId);
-			newTaskList.add(task);
-			newTaskId++;
-		}
-		
-		return newTaskList;
 	}
 	
 	private void resetRecurring() {
@@ -480,7 +467,7 @@ public class Observer {
 				break;
 		}		
 
-		return generateTaskId(data);
+		return data;
 	}
 	
 	private void retrieveAllData(){

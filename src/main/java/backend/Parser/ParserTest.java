@@ -169,6 +169,15 @@ public class ParserTest {
 	    expected = new ArrayList<String>( Arrays.asList("sortP") );
 	    executeTest();
 	    
+	    input = "filepath Desktop/TankTask/";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("filepath", "Desktop/TankTask/") );
+	    executeTest();
+	    
+	    input = "fp Desktop/TankTask/";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("filepath", "Desktop/TankTask/") );
+	    executeTest();
 	}
 	
 	@Test

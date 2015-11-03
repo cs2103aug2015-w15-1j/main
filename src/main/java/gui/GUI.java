@@ -351,6 +351,7 @@ public class GUI extends Application{
 
 		//Overdue shows only if there is any overdue tasks
 		if (controller.getOverdueList().size()!=0){
+			toggleFloat = false;
 			floating.setText("Overdue:");
 			listOverdue = getList(controller.getOverdueList());
 			listOverdue.setFocusTraversable(false);
@@ -360,20 +361,12 @@ public class GUI extends Application{
 		}
 		else{
 			//floating
-			if (toggleFloat == false){
-				floating.setText(LIST_FLOATING);
-				listFloat = getList(controller.getFloatList());
-				listFloat.setFocusTraversable( false );
-				GridPane.setConstraints(listFloat, 3, 1);
-				gridPane.getChildren().addAll(listFloat);
-			}
-			else{
-				floating.setText("Categories:");
-				listCate = getStringList(controller.getCateList());
-				listCate.setFocusTraversable( false );
-				GridPane.setConstraints(listCate, 3, 1);
-				gridPane.getChildren().add(listCate);
-			}
+			toggleFloat = true;
+			floating.setText(LIST_FLOATING);
+			listFloat = getList(controller.getFloatList());
+			listFloat.setFocusTraversable( false );
+			GridPane.setConstraints(listFloat, 3, 1);
+			gridPane.getChildren().addAll(listFloat);
 		}
 
 	}
@@ -412,9 +405,7 @@ public class GUI extends Application{
 			detailField.setText(MESSAGE_EMPTY);
 		} else{
 			detailField.setText(getFocusList.get(0).toString());
-			currentPosition = 0;
-			listFocus.scrollTo(currentPosition);
-			listFocus.getSelectionModel().select(currentPosition);
+
 		}
 		gridPane.getChildren().add(detailField);
 	}
@@ -474,9 +465,9 @@ public class GUI extends Application{
 	}
 
 	private static void refreshingFocus(int currentListNum){
-		if (currentListNum == NUM_SEARCH){
+		/*if (currentListNum == NUM_SEARCH){
 			controller.retrieveSearch();
-		}
+		}*/
 		controller.determineList(currentListNum);
 		try {
 			changeFocusList(currentListNum);
@@ -491,6 +482,8 @@ public class GUI extends Application{
 		gridPane.getChildren().remove(listFocus);
 		listFocus = getList(controller.getFocusList());
 		listFocus.setFocusTraversable(false);
+		listFocus.scrollTo(currentPosition);
+		listFocus.getSelectionModel().select(currentPosition);
 		GridPane.setConstraints(listFocus, 0, 1);
 		gridPane.getChildren().add(listFocus);	
 	}
@@ -741,7 +734,6 @@ public class GUI extends Application{
 	private static void exit(){
 		System.out.println(isHelp);
 		if (isHelp){
-			System.out.println("GOODBYE!");
 			help.close();
 			isHelp = false;
 		}
@@ -794,9 +786,30 @@ public class GUI extends Application{
 	}
 
 	private static void toggleFloat() throws IOException, JSONException, ParseException{
-		controller.retrieveAllData();
-		if (currentScene == SCENE_MAIN){
-			gridPane.getChildren().removeAll(listFloat,listCate);
+		if (currentScene == SCENE_MAIN && !controller.getOverdueList().isEmpty()){
+			controller.retrieveAllData();
+			gridPane.getChildren().removeAll(listFloat);
+			
+			if (toggleFloat == true ){
+				toggleFloat = false;
+				floating.setText("Overdue:");
+				listOverdue = getList(controller.getOverdueList());
+				listOverdue.setFocusTraversable(false);
+				listOverdue.setId("listOverdue");
+				GridPane.setConstraints(listOverdue, 3,1);
+				gridPane.getChildren().addAll(listOverdue);
+			}
+			else{
+				//floating
+				toggleFloat = true;
+				floating.setText(LIST_FLOATING);
+				listFloat = getList(controller.getFloatList());
+				listFloat.setFocusTraversable( false );
+				GridPane.setConstraints(listFloat, 3, 1);
+				gridPane.getChildren().addAll(listFloat);
+			}
+			//toggle categories no longer in use.
+			/*
 			if (toggleFloat==false){
 				toggleFloat=true;
 				floating.setText("Categories:");
@@ -813,7 +826,7 @@ public class GUI extends Application{
 				GridPane.setConstraints(listFloat, 3, 1);
 				gridPane.getChildren().add(listFloat);
 
-			}
+			}*/
 		}
 	}
 

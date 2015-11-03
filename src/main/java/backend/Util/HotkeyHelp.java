@@ -11,7 +11,7 @@ public class HotkeyHelp {
 	
 	public HotkeyHelp() {
 		f1 = "Press 'F1' to toggle help";
-		f2 = "Press 'F2' to get list of existing categories.";
+		f2 = "Press 'F2' to toggle between floating and overdue tasks (if any)";
 		f3 = "Press 'F3' to get Today's Tasks & Events.";
 		f4 = "Press 'F4' see completed Tasks, Events & Floats";
 		esc = "Press 'esc' to exit program";

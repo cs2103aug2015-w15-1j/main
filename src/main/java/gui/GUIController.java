@@ -1,4 +1,4 @@
-package main.java.gui;
+ package main.java.gui;
 
 import java.util.ArrayList;
 
@@ -56,6 +56,8 @@ public class GUIController {
 	}
 	void retrieveSearch(){
 		getSearch = logicComponent.retrieveSearchData();
+		//System.out.println("Search results starts here");
+		//System.out.println(getSearch);
 		assert getSearch!=null;
 	}
 	

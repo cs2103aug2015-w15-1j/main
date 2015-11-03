@@ -1,8 +1,11 @@
-package main.java.gui;
+ package main.java.gui;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -11,8 +14,6 @@ import org.json.JSONException;
 import org.json.simple.parser.ParseException;
 
 import com.sun.javafx.application.LauncherImpl;
-
-import java.util.logging.*;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -39,6 +40,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import main.java.backend.Storage.Task.Task;
 
 public class GUI extends Application{
@@ -82,6 +84,7 @@ public class GUI extends Application{
 	private static GUIController controller;
 	private static HelpView help;
 	private static GridPane gridPane;
+	private static Stage stage;
 	private static Scene mainScene;	
 	private static String userCommands;
 	private static Console console;
@@ -133,11 +136,18 @@ public class GUI extends Application{
 
 	private static void redirectOutput(PrintStream stream){
 		System.setOut(stream);
-		//System.setErr(stream);
+		System.setErr(stream);
 	}
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
+		final File file = new File("flag");
+        final RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+        final FileLock fileLock = randomAccessFile.getChannel().tryLock();
+       // System.out.println(fileLock == null);
+        if (fileLock == null) {
+            Platform.exit();
+        }
 		primaryStage.setTitle("TankTask");
 		setUpDefault();
 		setupUserInput();
@@ -146,11 +156,26 @@ public class GUI extends Application{
 		primaryStage.getIcons().add(icon);
 
 		primaryStage.setScene(mainScene);
-		primaryStage.show();
+		stage = primaryStage;
+		stage.show();
 		
 		determineEvents();
 		reminders();
-		
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+
+            @Override
+            public void handle(WindowEvent arg0) {
+                try {
+                    fileLock.release();
+                    randomAccessFile.close();
+                    System.out.println("Closing");
+                } catch (Exception ex) {
+                    System.out.print(ex.getMessage());
+                }
+
+            }
+        });
+
 		
 	}
 	private void reminders(){
@@ -176,20 +201,18 @@ public class GUI extends Application{
 	}
 
 	protected void runNoti() {
+		
 		String content = "";
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("REMINDER!");
 		alert.setHeaderText(null);
 		ArrayList<Task> reminders = controller.getReminderList();
-		if (reminders.isEmpty()){
-			content = "HELLO KHAIRUL";
-		}
 		for (int i=0;i<reminders.size();i++){
 			content+=reminders.get(i).reminderPrint();
 		}
 		alert.setContentText(content);
-
 		alert.showAndWait();
+		refresh();
 	}
 
 	private void setUpDefault() throws IOException, JSONException, ParseException{
@@ -418,6 +441,7 @@ public class GUI extends Application{
 
 	private static void refresh(){
 		//System.out.println("refreshing");
+		controller.retrieveAllData();
 		if (currentScene == SCENE_MAIN){
 			gridPane.getChildren().removeAll(tasks,events,floating,listOverdue, listFloat,listTasks,listEvents);
 			setUpHeadings();
@@ -429,7 +453,6 @@ public class GUI extends Application{
 	}
 
 	private static void refreshingFocus(int currentListNum){
-		controller.retrieveAllData();
 		if (currentListNum == NUM_SEARCH){
 			controller.retrieveSearch();
 		}
@@ -482,8 +505,7 @@ public class GUI extends Application{
 			@Override
 			public void handle(KeyEvent ke)
 			{	
-				//System.out.println(ke.getCode().toString());
-				controller.retrieveAllData();
+				
 				if (ke.getCode().equals(KeyCode.ENTER))
 				{
 					userInputCommands();	
@@ -504,8 +526,6 @@ public class GUI extends Application{
 
 					displayStringToScreen(response);
 
-				} else if (ke.getCode().equals(KeyCode.F12)){
-					runNoti();
 				}else if (ke.getCode().equals(KeyCode.F1)){
 					help.helpPopUp();
 				} else if(ke.getCode().equals(KeyCode.F2)){
@@ -585,8 +605,8 @@ public class GUI extends Application{
 						}
 					}
 				}
-
 			}
+			
 		});
 	}
 
@@ -691,6 +711,7 @@ public class GUI extends Application{
 					displayStringToScreen(display);
 
 				}
+				controller.retrieveAllData();
 			}
 		}
 	}

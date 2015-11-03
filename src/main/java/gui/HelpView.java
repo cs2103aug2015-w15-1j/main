@@ -1,6 +1,5 @@
-package main.java.gui;
+ package main.java.gui;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import javafx.collections.FXCollections;
@@ -44,11 +43,8 @@ public class HelpView {
 		leftText = new Text();
 		rightText = new Text();
 		fullList = new ArrayList<ArrayList<String>>();
-		try {
-			command = new CommandHelp();
-		} catch (FileNotFoundException e) {
-			System.out.print(e.getMessage());
-		}
+		command = new CommandHelp();
+		
 		fullList = command.getSplitList();
 		textList = command.getSplitNaming();
 		assert fullList!=null && !fullList.isEmpty();
@@ -57,7 +53,7 @@ public class HelpView {
 	}
 	
 	public void helpPopUp() {
-		currentView=-2;
+		currentView=-3;
 		Stage pop = new Stage();
 		pane = new GridPane();
 		comp = new VBox();
@@ -253,12 +249,12 @@ public class HelpView {
 				HBox box2 = new HBox();
 				box2.setAlignment(Pos.CENTER);
 				ImageView newimv = new ImageView();
-				Image newimage = new Image(GUI.class.getResourceAsStream(imageNames.get(++j)));
+				Image newimage = new Image(HelpView.class.getResourceAsStream(imageNames.get(++j)));
 				newimv.setImage(newimage);
 				newimv.setFitWidth(45);
 				newimv.setPreserveRatio(true);
 				ImageView newimv2 = new ImageView();
-				Image newimage2 = new Image(GUI.class.getResourceAsStream(imageNames.get(++j)));
+				Image newimage2 = new Image(HelpView.class.getResourceAsStream(imageNames.get(++j)));
 				newimv2.setImage(newimage2);
 				newimv2.setFitWidth(45);
 				newimv2.setPreserveRatio(true);

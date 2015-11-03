@@ -1,7 +1,6 @@
 package main.java.backend.Logic;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EmptyStackException;
 
 import main.java.backend.Storage.Storage;
@@ -80,22 +79,6 @@ public class AddCommand extends Command {
 		}
 	}
 	
-	private ArrayList<Task> generateTaskId(ArrayList<Task> taskList) {
-		
-		ArrayList<Task> newTaskList = new ArrayList<Task> ();
-		int newTaskId = 0;
-		
-		Collections.sort(taskList);
-		
-		for(Task task : taskList) {
-			task.setTaskId(newTaskId);
-			newTaskList.add(task);
-			newTaskId++;
-		}
-		
-		return newTaskList;
-	}
-	
 	private RecurrenceType getRecurrence(String recurrence) {
 		
 		if(recurrence.equals("day")) {
@@ -150,8 +133,8 @@ public class AddCommand extends Command {
 		Task newTask = getTask(taskType, command);
 
 		taskList = storageComponent.load();
+		newTask.setIndex(taskList.size());
 		taskList.add(newTask);
-		taskList = generateTaskId(taskList);
 		storageComponent.save(taskList);
 
 		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, newTask.getName());

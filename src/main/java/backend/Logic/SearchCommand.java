@@ -1,8 +1,6 @@
 package main.java.backend.Logic;
 
 import java.util.ArrayList;
-import java.util.TreeMap;
-
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
 
@@ -22,7 +20,7 @@ public class SearchCommand extends Command {
 	}
 	
 	public String execute() {
-		System.out.println("Keyword: "+this.getKeywords());
+//		System.out.println("Keyword: "+this.getKeywords());
 		taskList = storageComponent.load();
 		ArrayList<Task> result = new ArrayList<Task> ();
 		String[] tokenize = this.getKeywords().toLowerCase().split(" ");

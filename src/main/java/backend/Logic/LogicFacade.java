@@ -2,6 +2,7 @@ package main.java.backend.Logic;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EmptyStackException;
 import java.util.Stack;
 import java.util.logging.FileHandler;
@@ -90,8 +91,6 @@ public class LogicFacade {
 					break;
 				case SEARCH:
 					feedbackString = commandObject.execute();
-					ArrayList<Task> searchResults = commandObject.getSearchResults();
-					getterSubComponent.updateSearchResultsList(searchResults);
 					searchStack.push(commandObject);
 					break;
 				case EXIT:
@@ -101,15 +100,11 @@ public class LogicFacade {
 					historyStack.push(commandObject);
 					futureStack = new Stack<Command>();
 			}
-			if(!searchStack.isEmpty()) {
-//				System.out.println("is search stack empty? "+searchStack.empty());
-				searchStack.peek().execute();
-			}
 			getterSubComponent.updateIndex();
 //			System.out.println("feedbackString: "+feedbackString);
 //			System.out.println("History stack size after command execution: "+historyStack.size());
 			return feedbackString;
-		} catch (NullPointerException | EmptyStackException e) {
+		} catch ( EmptyStackException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
@@ -123,7 +118,24 @@ public class LogicFacade {
 	}
 	
 	public ArrayList<Task> retrieveSearchData() {
+		if(!searchStack.isEmpty()) {
+//			System.out.println("is search stack empty? "+searchStack.empty());
+			searchStack.peek().execute();
+			ArrayList<Task> searchResults = searchStack.peek().getSearchResults();
+//			Collections.sort(searchResults);
+//			System.out.println(searchResults);
+//			toPrint(searchResults);
+			getterSubComponent.updateSearchResultsList(searchResults);
+			
+		}
 		return getterSubComponent.getSearchResultsList();
 	}
+	
+//	private void toPrint(ArrayList<Task> searchResult) {
+//		System.out.println("Search Result Array Size: "+searchResult.size());
+//		for (int i = 0; i < searchResult.size(); i++) {
+//			System.out.println(i+1+". "+searchResult.get(i).getName());
+//		}
+//	}
 
 }

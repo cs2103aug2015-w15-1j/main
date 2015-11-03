@@ -465,8 +465,7 @@ public class Observer {
 			case ("reminder") :
 				data = getAllReminder();
 				break;
-		}
-		
+		}		
 		Collections.sort(data);
 		return data;
 	}

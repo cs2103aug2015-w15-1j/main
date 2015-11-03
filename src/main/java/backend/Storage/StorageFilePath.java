@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Properties;
 
 public class StorageFilePath {
@@ -18,8 +17,6 @@ public class StorageFilePath {
 	
 	// TODO: Change default file path
 	private static final String PATH_LOCATION_DEFAULT = System.getProperty("user.home") + "/Desktop" + "/filename.txt";
-	private static String PATH_LOCATION_OLD;
-	private static String PATH_LOCATION_NEW;
 	
 	private File textFile;
 	private FileReader reader;
@@ -30,8 +27,7 @@ public class StorageFilePath {
 	public StorageFilePath() {
 		
 		properties = new Properties();
-		PATH_LOCATION_OLD = retrieveFilePath();
-		textFile = new File(PATH_LOCATION_OLD);
+		textFile = new File(retrieveFilePath());
 	}
 	
 	private String retrieveFilePath() {

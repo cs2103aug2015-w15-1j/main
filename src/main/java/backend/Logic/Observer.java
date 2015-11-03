@@ -466,7 +466,7 @@ public class Observer {
 				data = getAllReminder();
 				break;
 		}		
-		Collections.sort(data);
+
 		return data;
 	}
 	

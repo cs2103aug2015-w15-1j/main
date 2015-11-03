@@ -80,11 +80,12 @@ public class AddCommand extends Command {
 		}
 	}
 	
-	private ArrayList<Task> generateTaskId() {
+	private ArrayList<Task> generateTaskId(ArrayList<Task> taskList) {
 		
-		ArrayList<Task> taskList = storageComponent.load();
 		ArrayList<Task> newTaskList = new ArrayList<Task> ();
 		int newTaskId = 0;
+		
+		Collections.sort(taskList);
 		
 		for(Task task : taskList) {
 			task.setTaskId(newTaskId);
@@ -148,10 +149,9 @@ public class AddCommand extends Command {
 
 		Task newTask = getTask(taskType, command);
 
-		taskList = generateTaskId();
-		newTask.setTaskId(taskList.size());
+		taskList = storageComponent.load();
 		taskList.add(newTask);
-		Collections.sort(taskList);
+		taskList = generateTaskId(taskList);
 		storageComponent.save(taskList);
 
 		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, newTask.getName());

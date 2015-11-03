@@ -52,6 +52,7 @@ public class ParserVault extends ParserSkeleton{
         put("description", new ArrayList<String>( Arrays.asList("des")));
         put("event", new ArrayList<String>( Arrays.asList("from"))); 
         put("every", new ArrayList<String>( Arrays.asList("recur"))); 
+        put("filepath", new ArrayList<String>( Arrays.asList("fp")));
         put("priority", new ArrayList<String>( Arrays.asList("pri")));
         put("reminder", new ArrayList<String>( Arrays.asList("rem")));
     }};

@@ -169,6 +169,15 @@ public class ParserTest {
 	    expected = new ArrayList<String>( Arrays.asList("sortP") );
 	    executeTest();
 	    
+	    input = "filepath Desktop/TankTask/";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("filepath", "Desktop/TankTask/") );
+	    executeTest();
+	    
+	    input = "fp Desktop/TankTask/";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("filepath", "Desktop/TankTask/") );
+	    executeTest();
 	}
 	
 	@Test
@@ -450,6 +459,11 @@ public class ParserTest {
 	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 15, 11:59pm") );
 	    executeTest();
 	    
+		input = "1 deadline 30 Dec 8:07pm";
+		actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 15, 8:07pm") );
+	    executeTest();
+	    
 	    //Test whether time without minutes work
 		input = "1 deadline 30-12 11pm";
 	    actual = parser.parseInput(input);
@@ -488,6 +502,22 @@ public class ParserTest {
 		actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", dateNow + " 20:00:00 " + yearNow) );
 	    printTest();*/
+	    
+	    //Testing if zeroes are removed correctly from time
+		input = "1 deadline 30 Dec 8pm";
+		actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 15, 8pm") );
+	    executeTest();
+	    
+		input = "1 deadline 30 Dec 8:07pm";
+		actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 15, 8:07pm") );
+	    executeTest();
+	    
+		input = "1 deadline 30 Dec 8:10pm";
+		actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 15, 8:10pm") );
+	    executeTest();
 	    
 	    //Testing for event with both start and end date/time
 	    input = "3 event 15/09 10:00 to 17/09 09:59";

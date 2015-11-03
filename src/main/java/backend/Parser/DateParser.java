@@ -65,7 +65,6 @@ public class DateParser extends ParserSkeleton{
 		parsedDate = standardizeDateFormat(parsedDate);
 		parsedDate = confirmDateIsInFuture(parsedDate);
 		parsedDate = removeMinuteIfZero(parsedDate);
-		
 		return parsedDate;
 	}
 
@@ -355,7 +354,11 @@ public class DateParser extends ParserSkeleton{
 			if (minute == 0) {
 				time = hour + period;
 			} else {
-				time = hour + ":" + minute + period;
+				if (minute < 10) {
+					time = hour + ":0" + minute + period;
+				} else {
+					time = hour + ":" + minute + period;
+				}
 			}
 			
 			String[] dateTokens = dateString.split(", ");

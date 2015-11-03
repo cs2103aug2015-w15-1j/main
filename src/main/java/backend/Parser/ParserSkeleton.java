@@ -8,7 +8,7 @@ abstract class ParserSkeleton {
 	//List of all command words accepted by the program
 	final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList(
 	"add", "addcat", "category", "deadline", "description", "delete", "deleteAll", "done", "event", "every", 
-	"exit", "priority", "redo", "reminder", "rename", "reset", "search", "setcol", "showcat",   
+	"exit", "filepath", "priority", "redo", "reminder", "rename", "reset", "search", "setcol", "showcat",   
 	"show", "showE", "showF", "showO", "showT", "showToday", "sort", "sortD", "sortN", "sortP", "undo", "undone") );
 	
 	//Commands that work just by typing the command word (without additional content)
@@ -17,11 +17,11 @@ abstract class ParserSkeleton {
 	
 	//Commands that if appear first, will prevent other command keywords from having effect
 	final ArrayList<String> COMMANDS_DOMINATING = new ArrayList<String>( Arrays.asList(
-	"addcat", "delete", "done", "every", "reset", "search", "setcol", "show", "showcat", "sort", "undone") );
+	"addcat", "delete", "done", "every", "filepath", "reset", "search", "setcol", "show", "showcat", "sort", "undone") );
 	
 	//Commands that can accept any amount of words
 	final ArrayList<String> COMMANDS_NEED_WORDS = new ArrayList<String>( 
-	Arrays.asList("add", "addcat", "category", "description", "search") );
+	Arrays.asList("add", "addcat", "category", "description", "filepath", "search") );
 	
 	//Commands that cannot be part of a one-shot command
 	final ArrayList<String> COMMANDS_NOT_ONE_SHOT = new ArrayList<String>( 

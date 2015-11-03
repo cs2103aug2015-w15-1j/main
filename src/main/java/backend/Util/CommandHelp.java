@@ -2,6 +2,7 @@ package main.java.backend.Util;
 
 import java.util.ArrayList;
 
+//@@author A0126125R
 public class CommandHelp {
 	
 	ArrayList<ArrayList<String>> fullList;
@@ -33,8 +34,8 @@ public class CommandHelp {
 	
 	private void split(){
 		add.add("List of Command Keywords in TankTask:"
-				+ "	\n	Adding Tasks\n"
-				+ "			add"
+				+ "	\nAdding Tasks\n"
+				+ "		\n	add"
 				+ "		\n		Format: add [Task Name]"
 				+ "		\n			Example: add Feed the fish"
 				+ "\n"
@@ -46,8 +47,8 @@ public class CommandHelp {
 				+ "		\n		Format: add [Task Name] from [Start] to [End]"
 				+ "		\n			Example: add Feed the fish from today 6pm to 6:15pm");
 		doneUndone.add("List of Command Keywords in TankTask:"
-				+ "	\n	Managing your Tasks\n"
-				+ "			done"
+				+ "	\nManaging your Tasks\n"
+				+ "		\n	done"
 				+ "		\n		Format 1: done [Task Index]"
 				+ "		\n			Example: done 1"
 				+ "		\n			"
@@ -61,7 +62,7 @@ public class CommandHelp {
 				+ "		\n		Format 2: [Task Index] undone"
 				+ "		\n			Example: 1 undone");
 		deleteRedo.add("List of Command Keywords in TankTask:"
-				+ "	\n	Managing your Tasks"
+				+ "	\nManaging your Tasks"
 				+ "\n"
 				+ "		\n	delete (Alternate form: del)"
 				+ "		\n		Format 1: del [Task Index]"
@@ -76,7 +77,7 @@ public class CommandHelp {
 				+ "		\n	redo"
 				+ "		\n		Format: redo");
 		showSort.add("List of Command Keywords in TankTask:"
-				+ "\n	Managing your Tasks "
+				+ "\nManaging your Tasks "
 				+ "\n"
 				+ "		\n	search"
 				+ "		\n		Format: search [Search Term(s)]"
@@ -96,7 +97,7 @@ public class CommandHelp {
 				+ "		\n		Format 2: sort[X]"
 				+ "		\n			Example: sortP");
 		everyExit.add("List of Command Keywords in TankTask:"
-				+ "		\n	Managing your Tasks"
+				+ "		\nManaging your Tasks"
 				+ "\n"
 				+ "		\n	every"
 				+ "		\n		Format: every [Frequency (day/week/month/year)] [Date/Time]"
@@ -113,7 +114,7 @@ public class CommandHelp {
 				+ "		\n	exit"
 				+ "		\n		Format: exit");
 		renameEvent.add("List of Command Keywords in TankTask:"
-				+ "		\n	Editing your Tasks"
+				+ "		\nEditing your Tasks"
 				+ "\n"
 				+ "		\n	rename"
 				+ "		\n		Format: [Task Index] rename [New Task Name]"
@@ -131,7 +132,7 @@ public class CommandHelp {
 				+ "		\n			Example: 1 from 20 Oct 3pm to 5pm"
 				+ "		\n			Example: 1 from 20 Oct 3pm to 21 Oct 8am");
 		desCate.add("List of Command Keywords in TankTask:"
-				+ "		\n	Editing your Tasks"
+				+ "		\nEditing your Tasks"
 				+ "\n"
 				+ "		\n	description (Alternate form: des)"
 				+ "		\n		Format: [Task Index] des [Description]"

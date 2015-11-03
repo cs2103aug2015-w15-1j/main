@@ -14,6 +14,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -24,7 +29,9 @@ import javafx.stage.Stage;
 import main.java.backend.Util.CommandHelp;
 import main.java.backend.Util.HotkeyHelp;
 
+//@@author A0126125R
 public class HelpView {
+	Stage pop;
 	CommandHelp command;
 	HotkeyHelp hotkey;
 	Text leftText;
@@ -54,8 +61,13 @@ public class HelpView {
 	
 	public void helpPopUp() {
 		currentView=-3;
-		Stage pop = new Stage();
+		pop = new Stage();
 		pane = new GridPane();
+		Image image = new Image(GUI.class.getResourceAsStream("Resources/background.png"));
+		BackgroundSize backgroundSize = new BackgroundSize(100, 100, true, true, true,true);
+		BackgroundImage backgroundImage = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
+		Background background = new Background(backgroundImage);
+		pane.setBackground(background);
 		comp = new VBox();
 		comp2 = new VBox();
 		content = new VBox();
@@ -93,7 +105,7 @@ public class HelpView {
 		
 		pane.setGridLinesVisible(false); //checking
 		pane.getChildren().addAll(leftNavi,rightNavi);
-		Scene stageScene = new Scene(pane, 700, 650);
+		Scene stageScene = new Scene(pane, 800, 600);
 		Image icon = new Image(getClass().getResourceAsStream("tank.png")); 
 		pop.getIcons().add(icon);
 		stageScene.getStylesheets().add(getClass().getResource("HelpStyle.css").toExternalForm());
@@ -267,5 +279,9 @@ public class HelpView {
 			}
 			
 		}
+	}
+
+	public void close() {
+		pop.close();
 	}
 }

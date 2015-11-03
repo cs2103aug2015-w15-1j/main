@@ -5,6 +5,7 @@ import java.io.OutputStream;
 
 import javafx.scene.control.TextArea;
 
+//@@author A0126125R
 public class Console extends OutputStream{
 	private TextArea txt;
 	

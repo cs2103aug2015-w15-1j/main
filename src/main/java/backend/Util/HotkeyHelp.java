@@ -2,6 +2,7 @@ package main.java.backend.Util;
 
 import java.util.ArrayList;
 
+//@@author A0126125R
 public class HotkeyHelp {
 	
 	String f1,f2 ,f3, f4, esc, tab,up,down,left,right,ctrlz,ctrly,shiftup,shiftdown;

@@ -1,6 +1,6 @@
-
+/*@@author A0126125R */
 .root{
-	-fx-background-image:url(../../../../src/main/java/gui/Resources/background.png);
+	/*-fx-background-image:url(../Resources/background.png);*/
 	-fx-text-inner-color: black;
 	-fx-font-size: 15px;
 }
@@ -41,6 +41,10 @@
 
 .list-cell:empty {
 	-fx-background-color:#A0CFEC;
+}
+
+.list-cell:selected {
+	-fx-font-size: 20px;
 }
 
 .user{

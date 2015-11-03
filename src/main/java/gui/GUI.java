@@ -1,4 +1,5 @@
- package main.java.gui;
+
+package main.java.gui;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -33,6 +34,11 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
@@ -43,6 +49,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import main.java.backend.Storage.Task.Task;
 
+//@@author A0126125R
 public class GUI extends Application{
 	
 	//Possible messages
@@ -78,8 +85,9 @@ public class GUI extends Application{
 	private static int currentList = 1;
 	private static int currentPosition = 0;
 	private static int currentScene = 1;
-	private static boolean toggleCate = false;
+	private static boolean toggleFloat = false;
 	private static boolean noti = false;
+	private static boolean isHelp = false;
 
 	private static GUIController controller;
 	private static HelpView help;
@@ -136,7 +144,7 @@ public class GUI extends Application{
 
 	private static void redirectOutput(PrintStream stream){
 		System.setOut(stream);
-		System.setErr(stream);
+	//	System.setErr(stream); //error codes are not shown in console.
 	}
 
 	@Override
@@ -144,10 +152,11 @@ public class GUI extends Application{
 		final File file = new File("flag");
         final RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
         final FileLock fileLock = randomAccessFile.getChannel().tryLock();
-       // System.out.println(fileLock == null);
+       // System.out.println(fileLock == null); //check whether file is locked.
         if (fileLock == null) {
             Platform.exit();
         }
+        
 		primaryStage.setTitle("TankTask");
 		setUpDefault();
 		setupUserInput();
@@ -166,6 +175,9 @@ public class GUI extends Application{
             @Override
             public void handle(WindowEvent arg0) {
                 try {
+                	if (isHelp){
+                		help.close();
+                	}
                     fileLock.release();
                     randomAccessFile.close();
                     System.out.println("Closing");
@@ -189,7 +201,7 @@ public class GUI extends Application{
 			    			@Override
 			    			public void run() {
 			    				noti = controller.getNoti();
-			    				// System.out.println("reminder check");
+			    				// System.out.println("reminder check"); //checks that it runs into the method every minute
 						           if (noti){
 						            	runNoti();
 						            }
@@ -219,6 +231,7 @@ public class GUI extends Application{
 		setUpGrid(); //general info
 		initGrid(); //setting up individual sizing
 		setUpGridContents();//setting up contents;
+		
 		mainScene = new Scene(gridPane,1000,600);
 		mainScene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 	}
@@ -243,6 +256,11 @@ public class GUI extends Application{
 
 	private void setUpGrid() {
 		gridPane = new GridPane();
+		Image image = new Image(GUI.class.getResourceAsStream("Resources/background.png"));
+		BackgroundSize backgroundSize = new BackgroundSize(100, 100, true, true, true,true);
+		BackgroundImage backgroundImage = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
+		Background background = new Background(backgroundImage);
+		gridPane.setBackground(background);
 		gridPane.setFocusTraversable(false);
 		gridPane.setGridLinesVisible(false); //checking
 		gridPane.setVgap(4);
@@ -342,7 +360,7 @@ public class GUI extends Application{
 		}
 		else{
 			//floating
-			if (toggleCate == false){
+			if (toggleFloat == false){
 				floating.setText(LIST_FLOATING);
 				listFloat = getList(controller.getFloatList());
 				listFloat.setFocusTraversable( false );
@@ -394,6 +412,9 @@ public class GUI extends Application{
 			detailField.setText(MESSAGE_EMPTY);
 		} else{
 			detailField.setText(getFocusList.get(0).toString());
+			currentPosition = 0;
+			listFocus.scrollTo(currentPosition);
+			listFocus.getSelectionModel().select(currentPosition);
 		}
 		gridPane.getChildren().add(detailField);
 	}
@@ -527,10 +548,11 @@ public class GUI extends Application{
 					displayStringToScreen(response);
 
 				}else if (ke.getCode().equals(KeyCode.F1)){
+					isHelp = true;
 					help.helpPopUp();
 				} else if(ke.getCode().equals(KeyCode.F2)){
 					try {
-						toggleCategory();
+						toggleFloat();
 					} catch (IOException | JSONException | ParseException e) {
 						e.printStackTrace();
 					}
@@ -717,6 +739,12 @@ public class GUI extends Application{
 	}
 
 	private static void exit(){
+		System.out.println(isHelp);
+		if (isHelp){
+			System.out.println("GOODBYE!");
+			help.close();
+			isHelp = false;
+		}
 		Platform.exit();
 	}
 
@@ -729,6 +757,7 @@ public class GUI extends Application{
 		}
 		changeFocusListDetails(currentList);
 		listFocus.scrollTo(currentPosition);
+		listFocus.getSelectionModel().select(currentPosition);
 
 	}
 
@@ -739,6 +768,7 @@ public class GUI extends Application{
 		}
 		refreshingFocus(currentList);
 		listFocus.scrollTo(currentPosition);
+		listFocus.getSelectionModel().select(currentPosition);
 	}
 
 	private static void eventLeft() throws IOException, JSONException, ParseException{
@@ -749,6 +779,7 @@ public class GUI extends Application{
 		}
 		refreshingFocus(currentList);
 		listFocus.scrollTo(currentPosition);
+		listFocus.getSelectionModel().select(currentPosition);
 	}
 
 	private static void eventRight() throws IOException, JSONException, ParseException{
@@ -759,14 +790,15 @@ public class GUI extends Application{
 		}
 		refreshingFocus(currentList);
 		listFocus.scrollTo(currentPosition);
+		listFocus.getSelectionModel().select(currentPosition);
 	}
 
-	private static void toggleCategory() throws IOException, JSONException, ParseException{
+	private static void toggleFloat() throws IOException, JSONException, ParseException{
 		controller.retrieveAllData();
 		if (currentScene == SCENE_MAIN){
 			gridPane.getChildren().removeAll(listFloat,listCate);
-			if (toggleCate==false){
-				toggleCate=true;
+			if (toggleFloat==false){
+				toggleFloat=true;
 				floating.setText("Categories:");
 				listCate = getStringList(controller.getCateList());
 				listCate.setFocusTraversable( false );
@@ -774,7 +806,7 @@ public class GUI extends Application{
 				gridPane.getChildren().add(listCate);
 
 			} else{
-				toggleCate = false;
+				toggleFloat = false;
 				floating.setText(LIST_FLOATING);
 				listFloat = getList(controller.getFloatList());
 				listFloat.setFocusTraversable( false );
@@ -784,20 +816,5 @@ public class GUI extends Application{
 			}
 		}
 	}
-/*
-	private static void subTaskView(){
-		if (currentScene == SCENE_MAIN){
-			gridPane.getChildren().remove(listEvents);
-			events.setText("SubTasks: ");
-			//to-do
-		}
-		else {
-			gridPane.getChildren().remove(detailField);
-			detailsHeading.setText("SubTask List");
-			//to-do
-			//notes: either get logic to return the arraylist straight
-			//without saying which specific task. 
-			//or get the name of specific task and call logic again (waste time)
-		}
-	}*/
+
 }

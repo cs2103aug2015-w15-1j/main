@@ -7,10 +7,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
+//@@author A0126125R
 public class GuiPreloader extends Preloader {
 
     private static final double WIDTH = 400;
@@ -41,6 +47,11 @@ public class GuiPreloader extends Preloader {
             image.setPreserveRatio(true);
             VBox root = new VBox(image,title, progress);
             root.setAlignment(Pos.CENTER);
+    		Image bgImage = new Image(GUI.class.getResourceAsStream("Resources/background.png"));
+    		BackgroundSize backgroundSize = new BackgroundSize(100, 100, true, true, true,true);
+    		BackgroundImage backgroundImage = new BackgroundImage(bgImage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
+    		Background background = new Background(backgroundImage);
+    		root.setBackground(background);
 
             scene = new Scene(root, WIDTH, HEIGHT);
         });

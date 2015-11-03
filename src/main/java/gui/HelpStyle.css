@@ -1,5 +1,6 @@
+/*@@author A0126125R */
 .root{
-	-fx-background-image:url(../../../../src/main/java/gui/Resources/background.png);
+	/*-fx-background-image:url(Resources/background.png);*/
 	-fx-text-inner-color: black;
 }
 .label{

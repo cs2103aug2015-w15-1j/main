@@ -9,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.TreeMap;
 
 import main.java.backend.Storage.Task.Task;
 
@@ -27,16 +26,17 @@ public class StorageLoad extends StorageOperation {
 	private BufferedReader bufferedReader;
 	private FileReader textFileReader;
 
-	public StorageLoad(String filePath) {
+	public StorageLoad() {
 
-		//String.format(CUSTOM_FILE_LOCATION, filePath);
 		storageFormat = new StorageFormat();
+		storageFilePath = new StorageFilePath();
+		filePath = storageFilePath.retrieve();
 		initFile();
 	}
 
 	private void initFile() {
 
-		textFile = new File(CUSTOM_FILE_LOCATION);
+		textFile = new File(filePath);
 		try {
 			createFile();
 			initReader();
@@ -93,7 +93,7 @@ public class StorageLoad extends StorageOperation {
 		String plainText = new String();
 		try {
 			plainText = new String(Files.readAllBytes
-					(Paths.get(CUSTOM_FILE_LOCATION)), StandardCharsets.UTF_8);
+					(Paths.get(filePath)), StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			throw new StorageException();
 		}

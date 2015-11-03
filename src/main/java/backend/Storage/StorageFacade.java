@@ -15,18 +15,33 @@ public class StorageFacade implements Storage {
 
 	private StorageLoad load;
 	private StorageSave save;
+	private StorageFilePath filePath;
 	
-	public void init(String filePath) {
-		load = new StorageLoad(filePath);
-		save = new StorageSave(filePath);
+	private void reinit() {
+		load = new StorageLoad();
+		save = new StorageSave();
 	}
 	
+	@Override
+	public void init() {
+		load = new StorageLoad();
+		save = new StorageSave();
+		filePath = new StorageFilePath();
+	}
+	
+	@Override
 	public ArrayList<Task> load() {
 		return load.execute(null);
 	}
 	
+	@Override
 	public void save(ArrayList<Task> allData) {
 		save.execute(allData);
 	}
 	
+	@Override
+	public void updateFilePath(String newFilePath) {
+		filePath.execute(newFilePath);
+		reinit();
+	}
  }

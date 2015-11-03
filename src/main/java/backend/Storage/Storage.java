@@ -6,10 +6,12 @@ import main.java.backend.Storage.Task.Task;;
 
 public interface Storage {
 
-	public void init(String fileName);
+	public void init();
 	
 	public ArrayList<Task> load();
 	
 	public void save(ArrayList<Task> allData);
+	
+	public void updateFilePath(String filePath);
 	
 }

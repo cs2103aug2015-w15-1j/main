@@ -23,15 +23,16 @@ public class StorageSave extends StorageOperation {
 	private BufferedWriter bufferedWriter;
 	private FileWriter textFileWriter;
 	
-	public StorageSave(String filePath) {
+	public StorageSave() {
 		
+		storageFilePath = new StorageFilePath();
 		storageFormat = new StorageFormat();
-		//String.format(CUSTOM_FILE_LOCATION, filePath);
+		filePath = storageFilePath.retrieve();
 	}
 
 	private void initializeWriter() throws StorageException {
 		
-		textFile = new File(CUSTOM_FILE_LOCATION);
+		textFile = new File(filePath);
 		try {
 			textFileWriter = new FileWriter(textFile);
 		} catch (IOException e) {
@@ -51,17 +52,10 @@ public class StorageSave extends StorageOperation {
 		}
 	}
 	
-	private void changeFileDirectory() {
-
-		File newFile = new File(CUSTOM_FILE_LOCATION);
-		textFile.renameTo(newFile);
-	}
-	
 	public ArrayList<Task> execute(ArrayList<Task> allData) {
 		
 		try {
 			initializeWriter();
-			changeFileDirectory();
 			
 			if(allData != null) {
 				bufferedWriter.write(storageFormat.serialize(allData));

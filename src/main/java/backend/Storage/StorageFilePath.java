@@ -1,3 +1,4 @@
+//@@author A0126258A
 package main.java.backend.Storage;
 
 import java.io.BufferedInputStream;
@@ -20,8 +21,7 @@ public class StorageFilePath {
 	private static final String FILE_HEADING = "File path for data storage";
 	private static final String FILE_KEY = "filepath";
 	
-	private String CURRENT_FILE_NAME = "";
-	private String NEW_FILE_NAME = "";
+	private String filePathOld, filePathNew = "";
 	
 	// TODO: Change default file path
 	private static final String PATH_LOCATION_DEFAULT = System.getProperty("user.home") + "/Desktop" + "/filename.txt";
@@ -38,41 +38,15 @@ public class StorageFilePath {
 		textFile = new File(retrieveFilePath());
 	}
 	
-	private String retrieveFilePath() {
-		
-		String filePath = properties.getProperty(FILE_KEY);
-		
-		CURRENT_FILE_NAME = filePath;
-		
-		if(filePath == null) {
-			return PATH_LOCATION_DEFAULT;
-		} else {
-			return filePath;
-		}
-	}
-
-	public void execute(String newFilePath) {
-		NEW_FILE_NAME = newFilePath;
-		
-		try {
-			writer = new FileWriter(FILE_CONFIGURATION);
-			textFile.renameTo(new File(newFilePath));
-			dataTransfer();
-			properties.setProperty(FILE_KEY, newFilePath);
-			properties.store(writer, FILE_HEADING);
-			writer.close();
-		} catch (IOException e) {
-			System.out.println(ERROR_WRITE_DATA);
-		}	
-	}
 	
+	//@@author A0121284N
 	private void dataTransfer() {
 		String oldFilePath = retrieveFilePath();
 		byte[] buffer = new byte[10000];
 		try {
 			FileInputStream fileInput = new FileInputStream(oldFilePath);
 			BufferedInputStream bufferedInput = new BufferedInputStream(fileInput);
-			FileOutputStream fileOutput = new FileOutputStream(this.NEW_FILE_NAME);
+			FileOutputStream fileOutput = new FileOutputStream(this.filePathNew);
 			BufferedOutputStream bufferedOutput = new BufferedOutputStream(fileOutput);
 			while(true) {
 				int length = fileInput.read(buffer);
@@ -92,6 +66,36 @@ public class StorageFilePath {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	//@@author A0126258A
+	private String retrieveFilePath() {
+		
+		String filePath = properties.getProperty(FILE_KEY);
+		
+		if(filePath == null) {
+			return PATH_LOCATION_DEFAULT;
+		} else {
+			return filePath;
+		}
+	}
+
+	public void execute(String newFilePath) {
+		
+		filePathOld = retrieveFilePath();
+		filePathNew = newFilePath;
+		
+		try {
+			writer = new FileWriter(FILE_CONFIGURATION);
+			textFile.renameTo(new File(newFilePath));
+			dataTransfer();
+			properties.setProperty(FILE_KEY, newFilePath);
+			properties.store(writer, FILE_HEADING);
+			writer.close();
+		} catch (IOException e) {
+			properties.setProperty(FILE_KEY, filePathOld);
+			System.out.println(ERROR_WRITE_DATA);
+		}	
 	}
 
 	public String retrieve() {

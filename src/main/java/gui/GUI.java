@@ -34,6 +34,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
@@ -131,6 +132,7 @@ public class GUI extends Application{
 		console = new Console(consoleText);
 		ps = new PrintStream(console, true);
 		recentCommands = new ArrayList<String>();
+		listFocus = new ListView<TextFlow>();
 		for (int i = 0; i < COUNT_LIMIT; i++) {
             double progress = (100 * i) / COUNT_LIMIT;
             LauncherImpl.notifyPreloader(this, new GuiPreloader.ProgressNotification(progress));
@@ -205,6 +207,9 @@ public class GUI extends Application{
 						           if (noti){
 						            	runNoti();
 						            }
+						           else {
+						        	   refresh();
+						           }
 			    			}
 			    			});
 			           
@@ -337,14 +342,29 @@ public class GUI extends Application{
 		controller.retrieveAllData();
 		gridPane.getChildren().removeAll(listTasks,listEvents,listOverdue,listCate);
 		//tasks		
-		listTasks = getList(controller.getTasksList());
+		listTasks = convertList(controller.getTasksList());
 		GridPane.setColumnSpan(listTasks, 2);
 		listTasks.setFocusTraversable( false );
+		
+		listTasks.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+
+            @Override
+            public void handle(MouseEvent event) {
+                event.consume();
+            }
+        });
 		GridPane.setConstraints(listTasks, 0, 1);
 
 		//Events
-		listEvents = getList(controller.getEventsList());
+		listEvents = convertList(controller.getEventsList());
 		listEvents.setFocusTraversable( false );
+		listEvents.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+
+            @Override
+            public void handle(MouseEvent event) {
+                event.consume();
+            }
+        });
 		GridPane.setConstraints(listEvents, 2, 1);
 
 		gridPane.getChildren().addAll(listTasks,listEvents);
@@ -353,9 +373,16 @@ public class GUI extends Application{
 		if (controller.getOverdueList().size()!=0){
 			toggleFloat = false;
 			floating.setText("Overdue:");
-			listOverdue = getList(controller.getOverdueList());
+			listOverdue = convertList(controller.getOverdueList());
 			listOverdue.setFocusTraversable(false);
 			listOverdue.setId("listOverdue");
+			listOverdue.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+
+	            @Override
+	            public void handle(MouseEvent event) {
+	                event.consume();
+	            }
+	        });
 			GridPane.setConstraints(listOverdue, 3,1);
 			gridPane.getChildren().addAll(listOverdue);
 		}
@@ -363,8 +390,15 @@ public class GUI extends Application{
 			//floating
 			toggleFloat = true;
 			floating.setText(LIST_FLOATING);
-			listFloat = getList(controller.getFloatList());
+			listFloat = convertList(controller.getFloatList());
 			listFloat.setFocusTraversable( false );
+			listFloat.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+
+	            @Override
+	            public void handle(MouseEvent event) {
+	                event.consume();
+	            }
+	        });
 			GridPane.setConstraints(listFloat, 3, 1);
 			gridPane.getChildren().addAll(listFloat);
 		}
@@ -386,7 +420,7 @@ public class GUI extends Application{
 	private static void setUpFocusContents() throws IOException, JSONException, ParseException {
 		gridPane.getChildren().removeAll(listFocus, detailField);
 		ArrayList<Task> getFocusList = controller.retrieveTask();
-		listFocus = getList(getFocusList);
+		listFocus = convertList(getFocusList);
 		listFocus.setFocusTraversable(false);
 		GridPane.setConstraints(listFocus, 0, 1);
 		gridPane.getChildren().add(listFocus);	
@@ -410,7 +444,7 @@ public class GUI extends Application{
 		gridPane.getChildren().add(detailField);
 	}
 
-	private static ListView<TextFlow> getList(ArrayList<Task> list){
+	private static ListView<TextFlow> convertList(ArrayList<Task> list){
 		assert list != null;
 		ObservableList<TextFlow> tasks = FXCollections.observableArrayList();
 		for (int i=0;i<list.size();i++){
@@ -429,8 +463,9 @@ public class GUI extends Application{
 		ListView<TextFlow> listTask = new ListView<TextFlow>(tasks);
 		return listTask;
 	}
-
-	private static ListView<TextFlow> getStringList(ArrayList<String> list){
+	
+	//category no longer used. method is not needed.
+	/*private static ListView<TextFlow> getStringList(ArrayList<String> list){
 		assert list!=null;
 		ObservableList<TextFlow> tasks = FXCollections.observableArrayList();
 		for (int i=0;i<list.size();i++){
@@ -445,7 +480,7 @@ public class GUI extends Application{
 		}
 		ListView<TextFlow> listString = new ListView<TextFlow>(tasks);
 		return listString;
-	}
+	}*/
 
 	private static void displayStringToScreen(String getProcessedInput) {
 		System.out.println(getProcessedInput);
@@ -480,8 +515,16 @@ public class GUI extends Application{
 
 	private static void changeFocusList(int listNum) throws IOException, JSONException, ParseException{
 		gridPane.getChildren().remove(listFocus);
-		listFocus = getList(controller.getFocusList());
+		listFocus = convertList(controller.getFocusList());
 		listFocus.setFocusTraversable(false);
+		listFocus.setMouseTransparent( false );
+		listFocus.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+
+            @Override
+            public void handle(MouseEvent event) {
+                event.consume();
+            }
+        });
 		listFocus.scrollTo(currentPosition);
 		listFocus.getSelectionModel().select(currentPosition);
 		GridPane.setConstraints(listFocus, 0, 1);
@@ -636,12 +679,33 @@ public class GUI extends Application{
 		events.setText("Completed Events: ");
 		floating.setText("Completed Floating: ");
 		gridPane.getChildren().removeAll(listTasks,listEvents,listFloat);
-		listTasks = getList(controller.getCompletedTasks());
+		listTasks = convertList(controller.getCompletedTasks());
 		listTasks.setFocusTraversable(false);
-		listEvents = getList(controller.getCompletedEvents());
+		listTasks.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+
+            @Override
+            public void handle(MouseEvent event) {
+                event.consume();
+            }
+        });
+		listEvents = convertList(controller.getCompletedEvents());
 		listEvents.setFocusTraversable(false);
-		listFloat = getList(controller.getCompletedFloat());
+		listEvents.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+
+            @Override
+            public void handle(MouseEvent event) {
+                event.consume();
+            }
+        });
+		listFloat = convertList(controller.getCompletedFloat());
 		listFloat.setFocusTraversable(false);
+		listFloat.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+
+            @Override
+            public void handle(MouseEvent event) {
+                event.consume();
+            }
+        });
 		GridPane.setConstraints(listTasks, 0, 1);
 		GridPane.setColumnSpan(listTasks, 2);
 		GridPane.setConstraints(listEvents, 2, 1);
@@ -793,8 +857,15 @@ public class GUI extends Application{
 			if (toggleFloat == true ){
 				toggleFloat = false;
 				floating.setText("Overdue:");
-				listOverdue = getList(controller.getOverdueList());
+				listOverdue = convertList(controller.getOverdueList());
 				listOverdue.setFocusTraversable(false);
+				listOverdue.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+
+		            @Override
+		            public void handle(MouseEvent event) {
+		                event.consume();
+		            }
+		        });
 				listOverdue.setId("listOverdue");
 				GridPane.setConstraints(listOverdue, 3,1);
 				gridPane.getChildren().addAll(listOverdue);
@@ -803,8 +874,15 @@ public class GUI extends Application{
 				//floating
 				toggleFloat = true;
 				floating.setText(LIST_FLOATING);
-				listFloat = getList(controller.getFloatList());
+				listFloat = convertList(controller.getFloatList());
 				listFloat.setFocusTraversable( false );
+				listFloat.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+
+		            @Override
+		            public void handle(MouseEvent event) {
+		                event.consume();
+		            }
+		        });
 				GridPane.setConstraints(listFloat, 3, 1);
 				gridPane.getChildren().addAll(listFloat);
 			}
@@ -821,7 +899,7 @@ public class GUI extends Application{
 			} else{
 				toggleFloat = false;
 				floating.setText(LIST_FLOATING);
-				listFloat = getList(controller.getFloatList());
+				listFloat = convertList(controller.getFloatList());
 				listFloat.setFocusTraversable( false );
 				GridPane.setConstraints(listFloat, 3, 1);
 				gridPane.getChildren().add(listFloat);

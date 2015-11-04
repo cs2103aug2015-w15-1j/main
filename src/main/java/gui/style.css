@@ -45,6 +45,8 @@
 
 .list-cell:selected {
 	-fx-font-size: 17px;
+	-fx-background-color: #46C7C7;
+	
 }
 
 .user{

@@ -387,7 +387,7 @@ public class DateParser extends ParserSkeleton{
 			eventEnd = startDate + ", " + endTime;	
 		} else if (hasNoTime(eventEnd)) {
 			String endDate = eventEnd;
-			eventEnd = endDate + ", " + startTime;
+			eventEnd = endDate + ", 9pm";
 		}
 		
 		if (startDateIsAfterEndDate(eventStart, eventEnd)) {

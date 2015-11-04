@@ -539,23 +539,23 @@ public class ParserTest {
 	    //Testing for event with end date but not time (should set the end time to be same as start time)
 	    input = "4 event 15/09 10am to 16/09";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10am", "Fri, 16 Sep 16, 10am") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10am", "Fri, 16 Sep 16, 9pm") );
 	    executeTest();
 	    
 	    input = "4 event 15 Sep 10am to 16 Sep";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10am", "Fri, 16 Sep 16, 10am") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10am", "Fri, 16 Sep 16, 9pm") );
 	    executeTest();
 	    
 	    input = "4 event 15 September 10am to 16 September";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10am", "Fri, 16 Sep 16, 10am") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10am", "Fri, 16 Sep 16, 9pm") );
 	    executeTest();
 	    
 	    //Testing for when end date is before start date (should set it to one day or one year later)
 	    input = "4 event 15 Sep 10am to 14 Sep";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10am", "Thu, 14 Sep 17, 10am") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10am", "Thu, 14 Sep 17, 9pm") );
 	    executeTest();
 	    
 	    input = "4 event 15 Sep 10:30am to 10am";
@@ -618,7 +618,7 @@ public class ParserTest {
 	    //Testing for event with no start or end time (set both to 9am)
 	    input = "2 event 15 Sep to 16 Sep";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 15 Sep 16, 9am", "Fri, 16 Sep 16, 9am") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Thu, 15 Sep 16, 9am", "Fri, 16 Sep 16, 9pm") );
 	    executeTest();
 	   
 	    //Testing for when time was entered before date
@@ -629,12 +629,12 @@ public class ParserTest {
 	    
 	    input = "4 event 10am 15/09 to 16/09";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10am", "Fri, 16 Sep 16, 10am") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10am", "Fri, 16 Sep 16, 9pm") );
 	    executeTest();
 	    
 	    input = "4 event 10am 15 Sep to 14 Sep";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10am", "Thu, 14 Sep 17, 10am") );
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10am", "Thu, 14 Sep 17, 9pm") );
 	    executeTest();
 	    
 	    input = "4 event 10:30am 15 Sep to 10am";

@@ -9,6 +9,11 @@ import java.util.Date;
 
 import org.junit.Test;
 
+/**
+ * DateParser
+ * Contains the test cases for Parser component
+ * @@author A0121795B
+ */
 public class ParserTest {
 	public Parser parser = new Parser();
 	String input;
@@ -142,6 +147,11 @@ public class ParserTest {
 	    input = "show today";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("showToday") );
+	    executeTest();
+	    
+	    input = "showdone";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("showDone") );
 	    executeTest();
 	    
 	    input = "sortp";

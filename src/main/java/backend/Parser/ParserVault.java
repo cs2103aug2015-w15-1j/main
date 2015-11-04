@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+/**
+ * ParserVault
+ * Stores the contents of the parsed input and generates the result
+ * @@author A0121795B
+ */
 public class ParserVault extends ParserSkeleton{
 	
 	private DateParser dateParser = new DateParser();
@@ -498,6 +503,8 @@ public class ParserVault extends ParserSkeleton{
 			return "O";
 		case "today":
 			return "Today";
+		case "done":
+			return "Done";
 		default:
 			return "error";
 		}

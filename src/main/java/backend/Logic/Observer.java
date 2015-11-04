@@ -175,7 +175,7 @@ public class Observer {
 
 	private long getTodayEndTime() {
 
-		return getTodayStartTime() + DAY_IN_MILLISECOND;
+		return getTodayStartTime() + DAY_IN_MILLISECOND + DAY_IN_MILLISECOND;
 	}
 
 	private ArrayList<Task> getUpcoming(ArrayList<Task> allTasks, TaskType taskType) {

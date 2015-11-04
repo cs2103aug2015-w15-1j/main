@@ -1,3 +1,5 @@
+//@author A0126258A
+
 package main.java.backend.Storage;
 
 import java.util.ArrayList;
@@ -7,8 +9,6 @@ import main.java.backend.Storage.Task.Task;
 /**
  * This class loads from and saves data to text file.
  * 
- * @author A0126258A
- *
  */
 
 public class StorageFacade implements Storage {

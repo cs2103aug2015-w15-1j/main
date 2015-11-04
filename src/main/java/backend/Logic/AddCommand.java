@@ -45,9 +45,6 @@ public class AddCommand extends Command {
 			case ("addE") :
 				feedbackString = addTask(TaskType.EVENT, this);
 				break;
-			case ("addS"):
-				feedbackString = addSubTask(this);
-				break;	
 		}
 //		System.out.println("History state after execution: "+historyState);
 //		System.out.println("Future state after execution: "+futureState);
@@ -155,14 +152,5 @@ public class AddCommand extends Command {
 		storageComponent.save(taskList);
 
 		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, newTask.getName());
-	}
-
-	private String addSubTask(Command commandObject) {
-		
-		String taskName = commandObject.getTaskName();
-		String subTaskDescription = commandObject.getDescription();
-//		storageObject.addSubTask(taskName,subTaskDescription);
-		currentState = storageComponent.load();
-		return String.format(EXECUTION_ADD_SUBTASK_SUCCESSFUL, subTaskDescription,taskName);
 	}
 }

@@ -37,7 +37,7 @@ public class History {
 	private void initLogger() {
 		
 		try {
-			logHandler = new FileHandler("HistoryComponentLog.txt",true);
+			logHandler = new FileHandler("TankTask.txt",true);
 			logHandler.setFormatter(new SimpleFormatter());
 			historyLogger.addHandler(logHandler);
 			historyLogger.setUseParentHandlers(false);

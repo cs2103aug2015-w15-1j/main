@@ -17,6 +17,7 @@ public class LogicCommandHandler {
 	private static final String COMMAND_UNDO = "undo";
 	private static final String COMMAND_REDO = "redo";
 	private static final String COMMAND_ERROR = "error";
+	private static final String COMMAND_FILEPATH = "filepath";
 	private static final String[] addKeywords = new String[] {"addF", "addT",
 			"addE", "adds", "addcat"};
 	private static final String[] editKeywords = new String[] {"set", "setT", 
@@ -25,14 +26,14 @@ public class LogicCommandHandler {
 	private static final String[] sortKeywords = new String[] {"sortN", "sortP","sortS","sortD"};
 	private static final String[] viewKeywords = new String[] {"showCat", "show floating",
 			"show todo", "show events", "show overdue", "showT", "showE", "showO","showF"};
-	private LogicCommandHandler(String filename, Storage storage, History history) {
+	private LogicCommandHandler(Storage storage, History history) {
 		storageComponent = storage;
 		historySubComponent = history;
 	}
 
-	public static LogicCommandHandler getInstance(String filename, Storage storage, History history) {
+	public static LogicCommandHandler getInstance(Storage storage, History history) {
 		if (commandHandler == null) {
-			commandHandler = new LogicCommandHandler(filename,storage,history);
+			commandHandler = new LogicCommandHandler(storage,history);
 		}
 		return commandHandler;
 	}
@@ -43,33 +44,35 @@ public class LogicCommandHandler {
 //		System.out.println("determined Command Type: "+determinedCommandType);
 		Command commandObject = new Command();
 		switch (determinedCommandType) {
-			case COMMAND_ADD:
+			case COMMAND_ADD :
 				commandObject = initAddCommand(parsedUserInput);
 				break;
-			case COMMAND_EDIT:
+			case COMMAND_EDIT :
 				commandObject = initEditCommand(parsedUserInput);
 				break;
-			case COMMAND_SORT:
+			case COMMAND_SORT :
 				commandObject= initSortCommand(parsedUserInput);
 				break;
-			case COMMAND_SEARCH:
+			case COMMAND_SEARCH :
 				commandObject = initSearchCommand(parsedUserInput);
 				break;
-			case COMMAND_EXIT:
+			case COMMAND_EXIT :
 				commandObject = initExitCommand(parsedUserInput);
 				break;
-			case COMMAND_UNDO:
+			case COMMAND_UNDO :
 				commandObject = initUndoCommand(parsedUserInput);
 				break;
-			case COMMAND_REDO:
+			case COMMAND_REDO :
 				commandObject = initRedoCommand(parsedUserInput);
 				break;
-			case COMMAND_VIEW:
+			case COMMAND_VIEW :
 				commandObject = initViewCommand(parsedUserInput);
 				break;
-			case COMMAND_ERROR:
+			case COMMAND_ERROR :
 				commandObject = initErrorCommand(parsedUserInput);
-				break;				
+				break;
+			case COMMAND_FILEPATH :
+				commandObject = initFilePathCommand(parsedUserInput);
 		}
 	return commandObject;
 	}
@@ -94,8 +97,16 @@ public class LogicCommandHandler {
 			commandString = COMMAND_UNDO;
 		} else if (commandGiven.contains(COMMAND_REDO)) {
 			commandString = COMMAND_REDO;
+		} else if (commandGiven.contains(COMMAND_FILEPATH)) {
+			commandString = COMMAND_FILEPATH;
 		}
 		return commandString;
+	}
+	
+	private Command initFilePathCommand(ArrayList<String> parsedUserInput) {
+		Command filePathCommandObject = new FilePathCommand(Command.Type.FILEPATH);
+		filePathCommandObject.setFilePath(parsedUserInput.get(1));
+		return filePathCommandObject;
 	}
 	
 	private Command initErrorCommand(ArrayList<String> parsedUserInput) {

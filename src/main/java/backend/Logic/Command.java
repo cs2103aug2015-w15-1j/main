@@ -8,7 +8,7 @@ import main.java.backend.Storage.Task.Task;
 public class Command {
 	
 	public enum Type {
-		ADD, EDIT, SORT, SEARCH, EXIT, UNDO, REDO, VIEW, ERROR
+		ADD, EDIT, SORT, SEARCH, EXIT, UNDO, REDO, VIEW, ERROR, FILEPATH
 	}
 	
 	private Type type;
@@ -249,6 +249,18 @@ public class Command {
 
 
 	public ArrayList<Task> getSearchResults() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	public void setFilePath(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public String getFilePath() {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -28,14 +28,13 @@ public class LogicFacade {
 	private static Stack<Command> searchStack;
 	private ArrayList<Task> currentState;
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
-	private static final String DEFAULT_FILENAME = "default.txt";
 	
 	private LogicFacade() {
 		initLogger();
 		storageComponent = new StorageFacade();
 		historySubComponent = History.getInstance();
-		logicCommandHandler = LogicCommandHandler.getInstance(DEFAULT_FILENAME,storageComponent,historySubComponent);
-		storageComponent.init(DEFAULT_FILENAME);
+		logicCommandHandler = LogicCommandHandler.getInstance(storageComponent,historySubComponent);
+		storageComponent.init();
 		parserComponent = new Parser();
 		getterSubComponent = Observer.getInstance(storageComponent);
 		historyStack = new Stack<Command>();
@@ -54,7 +53,7 @@ public class LogicFacade {
 	
 	private void initLogger() {
 		try {
-			logHandler = new FileHandler("LogicFacadeLog.txt",true);
+			logHandler = new FileHandler("TankTask.txt",true);
 			logHandler.setFormatter(new SimpleFormatter());
 			logicControllerLogger.addHandler(logHandler);
 			logicControllerLogger.setUseParentHandlers(false);
@@ -73,29 +72,34 @@ public class LogicFacade {
 //			System.out.println("CommandObject type: "+commandObject.getType());
 			String feedbackString = "";
 			switch (commandObject.getType()) {
-				case UNDO:
+				case UNDO :
 //					System.out.println(feedbackString);
+//					System.out.println(historyStack.peek());
 					Command undoableCommand = historyStack.pop();
 					feedbackString = undoableCommand.undo();
 					futureStack.push(undoableCommand);
 					break;
-				case REDO:
+				case REDO :
 					feedbackString = futureStack.peek().redo();
 					historyStack.push(futureStack.pop());
 					break;
-				case VIEW:
+				case VIEW :
 					feedbackString = commandObject.getCommandField();
 					break;
-				case ERROR:
+				case ERROR :
 					feedbackString = commandObject.getErrorMessage();
 					break;
-				case SEARCH:
+				case SEARCH :
 					feedbackString = commandObject.execute();
 					searchStack.push(commandObject);
 					break;
-				case EXIT:
+				case FILEPATH :
+					storageComponent.updateFilePath(commandObject.getFilePath());
+					feedbackString = commandObject.execute();
+					break;
+				case EXIT :
 					System.exit(0);
-				default:
+				default :
 					feedbackString = commandObject.execute();
 					historyStack.push(commandObject);
 					futureStack = new Stack<Command>();
@@ -104,7 +108,7 @@ public class LogicFacade {
 //			System.out.println("feedbackString: "+feedbackString);
 //			System.out.println("History stack size after command execution: "+historyStack.size());
 			return feedbackString;
-		} catch ( EmptyStackException e) {
+		} catch (NullPointerException | EmptyStackException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}

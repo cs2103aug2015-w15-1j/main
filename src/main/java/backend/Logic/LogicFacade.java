@@ -1,3 +1,4 @@
+//@@author A0121284N
 package main.java.backend.Logic;
 
 import java.io.IOException;
@@ -53,7 +54,7 @@ public class LogicFacade {
 	
 	private void initLogger() {
 		try {
-			logHandler = new FileHandler("TankTask.txt",true);
+			logHandler = new FileHandler("TankTaskLog.txt",true);
 			logHandler.setFormatter(new SimpleFormatter());
 			logicControllerLogger.addHandler(logHandler);
 			logicControllerLogger.setUseParentHandlers(false);
@@ -108,7 +109,7 @@ public class LogicFacade {
 //			System.out.println("feedbackString: "+feedbackString);
 //			System.out.println("History stack size after command execution: "+historyStack.size());
 			return feedbackString;
-		} catch (NullPointerException | EmptyStackException e) {
+		} catch (EmptyStackException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}

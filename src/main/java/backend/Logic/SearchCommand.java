@@ -10,15 +10,18 @@ public class SearchCommand extends Command {
 	private Storage storageComponent;
 	private static ArrayList<Task> taskList;
 
+	//@@author A0121284N
 	public SearchCommand(Type typeInput, Storage storage) {
 		super(typeInput);
 		storageComponent = storage;
 	}
 	
+	//@@author A0121284N
 	public ArrayList<Task> getSearchResults() {
 		return this.searchResults;
 	}
 	
+	//@@author A0126258A
 	public String execute() {
 //		System.out.println("Keyword: "+this.getKeywords());
 		taskList = storageComponent.load();

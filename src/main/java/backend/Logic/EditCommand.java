@@ -42,6 +42,7 @@ public class EditCommand extends Command {
 	private Storage storageComponent;
 	private History historySubComponent;
 	
+	//@@author A0121284N
 	public EditCommand(Type typeInput, Storage storage, History history) {
 		super(typeInput);
 		storageComponent = storage;
@@ -49,10 +50,11 @@ public class EditCommand extends Command {
 		initLogger();
 	}
 	
+	//@@author A0121284N
 	private void initLogger() {
 			
 			try {
-				logHandler = new FileHandler("LogicEditorLog.txt",true);
+				logHandler = new FileHandler("TankTaskLog.txt",true);
 				logHandler.setFormatter(new SimpleFormatter());
 				logicEditorLogger.addHandler(logHandler);
 				logicEditorLogger.setUseParentHandlers(false);
@@ -61,7 +63,8 @@ public class EditCommand extends Command {
 				logicEditorLogger.warning("Logger failed to initialise: " + e.getMessage());
 			}
 		}
-
+	
+	//@@author A0121284N
 	public String execute(){
 		String feedbackString = "";
 		logicEditorLogger.info("Get Command Field: "+this.getCommandField());
@@ -122,7 +125,8 @@ public class EditCommand extends Command {
 		historySubComponent.push(currentState);
 		return feedbackString;
 	}
-
+	
+	//@@author A0121284N
 	public String undo() {
 		try {
 			ArrayList<Task> historyState = historySubComponent.undo();
@@ -135,6 +139,7 @@ public class EditCommand extends Command {
 		}
 	}
 	
+	//@@author A0121284N
 	public String redo() {
 		try {
 			ArrayList<Task> futureState = historySubComponent.redo();
@@ -145,6 +150,7 @@ public class EditCommand extends Command {
 		}
 	}
 	
+	//@@author A0126258A
 	private void setTaskId(ArrayList<Task> taskList) {
 		
 		Collections.sort(taskList);
@@ -157,6 +163,7 @@ public class EditCommand extends Command {
 		}
 	}
 	
+	//@@author A0121284N
 	private String setMultipleFieldsForTask(Command commandObject) {
 
 		logicEditorLogger.info("taskId: "+commandObject.getTaskName());
@@ -193,7 +200,8 @@ public class EditCommand extends Command {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-
+	
+	//@@author A0121284N
 	private String setMultipleFieldsForEvents(Command commandObject) {
 
 		try {
@@ -231,6 +239,7 @@ public class EditCommand extends Command {
 		}
 	}
 	
+	//@@author A0121284N
 	private String setMultipleFieldsForFloats(Command commandObject) {
 
 		try {
@@ -264,6 +273,7 @@ public class EditCommand extends Command {
 		}
 	}
 	
+	//@@author A0126258A
 	private Task.RecurrenceType getRecurrenceType(String recurrenceType) {
 
 		if(recurrenceType.equals(RECURRING_DAY)) {
@@ -279,6 +289,7 @@ public class EditCommand extends Command {
 		} 
 	}
 	
+	//@@author A0126258A
 	private Task.TaskType getTaskType(Task task) {
 		
 		if(!task.getEnd().isEmpty()) {
@@ -288,6 +299,7 @@ public class EditCommand extends Command {
 		}
 	}
 	
+	//@@author A0126258A
 	private int getTaskId(int taskIndex) {
 		
 		ArrayList<Task> taskList = storageComponent.load();
@@ -301,7 +313,8 @@ public class EditCommand extends Command {
 		
 		return taskId;
 	}
-
+	
+	//@@author A0121284N
 	private String delete(Command commandObject) {
 		try{
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
@@ -318,6 +331,7 @@ public class EditCommand extends Command {
 		}
 	}
 	
+	//@@author A0121284N
 	private String reset(Command commandObject) {
 		taskList = storageComponent.load();
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
@@ -356,12 +370,14 @@ public class EditCommand extends Command {
 		return String.format("Field %1$s has been reset", resetField);
 	}
 	
+	//@@author A0121284N
 	private String deleteAll(EditCommand editCommand) {
 		taskList = storageComponent.load();
 		storageComponent.save(null);
 		return "Everything has been deleted";
 	}
 
+	//@@author A0121284N
 	private String setPriority(Command commandObject){
 		try {
 			taskList = storageComponent.load();
@@ -378,6 +394,7 @@ public class EditCommand extends Command {
 		}
 	}
 	
+	//@@author A0121284N
 	private String rename(Command commandObject) {
 		taskList = storageComponent.load();
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
@@ -403,7 +420,8 @@ public class EditCommand extends Command {
 		return String.format(EXECUTION_SET_COLOUR_SUCCESSFUL, categoryName,colourId);
 	}
 	*/
-
+	
+	//@@author A0121284N
 	private String setCategory(Command commandObject) {
 		taskList = storageComponent.load();
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
@@ -416,6 +434,7 @@ public class EditCommand extends Command {
 		return String.format(EXECUTION_SET_CATEGORY_SUCCESSFUL, taskId, categoryName);
 	}
 
+	//@@author A0121284N
 	private String setUndone(Command commandObject) {
 		try {
 			taskList = storageComponent.load();
@@ -430,7 +449,8 @@ public class EditCommand extends Command {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-
+	
+	//@@author A0121284N
 	private String setDone(Command commandObject) {
 		try {
 			taskList = storageComponent.load();
@@ -446,7 +466,8 @@ public class EditCommand extends Command {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-
+	
+	//@@author A0121284N
 	private String setReminder(Command commandObject) {
 		try {
 			taskList = storageComponent.load();
@@ -461,7 +482,8 @@ public class EditCommand extends Command {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-
+	
+	//@@author A0121284N
 	private String setDescription(Command commandObject) {
 		try {
 			taskList = storageComponent.load();
@@ -476,7 +498,8 @@ public class EditCommand extends Command {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-
+	
+	//@@author A0121284N
 	private String setEventStartAndEndTime(Command commandObject) {
 		try {
 			taskList = storageComponent.load();
@@ -501,7 +524,8 @@ public class EditCommand extends Command {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-
+	
+	//@@author A0121284N
 	private String setDeadline(Command commandObject) {
 		try {
 			taskList = storageComponent.load();
@@ -526,6 +550,7 @@ public class EditCommand extends Command {
 		}
 	}
 	
+	//@@author A0126258A
 	private String setRecurring(Command commandObject) {
 		try {
 			taskList = storageComponent.load();

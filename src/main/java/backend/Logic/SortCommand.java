@@ -12,16 +12,19 @@ public class SortCommand extends Command {
 	private String sortField = "";
 	ArrayList<Task> currentState;
 
+	//@@author A0121284N
 	public SortCommand(Type typeInput, Storage storage) {
 		super(typeInput);
 		storageComponent = storage;
 		currentState = storageComponent.load();
 	}
-	
+
+	//@@author A0121284N
 	public void setSortField(String input) {
 		this.sortField = input;
 	}
 	
+	//@@author A0121284N
 	public String execute() {
 //		System.out.println("sortField: "+sortField);
 //		System.out.println("currentState+ "+currentState);
@@ -31,6 +34,7 @@ public class SortCommand extends Command {
 		return "All items sorted";
 	}
 	
+	//@@author A0126258A
 	private ArrayList<Task> generateTaskId(ArrayList<Task> taskList) {
 
 		ArrayList<Task> newTaskList = new ArrayList<Task> ();
@@ -45,6 +49,7 @@ public class SortCommand extends Command {
 		return newTaskList;
 	}
 	
+	//@@author A0126258A
 	private ArrayList<Task> sortName(ArrayList<Task> taskList) {
 		
 		Collections.sort(taskList, new Comparator<Task> () {
@@ -62,7 +67,8 @@ public class SortCommand extends Command {
 		
 		return generateTaskId(taskList);
 	}
-
+	
+	//@@author A0126258A 
 	private ArrayList<Task> sortPriority(ArrayList<Task> taskList) {
 		
 		Collections.sort(taskList, new Comparator<Task> () {
@@ -81,6 +87,7 @@ public class SortCommand extends Command {
 		return generateTaskId(taskList);
 	}
 	
+	//@@author A0126258A
 	private ArrayList<Task> sortStart(ArrayList<Task> taskList) {
 		
 		Collections.sort(taskList, new Comparator<Task> () {
@@ -107,6 +114,7 @@ public class SortCommand extends Command {
 		return generateTaskId(taskList);
 	}
 	
+	//@@author A0126258A
 	private ArrayList<Task> sortDeadline(ArrayList<Task> taskList) {
 		
 		Collections.sort(taskList, new Comparator<Task> () {
@@ -127,6 +135,7 @@ public class SortCommand extends Command {
 		return generateTaskId(taskList);
 	}
 	
+	//@@author A0126258A
 	private ArrayList<Task> sort(String field, ArrayList<Task> taskList) {
 		
 		ArrayList<Task> sortedTaskList = new ArrayList<Task> ();

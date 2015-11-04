@@ -1,3 +1,4 @@
+//@@author A0121284N
 package main.java.backend.Logic;
 
 import java.io.IOException;
@@ -37,7 +38,7 @@ public class History {
 	private void initLogger() {
 		
 		try {
-			logHandler = new FileHandler("TankTask.txt",true);
+			logHandler = new FileHandler("TankTaskLog.txt",true);
 			logHandler.setFormatter(new SimpleFormatter());
 			historyLogger.addHandler(logHandler);
 			historyLogger.setUseParentHandlers(false);

@@ -39,6 +39,7 @@ public class Observer {
 	private ArrayList<Task> getCompletedFloat;
 	private static ArrayList<Task> searchResults = new ArrayList<Task>();
 	
+	//@@author A0121284N
 	public static Observer getInstance(Storage storageComponent) {
 		
 		if (logicGetterObject == null) {
@@ -47,10 +48,12 @@ public class Observer {
 		return logicGetterObject;
 	}
 
+	//@@author A0121284N
 	private Observer(Storage storage) {
 		this.storage = storage;
 	}
 	
+	//@@author A0126258A
 	private String reformatDate(String date) {
 		
 		String newDate = date
@@ -61,6 +64,7 @@ public class Observer {
 		return newDate;
 	}
 	
+	//@@author A0126258A
 	private void resetRecurring() {
 
 		ArrayList<Task> taskList = storage.load();
@@ -84,6 +88,7 @@ public class Observer {
 		storage.save(taskList);
 	}
 	
+	//@@author A0126258A
 	private String getUpcomingDate(Task task, String currentDate) {
 		
 		String upcomingDate = new String();
@@ -116,6 +121,7 @@ public class Observer {
 		return reformatDate(upcomingDate);
 	}
 	
+	//@@author A0126258A
 	public String getUpcomingDate(Task task, RecurrenceType recur, String currentDate) {
 		
 		String upcomingDate = new String();
@@ -148,12 +154,14 @@ public class Observer {
 		return reformatDate(upcomingDate);
 	}
 	
+	//@@author A0126258A
 	private String getDate(long milliSeconds) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(milliSeconds);
 		return standardFormat.format(calendar.getTime());
 	}
 
+	//@@author A0126258A
 	private long getCurrentTime() {
 
 		long currentMilliseconds = System.currentTimeMillis();
@@ -162,6 +170,7 @@ public class Observer {
 		return Constant.stringToMillisecond(standardFormat.format(resultdate));
 	}
 	
+	//@@author A0126258A
 	private long getTodayStartTime() {
 
 		LocalDateTime now = LocalDateTime.now();
@@ -173,11 +182,13 @@ public class Observer {
 				standardFormat.format(resultDate));
 	}
 
+	//@@author A0126258A
 	private long getTodayEndTime() {
 
 		return getTodayStartTime() + DAY_IN_MILLISECOND + DAY_IN_MILLISECOND;
 	}
 
+	//@@author A0126258A
 	private ArrayList<Task> getUpcoming(ArrayList<Task> allTasks, TaskType taskType) {
 
 		ArrayList<Task> upcomingTasks = new ArrayList<Task> ();
@@ -195,6 +206,7 @@ public class Observer {
 		return upcomingTasks;
 	}
 	
+	//@@author A0126258A
 	private ArrayList<Task> getCompleted(ArrayList<Task> allTasks) {
 		
 		ArrayList<Task> completedTasks = new ArrayList<Task> ();
@@ -208,6 +220,7 @@ public class Observer {
 		return completedTasks;
 	}
 
+	//@@author A0126258A
 	private ArrayList<Task> getOverdue(ArrayList<Task> allTasks, TaskType taskType) {
 
 		ArrayList<Task> overdueTasks = new ArrayList<Task> ();
@@ -223,30 +236,19 @@ public class Observer {
 		}
 
 		return overdueTasks;
-	}
-	
-	/*
-	private ArrayList<String> getCategories() {
-		
-		ArrayList<String> categories = new ArrayList<String> ();
-		for(String name : storage.load().keySet()) {
-			if(!name.isEmpty()) {
-				categories.add(name);
-			}
-		}
-		return categories;
-	}
-	*/
-	
+	}	
 
+	//@@author A0121284N
 	public ArrayList<Task> getSearchResultsList() {
 		return this.searchResults;
 	}
 	
+	//@@author A0121284N
 	public void updateSearchResultsList(ArrayList<Task> searchList) {
 		this.searchResults = searchList;
 	}
 	
+	//@@author A0126258A
 	private ArrayList<Task> getTasks(TaskType taskType) {
 		
 		ArrayList<Task> tasks = new ArrayList<Task> ();
@@ -261,6 +263,7 @@ public class Observer {
 		return tasks;
 	}
 	
+	//@@author A0126258A
 	private ArrayList<Task> getTodayToDos() {
 
 		ArrayList<Task> allToDos = getToDos();
@@ -278,6 +281,7 @@ public class Observer {
 		return todayToDos;
 	}
 	
+	//@@author A0126258A
 	private ArrayList<Task> getTodayEvents() {
 
 		ArrayList<Task> allEvents = getEvents();
@@ -295,6 +299,7 @@ public class Observer {
 		return todayEvents;
 	}
 	
+	//@@author A0126258A
 	private ArrayList<Task> getAllToday() {
 		
 		ArrayList<Task> todayTasks = getTodayToDos();
@@ -303,6 +308,7 @@ public class Observer {
 		return todayTasks;
 	}
 	
+	//@@author A0126258A
 	private ArrayList<Task> getAllOverdue() {
 
 		ArrayList<Task> overdueTasks = getOverdue(getToDos(), TaskType.TODO);
@@ -313,6 +319,7 @@ public class Observer {
 		return overdueTasks;
 	}
 	
+	//@@author A0126258A
 	private ArrayList<Task> getPastEvents() {
 		
 		ArrayList<Task> pastEvents = new ArrayList<Task> ();
@@ -326,6 +333,7 @@ public class Observer {
 		return pastEvents;
 	}
 	
+	//@@author A0126258A
 	private ArrayList<Task> getUnDoneFloatingTasks() {
 		
 		ArrayList<Task> tasks = new ArrayList<Task> ();
@@ -340,41 +348,49 @@ public class Observer {
 		return tasks;
 	}
 	
+	//@@author A0126258A
 	private ArrayList<Task> getFloatingTasks() {
 		
 		return getTasks(TaskType.FLOATING);
 	}
 
+	//@@author A0126258A
 	private ArrayList<Task> getToDos() {
 		
 		return getTasks(TaskType.TODO);
 	}
 
+	//@@author A0126258A
 	private ArrayList<Task> getEvents() {
 		
 		return getTasks(TaskType.EVENT);
 	}
 	
+	//@@author A0126258A
 	private ArrayList<Task> getCompletedFloats() {
 
 		return getCompleted(getFloatingTasks());
 	}
 
+	//@@author A0126258A
 	private ArrayList<Task> getCompletedToDos() {
 
 		return getCompleted(getToDos());
 	}
 	
+	//@@author A0126258A
 	private ArrayList<Task> getUpcomingToDos() {
 
 		return getUpcoming(getToDos(), TaskType.TODO);
 	}
 
+	//@@author A0126258A
 	private ArrayList<Task> getUpcomingEvents() {
 
 		return getUpcoming(getEvents(), TaskType.EVENT);
 	}
 	
+	//@@author A0126258A
 	public ArrayList<String> retrieveStringData(String dataType) {
 		
 		ArrayList<String> data = new ArrayList<String>();
@@ -386,6 +402,7 @@ public class Observer {
 		return data;
 	}
 	
+	//@@author A0126258A
 	private ArrayList<Task> getAllReminder() {
 		
 		ArrayList<Task> remindTaskList = new ArrayList<Task> ();
@@ -407,19 +424,7 @@ public class Observer {
 		return remindTaskList;
 	}
 
-	/*
-	public ArrayList<Category> retrieveCategoryData(String dataType) {
-		
-		ArrayList<Category> data = new ArrayList<Category>();
-		switch (dataType) {
-			case ("searchResults") :
-				data = getSearchResultsList();
-				break;
-		}
-		return data;
-	}
-	*/
-
+	//@@author A0121284N
 	public ArrayList<Task> retrieveTaskData(String dataType) {
 		
 		ArrayList<Task> data = new ArrayList<Task>();
@@ -470,6 +475,7 @@ public class Observer {
 		return data;
 	}
 	
+	//@@author A0121284N
 	private void retrieveAllData(){
 		getTasks = retrieveTaskData("upcomingToDo");
 		assert getTasks!=null;
@@ -485,17 +491,21 @@ public class Observer {
 		retrieveCompletes();
 	}
 	
+	//@@author A0121284N
 	private void retrieveCompletes(){
 		getCompletedTasks = retrieveTaskData("completedToDo");
 		getCompletedEvents = retrieveTaskData("pastEvents");
 		getCompletedFloat= retrieveTaskData("completedFloats");
 	}
+	
+	//@@author A0121284N
 	private void retrieveTodays(){
 		getTodayTasks = retrieveTaskData("todayToDos");
 		getTodayEvents = retrieveTaskData("todayEvents");
 	}
 	
-	void updateIndex() {
+	//@@author A0121284N
+	public void updateIndex() {
 		retrieveAllData();
 		int a = getTasks.size(), b = getEvents.size(),c = getOverdue.size(),
 				d = getFloat.size(), e = getCompletedTasks.size(), f = getCompletedEvents.size();
@@ -509,6 +519,7 @@ public class Observer {
 //		System.out.println("update Index a: "+a);
 	}
 	
+	//@@author A0121284N
 	private void setIndex(ArrayList<Task> list, int taskIndex) {
 		taskList = storage.load();
 		for (Task task : list) { 

@@ -1,3 +1,4 @@
+//@@author A0121284N
 package main.java.backend.Logic;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class LogicCommandHandler {
 	}
 
 	public Command parse(ArrayList<String> parsedUserInput) {
-//		System.out.println("Command from parser: "+parsedUserInput.get(0));
+		System.out.println("Command from parser: "+parsedUserInput.get(0));
 		String determinedCommandType = determineCommandType(parsedUserInput.get(0));
 //		System.out.println("determined Command Type: "+determinedCommandType);
 		Command commandObject = new Command();

@@ -22,13 +22,15 @@ public class AddCommand extends Command {
 
 	private Storage storageComponent;
 	private History historySubComponent;
-
+	
+	//@@author A0121284N
 	public AddCommand(Type typeInput, Storage storage, History history) {
 		super(typeInput);
 		storageComponent = storage;
 		historySubComponent = history;
 	}
 	
+	//@@author A0121284N
 	public String execute() {	
 //		System.out.println("Future state before execution: "+futureState);
 //		System.out.println("History state before execution: "+historyState);
@@ -55,6 +57,7 @@ public class AddCommand extends Command {
 		return feedbackString;
 	}
 	
+	//@@author A0121284N	
 	public String undo() {
 		try {
 			ArrayList<Task> historyState = historySubComponent.undo();
@@ -67,6 +70,7 @@ public class AddCommand extends Command {
 		}
 	}
 	
+	//@@author A0121284N
 	public String redo() {
 		try {
 			ArrayList<Task> futureState = historySubComponent.redo();
@@ -77,6 +81,7 @@ public class AddCommand extends Command {
 		}
 	}
 	
+	//@@author A0126258A
 	private ArrayList<Task> generateTaskId() {
 		
 		ArrayList<Task> taskList = storageComponent.load();
@@ -92,6 +97,7 @@ public class AddCommand extends Command {
 		return newTaskList;
 	}
 	
+	//@@author A0126258A
 	private RecurrenceType getRecurrence(String recurrence) {
 		
 		if(recurrence.equals("day")) {
@@ -107,6 +113,7 @@ public class AddCommand extends Command {
 		return RecurrenceType.NONE;
 	}
 	
+	//@@author A0126258A
 	private int stringToInteger(String string) {
 		
 		if (!string.isEmpty()) {
@@ -116,6 +123,7 @@ public class AddCommand extends Command {
 		}
 	}
 	
+	//@@author A0121284N
 	private String getCategoryName(String categoryName) {
 		
 		if(categoryName.isEmpty()) {
@@ -124,7 +132,7 @@ public class AddCommand extends Command {
 			return categoryName;
 		}
 	}
-
+	//@@author A0126258A
 	private Task getTask(TaskType taskType, Command command) {
 		
 		RecurrenceType recurrenceType = getRecurrence(command.getRecurrenceType());
@@ -140,7 +148,8 @@ public class AddCommand extends Command {
 		return new Task(taskType, recurrenceType, recurrenceNumber, priority, categoryName, 
 				taskName, taskDescription, startDate, endDate, reminderDate);
 	}
-
+	
+	//@@author A0126258A
 	private String addTask(TaskType taskType, Command command) {
 
 		Task newTask = getTask(taskType, command);

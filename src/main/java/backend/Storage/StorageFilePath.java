@@ -1,6 +1,11 @@
 package main.java.backend.Storage;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,6 +19,9 @@ public class StorageFilePath {
 	private static final String FILE_CONFIGURATION = "config.properties";
 	private static final String FILE_HEADING = "File path for data storage";
 	private static final String FILE_KEY = "filepath";
+	
+	private String CURRENT_FILE_NAME = "";
+	private String NEW_FILE_NAME = "";
 	
 	// TODO: Change default file path
 	private static final String PATH_LOCATION_DEFAULT = System.getProperty("user.home") + "/Desktop" + "/filename.txt";
@@ -34,6 +42,8 @@ public class StorageFilePath {
 		
 		String filePath = properties.getProperty(FILE_KEY);
 		
+		CURRENT_FILE_NAME = filePath;
+		
 		if(filePath == null) {
 			return PATH_LOCATION_DEFAULT;
 		} else {
@@ -42,10 +52,12 @@ public class StorageFilePath {
 	}
 
 	public void execute(String newFilePath) {
+		NEW_FILE_NAME = newFilePath;
 		
 		try {
 			writer = new FileWriter(FILE_CONFIGURATION);
 			textFile.renameTo(new File(newFilePath));
+			dataTransfer();
 			properties.setProperty(FILE_KEY, newFilePath);
 			properties.store(writer, FILE_HEADING);
 			writer.close();
@@ -54,6 +66,34 @@ public class StorageFilePath {
 		}	
 	}
 	
+	private void dataTransfer() {
+		String oldFilePath = retrieveFilePath();
+		byte[] buffer = new byte[10000];
+		try {
+			FileInputStream fileInput = new FileInputStream(oldFilePath);
+			BufferedInputStream bufferedInput = new BufferedInputStream(fileInput);
+			FileOutputStream fileOutput = new FileOutputStream(this.NEW_FILE_NAME);
+			BufferedOutputStream bufferedOutput = new BufferedOutputStream(fileOutput);
+			while(true) {
+				int length = fileInput.read(buffer);
+				if(length == -1) {
+					break;
+				} else {
+					bufferedOutput.write(buffer);
+					bufferedOutput.flush();
+				}	
+			}
+			File oldFile = new File(oldFilePath);
+			oldFile.delete();
+			bufferedInput.close();
+			bufferedOutput.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
 	public String retrieve() {
 		
 		try {

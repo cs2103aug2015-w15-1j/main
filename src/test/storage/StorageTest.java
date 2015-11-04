@@ -1,5 +1,4 @@
 //@author A0126258A
-
 package storage;
 
 import static org.junit.Assert.*;

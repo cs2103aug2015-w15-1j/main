@@ -322,9 +322,10 @@ public class Observer {
 	//@@author A0126258A
 	private ArrayList<Task> getPastEvents() {
 		
+		ArrayList<Task> allEvents = getEvents();
 		ArrayList<Task> pastEvents = new ArrayList<Task> ();
 
-		for(Task task : pastEvents) {
+		for(Task task : allEvents) {
 			if(task.getDone()) {
 				pastEvents.add(task);
 			}

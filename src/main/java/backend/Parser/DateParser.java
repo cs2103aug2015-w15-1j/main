@@ -8,6 +8,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
+/**
+ * DateParser
+ * Specialized parser that parses date to standard format
+ * @@author A0121795B
+ */
 public class DateParser extends ParserSkeleton{
 
 	//List of months and their short-forms

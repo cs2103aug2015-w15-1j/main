@@ -3,17 +3,22 @@ package main.java.backend.Parser;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * ParserSkeleton
+ * Contains basic methods and data shared within Parser component
+ * @@author A0121795B
+ */
 abstract class ParserSkeleton {
 	
 	//List of all command words accepted by the program
 	final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList(
 	"add", "addcat", "category", "deadline", "description", "delete", "deleteAll", "done", "event", "every", 
 	"exit", "filepath", "priority", "redo", "reminder", "rename", "reset", "search", "setcol", "showcat",   
-	"show", "showE", "showF", "showO", "showT", "showToday", "sort", "sortD", "sortN", "sortP", "undo", "undone") );
+	"show", "showDone", "showE", "showF", "showO", "showT", "showToday", "sort", "sortD", "sortN", "sortP", "undo", "undone") );
 	
 	//Commands that work just by typing the command word (without additional content)
 	final ArrayList<String> COMMANDS_NO_CONTENT = new ArrayList<String>( Arrays.asList(
-	"deleteAll", "exit", "redo", "showE", "showF", "showO", "showT", "showToday", "sortD", "sortN", "sortP", "undo") );
+	"deleteAll", "exit", "redo", "showDone", "showE", "showF", "showO", "showT", "showToday", "sortD", "sortN", "sortP", "undo") );
 	
 	//Commands that if appear first, will prevent other command keywords from having effect
 	final ArrayList<String> COMMANDS_DOMINATING = new ArrayList<String>( Arrays.asList(

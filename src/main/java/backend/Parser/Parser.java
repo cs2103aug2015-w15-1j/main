@@ -3,6 +3,11 @@ package main.java.backend.Parser;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Parser
+ * Parses user input and return result to Logic Component
+ * @@author A0121795B
+ */
 public class Parser extends ParserSkeleton{
 	
 	private ParserVault parserVault = new ParserVault();

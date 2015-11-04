@@ -150,6 +150,10 @@ public class DateParser extends ParserSkeleton{
 		}
 		return true;
 	}
+	
+	boolean hasDate(String dateString) {
+		return !hasNoDate(dateString);
+	}
 
 	/**
 	 * This method checks if the user have included the time in the date string
@@ -167,6 +171,10 @@ public class DateParser extends ParserSkeleton{
 		return true;
 	}
 
+	boolean hasTime(String dateString) {
+		return !hasNoTime(dateString);
+	}
+	
 	String convertToRecurFormat(String freq, String dateString) {
 		/*SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
 		SimpleDateFormat recurDayFormat = new SimpleDateFormat("hh:mma");
@@ -201,6 +209,31 @@ public class DateParser extends ParserSkeleton{
 		return dateString;
 	}
 
+	String parseAndGetDayAndMonth(String dateString) {
+		dateString = parseDate(dateString);
+		return getDayAndMonth(dateString);
+	}
+	
+	String parseAndGetTime(String dateString) {
+		dateString = parseDate(dateString);
+		return getTime(dateString);
+	}
+	
+	String parseAndGetDayOfWeek(String dateString) {
+		dateString = parseDate(dateString);
+		return getDayOfWeek(dateString);
+	}
+	
+	String parseAndGetDayOfWeekAndTime(String dateString) {
+		dateString = parseDate(dateString);
+		return getDayOfWeek(dateString) + " " + getTime(dateString);
+	}
+	
+	String parseAndGetMonth(String dateString) {
+		dateString = parseDate(dateString);
+		return getMonth(dateString);
+	}
+	
 	private String parseDateWithNatty(String date) {
 		return NATTY.parse(date).get(0).getDates().toString();
 	}
@@ -533,6 +566,13 @@ public class DateParser extends ParserSkeleton{
 		String[] ddMMMyyTokens = ddMMMyy.split(" ");
 		return getFirst(ddMMMyyTokens) + " " + getSecond(ddMMMyyTokens);
 	}
+	
+	private String getMonth(String dateString) {
+		String[] dateTokens = dateString.split(", ");
+		String ddMMMyy = getSecond(dateTokens);
+		String[] ddMMMyyTokens = ddMMMyy.split(" ");
+		return getSecond(ddMMMyyTokens);
+	}
 
 	private int getYear(String dateString) {
 		String[] dateTokens = dateString.split(", ");
@@ -635,7 +675,7 @@ public class DateParser extends ParserSkeleton{
 
 	
 	boolean isDayOfWeek(String token) {
-		token = token.toLowerCase();
+		token = removeEndSpacesOrBrackets(token.toLowerCase());
 		if (DAYS_OF_WEEK.contains(token)){
 			return true;
 		}
@@ -653,7 +693,7 @@ public class DateParser extends ParserSkeleton{
 		return DAYS_OF_WEEK.contains(token.toLowerCase());
 	}*/
 
-	private boolean isMonth(String token) {
+	boolean isMonth(String token) {
 		if (isNumber(token) && getDateSymbol(token).isEmpty() && addSpaceBetweenDayAndMonth(token).split(" ").length == 1) {
 			return false;
 		}

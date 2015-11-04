@@ -156,6 +156,9 @@ public class ParserVault extends ParserSkeleton{
 	}
 
 	ArrayList<String> makeCommandWithContentResult(String command, String content){
+		if (command.equals("search")) {
+			content = parseSearchContent(content);
+		}
 		return new ArrayList<String>( Arrays.asList( command, content ) );
 	}
 
@@ -296,6 +299,38 @@ public class ParserVault extends ParserSkeleton{
 		//eventEnd = dateParser.makeEventEndComplete(eventStart, eventEnd);
 		
 		return new ArrayList<String>( Arrays.asList(eventStart, eventEnd));
+	}
+
+	private String parseSearchContent(String content) {
+		String[] contentTokens = content.split(" ");
+		String result = "";
+		String date = "";
+		for (String token: contentTokens) {
+			if (isErrorStatus(dateParser.isInvalidDate(token))) {
+				result += token + " ";
+			} else {
+				date += token + " ";
+			}
+		}
+		if (!date.isEmpty()) {
+			int dateLength = date.split(" ").length;
+			System.out.println(dateLength);
+			System.out.println(dateParser.isDayOfWeek(date));
+			if (dateParser.isDayOfWeek(getFirst(date)) && dateParser.hasTime(date) && dateLength == 2) {
+				date = dateParser.parseAndGetDayOfWeekAndTime(date); 
+			} else if (dateParser.hasDate(date) && dateParser.hasTime(date)) {
+				date = dateParser.parseDate(date);
+			} else if (dateParser.isMonth(date) && dateLength == 1){
+				date = dateParser.parseAndGetMonth(date);
+			} else if (dateParser.isDayOfWeek(date) && dateLength == 1){
+				date = dateParser.parseAndGetDayOfWeek(date);
+			} else if (dateParser.hasDate(date)) {
+				date = dateParser.parseAndGetDayAndMonth(date);
+			} else if (dateParser.hasTime(date)) {
+				date = dateParser.parseAndGetTime(date);
+			}
+		}
+		return removeEndSpacesOrBrackets(result + date);
 	}
 
 	private ArrayList<String> makeShowResult(String command, String content) {

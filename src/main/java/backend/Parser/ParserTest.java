@@ -10,7 +10,7 @@ import java.util.Date;
 import org.junit.Test;
 
 /**
- * DateParser
+ * ParserTest
  * Contains the test cases for Parser component
  * @@author A0121795B
  */
@@ -904,6 +904,66 @@ public class ParserTest {
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("every", "5", "01 Apr") );
 	    printTest();
+	    
+	    input = "search 12 feb 2pm";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("search", "Fri, 12 Feb 16, 2pm") );
+	    executeTest();
+	    
+	    input = "search 12 feb";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("search", "12 Feb") );
+	    executeTest();
+	    
+	    input = "search 12/2";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("search", "12 Feb") );
+	    executeTest();
+	    
+	    input = "search 2pm";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("search", "2pm") );
+	    executeTest();
+	    
+	    input = "search 14:30";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("search", "2:30pm") );
+	    executeTest();
+	    
+	    input = "search saturday";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("search", "Sat") );
+	    executeTest();
+	    
+	    input = "search fri";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("search", "Fri") );
+	    executeTest();
+	    
+	    input = "search saturday 14:00";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("search", "Sat 2pm") );
+	    executeTest();
+	    
+	    input = "search today";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("search", "") );
+	    printTest();
+	    
+	    input = "search next sat 2pm";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("search", "") );
+	    printTest();
+	    
+	    input = "search Sunday guitar lesson";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("search", "guitar lesson Sun") );
+	    executeTest();
+	    
+	    input = "search november";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("search", "Nov") );
+	    executeTest();
 	}
 	
 	@Test

@@ -944,6 +944,22 @@ public class ParserTest {
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("search", "Nov") );
 	    executeTest();
+	    
+	    //Test whether add20ToYear works
+	    input = "4 by 15/09/17 10am";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "4", "Fri, 15 Sep 17, 10am") );
+	    executeTest();
+	    
+	    input = "4 by 15 sep 18 10am";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "4", "Sat, 15 Sep 18, 10am") );
+	    executeTest();
+	    
+	    input = "4 by sep 15 27 10am";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "4", "Wed, 15 Sep 27, 10am") );
+	    executeTest();
 	}
 	
 	@Test

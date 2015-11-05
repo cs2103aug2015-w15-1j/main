@@ -65,6 +65,7 @@ public class DateParser extends ParserSkeleton{
 		date = swapDayAndMonth(date);
 		date = removeLater(date);
 		date = addSpaceBetweenDayAndMonth(date);
+		date = add20ToYear(date);
 		
 		String parsedDate = parseDateWithNatty(date);
 		parsedDate = standardizeDateFormat(parsedDate);
@@ -152,7 +153,13 @@ public class DateParser extends ParserSkeleton{
 		}
 		
 		try {
-			String parsedTime = getTime(parseDate(dateString));
+			dateString = swapDayAndMonth(dateString);
+			dateString = removeLater(dateString);
+			dateString = addSpaceBetweenDayAndMonth(dateString);
+			String parsedDate = parseDateWithNatty(dateString);
+			parsedDate = removeMinuteIfZero(parsedDate);
+			
+			String parsedTime = getTime(parsedDate);
 			String timeString = getTimeFromString(dateString);
 			if (isNotMatchingTimes(parsedTime, timeString)) {
 				return makeErrorResult("InvalidTimeError", timeString);
@@ -364,7 +371,7 @@ public class DateParser extends ParserSkeleton{
 			return Integer.parseInt(timeString); 
 		} catch (NumberFormatException e) {
 			System.out.println("TimeParsingError: problem converting time '" + timeString + "' to integer");
-			e.printStackTrace();
+			//e.printStackTrace();
 			return -1;
 		}
 	}
@@ -415,6 +422,23 @@ public class DateParser extends ParserSkeleton{
 			}
 		}
 		return removeEndSpacesOrBrackets(date);
+	}
+
+	private String add20ToYear(String date) {
+		String[] dateTokens = date.split(" ");
+		String day = "";
+		for (int i = 0; i < dateTokens.length; i++){
+			String token = dateTokens[i];
+			if (isNumber(token)) {
+				if (day.isEmpty()) {
+					day = token;
+				} else if (token.length() != 4 && !getNext(dateTokens, i).toLowerCase().equals("am") 
+						&& !getNext(dateTokens, i).toLowerCase().equals("pm")){
+					dateTokens[i] = "20" + token;
+				}
+			}
+		}
+		return mergeTokens(dateTokens, 0, dateTokens.length);
 	}
 
 	/**

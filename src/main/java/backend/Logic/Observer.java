@@ -59,7 +59,7 @@ public class Observer {
 		String newDate = date
 				.replace(":00", "")
 				.replace("AM", "am")
-				.replace("PM", "");
+				.replace("PM", "pm");
 		
 		return newDate;
 	}
@@ -68,7 +68,7 @@ public class Observer {
 	private void resetRecurring() {
 
 		ArrayList<Task> taskList = storage.load();
-
+		
 		for(Task task : taskList) {
 
 			// Only reset date when todo/event is over
@@ -77,10 +77,14 @@ public class Observer {
 					<= getCurrentTime()) {
 				
 				if(task.getTaskType().equals(TaskType.EVENT)) {
-					task.setEnd(getUpcomingDate(task, task.getEnd()));
+					String start = getUpcomingDate(task, task.getEnd());
+					System.out.println("START: " + start);
+					task.setStart(start);
 				}
 				if(!task.getTaskType().equals(TaskType.FLOATING)) {
-					task.setStart(getUpcomingDate(task, task.getStart()));
+					String deadline = getUpcomingDate(task, task.getEnd());
+					System.out.println("DEADLINE: " + deadline);
+					task.setEnd(deadline);
 				}
 				taskList.set(task.getTaskId(), task);
 			}

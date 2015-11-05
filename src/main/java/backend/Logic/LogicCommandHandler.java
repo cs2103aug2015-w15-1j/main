@@ -105,7 +105,7 @@ public class LogicCommandHandler {
 	}
 	
 	private Command initFilePathCommand(ArrayList<String> parsedUserInput) {
-		Command filePathCommandObject = new FilePathCommand(Command.Type.FILEPATH);
+		Command filePathCommandObject = new FilePathCommand(Command.Type.FILEPATH,storageComponent);
 		filePathCommandObject.setFilePath(parsedUserInput.get(1));
 		return filePathCommandObject;
 	}

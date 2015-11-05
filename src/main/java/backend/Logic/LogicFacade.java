@@ -72,6 +72,7 @@ public class LogicFacade {
 			Command commandObject = logicCommandHandler.parse(parsedUserInput);
 //			System.out.println("CommandObject type: "+commandObject.getType());
 			String feedbackString = "";
+//			System.out.println(commandObject.getType());
 			switch (commandObject.getType()) {
 				case UNDO :
 //					System.out.println(feedbackString);
@@ -95,7 +96,6 @@ public class LogicFacade {
 					searchStack.push(commandObject);
 					break;
 				case FILEPATH :
-					storageComponent.updateFilePath(commandObject.getFilePath());
 					feedbackString = commandObject.execute();
 					break;
 				case EXIT :

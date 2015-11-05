@@ -1,16 +1,15 @@
 //@@author A0121284N
 package main.java.backend.Logic;
 
+import main.java.backend.Storage.Storage;
+
 public class FilePathCommand extends Command {
 	String filepath = "";
+	Storage storageComponent;
 
-	public FilePathCommand(Type typeInput) {
+	public FilePathCommand(Type typeInput, Storage storage) {
 		super(typeInput);
-		// TODO Auto-generated constructor stub
-	}
-
-	public FilePathCommand() {
-		// TODO Auto-generated constructor stub
+		storageComponent = storage;
 	}
 	
 	public void setFilePath(String path) {
@@ -22,6 +21,7 @@ public class FilePathCommand extends Command {
 	}
 	
 	public String execute() {
+		storageComponent.updateFilePath(filepath);
 		return "File path changed to "+filepath;
 	}
 

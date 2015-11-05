@@ -97,22 +97,6 @@ public class Command {
 	public void setKeywords(String keywordInput) {
 		this.keywords = keywordInput;
 	}
-	
-	public void setColour(String colourInput) {
-		this.colour = colourInput;
-	}
-	
-	public void setHistoryState(TreeMap<Integer, Task> history) {
-		historyState = history;
-	}
-	
-	public void setCurrentState(TreeMap<Integer, Task> current) {
-		currentState = current;
-	}
-	
-	public void setFutureState(TreeMap<Integer, Task> future) {
-		futureState = future;
-	}
 
 	public Type getType() {
 		return this.type;
@@ -162,58 +146,16 @@ public class Command {
 		return this.keywords;
 	}
 	
-	public String getColour() {
-		return this.colour;
-	}
-	
 	
 	public String getNewName() {
 		return this.newName;
 	}
-	
-	public String toString() {
-		StringBuilder format = new StringBuilder();
-		format.append("type: "+ getType() + LINE_SEPARATOR);
-		format.append("commandField: "+ getCommandField() + LINE_SEPARATOR);
-		format.append("taskName: "+ getTaskName() + LINE_SEPARATOR);
-		format.append("description: "+ getDescription() + LINE_SEPARATOR);
-		format.append("priority: "+ getPriority() + LINE_SEPARATOR);
-		format.append("reminder: " + getReminder() + LINE_SEPARATOR);
-		format.append("category: " + getCategory() + LINE_SEPARATOR);
-		format.append("startDateAndTime " + getStartDateAndTime() + LINE_SEPARATOR);
-		format.append("endDateAndTime :" + getEndDateAndTime() + LINE_SEPARATOR);
-		format.append("keywords: " + getKeywords() + LINE_SEPARATOR);
-		format.append("colour: "+ getColour() + LINE_SEPARATOR);
-		return format.toString();
-	}
-	
-	public TreeMap<Integer, Task> getHistoryState() {
-		return historyState;
-	}
-	
-	public TreeMap<Integer, Task> getCurrentState() {
-		return currentState;
-	}
-	
-	public TreeMap<Integer, Task> getFutureState() {
-		return futureState;
-	}
-
 
 	public String execute() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-
-	public void setIndex(ArrayList<Task> list, int i, int taskIndex) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
 	public String undo() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
@@ -226,11 +168,9 @@ public class Command {
 		this.newName = name;
 		
 	}
-
-
+	
 	public void setErrorMessage(String string) {
 		// TODO Auto-generated method stub
-		
 	}
 
 
@@ -257,7 +197,6 @@ public class Command {
 
 	public void setFilePath(String string) {
 		// TODO Auto-generated method stub
-		
 	}
 
 

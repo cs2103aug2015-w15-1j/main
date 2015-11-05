@@ -11,9 +11,7 @@ import main.java.backend.Storage.Task.Task.TaskType;
 
 public class AddCommand extends Command {
 	
-	private static final String EXECUTION_ADD_SUBTASK_SUCCESSFUL = "SubTask %1$s is added to Task %2$s";
 	private static final String EXECUTION_ADD_TASK_SUCCESSFUL = "Task %1$s has been added";
-	private static final String EXECUTION_COMMAND_SUCCESSFUL =  "Valid Command.";
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
 	private static final String CATEGORY_DEFAULT = "default";
 	
@@ -32,9 +30,6 @@ public class AddCommand extends Command {
 	
 	//@@author A0121284N
 	public String execute() {	
-//		System.out.println("Future state before execution: "+futureState);
-//		System.out.println("History state before execution: "+historyState);
-//		System.out.println("Current state before execution: "+currentState);
 		String feedbackString = new String();
 		System.out.println("execute commandObject.getCommandField: "+this.getCommandField());
 		switch (this.getCommandField()) {
@@ -48,9 +43,6 @@ public class AddCommand extends Command {
 				feedbackString = addTask(TaskType.EVENT, this);
 				break;
 		}
-//		System.out.println("History state after execution: "+historyState);
-//		System.out.println("Future state after execution: "+futureState);
-//		System.out.println("Current state after execution: "+currentState);
 		System.out.println("feedbackString in AddCommandObject: "+ feedbackString);
 		currentState = storageComponent.load();
 		historySubComponent.push(currentState);

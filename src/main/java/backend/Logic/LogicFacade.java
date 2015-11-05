@@ -66,17 +66,11 @@ public class LogicFacade {
 	
 	public String execute(String userInput) {
 		try {
-//			System.out.println("History stack size before command execution: "+historyStack.size());
 			ArrayList<String> parsedUserInput = parserComponent.parseInput(userInput);
-//			System.out.println(parsedUserInput);
 			Command commandObject = logicCommandHandler.parse(parsedUserInput);
-//			System.out.println("CommandObject type: "+commandObject.getType());
 			String feedbackString = "";
-//			System.out.println(commandObject.getType());
 			switch (commandObject.getType()) {
 				case UNDO :
-//					System.out.println(feedbackString);
-//					System.out.println(historyStack.peek());
 					Command undoableCommand = historyStack.pop();
 					feedbackString = undoableCommand.undo();
 					futureStack.push(undoableCommand);
@@ -106,8 +100,6 @@ public class LogicFacade {
 					futureStack = new Stack<Command>();
 			}
 			getterSubComponent.updateIndex();
-//			System.out.println("feedbackString: "+feedbackString);
-//			System.out.println("History stack size after command execution: "+historyStack.size());
 			return feedbackString;
 		} catch (EmptyStackException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
@@ -124,23 +116,11 @@ public class LogicFacade {
 	
 	public ArrayList<Task> retrieveSearchData() {
 		if(!searchStack.isEmpty()) {
-//			System.out.println("is search stack empty? "+searchStack.empty());
 			searchStack.peek().execute();
 			ArrayList<Task> searchResults = searchStack.peek().getSearchResults();
-//			Collections.sort(searchResults);
-//			System.out.println(searchResults);
-//			toPrint(searchResults);
 			getterSubComponent.updateSearchResultsList(searchResults);
 			
 		}
 		return getterSubComponent.getSearchResultsList();
 	}
-	
-//	private void toPrint(ArrayList<Task> searchResult) {
-//		System.out.println("Search Result Array Size: "+searchResult.size());
-//		for (int i = 0; i < searchResult.size(); i++) {
-//			System.out.println(i+1+". "+searchResult.get(i).getName());
-//		}
-//	}
-
 }

@@ -21,8 +21,13 @@ public class FilePathCommand extends Command {
 	}
 	
 	public String execute() {
-		storageComponent.updateFilePath(filepath);
-		return "File path changed to "+filepath;
+		Boolean isExecuted = storageComponent.updateFilePath(filepath);
+		if (isExecuted) {
+			return "File path changed to "+filepath;
+		} else {
+			return "File path does not exist";
+		}
+		
 	}
 
 }

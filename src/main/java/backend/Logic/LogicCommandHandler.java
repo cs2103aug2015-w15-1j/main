@@ -111,14 +111,14 @@ public class LogicCommandHandler {
 	}
 	
 	private Command initErrorCommand(ArrayList<String> parsedUserInput) {
-		Command errorCommandObject = new ErrorCommand(Command.Type.ERROR);
+		ErrorCommand errorCommandObject = new ErrorCommand(Command.Type.ERROR);
 		errorCommandObject.setCommandField(parsedUserInput.get(0));
 		errorCommandObject.setErrorMessage(parsedUserInput.get(1));
 		return errorCommandObject;
 	}
 
 	private Command initViewCommand(ArrayList<String> parsedUserInput) {
-		Command viewCommandObject = new ViewCommand(Command.Type.VIEW,storageComponent);
+		ViewCommand viewCommandObject = new ViewCommand(Command.Type.VIEW,storageComponent);
 		viewCommandObject.setCommandField(parsedUserInput.get(0));
 		return viewCommandObject;
 	}
@@ -130,7 +130,6 @@ public class LogicCommandHandler {
 	}
 
 	private Command initUndoCommand(ArrayList<String> parsedUserInput) {
-//		System.out.println("Initialising undoCommandObject");
 		Command undoCommandObject = new Command(Command.Type.UNDO);
 		undoCommandObject.setCommandField(parsedUserInput.get(0));
 		return undoCommandObject;
@@ -143,9 +142,7 @@ public class LogicCommandHandler {
 	}
 
 	private Command initSearchCommand(ArrayList<String> parsedUserInput) {
-//		System.out.println("setCommandField: "+parsedUserInput.get(0));
-//		System.out.println("setKeywords: "+parsedUserInput.get(1));
-		Command searchCommandObject = new SearchCommand(Command.Type.SEARCH,storageComponent);
+		SearchCommand searchCommandObject = new SearchCommand(Command.Type.SEARCH,storageComponent);
 		searchCommandObject.setCommandField(parsedUserInput.get(0));
 		searchCommandObject.setKeywords(parsedUserInput.get(1));
 		return searchCommandObject;
@@ -159,7 +156,7 @@ public class LogicCommandHandler {
 
 	private Command initAddCommand(ArrayList<String> parsedUserInput) {
 		int inputLength = parsedUserInput.size();
-		Command addCommandObject = new AddCommand(Command.Type.ADD,storageComponent,historySubComponent);
+		AddCommand addCommandObject = new AddCommand(Command.Type.ADD,storageComponent,historySubComponent);
 		addCommandObject.setCommandField(parsedUserInput.get(0));
 		addCommandObject.setTaskName(parsedUserInput.get(1));
 		addCommandObject.setDescription(parsedUserInput.get(2));
@@ -179,7 +176,7 @@ public class LogicCommandHandler {
 	}
 	
 	private Command initEditCommand(ArrayList<String> parsedUserInput) {
-		Command editCommandObject = new EditCommand(Command.Type.EDIT,storageComponent,historySubComponent);
+		EditCommand editCommandObject = new EditCommand(Command.Type.EDIT,storageComponent,historySubComponent);
 		editCommandObject.setCommandField(parsedUserInput.get(0));
 		switch (parsedUserInput.get(0)) {
 			case ("set") :
@@ -203,9 +200,7 @@ public class LogicCommandHandler {
 				editCommandObject.setTaskName(parsedUserInput.get(1));
 				editCommandObject.setDescription(parsedUserInput.get(2));
 				editCommandObject.setStartDateAndTime(parsedUserInput.get(3));
-//				System.out.println("setE StartTime/Date: "+ parsedUserInput.get(3));
 				editCommandObject.setEndDateAndTime(parsedUserInput.get(4));
-//				System.out.println("setE EndTime/Date: "+ parsedUserInput.get(4));
 				editCommandObject.setPriority(parsedUserInput.get(5));
 				editCommandObject.setReminder(parsedUserInput.get(6));
 				editCommandObject.setCategory(parsedUserInput.get(7));
@@ -255,11 +250,8 @@ public class LogicCommandHandler {
 				break;
 			case ("every") :
 				editCommandObject.setTaskName(parsedUserInput.get(1));
-//				System.out.println("Recurrence Frequency: "+parsedUserInput.get(2));
 				editCommandObject.setRecurrenceFrequency(parsedUserInput.get(2));
-//				System.out.println("Recurrence Type: "+parsedUserInput.get(3));
 				editCommandObject.setRecurrenceType(parsedUserInput.get(3));
-//				System.out.println("StartDateAndTime: "+parsedUserInput.get(4));
 				editCommandObject.setStartDateAndTime(parsedUserInput.get(4));
 				break;
 		}

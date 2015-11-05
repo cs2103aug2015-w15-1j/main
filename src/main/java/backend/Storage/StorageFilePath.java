@@ -136,6 +136,9 @@ public class StorageFilePath {
 		if(isFilePathExist(newFilePath) && !oldFilePath.equals(newFilePath)) {
 			try {
 				writer = new FileWriter(FILE_CONFIGURATION);
+				File oldFile = new File(oldFilePath);
+				File newFile = new File(newFilePath);
+				oldFile.renameTo(newFile);
 				dataTransfer(oldFilePath, newFilePath);
 				properties.setProperty(FILE_KEY, newFilePath);
 				properties.store(writer, FILE_HEADING);

@@ -59,9 +59,7 @@ public class StorageFilePath {
 				}	
 			}
 			File oldFile = new File(oldFilePath);
-			System.out.println("OLD: " + oldFilePath);
-			System.out.println("NEW: " + newFilePath);
-			System.out.println("DELETED: " + oldFile.delete());
+			oldFile.delete();
 			bufferedInput.close();
 			bufferedOutput.close();
 		} catch (IOException e) {

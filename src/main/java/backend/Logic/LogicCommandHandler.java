@@ -160,7 +160,7 @@ public class LogicCommandHandler {
 		addCommandObject.setCommandField(parsedUserInput.get(0));
 		addCommandObject.setTaskName(parsedUserInput.get(1));
 		addCommandObject.setDescription(parsedUserInput.get(2));
-		addCommandObject.setCategory(parsedUserInput.get(inputLength-1));
+		addCommandObject.setRecurrence(parsedUserInput.get(inputLength-1));
 		addCommandObject.setReminder(parsedUserInput.get(inputLength-2));
 		addCommandObject.setPriority(parsedUserInput.get(inputLength-3));
 		switch (parsedUserInput.get(0)){
@@ -184,7 +184,7 @@ public class LogicCommandHandler {
 				editCommandObject.setDescription(parsedUserInput.get(2));
 				editCommandObject.setPriority(parsedUserInput.get(3));
 				editCommandObject.setReminder(parsedUserInput.get(4));
-				editCommandObject.setCategory(parsedUserInput.get(5));
+				editCommandObject.setRecurrence(parsedUserInput.get(5));
 				editCommandObject.setNewName(parsedUserInput.get(6));
 				break;
 			case ("setT") :
@@ -193,7 +193,7 @@ public class LogicCommandHandler {
 				editCommandObject.setEndDateAndTime(parsedUserInput.get(3));
 				editCommandObject.setPriority(parsedUserInput.get(4));
 				editCommandObject.setReminder(parsedUserInput.get(5));
-				editCommandObject.setCategory(parsedUserInput.get(6));
+				editCommandObject.setRecurrence(parsedUserInput.get(6));
 				editCommandObject.setNewName(parsedUserInput.get(7));
 				break;
 			case ("setE") :
@@ -203,7 +203,7 @@ public class LogicCommandHandler {
 				editCommandObject.setEndDateAndTime(parsedUserInput.get(4));
 				editCommandObject.setPriority(parsedUserInput.get(5));
 				editCommandObject.setReminder(parsedUserInput.get(6));
-				editCommandObject.setCategory(parsedUserInput.get(7));
+				editCommandObject.setRecurrence(parsedUserInput.get(7));
 				editCommandObject.setNewName(parsedUserInput.get(8));
 				break;
 			case ("deadline") :
@@ -223,10 +223,6 @@ public class LogicCommandHandler {
 				editCommandObject.setTaskName(parsedUserInput.get(1));
 				editCommandObject.setReminder(parsedUserInput.get(2));
 				break;
-			case ("setcat") : 
-				editCommandObject.setTaskName(parsedUserInput.get(1));
-				editCommandObject.setCategory(parsedUserInput.get(2));
-			 	break;	
 			case ("priority") :
 				editCommandObject.setTaskName(parsedUserInput.get(1));
 				editCommandObject.setPriority(parsedUserInput.get(2));
@@ -250,9 +246,7 @@ public class LogicCommandHandler {
 				break;
 			case ("every") :
 				editCommandObject.setTaskName(parsedUserInput.get(1));
-				editCommandObject.setRecurrenceFrequency(parsedUserInput.get(2));
-				editCommandObject.setRecurrenceType(parsedUserInput.get(3));
-				editCommandObject.setStartDateAndTime(parsedUserInput.get(4));
+				editCommandObject.setRecurrence(parsedUserInput.get(2));
 				break;
 		}
 		return editCommandObject;

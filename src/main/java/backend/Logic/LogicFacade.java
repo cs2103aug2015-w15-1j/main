@@ -67,6 +67,7 @@ public class LogicFacade {
 	public String execute(String userInput) {
 		try {
 			ArrayList<String> parsedUserInput = parserComponent.parseInput(userInput);
+			System.out.println("Parsed User Input" + parsedUserInput);
 			Command commandObject = logicCommandHandler.parse(parsedUserInput);
 			String feedbackString = "";
 			switch (commandObject.getType()) {

@@ -22,8 +22,6 @@ public class EditCommand extends Command {
 	private static final String EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL = "Event %1$s has been setted to %2$s till %3$s";
 	private static final String EXECUTION_SET_DESCRIPTION_SUCCESSFUL = "Description for task %1$s has been set";
 	private static final String EXECUTION_SET_REMINDER_SUCCESSFUL = "Reminder for Task %1$s has been set to be at %2$s";
-	private static final String EXECUTION_SET_CATEGORY_SUCCESSFUL = "Task %1$s is set to the category %2$s";
-	private static final String EXECUTION_SET_COLOUR_SUCCESSFUL = "Category %1$s is set to the colour %2$s";
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
 	private static final String EXECUTION_UNDONE_COMMAND_SUCCESSFUL = "Task %1$s is completed";
 	private static final String EXECUTION_DONE_COMMAND_SUCCESSFUL = "Task %1$s is not completed";
@@ -87,12 +85,6 @@ public class EditCommand extends Command {
 				break;
 			case ("deleteAll"):
 				feedbackString = deleteAll(this);
-				break;
-			case ("setCol") :
-//				feedbackString = setColour(this);
-				break;
-			case ("category") :
-				feedbackString = setCategory(this);
 				break;
 			case ("undone") :
 				feedbackString = setUndone(this);
@@ -187,9 +179,9 @@ public class EditCommand extends Command {
 				logicEditorLogger.info("reminder: "+commandObject.getReminder());
 				setReminder(commandObject);
 			}
-			if(!commandObject.getCategory().equals("")) {
-				logicEditorLogger.info("category: "+commandObject.getCategory());
-				setCategory(commandObject);
+			if(!commandObject.getRecurrence().equals("")) {
+				logicEditorLogger.info("category: "+commandObject.getRecurrence());
+//				setRecurrence(commandObject);
 			}
 			if (!commandObject.getEndDateAndTime().equals("")) {
 				setDeadline(commandObject);
@@ -224,9 +216,9 @@ public class EditCommand extends Command {
 				logicEditorLogger.info("reminder: "+commandObject.getReminder());
 				setReminder(commandObject);
 			}
-			if(!commandObject.getCategory().equals("")) {
-				logicEditorLogger.info("category: "+commandObject.getCategory());
-				setCategory(commandObject);
+			if(!commandObject.getRecurrence().equals("")) {
+				logicEditorLogger.info("category: "+commandObject.getRecurrence());
+//				setRecurrence(commandObject);
 			}
 			if (!commandObject.getStartDateAndTime().equals("") && 
 					!commandObject.getEndDateAndTime().equals("")) {
@@ -263,9 +255,9 @@ public class EditCommand extends Command {
 				logicEditorLogger.info("reminder: "+commandObject.getReminder());
 				setReminder(commandObject);
 			}
-			if(!commandObject.getCategory().equals("")) {
-				logicEditorLogger.info("category: "+commandObject.getCategory());
-				setCategory(commandObject);
+			if(!commandObject.getRecurrence().equals("")) {
+				logicEditorLogger.info("category: "+commandObject.getRecurrence());
+//				setRecurrence(commandObject);
 			}
 			return EXECUTION_SET_SUCCESSFUL;
 		} catch (NumberFormatException e) {
@@ -406,34 +398,6 @@ public class EditCommand extends Command {
 		return String.format("Task %1$s has been renamed to %2$s", taskIndex, newName);
 	}
 
-	/*
-	private String setColour(Command commandObject) {
-
-		taskList = storage.load();
-		String categoryName = commandObject.getCategory();
-		String colourId = commandObject.getColour();
-
-		Category category = taskList.get(categoryName);
-		category.setCategoryColour(colourId);
-		storage.save(taskList);
-
-		return String.format(EXECUTION_SET_COLOUR_SUCCESSFUL, categoryName,colourId);
-	}
-	*/
-	
-	//@@author A0121284N
-	private String setCategory(Command commandObject) {
-		taskList = storageComponent.load();
-		int taskIndex = Integer.parseInt(commandObject.getTaskName());
-		String categoryName = commandObject.getCategory();
-		int taskId = getTaskId(taskIndex);
-
-		taskList.get(taskId).setCategoryName(categoryName);
-		storageComponent.save(taskList);
-
-		return String.format(EXECUTION_SET_CATEGORY_SUCCESSFUL, taskId, categoryName);
-	}
-
 	//@@author A0121284N
 	private String setUndone(Command commandObject) {
 		try {
@@ -555,12 +519,13 @@ public class EditCommand extends Command {
 		try {
 			taskList = storageComponent.load();
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
-			int recurrenceFrequency = Integer.parseInt(commandObject.getRecurrenceFrequency());
-			System.out.println("Recurrence Frequency: "+recurrenceFrequency);
-			String recurrenceType = commandObject.getRecurrenceType();
-			System.out.println("Recurrence Type: "+recurrenceType);
+			String[] recurrence = commandObject.getRecurrence().split(" ");
+			int recurrenceFrequency = Integer.parseInt(recurrence[0]);
+//			System.out.println("Recurrence Frequency: "+recurrenceFrequency);
+			String recurrenceType = recurrence[1];
+//			System.out.println("Recurrence Type: "+recurrenceType);
 			String date = commandObject.getStartDateAndTime();
-			System.out.println("StartDateAndTime: "+date);
+//			System.out.println("StartDateAndTime: "+date);
 			int taskId = getTaskId(taskIndex);
 			Task task = taskList.get(taskId);
 

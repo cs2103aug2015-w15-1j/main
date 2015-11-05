@@ -15,7 +15,7 @@ public class ParserVault extends ParserSkeleton{
 
 	ParserVault() {
 		//Force Natty parser to be initialized by running dateParser once
-    	String pi = "31/4/15 9:26";
+    	String pi = "Mar 14 15 9.26pm";
     	dateParser.parseDate(pi);
 	}
 

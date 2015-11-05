@@ -551,6 +551,11 @@ public class ParserTest {
 	    "Sat, 17 Sep 16, 9:59am") );
 	    executeTest();
 	    
+	    input = "4 event 15/09 10AM to 16/09 11AM";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10am", "Fri, 16 Sep 16, 11am") );
+	    executeTest();
+	    
 	    //Testing for event with end date but not time (should set the end time to be same as start time)
 	    input = "4 event 15/09 10am to 16/09";
 	    actual = parser.parseInput(input);
@@ -619,6 +624,11 @@ public class ParserTest {
 	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 10:30am", "Thu, 15 Sep 16, 10:45am") );
 	    executeTest();
 
+	    input = "4 event 15/09 11:55PM to 11:59PM";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Thu, 15 Sep 16, 11:55pm", "Thu, 15 Sep 16, 11:59pm") );
+	    executeTest();
+	    
 	    //Testing for event with no end date/time (should set end date to be same as start date, time to be 11:59pm)
 	    input = "2 event 15/09 10am";
 	    actual = parser.parseInput(input);

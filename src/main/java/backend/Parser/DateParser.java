@@ -103,7 +103,7 @@ public class DateParser extends ParserSkeleton{
 		}
 		
 		eventEnd = makeEventEndComplete(eventStart, eventEnd);
-
+		
 		return new ArrayList<String>( Arrays.asList("OK", eventEnd));
 	}
 
@@ -761,8 +761,7 @@ public class DateParser extends ParserSkeleton{
 		} else {
 			return false;
 		}
-		
-		String[] timeTokens = token.split(period);
+		String[] timeTokens = token.toLowerCase().split(period);
 		if (timeTokens.length <= 1) {
 			String time = "";
 			if (timeTokens.length == 1){

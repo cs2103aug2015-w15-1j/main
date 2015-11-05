@@ -19,17 +19,12 @@ public class Command {
 	private String recurrenceFrequency = "";
 	private String description = "";
 	private String priority = "";
-	private String reminder = ""; 
+	private String rename = ""; 
 	private String category = "";
 	private String startDateAndTime = "";
 	private String endDateAndTime = "";
 	private String keywords = "";
-	private String colour = "";
 	private String newName = "";
-	private static TreeMap<Integer, Task> historyState;
-	private static TreeMap<Integer, Task> currentState;
-	private static TreeMap<Integer, Task> futureState;
-	private final String LINE_SEPARATOR = System.getProperty("line.separator");
 	private String resetField = "";
 
     // ================================================================
@@ -71,10 +66,10 @@ public class Command {
 	}
 	
 	public void setReminder(String reminderInput) {
-		this.reminder = reminderInput;
+		this.rename = reminderInput;
 	}
 	
-	public void setCategory(String categoryInput) {
+	public void setRecurrence(String categoryInput) {
 		this.category = categoryInput;
 	}
 	
@@ -127,10 +122,10 @@ public class Command {
 	}
 	
 	public String getReminder() {
-		return this.reminder;
+		return this.rename;
 	}
 	
-	public String getCategory() {
+	public String getRecurrence() {
 		return this.category;
 	}
 	

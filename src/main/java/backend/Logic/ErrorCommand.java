@@ -9,10 +9,6 @@ public class ErrorCommand extends Command {
 		// TODO Auto-generated constructor stub
 	}
 
-	public ErrorCommand() {
-		// TODO Auto-generated constructor stub
-	}
-	
 	public void setErrorMessage(String message) {
 		this.errorMessage = message;
 	}

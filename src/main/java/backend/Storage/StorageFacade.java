@@ -40,8 +40,9 @@ public class StorageFacade implements Storage {
 	}
 	
 	@Override
-	public void updateFilePath(String newFilePath) {
-		filePath.execute(newFilePath);
+	public boolean updateFilePath(String newFilePath) {
+		boolean isSuccess = filePath.execute(newFilePath);
 		reinit();
+		return isSuccess;
 	}
  }

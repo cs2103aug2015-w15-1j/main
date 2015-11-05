@@ -335,6 +335,11 @@ public class ParserTest {
 	    												"4", "", "1 day", "") );
 	    executeTest();
 	    
+	    input = "2 priority 4 every day";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("set", "2", "", "4", "", "1 day", "") );
+	    executeTest();
+	    
 	    input = "3 deadline 19 Nov 3pm every 6 months";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("setT", "3", "", "Thu, 19 Nov 15, 3pm", 

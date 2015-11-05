@@ -241,7 +241,7 @@ public class ParserVault extends ParserSkeleton{
 			}
 		}
 		if (!recur.isEmpty()) {
-			if (deadline.isEmpty() && event.isEmpty()) {
+			if (deadline.isEmpty() && event.isEmpty() && command.equals("add")) {
 				return makeErrorResult("NoDateForRecurrenceError", recur);
 			}
 			ArrayList<String> parsedResult = makeRecurringResult(command, index, recur);

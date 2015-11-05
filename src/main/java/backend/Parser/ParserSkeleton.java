@@ -22,7 +22,7 @@ abstract class ParserSkeleton {
 	
 	//Commands that if appear first, will prevent other command keywords from having effect
 	final ArrayList<String> COMMANDS_DOMINATING = new ArrayList<String>( Arrays.asList(
-	"addcat", "delete", "done", "every", "filepath", "reset", "search", "setcol", "show", "showcat", "sort", "undone") );
+	"addcat", "delete", "done", "filepath", "reset", "search", "setcol", "show", "showcat", "sort", "undone") );
 	
 	//Commands that can accept any amount of words
 	final ArrayList<String> COMMANDS_NEED_WORDS = new ArrayList<String>( 

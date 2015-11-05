@@ -21,7 +21,7 @@ public class ParserVault extends ParserSkeleton{
 
 	//The default list of fields and the order in which their contents are put into result
 	private final ArrayList<String> FIELDS_DEFAULT = new ArrayList<String>( Arrays.asList(
-	"command", "task", "description", "deadline", "eventStart", "eventEnd", "priority", "reminder", "category", "rename") );
+	"command", "task", "description", "deadline", "eventStart", "eventEnd", "priority", "reminder", "every", "rename") );
 	
 	//List of fields that are used in the current result
 	private ArrayList<String> fields = new ArrayList<String>(FIELDS_DEFAULT);
@@ -42,7 +42,7 @@ public class ParserVault extends ParserSkeleton{
 
 	//Command fields that can be edited/reset
 	private final ArrayList<String> COMMANDS_CAN_RESET = new ArrayList<String>( 
-	Arrays.asList("all", "description", "deadline", "event", "priority", "reminder", "category") );	
+	Arrays.asList("all", "description", "deadline", "every", "event", "priority", "reminder", "category") );	
 	
 	//How often a recurring task can recur
 	private final ArrayList<String> RECUR_FREQUENCY = new ArrayList<String>( Arrays.asList(
@@ -226,6 +226,7 @@ public class ParserVault extends ParserSkeleton{
 		String event = getContent("event");
 		String reminder = getContent("reminder");
 		String priority = getContent("priority");
+		String recur = getContent("every");
 		if (command.equals("add")) {
 			fields.remove("rename");
 		}
@@ -237,6 +238,18 @@ public class ParserVault extends ParserSkeleton{
 			ArrayList<String> parseResult = makeDateResult("reminder", reminder);
 			if (isErrorStatus(parseResult)) {
 				return makeErrorResult("InvalidDateError", reminder);
+			}
+		}
+		if (!recur.isEmpty()) {
+			if (deadline.isEmpty() && event.isEmpty()) {
+				return makeErrorResult("NoDateForRecurrenceError", recur);
+			}
+			ArrayList<String> parsedResult = makeRecurringResult(command, index, recur);
+			if (isErrorStatus(parsedResult)) {
+				return parsedResult;
+			} else {
+				recur = getLast(parsedResult);
+				storeContent("every", recur);
 			}
 		}
 		if (!deadline.isEmpty() && !event.isEmpty()){
@@ -299,38 +312,6 @@ public class ParserVault extends ParserSkeleton{
 		//eventEnd = dateParser.makeEventEndComplete(eventStart, eventEnd);
 		
 		return new ArrayList<String>( Arrays.asList(eventStart, eventEnd));
-	}
-
-	private String parseSearchContent(String content) {
-		String[] contentTokens = content.split(" ");
-		String result = "";
-		String date = "";
-		for (String token: contentTokens) {
-			if (isErrorStatus(dateParser.isInvalidDate(token))) {
-				result += token + " ";
-			} else {
-				date += token + " ";
-			}
-		}
-		if (!date.isEmpty()) {
-			int dateLength = date.split(" ").length;
-			System.out.println(dateLength);
-			System.out.println(dateParser.isDayOfWeek(date));
-			if (dateParser.isDayOfWeek(getFirst(date)) && dateParser.hasTime(date) && dateLength == 2) {
-				date = dateParser.parseAndGetDayOfWeekAndTime(date); 
-			} else if (dateParser.hasDate(date) && dateParser.hasTime(date)) {
-				date = dateParser.parseDate(date);
-			} else if (dateParser.isMonth(date) && dateLength == 1){
-				date = dateParser.parseAndGetMonth(date);
-			} else if (dateParser.isDayOfWeek(date) && dateLength == 1){
-				date = dateParser.parseAndGetDayOfWeek(date);
-			} else if (dateParser.hasDate(date)) {
-				date = dateParser.parseAndGetDayAndMonth(date);
-			} else if (dateParser.hasTime(date)) {
-				date = dateParser.parseAndGetTime(date);
-			}
-		}
-		return removeEndSpacesOrBrackets(result + date);
 	}
 
 	private ArrayList<String> makeShowResult(String command, String content) {
@@ -414,40 +395,25 @@ public class ParserVault extends ParserSkeleton{
 			content = mergeTokens(fieldTokens, 2, fieldTokens.length);
 		} else {
 			interval = "1";
-			if (dateParser.isDayOfWeek(getFirst(content))) {
+			/*if (dateParser.isDayOfWeek(getFirst(content))) {
 				freq = "week";
 			} else {
 				freq = getFirst(content);
 				content = mergeTokens(fieldTokens, 1, fieldTokens.length);
-			}
+			}*/
+			freq = getFirst(content);
+			content = mergeTokens(fieldTokens, 1, fieldTokens.length);
 		}
 
 		if (isNotValidFrequency(freq)) {
 			return makeErrorResult("InvalidFrequencyError", freq);
 		}
 		freq = convertToDefaultFrequency(freq);
-		if (freq.equals("month")) {
-			String dayOfMonth = getNumber(content);
-			if (isNotValidDayOfMonth(dayOfMonth)) {
-				return makeErrorResult("InvalidDayOfMonthError", content);
-			}
+		/*if (freq.equals("month")) {
 			int day = convertStringToInt(dayOfMonth);
 			String date = dateParser.getNextNearestDate(day);
-			/*if (dateParser.noSuchDayInMonth(day, month)) {
-				month = dateParser.plusOneMonth(month);
-			}*/
-			return new ArrayList<String> ( Arrays.asList(command, name, interval, freq, date) );
-		}
-		ArrayList<String> dateValidity = dateParser.isInvalidDate(content);
-		if (isErrorStatus(dateValidity)){
-			return dateValidity;
-		}
-		if (dateParser.hasNoTime(content)) {
-			content += " 9am";
-		}
-		String date = dateParser.parseDate(content);
-		date = dateParser.convertToRecurFormat(freq, date);
-		return new ArrayList<String> ( Arrays.asList(command, name, interval, freq, date) );
+		}*/
+		return new ArrayList<String> ( Arrays.asList(command, name, interval + " " + freq) );
 	}
 
 	private ArrayList<String> makeMultiFieldResultWithDeadline(String command, String deadline) {
@@ -473,6 +439,36 @@ public class ParserVault extends ParserSkeleton{
 			return parseResult;
 		}
 		return putFieldContentInResult();
+	}
+
+	private String parseSearchContent(String content) {
+		String[] contentTokens = content.split(" ");
+		String result = "";
+		String date = "";
+		for (String token: contentTokens) {
+			if (isErrorStatus(dateParser.isInvalidDate(token))) {
+				result += token + " ";
+			} else {
+				date += token + " ";
+			}
+		}
+		if (!date.isEmpty()) {
+			int dateLength = date.split(" ").length;
+			if (dateParser.isDayOfWeek(getFirst(date)) && dateParser.hasTime(date) && dateLength == 2) {
+				date = dateParser.parseAndGetDayOfWeekAndTime(date); 
+			} else if (dateParser.hasDate(date) && dateParser.hasTime(date)) {
+				date = dateParser.parseDate(date);
+			} else if (dateParser.isMonth(date) && dateLength == 1){
+				date = dateParser.parseAndGetMonth(date);
+			} else if (dateParser.isDayOfWeek(date) && dateLength == 1){
+				date = dateParser.parseAndGetDayOfWeek(date);
+			} else if (dateParser.hasDate(date)) {
+				date = dateParser.parseAndGetDayAndMonth(date);
+			} else if (dateParser.hasTime(date)) {
+				date = dateParser.parseAndGetTime(date);
+			}
+		}
+		return removeEndSpacesOrBrackets(result + date);
 	}
 
 	private boolean isCommandThatCanBeReset(String token) {
@@ -509,7 +505,7 @@ public class ParserVault extends ParserSkeleton{
 		return freq;
 	}
 
-	private boolean isNotValidDayOfMonth(String token){
+	/*private boolean isNotValidDayOfMonth(String token){
 		int maxDayOfMonth = 31;
 		if (isNumber(token)){
 			if (Integer.parseInt(token) <= maxDayOfMonth) {
@@ -517,7 +513,7 @@ public class ParserVault extends ParserSkeleton{
 			}
 		}
 		return true;
-	}
+	}*/
 
 	private String getTaskType(String token){
 		switch (token.toLowerCase()) {
@@ -581,10 +577,10 @@ public class ParserVault extends ParserSkeleton{
 				result.add(error + ": '" + token + "' is not recognised as an index");
 				break;
 			case "EmptyFieldError":
-				result.add(error + ": please enter content for the command '" + token + "'");
+				result.add(error + ": Please enter content for the command '" + token + "'");
 				break;
 			case "NoEndDateError":
-				result.add(error + ": please enter an end date after the command word 'to'");
+				result.add(error + ": Please enter an end date after the command word 'to'");
 				break;
 			case "InvalidPriorityError":
 				result.add(error + ": '" + token + "' is not between 1 to 5");
@@ -596,7 +592,7 @@ public class ParserVault extends ParserSkeleton{
 				result.add(error + ": Task cannot have both deadline and event date");
 				break;
 			case "InvalidFrequencyError":
-				result.add(error + ": please enter 'day'/'week'/'month'/'year' after 'every' to indicate the frequency");
+				result.add(error + ": Please enter 'day'/'week'/'month'/'year' after 'every' to indicate the frequency");
 				break;
 			case "InvalidDayOfMonthError":
 				result.add(error + ": '" + token + "' is not between 1 to 31");
@@ -609,6 +605,9 @@ public class ParserVault extends ParserSkeleton{
 				break;
 			case "InvalidResetError":
 				result.add(error + ": '" + token + "' is not a field that can be reset");
+				break;
+			case "NoDateForRecurrenceError":
+				result.add(error + ": Cannot make task recur. Please set a deadline or start date for the task");
 				break;
 			default:
 				break; 

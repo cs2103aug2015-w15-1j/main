@@ -107,6 +107,40 @@ public class DateParser extends ParserSkeleton{
 		return new ArrayList<String>( Arrays.asList("OK", eventEnd));
 	}
 
+	String convertToRecurFormat(String freq, String dateString) {
+		/*SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
+		SimpleDateFormat recurDayFormat = new SimpleDateFormat("hh:mma");
+		SimpleDateFormat recurWeekFormat = new SimpleDateFormat("EEE hh:mma");
+		SimpleDateFormat recurYearFormat = new SimpleDateFormat("dd MMM");*/
+		
+		switch (freq.toLowerCase()) {
+			case "day":
+			case "days":
+				//dateString = getTime(dateString);
+				dateString = minusOneYear(dateString);
+				if (isInThePast(dateString)) {
+					dateString = removeMinuteIfZero(plusOneDay(dateString, null));
+				}
+				break;
+			case "week":
+			case "weeks":
+				//dateString = getDayOfWeek(dateString) + " " + getTime(dateString);
+				String oneWeekBefore = minusOneWeek(dateString);
+				if (!isInThePast(oneWeekBefore)) {
+					dateString = oneWeekBefore;
+				}
+				break;
+			case "year":
+			case "years":
+				//dateString = getDayAndMonth(dateString);
+				break;
+			default:
+				break;
+		}
+		
+		return dateString;
+	}
+
 	ArrayList<String> isInvalidDate(String dateString){
 		if (dateString.isEmpty()) {
 			return new ArrayList<String>(Arrays.asList( "OK" ));
@@ -132,6 +166,44 @@ public class DateParser extends ParserSkeleton{
 		} catch (Exception e){
 			return makeErrorResult("InvalidDateError", dateString);
 		}
+	}
+
+	boolean isDayOfWeek(String token) {
+		token = removeEndSpacesOrBrackets(token.toLowerCase());
+		if (DAYS_OF_WEEK.contains(token)){
+			return true;
+		}
+		if (token.length() >= 3) {
+			for (String day: DAYS_OF_WEEK){
+				if (day.startsWith(token)) {
+					//System.out.println("t");
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/*private boolean isDayOfWeek(String token) {
+		return DAYS_OF_WEEK.contains(token.toLowerCase());
+	}*/
+	
+	boolean isMonth(String token) {
+		if (isNumber(token) && getDateSymbol(token).isEmpty() && addSpaceBetweenDayAndMonth(token).split(" ").length == 1) {
+			return false;
+		}
+		token = token.toLowerCase();
+		token = convertMonthToDefault(token);
+		if (MONTHS.contains(token)){
+			return true;
+		}
+		for (String month: MONTHS) {
+			if (containsMonth(token, month)) {
+				return true;
+			}
+		}
+		return false;
+		//return MONTHS.contains(token.toLowerCase());
 	}
 
 	boolean hasNoDate(String dateString) {
@@ -175,38 +247,22 @@ public class DateParser extends ParserSkeleton{
 		return !hasNoTime(dateString);
 	}
 	
-	String convertToRecurFormat(String freq, String dateString) {
-		/*SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
-		SimpleDateFormat recurDayFormat = new SimpleDateFormat("hh:mma");
-		SimpleDateFormat recurWeekFormat = new SimpleDateFormat("EEE hh:mma");
-		SimpleDateFormat recurYearFormat = new SimpleDateFormat("dd MMM");*/
-		
-		switch (freq.toLowerCase()) {
-			case "day":
-			case "days":
-				//dateString = getTime(dateString);
-				dateString = minusOneYear(dateString);
-				if (isInThePast(dateString)) {
-					dateString = removeMinuteIfZero(plusOneDay(dateString, null));
-				}
-				break;
-			case "week":
-			case "weeks":
-				//dateString = getDayOfWeek(dateString) + " " + getTime(dateString);
-				String oneWeekBefore = minusOneWeek(dateString);
-				if (!isInThePast(oneWeekBefore)) {
-					dateString = oneWeekBefore;
-				}
-				break;
-			case "year":
-			case "years":
-				//dateString = getDayAndMonth(dateString);
-				break;
-			default:
-				break;
+	String getNextNearestDate(int day){
+		String currDate = parseDate(getTomorrowDate() + " 9am"); 
+		int currDay;
+		/*if (isInThePast(currDate)) {
+			currDate = plusOneDay(currDate, null);
+		}*/
+		while ((currDay = getDayOfMonth(currDate)) != day) {
+			if (currDay < day) {
+				currDate = plusXDays(currDate, day-currDay);
+			} else {
+				String currMonth = getCurrentMonth();
+				currDate = plusXDays(currDate, getMaxDay(currMonth)-currDay+day);
+			}
 		}
-		
-		return dateString;
+		//return currDate;
+		return getDayMonthAndYear(currDate);
 	}
 
 	String parseAndGetDayAndMonth(String dateString) {
@@ -448,7 +504,6 @@ public class DateParser extends ParserSkeleton{
 		} else {
 			date = convertStringToDate(dateString, sdf);
 		}
-		System.out.println(date.toString());
 		
 		Calendar c = Calendar.getInstance(); 
 		c.setTime(date); 
@@ -467,15 +522,6 @@ public class DateParser extends ParserSkeleton{
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
 		c.add(Calendar.DATE, day);
-		date = c.getTime();
-		return removeMinuteIfZero(standardizeDateFormat(date.toString()));
-	}
-	
-	public String plusOneMonth(String month) {
-		Date date = convertStandardDateString(month);
-		Calendar c = Calendar.getInstance();
-		c.setTime(date);
-		c.add(Calendar.MONTH, 1);
 		date = c.getTime();
 		return removeMinuteIfZero(standardizeDateFormat(date.toString()));
 	}
@@ -507,23 +553,6 @@ public class DateParser extends ParserSkeleton{
 		return removeMinuteIfZero(standardizeDateFormat(date.toString()));
 	}
 
-	String getNextNearestDate(int day){
-		String currDate = parseDate(getTomorrowDate() + " 9am"); 
-		int currDay;
-		/*if (isInThePast(currDate)) {
-			currDate = plusOneDay(currDate, null);
-		}*/
-		while ((currDay = getDayOfMonth(currDate)) != day) {
-			if (currDay < day) {
-				currDate = plusXDays(currDate, day-currDay);
-			} else {
-				String currMonth = getCurrentMonth();
-				currDate = plusXDays(currDate, getMaxDay(currMonth)-currDay+day);
-			}
-		}
-		return currDate;
-	}
-	
 	private String setToCurrentYear(String dateString) {
 		String currYear = Integer.toString(getCurrentYear());
 		String[] dateTokens = dateString.split(", ");
@@ -656,7 +685,7 @@ public class DateParser extends ParserSkeleton{
 		return removeMinuteIfZero(standardizeDateFormat(now.toString()));
 	}
 
-	String getCurrentMonth() {
+	private String getCurrentMonth() {
 		SimpleDateFormat sdfDate = new SimpleDateFormat("MMM");
 	    Date now = new Date();
 	    return sdfDate.format(now);
@@ -673,43 +702,6 @@ public class DateParser extends ParserSkeleton{
 		return time.split(":").length > 1;
 	}
 
-	
-	boolean isDayOfWeek(String token) {
-		token = removeEndSpacesOrBrackets(token.toLowerCase());
-		if (DAYS_OF_WEEK.contains(token)){
-			return true;
-		}
-		if (token.length() >= 3) {
-			for (String day: DAYS_OF_WEEK){
-				if (day.startsWith(token)) {
-					//System.out.println("t");
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	/*private boolean isDayOfWeek(String token) {
-		return DAYS_OF_WEEK.contains(token.toLowerCase());
-	}*/
-
-	boolean isMonth(String token) {
-		if (isNumber(token) && getDateSymbol(token).isEmpty() && addSpaceBetweenDayAndMonth(token).split(" ").length == 1) {
-			return false;
-		}
-		token = token.toLowerCase();
-		token = convertMonthToDefault(token);
-		if (MONTHS.contains(token)){
-			return true;
-		}
-		for (String month: MONTHS) {
-			if (containsMonth(token, month)) {
-				return true;
-			}
-		}
-		return false;
-		//return MONTHS.contains(token.toLowerCase());
-	}
 	
 	private boolean containsMonth (String token, String month){
 		return (token.startsWith(month) || token.endsWith(month));
@@ -906,7 +898,7 @@ public class DateParser extends ParserSkeleton{
 		return token;
 	}
 	
-	boolean noSuchDayInMonth(int day, String month) {
+	private boolean noSuchDayInMonth(int day, String month) {
 		month = removeFrontZero(month.toLowerCase());
 		if (has31Days(month)) {
 			return day > 31;

@@ -210,13 +210,13 @@ public class Parser extends ParserSkeleton{
 				result.add(error + ": '" + token + "' is not recognised as a command");
 				break;
 			case "NoCommandError":
-				result.add(error + ": please enter a command after the task index '" + token + "'");
+				result.add(error + ": Please enter a command after the task index '" + token + "'");
 				break;
 			case "DuplicateCommandError":
-				result.add(error + ": duplicate command '" + token + "'");
+				result.add(error + ": Duplicate command '" + token + "'");
 				break;
 			case "EmptyFieldError":
-				result.add(error + ": please enter content for the command '" + token + "'");
+				result.add(error + ": Please enter content for the command '" + token + "'");
 				break;
 			default:
 				break; 

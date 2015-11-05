@@ -329,22 +329,22 @@ public class ParserTest {
 	    												"Fri, 25 Dec 15, 9pm", "", "") );
 	    executeTest();
 	    
-	    input = "2 priority 4 deadline 5 October 20:00 category research ";
+	    input = "2 priority 4 deadline 5 October 20:00 every day ";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("setT", "2", "", "Wed, 05 Oct 16, 8pm",
-	    												"4", "", "research", "") );
+	    												"4", "", "1 day", "") );
 	    executeTest();
 	    
-	    input = "3 deadline 19 Nov 3pm category important";
+	    input = "3 deadline 19 Nov 3pm every 6 months";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("setT", "3", "", "Thu, 19 Nov 15, 3pm", 
-													"", "", "important", "") );
+													"", "", "6 month", "") );
 	    executeTest();
 	    
 	    //Check that command shortforms also work for one-shot commands
-	    input = "1 des hello cat world dea 11 Jan 2pm rem 5 Jan 2pm pri 2";
+	    input = "1 des hello dea 11 Jan 2pm rem 5 Jan 2pm pri 2";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("setT", "1", "hello", "Mon, 11 Jan 16, 2pm", "2", "Tue, 05 Jan 16, 2pm", "world", "") );
+	    expected = new ArrayList<String>( Arrays.asList("setT", "1", "hello", "Mon, 11 Jan 16, 2pm", "2", "Tue, 05 Jan 16, 2pm", "", "") );
 	    executeTest();
 	    
 	    input = "1 des hello rename bla bla pri 2";
@@ -352,21 +352,31 @@ public class ParserTest {
 	    expected = new ArrayList<String>( Arrays.asList("set", "1", "hello", "2", "", "", "bla bla") );
 	    executeTest();
 	    
-	    //Check that 'every' is not recognised in one-shot commands
-	    input = "1 des hello every bla bla pri 2";
+	    //Test recurring in one-shot command
+	    input = "add daily task from 20 dec 2pm to 4pm every day";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("set", "1", "hello every bla bla", "2", "", "", "") );
+	    expected = new ArrayList<String>( Arrays.asList("addE", "daily task", "", "Sun, 20 Dec 15, 2pm", "Sun, 20 Dec 15, 4pm", "", "", "1 day") );
+	    executeTest();
+	    
+	    input = "add weekly task by friday 5pm every week";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("addT", "weekly task", "", "Fri, 06 Nov 15, 5pm", "Sun, 20 Dec 15, 4pm", "", "", "1 week") );
+	    printTest();
+	    
+	    input = "add monthly task from 30 dec every 2 months";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("addE", "monthly task", "", "Wed, 30 Dec 15, 9am", "Wed, 30 Dec 15, 9pm", "", "", "2 month") );
 	    executeTest();
 	}
 	
 	@Test
 	/**
-	 * Test whether parser can ignore duplicate commands in certain scenarios
+	 * Test whether parser can ignore Duplicate commands in certain scenarios
 	 */
 	public void DuplicateCommands() {
 		System.out.println("\n-----------------Result for DuplicateCommands-----------------");
 	    
-		//Test whether duplicate 'add' is considered as part of task name
+		//Test whether Duplicate 'add' is considered as part of task name
 	    input = "add add";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("addF", "add", "", "", "", "") );
@@ -377,7 +387,7 @@ public class ParserTest {
 	    expected = new ArrayList<String>( Arrays.asList("addF", "add food to the fridge", "", "2", "", "") );
 	    executeTest();
 	    
-	    //Test whether duplicate 'description' is considered as part of description
+	    //Test whether Duplicate 'description' is considered as part of description
 	    input = "1 description hello this is a description";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("description", "1", "hello this is a description") );
@@ -388,16 +398,16 @@ public class ParserTest {
 	    expected = new ArrayList<String>( Arrays.asList("set", "1", "hello this is a description", "3", "", "", "") );
 	    executeTest();
 	    
-	    //Test whether other duplicate commands are considered as part of description (when description is in effect)
-	    input = "1 cat hello des this is a cat";
+	    //Test whether other Duplicate commands are considered as part of description (when description is in effect)
+	    input = "1 deadline 15 dec 10pm every day des i do this every day";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("set", "1", "this is a cat", "", "", "hello", "") );
+	    expected = new ArrayList<String>( Arrays.asList("setT", "1", "i do this every day", "Tue, 15 Dec 15, 10pm", "", "", "1 day", "") );
 	    executeTest();
 	    
 	    //Test whether command keywords inside quotations will be ignored
-	    input = "1 des buy cat from pet shop";
+	    input = "1 des buy from every pet shop";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: please enter content for the command 'category'") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: Please enter content for the command 'event'") );
 	    executeTest();
 	    
 	    input = "1 des \"buy cat from pet shop\"";
@@ -658,40 +668,40 @@ public class ParserTest {
 	    "Wed, 30 Dec 15, 11am", "Wed, 30 Dec 15, 3pm", "", "Tue, 29 Dec 15, 12pm", "", "") );
 	    executeTest();
 	    
-	    input = "add 2101 meeting category meetings event 12/12/15 12:00 to 18:00 priority 3";
+	    input = "add 2101 meeting event 12/12/15 12:00 to 18:00 priority 3";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("addE", "2101 meeting", "", "Sat, 12 Dec 15, 12pm", 
-	    "Sat, 12 Dec 15, 6pm", "3", "", "meetings") );
+	    "Sat, 12 Dec 15, 6pm", "3", "", "") );
 	    executeTest();
 	       
-	    input = "add 2101 meeting category meetings event Dec 12 12:00 to 18:00 priority 3";
+	    input = "add 2101 meeting event Dec 12 12:00 to 18:00 priority 3";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("addE", "2101 meeting", "", "Sat, 12 Dec 15, 12pm", 
-	    "Sat, 12 Dec 15, 6pm", "3", "", "meetings") );
+	    "Sat, 12 Dec 15, 6pm", "3", "", "") );
 	    executeTest();
 	    
-	    input = "add 2101 meeting category meetings event 12 Dec 2015 12:00 to 18:00 priority 3";
+	    input = "add 2101 meeting event 12 Dec 2015 12:00 to 18:00 priority 3";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("addE", "2101 meeting", "", "Sat, 12 Dec 15, 12pm", 
-	    										"Sat, 12 Dec 15, 6pm", "3", "", "meetings") );
+	    										"Sat, 12 Dec 15, 6pm", "3", "", "") );
 	    executeTest();
 	    
-	    input = "add 2101 meeting category meetings event Dec 12 12:00 to 12 Dec 18:00 priority 3";
+	    input = "add 2101 meeting event Dec 12 12:00 to 12 Dec 18:00 priority 3";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("addE", "2101 meeting", "", "Sat, 12 Dec 15, 12pm", 
-	    										"Sat, 12 Dec 15, 6pm", "3", "", "meetings") );
+	    										"Sat, 12 Dec 15, 6pm", "3", "", "") );
 	    executeTest();
 	    
-	    input = "add longest meeting ever category meetings event Dec 12 2015 12:00 to Dec 12 2016 18:00 priority 3";
+	    input = "add longest meeting ever event Dec 12 2015 12:00 to Dec 12 2016 18:00 priority 3";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("addE", "longest meeting ever", "", "Sat, 12 Dec 15, 12pm", 
-	    										"Mon, 12 Dec 16, 6pm", "3", "", "meetings") );
+	    										"Mon, 12 Dec 16, 6pm", "3", "", "") );
 	    executeTest();
 	    
-	    input = "add longest meeting ever category meetings event 12/12/15 12:00 to 12/12/16 18:00 priority 3";
+	    input = "add longest meeting ever event 12/12/15 12:00 to 12/12/16 18:00 priority 3";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("addE", "longest meeting ever", "", "Sat, 12 Dec 15, 12pm", 
-	    										"Mon, 12 Dec 16, 6pm", "3", "", "meetings") );
+	    										"Mon, 12 Dec 16, 6pm", "3", "", "") );
 	    executeTest();
 	    
 	    //Test whether parser will change an old year to the current year
@@ -786,108 +796,63 @@ public class ParserTest {
 	    executeTest();
 	    
 	    //Test whether daily recurring task works
-	    input = "5 every day 8am";
+	    input = "5 every day";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "day", "Mon, 02 Nov 15, 8am") );
-	    printTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1 day") );
+	    executeTest();
 	    
-	    input = "5 every day 10am";
+	    input = "5 every 3 days";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "day", "Mon, 02 Nov 15, 10am") );
-	    printTest();
-	    
-	    input = "5 every 3 days 1pm";
-	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "3", "day", "Mon, 02 Nov 15, 1pm") );
-	    printTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "3 day") );
+	    executeTest();
 	    	    
 	    //Test whether weekly recurring task works
-	    input = "5 every 1 week Tuesday 10am";
+	    input = "5 every 1 week";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "week", "Tue, 03 Nov 15, 10am") );
-	    printTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1 week") );
+	    executeTest();
 	    
-	    input = "5 every week Wed 10.30";
+	    input = "5 every week";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "week", "Wed, 04 Nov 15, 10:30am") );
-	    printTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1 week") );
+	    executeTest();
 	    
-	    input = "5 every week Tue";
+	    input = "5 every 2 WEEKS";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "week", "Tue, 03 Nov 15, 12pm") );
-	    printTest();
-	    
-	    input = "5 every 2 WEEKS Tue 3pm";
-	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "2", "week", "Tue, 03 Nov 15, 3pm") );
-	    printTest();
-	    
-	    input = "5 every saturday 6am";
-	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "week", "Sat, 07 Nov 15, 6am") );
-	    printTest();
-	    
-	    input = "5 every thurs 7am";
-	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "week", "Thu, 05 Nov 15, 7am") );
-	    printTest();
-	    
-	    input = "5 every sun 6pm";
-	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "week", "08 Nov 15, 6pm") );
-	    printTest();
-	    
-	    input = "5 every sun 11:30pm";
-	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "week", "01 Nov 15, 11:30pm") );
-	    printTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "2 week") );
+	    executeTest();
 	    
 	    //Test whether monthly recurring task works
-	    input = "5 every month 15";
+	    input = "5 every month";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "month", "Sun, 15 Nov 15, 3pm") );
-	    printTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1 month") );
+	    executeTest();
 	    
-	    input = "5 every month 1";
+	    input = "5 every 3 months";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "month", "Tue, 01 Dec 15, 3pm") );
-	    printTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "3 month") );
+	    executeTest();
 	    
-	    input = "5 every month 18th";
+	    input = "5 every month aaaaa";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "month", "Wed, 18 Nov 15, 3pm") );
-	    printTest();
-	    
-	    input = "5 every month 6th";
-	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "month", "Fri, 06 Nov 15, 3pm") );
-	    printTest();
-	    
-	    input = "5 every 3 month 22";
-	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "3", "month", "Sun, 22 Nov 15, 3pm") );
-	    printTest();
-	    
-	    input = "5 every 3 month 31";
-	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "3", "month", "Thu, 31 Dec 15, 3pm") );
-	    printTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1 month") );
+	    executeTest();
 	    
 	    //Test whether yearly recurring task works
-	    input = "5 every year April 1";
+	    input = "5 every year";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1", "year", "Fri, 01 Apr 16, 12pm") );
-	    printTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "1 year") );
+	    executeTest();
 	    
-	    input = "5 every 10 years 7 Jul";
+	    input = "5 every 10 years";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "10", "year", "Thu, 07 Jul 16, 12pm") );
-	    printTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "10 year") );
+	    executeTest();
 	    
-	    input = "5 every 100 years 2/11";
+	    input = "5 every 100 years";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("every", "5", "10", "year", "Mon, 02 Nov 15, 12pm") );
-	    printTest();
+	    expected = new ArrayList<String>( Arrays.asList("every", "5", "100 year") );
+	    executeTest();
 	    
 	    //Test if using 'next' or 'later' works
 	    input = "6 by 10 days later 2pm";
@@ -992,7 +957,7 @@ public class ParserTest {
 	    
 		input = "1";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "NoCommandError: please enter a command after the task index '1'") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "NoCommandError: Please enter a command after the task index '1'") );
 	    executeTest();
 	    	    
 	    //Parser should generate error when a command is expecting an index, but the next word(s) is not an index
@@ -1001,66 +966,66 @@ public class ParserTest {
 	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidIndexError: 'Project Proposal' is not recognised as an index") );
 	    executeTest();
 	   
-	    //Parser should generate error when duplicate commands are detected
+	    //Parser should generate error when Duplicate commands are detected
 		input = "1 deadline 30 October 12:34 deadline 30 December 23:59";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "DuplicateCommandError: duplicate command 'deadline'") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "DuplicateCommandError: Duplicate command 'deadline'") );
 	    executeTest();
 	    
 		input = "1 priority 1 priority 5 priority 3";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "DuplicateCommandError: duplicate command 'priority'") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "DuplicateCommandError: Duplicate command 'priority'") );
 	    executeTest();
 	    
 		input = "add Project Proposal deadline coming soon priority 2 deadline 30 Nov 23:59";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "DuplicateCommandError: duplicate command 'deadline'") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "DuplicateCommandError: Duplicate command 'deadline'") );
 	    executeTest();
 	    
 	    //Parser should generate error when user never include the content for a command
 	    input = "deadline";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: please enter content for the command 'deadline'") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: Please enter content for the command 'deadline'") );
 	    executeTest();
 	    
 	    input = "deadline deadline";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: please enter content for the command 'deadline'") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: Please enter content for the command 'deadline'") );
 	    executeTest();
 	    
 	    input = "add";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: please enter content for the command 'add'") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: Please enter content for the command 'add'") );
 	    executeTest();
 	    
 	    input = "done";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: please enter content for the command 'done'") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: Please enter content for the command 'done'") );
 	    executeTest();
 	    
 	    input = "1 priority";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: please enter content for the command 'priority'") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: Please enter content for the command 'priority'") );
 	    executeTest();
 	    
 	    input = "1 priority 3 deadline description hello";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: please enter content for the command 'deadline'") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: Please enter content for the command 'deadline'") );
 	    executeTest();
 	    
 	    input = "add dea des pri cat";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: please enter content for the command 'add'") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: Please enter content for the command 'add'") );
 	    executeTest();
 	    
 	    input = "show";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: please enter content for the command 'show'") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: Please enter content for the command 'show'") );
 	    executeTest();
 	    
 	    input = "1 reset";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: please enter content for the command 'reset'") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "EmptyFieldError: Please enter content for the command 'reset'") );
 	    executeTest();
 	    
 	    //Parser should generate error if priority is invalid (not between 1 to 5)
@@ -1114,11 +1079,6 @@ public class ParserTest {
 	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDateError: 'asdfghjkl' is not an acceptable date format") );
 	    executeTest();
 	    
-	    input = "5 every week zzzzz";
-	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDateError: 'zzzzz' is not an acceptable date format") );
-	    executeTest();
-	    
 	    //Parser should not allow a task to have both deadline and event date
 	    input = "1 deadline 15 Dec 8pm event 30 Dec 2pm to 6pm";
 	    actual = parser.parseInput(input);
@@ -1132,35 +1092,24 @@ public class ParserTest {
 	    
 	    input = "1 event 30 Dec 2pm to";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "NoEndDateError: please enter an end date after the command word 'to'") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "NoEndDateError: Please enter an end date after the command word 'to'") );
 	    executeTest();
 	    
 	    input = "1 event 30 Dec 2pm to rem 23 Dec 2pm";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "NoEndDateError: please enter an end date after the command word 'to'") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "NoEndDateError: Please enter an end date after the command word 'to'") );
 	    executeTest();
 	    
 	    //Parser should generate error when user never indicate the frequency of a recurring task
 	    input = "5 every 2pm 2015";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidFrequencyError: please enter 'day'/'week'/'month'/'year' after 'every' to indicate the frequency") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidFrequencyError: Please enter 'day'/'week'/'month'/'year' after 'every' to indicate the frequency") );
 	    executeTest();
 	    
 	    input = "5 every time Tue 12pm";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidFrequencyError: please enter 'day'/'week'/'month'/'year' after 'every' to indicate the frequency") );
-	    executeTest();
-	    
-	    //Parser should generate error when the day of the month in a monthly task is not valid
-	    input = "5 every month aaaaa";
-	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDayOfMonthError: 'aaaaa' is not between 1 to 31") );
-	    executeTest();
-	    
-	    input = "5 every month 32";
-	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDayOfMonthError: '32' is not between 1 to 31") );
-	    executeTest();
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidFrequencyError: Please enter 'day'/'week'/'month'/'year' after 'every' to indicate the frequency") );
+	    executeTest(); 
 	    
 	    //Parser should generate error when the content to show/sort/reset is invalid
 	    input = "show aaaaa";
@@ -1248,6 +1197,11 @@ public class ParserTest {
 	    input = "5 by 30 Feb 10am";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidDayOfMonthError: The date '30 Feb' does not exist (February only has 29 days!)") );
+	    executeTest();
+	    
+	    input = "add floating task every day";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("error", "NoDateForRecurrenceError: Cannot make task recur. Please set a deadline or start date for the task") );
 	    executeTest();
 	}
 }

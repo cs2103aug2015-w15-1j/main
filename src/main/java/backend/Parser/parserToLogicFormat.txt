@@ -1,16 +1,16 @@
 Add Floating:
-("addF", Task Name, Description, Priority, Reminder, Category)
+("addF", Task Name, Description, Priority, Reminder, Recurrence)
 Add ToDo:
-("addT", Task Name, Description, Deadline, Priority, Reminder, Category)
+("addT", Task Name, Description, Deadline, Priority, Reminder, Recurrence)
 Add Event:
-("addE", Task Name, Description, Start Date & Time, End Date & Time, Priority, Reminder, Category)
+("addE", Task Name, Description, Start Date & Time, End Date & Time, Priority, Reminder, Recurrence)
 
 Set:
-("set", Task Index, Description, Priority, Reminder, Category, New Task Name)
+("set", Task Index, Description, Priority, Reminder, Recurrence, New Task Name)
 Set ToDo:
-("setT", Task Index, Description, Deadline, Priority, Reminder, Category, New Task Name)
+("setT", Task Index, Description, Deadline, Priority, Reminder, Recurrence, New Task Name)
 Set Event:
-("setE", Task Index, Description, Start Date/Time, End Date/Time, Priority, Reminder, Category, New Task Name)
+("setE", Task Index, Description, Start Date/Time, End Date/Time, Priority, Reminder, Recurrence, New Task Name)
 
 Set Description:
 ("description", Task Index, Description)
@@ -22,8 +22,6 @@ Set Priority:
 ("priority", Task Index, Priority)
 Set Reminder:
 ("reminder", Task Index, Reminder)
-Set Category:
-("category", Task Index, Category)
 Rename Task:
 ("rename", Task Index, New Task Name)
 
@@ -50,7 +48,7 @@ Error:
 ("error", Error Message)
 
 Recurring Tasks:
-("every", Task Index, Interval, Frequency, Date of first occurrence)
+("every", Task Index, Recurrence) --> recurrence is interval & frequency, separated by space (eg. 1 day)
 
 Show Floating:
 ("showF")

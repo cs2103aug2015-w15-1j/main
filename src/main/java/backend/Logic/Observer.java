@@ -77,13 +77,11 @@ public class Observer {
 					<= getCurrentTime()) {
 				
 				if(task.getTaskType().equals(TaskType.EVENT)) {
-					String start = getUpcomingDate(task, task.getEnd());
-					System.out.println("START: " + start);
+					String start = getUpcomingDate(task, task.getStart());
 					task.setStart(start);
 				}
-				if(!task.getTaskType().equals(TaskType.FLOATING)) {
+				else if(!task.getTaskType().equals(TaskType.FLOATING)) {
 					String deadline = getUpcomingDate(task, task.getEnd());
-					System.out.println("DEADLINE: " + deadline);
 					task.setEnd(deadline);
 				}
 				taskList.set(task.getTaskId(), task);
@@ -102,39 +100,6 @@ public class Observer {
         date.setTimeInMillis(currentDateMilliseconds);
 		
 		switch(task.getRecurrenceType()) {
-			case NONE:
-				break;
-			case DAY:
-				date.add(Calendar.DATE, factor);
-	            upcomingDate = getDate(date.getTimeInMillis());
-				break;
-			case WEEK:
-				factor *= 7;
-				date.add(Calendar.DATE, factor);
-	            upcomingDate = getDate(date.getTimeInMillis());
-				break;
-			case MONTH:
-				date.add(Calendar.MONTH, factor);
-	            upcomingDate = getDate(date.getTimeInMillis());
-				break;
-			case YEAR:
-				date.add(Calendar.YEAR, factor);
-	            upcomingDate = getDate(date.getTimeInMillis());
-				break;
-		}
-		return reformatDate(upcomingDate);
-	}
-	
-	//@@author A0126258A
-	public String getUpcomingDate(Task task, RecurrenceType recur, String currentDate) {
-		
-		String upcomingDate = new String();
-		long currentDateMilliseconds = Constant.stringToMillisecond(currentDate);
-		int factor = task.getRecurrenceFrequency();
-		Calendar date = Calendar.getInstance();
-        date.setTimeInMillis(currentDateMilliseconds);
-		
-		switch(recur) {
 			case NONE:
 				break;
 			case DAY:

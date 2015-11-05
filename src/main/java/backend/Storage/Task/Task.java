@@ -201,8 +201,15 @@ public class Task implements Comparable<Task> {
 			sb.append("Reminder has been set." + System.getProperty("line.separator"));
 		}
 		if(!recurrenceType.equals(recurrenceType.NONE)) {
+			
+			String plural = "";
+			
+			if(recurrenceFrequency > 1) {
+				plural = "s";
+			}
+			
 			sb.append("Recurring every: " + recurrenceFrequency 
-					+ " " + recurrenceType.toString().toLowerCase()
+					+ " " + recurrenceType.toString().toLowerCase() + plural
 					+ System.getProperty("line.separator"));
 		}
 		return sb.toString();
@@ -240,8 +247,15 @@ public class Task implements Comparable<Task> {
 		}
 		
 		if(!recurrenceType.equals(recurrenceType.NONE)) {
+			
+			String plural = "";
+			
+			if(recurrenceFrequency > 1) {
+				plural = "s";
+			}
+			
 			sb.append("Recurring every: " + recurrenceFrequency 
-					+ " " + recurrenceType.toString().toLowerCase()
+					+ " " + recurrenceType.toString().toLowerCase() + plural
 					+ System.getProperty("line.separator"));
 		}
 		

@@ -534,12 +534,6 @@ public class EditCommand extends Command {
 			//delete(command);
 			task.setRecurrenceFrequency(recurrenceFrequency);
 			task.setRecurrenceType(getRecurrenceType(recurrenceType));
-			
-			if(task.getTaskType().equals(TaskType.TODO)) {
-				task.setEnd(date);
-			} else if(task.getTaskType().equals(TaskType.EVENT)) {
-				task.setStart(date);
-			} 
 			//taskList.add(task);
 			setTaskId(taskList);
 			storageComponent.save(taskList);

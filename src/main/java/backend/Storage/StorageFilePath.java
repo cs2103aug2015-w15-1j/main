@@ -59,6 +59,7 @@ public class StorageFilePath {
 				}	
 			}
 			File oldFile = new File(oldFilePath);
+			oldFile.setWritable(true);
 			oldFile.delete();
 			bufferedInput.close();
 			bufferedOutput.close();
@@ -135,7 +136,6 @@ public class StorageFilePath {
 		if(isFilePathExist(newFilePath) && !oldFilePath.equals(newFilePath)) {
 			try {
 				writer = new FileWriter(FILE_CONFIGURATION);
-				
 				dataTransfer(oldFilePath, newFilePath);
 				properties.setProperty(FILE_KEY, newFilePath);
 				properties.store(writer, FILE_HEADING);

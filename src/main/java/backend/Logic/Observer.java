@@ -91,18 +91,15 @@ public class Observer {
 			
 			// Only reset date when todo/event is over
 			if(!task.isRecurred() && !task.getRecurrenceType().equals(RecurrenceType.NONE)
+					&& !nextTask.getTaskType().equals(TaskType.FLOATING)
 					&& (task.getDone() || Constant.stringToMillisecond(task.getEnd()) 
 					<= getCurrentTime())) {
 				
 				task.setRecurred(true);
+				nextTask.setEnd(getUpcomingDate(nextTask, nextTask.getEnd()));
 				
 				if(nextTask.getTaskType().equals(TaskType.EVENT)) {
-					String start = getUpcomingDate(nextTask, nextTask.getStart());
-					nextTask.setStart(start);
-				}
-				if(!nextTask.getTaskType().equals(TaskType.FLOATING)) {
-					String deadline = getUpcomingDate(nextTask, nextTask.getEnd());
-					nextTask.setEnd(deadline);
+					nextTask.setStart(getUpcomingDate(nextTask, nextTask.getStart()));
 				}
 				
 				recurringTaskList.add(nextTask);
@@ -189,7 +186,7 @@ public class Observer {
 			if(taskType == TaskType.TODO && Constant.stringToMillisecond(task.getEnd()) 
 					> getCurrentTime() && !task.getDone()) {
 				upcomingTasks.add(task);
-			} else if(taskType == TaskType.EVENT && Constant.stringToMillisecond(task.getStart())
+			} else if(taskType == TaskType.EVENT && Constant.stringToMillisecond(task.getEnd())
 					> getCurrentTime() && !task.getDone()) {
 				upcomingTasks.add(task);
 			}
@@ -218,13 +215,10 @@ public class Observer {
 		ArrayList<Task> overdueTasks = new ArrayList<Task> ();
 
 		for(Task task : allTasks) {
-			if(taskType == TaskType.TODO && Constant.stringToMillisecond(task.getEnd())
+			if(Constant.stringToMillisecond(task.getEnd())
 					<= getCurrentTime() && !task.getDone()) {
 				overdueTasks.add(task);
-			} else if(taskType == TaskType.EVENT && Constant.stringToMillisecond(task.getStart())
-					<= getCurrentTime() && !task.getDone()) {
-				overdueTasks.add(task);
-			}
+			} 
 		}
 
 		return overdueTasks;

@@ -421,7 +421,6 @@ public class Observer {
 	public ArrayList<Task> retrieveTaskData(String dataType) {
 		
 		ArrayList<Task> data = new ArrayList<Task>();
-		resetRecurring();
 		
 		switch(dataType) {
 			case ("today") :
@@ -499,6 +498,7 @@ public class Observer {
 	
 	//@@author A0121284N
 	public void updateIndex() {
+		resetRecurring();
 		retrieveAllData();
 		int a = getTasks.size(), b = getEvents.size(),c = getOverdue.size(),
 				d = getFloat.size(), e = getCompletedTasks.size(), f = getCompletedEvents.size();

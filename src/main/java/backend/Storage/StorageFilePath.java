@@ -5,21 +5,17 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.Properties;
 
 public class StorageFilePath {
 
 	private static final String ERROR_READ_DATA = "An error occured when retrieving data from config file.";
 	private static final String ERROR_TRANSFER_DATA = "An error occured when transfering data from config file.";
-	private static final String ERROR_CLOSE_FILE = "An error occured when closing files.";
+	private static final String ERROR_WRITE_DATA = "An error occured when writing data from config file.";
 	
 	private static final String FILE_CONFIGURATION = "config.properties";
 	private static final String FILE_HEADING = "File path for data storage";
@@ -35,10 +31,6 @@ public class StorageFilePath {
 	
 	private FileReader reader;
 	private FileWriter writer;
-	private FileInputStream fileInput;
-	private BufferedInputStream bufferedInput;
-	private FileOutputStream fileOutput;
-	private BufferedOutputStream bufferedOutput;
 	
 	private Properties properties;
 
@@ -47,15 +39,19 @@ public class StorageFilePath {
 		properties = new Properties();
 	}
 	
+	
 	//@@author A0121284N
 	private void dataTransfer(String oldFilePath, String newFilePath) {
 	
+		System.out.println("OLD: " + oldFilePath);
+		System.out.println("NEW: " + newFilePath);
+		
 		byte[] buffer = new byte[10000];
 		try {
-			fileInput = new FileInputStream(oldFilePath);
-			bufferedInput = new BufferedInputStream(fileInput);
-			fileOutput = new FileOutputStream(newFilePath);
-			bufferedOutput = new BufferedOutputStream(fileOutput);
+			FileInputStream fileInput = new FileInputStream(oldFilePath);
+			BufferedInputStream bufferedInput = new BufferedInputStream(fileInput);
+			FileOutputStream fileOutput = new FileOutputStream(newFilePath);
+			BufferedOutputStream bufferedOutput = new BufferedOutputStream(fileOutput);
 			while(true) {
 				int length = fileInput.read(buffer);
 				if(length == -1) {
@@ -65,9 +61,10 @@ public class StorageFilePath {
 					bufferedOutput.flush();
 				}	
 			}
-			close();
 			File oldFile = new File(oldFilePath);
-			oldFile.delete();
+			System.out.println("DELETED: " + oldFile.delete());
+			bufferedInput.close();
+			bufferedOutput.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println(ERROR_TRANSFER_DATA);
@@ -76,17 +73,6 @@ public class StorageFilePath {
 	}
 	
 	//@@author A0126258A
-	private void close() {
-		try {
-			fileInput.close();
-			bufferedInput.close();
-			fileOutput.close();
-			bufferedOutput.close();
-		} catch (IOException e) {
-			System.out.println(ERROR_CLOSE_FILE);
-		}
-	}
-	
 	private String removeFileName(String[] tokenize, String slash) {
 		
 		String filePath = new String();
@@ -146,17 +132,16 @@ public class StorageFilePath {
 
 	public boolean execute(String newFilePath) {
 
-		String oldFilePath = retrieveFilePath();
+		String oldFilePath = retrieve();
 		newFilePath = appendTextFile(newFilePath);
 		
 		if(isFilePathExist(newFilePath) && !oldFilePath.equals(newFilePath)) {
 			try {
 				writer = new FileWriter(FILE_CONFIGURATION);
+				dataTransfer(oldFilePath, newFilePath);
 				properties.setProperty(FILE_KEY, newFilePath);
 				properties.store(writer, FILE_HEADING);
 				writer.close();
-				//Files.move(Paths.get(oldFilePath), Paths.get(newFilePath), StandardCopyOption.REPLACE_EXISTING);
-				dataTransfer(oldFilePath, newFilePath);
 			} catch (IOException e) {
 				return false;
 			}	
@@ -172,7 +157,6 @@ public class StorageFilePath {
 		try {
 			reader = new FileReader(FILE_CONFIGURATION);
 			properties.load(reader);
-			reader.close();
 		} catch (Exception e) {
 			System.out.println(ERROR_READ_DATA);
 		}

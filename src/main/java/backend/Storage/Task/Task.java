@@ -23,9 +23,8 @@ public class Task implements Comparable<Task> {
 	private int priority;
 	
 	private boolean isDone;
+	private boolean isRecurred;
 	
-	private String categoryName;
-	private String categoryColour;
 	private String name;
 	private String description;
 	private String start;
@@ -38,8 +37,14 @@ public class Task implements Comparable<Task> {
 		
 	}
 	
+	public Task(Task task) {
+		this(task.getTaskType(), task.getRecurrenceType(), task.getRecurrenceFrequency(),
+				task.getPriority(), task.getName(), task.getDescription(), task.getStart(), 
+				task.getEnd(), task.getReminder());
+	}
+	
 	public Task(TaskType taskType, RecurrenceType recurrenceType, int recurrenceFrequency, 
-			int priority, String categoryName, String name, String description, 
+			int priority, String name, String description, 
 			String start, String end, String reminder) {
 		
 		assert taskType != null;
@@ -50,7 +55,7 @@ public class Task implements Comparable<Task> {
 		this.recurrenceFrequency = recurrenceFrequency;
 		this.priority = priority;
 		this.isDone = false;
-		this.categoryName = categoryName;
+		this.isRecurred = false;
 		this.name = name;
 		this.description = description;
 		this.start = start;
@@ -115,20 +120,12 @@ public class Task implements Comparable<Task> {
 		this.isDone = isDone;
 	}
 	
-	public String getCategoryName() {
-		return categoryName;
+	public boolean isRecurred() {
+		return isRecurred;
 	}
 
-	public void setCategoryName(String categoryName) {
-		this.categoryName = categoryName;
-	}
-	
-	public String getCategoryColour() {
-		return categoryColour;
-	}
-
-	public void setCategoryColour(String categoryColour) {
-		this.categoryColour = categoryColour;
+	public void setRecurred(boolean isRecurred) {
+		this.isRecurred = isRecurred;
 	}
 
 	public String getName() {
@@ -305,8 +302,6 @@ public class Task implements Comparable<Task> {
 				&& this.indexForPrinting == task.getIndex()
 				&& this.priority == task.getPriority()
 				&& this.isDone == task.getDone()
-				&& this.categoryName.equals(task.getCategoryName())
-				&& this.categoryColour.equals(task.getCategoryColour())
 				&& this.name.equals(task.getName())
 				&& this.description.equals(task.getDescription())
 				&& this.start.equals(task.getStart())

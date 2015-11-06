@@ -52,6 +52,21 @@ public class Observer {
 	private Observer(Storage storage) {
 		this.storage = storage;
 	}
+
+	//@@author A0126258A
+	private ArrayList<Task> generateTaskId(ArrayList<Task> taskList) {
+
+		ArrayList<Task> newTaskList = new ArrayList<Task> ();
+		int newTaskId = 0;
+
+		for(Task task : taskList) {
+			task.setTaskId(newTaskId);
+			newTaskList.add(task);
+			newTaskId++;
+		}
+
+		return newTaskList;
+	}
 	
 	//@@author A0126258A
 	private String reformatDate(String date) {
@@ -68,26 +83,34 @@ public class Observer {
 	private void resetRecurring() {
 
 		ArrayList<Task> taskList = storage.load();
+		ArrayList<Task> recurringTaskList = new ArrayList<Task> ();
 		
 		for(Task task : taskList) {
 
+			Task nextTask = new Task(task);
+			
 			// Only reset date when todo/event is over
-			if(!task.getRecurrenceType().equals(RecurrenceType.NONE)
-					&& Constant.stringToMillisecond(task.getEnd()) 
-					<= getCurrentTime()) {
+			if(!task.isRecurred() && !task.getRecurrenceType().equals(RecurrenceType.NONE)
+					&& (task.getDone() || Constant.stringToMillisecond(task.getEnd()) 
+					<= getCurrentTime())) {
 				
-				if(task.getTaskType().equals(TaskType.EVENT)) {
-					String start = getUpcomingDate(task, task.getStart());
-					task.setStart(start);
+				task.setRecurred(true);
+				
+				if(nextTask.getTaskType().equals(TaskType.EVENT)) {
+					String start = getUpcomingDate(nextTask, nextTask.getStart());
+					nextTask.setStart(start);
 				}
-				else if(!task.getTaskType().equals(TaskType.FLOATING)) {
-					String deadline = getUpcomingDate(task, task.getEnd());
-					task.setEnd(deadline);
+				if(!nextTask.getTaskType().equals(TaskType.FLOATING)) {
+					String deadline = getUpcomingDate(nextTask, nextTask.getEnd());
+					nextTask.setEnd(deadline);
 				}
-				taskList.set(task.getTaskId(), task);
+				
+				recurringTaskList.add(nextTask);
 			}
 		}
-		storage.save(taskList);
+		
+		taskList.addAll(recurringTaskList);
+		storage.save(generateTaskId(taskList));
 	}
 	
 	//@@author A0126258A

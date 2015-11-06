@@ -43,9 +43,6 @@ public class StorageFilePath {
 	//@@author A0121284N
 	private void dataTransfer(String oldFilePath, String newFilePath) {
 	
-		System.out.println("OLD: " + oldFilePath);
-		System.out.println("NEW: " + newFilePath);
-		
 		byte[] buffer = new byte[10000];
 		try {
 			FileInputStream fileInput = new FileInputStream(oldFilePath);
@@ -62,9 +59,9 @@ public class StorageFilePath {
 				}	
 			}
 			File oldFile = new File(oldFilePath);
-			System.out.println("DELETED: " + oldFile.delete());
 			bufferedInput.close();
 			bufferedOutput.close();
+			oldFile.delete();
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println(ERROR_TRANSFER_DATA);

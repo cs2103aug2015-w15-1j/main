@@ -250,10 +250,10 @@ public class EditCommand extends Command {
 				logicEditorLogger.info("reminder: "+commandObject.getReminder());
 				setReminder(commandObject);
 			}
-			if(!commandObject.getRecurrence().equals("")) {
-				logicEditorLogger.info("Recurring: "+commandObject.getRecurrence());
-				setRecurring(commandObject);
-			}
+//			if(!commandObject.getRecurrence().equals("")) {
+//				logicEditorLogger.info("Recurring: "+commandObject.getRecurrence());
+//				setRecurring(commandObject);
+//			}
 			return EXECUTION_SET_SUCCESSFUL;
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
@@ -308,12 +308,15 @@ public class EditCommand extends Command {
 			int taskId = getTaskId(taskIndex);
 
 			taskList = storageComponent.load();
-			taskList.remove(taskId);
+			Task toBeRemoved = taskList.remove(taskId);
 			setTaskId(taskList);
 			storageComponent.save(taskList);
-			
-			return String.format(EXECUTION_DELETE_SUCCESSFUL, taskIndex);
-		} catch (NumberFormatException e) {
+			if(toBeRemoved != null) {
+				return String.format(EXECUTION_DELETE_SUCCESSFUL, taskIndex);
+			} else {
+				return EXECUTION_COMMAND_UNSUCCESSFUL;
+			}
+		} catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}

@@ -29,6 +29,7 @@ public class StorageFilePath {
 	private static final String DEFAULT_PATH_LOCATION = System.getProperty("user.home") + "/Desktop" + "/filename.txt";
 	private static final String DEFAULT_FILE_NAME = "/filename.txt";
 	
+	private File file;
 	private FileReader reader;
 	private FileWriter writer;
 	
@@ -59,10 +60,11 @@ public class StorageFilePath {
 				}	
 			}
 			File oldFile = new File(oldFilePath);
-			oldFile.setWritable(true);
-			oldFile.delete();
+			fileInput.close();
 			bufferedInput.close();
+			fileOutput.close();
 			bufferedOutput.close();
+			oldFile.delete();
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println(ERROR_TRANSFER_DATA);
@@ -136,9 +138,6 @@ public class StorageFilePath {
 		if(isFilePathExist(newFilePath) && !oldFilePath.equals(newFilePath)) {
 			try {
 				writer = new FileWriter(FILE_CONFIGURATION);
-				File oldFile = new File(oldFilePath);
-				File newFile = new File(newFilePath);
-				oldFile.renameTo(newFile);
 				dataTransfer(oldFilePath, newFilePath);
 				properties.setProperty(FILE_KEY, newFilePath);
 				properties.store(writer, FILE_HEADING);

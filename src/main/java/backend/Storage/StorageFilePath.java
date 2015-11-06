@@ -82,7 +82,6 @@ public class StorageFilePath {
 			bufferedInput.close();
 			fileOutput.close();
 			bufferedOutput.close();
-			writer.close();
 		} catch (IOException e) {
 			System.out.println(ERROR_CLOSE_FILE);
 		}
@@ -155,8 +154,9 @@ public class StorageFilePath {
 				writer = new FileWriter(FILE_CONFIGURATION);
 				properties.setProperty(FILE_KEY, newFilePath);
 				properties.store(writer, FILE_HEADING);
-				Files.move(Paths.get(oldFilePath), Paths.get(newFilePath), StandardCopyOption.REPLACE_EXISTING);
-				//dataTransfer(oldFilePath, newFilePath);
+				writer.close();
+				//Files.move(Paths.get(oldFilePath), Paths.get(newFilePath), StandardCopyOption.REPLACE_EXISTING);
+				dataTransfer(oldFilePath, newFilePath);
 			} catch (IOException e) {
 				return false;
 			}	

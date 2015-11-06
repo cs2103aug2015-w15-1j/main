@@ -181,7 +181,7 @@ public class EditCommand extends Command {
 			}
 			if(!commandObject.getRecurrence().equals("")) {
 				logicEditorLogger.info("category: "+commandObject.getRecurrence());
-//				setRecurrence(commandObject);
+				setRecurring(commandObject);
 			}
 			if (!commandObject.getEndDateAndTime().equals("")) {
 				setDeadline(commandObject);
@@ -211,19 +211,17 @@ public class EditCommand extends Command {
 				logicEditorLogger.info("priority :"+commandObject.getPriority());
 				setPriority(commandObject);
 			}
-//			System.out.println("priority setted");
 			if (!commandObject.getReminder().equals("")) {
 				logicEditorLogger.info("reminder: "+commandObject.getReminder());
 				setReminder(commandObject);
 			}
 			if(!commandObject.getRecurrence().equals("")) {
 				logicEditorLogger.info("category: "+commandObject.getRecurrence());
-//				setRecurrence(commandObject);
+				setRecurring(commandObject);
 			}
 			if (!commandObject.getStartDateAndTime().equals("") && 
 					!commandObject.getEndDateAndTime().equals("")) {
 				setEventStartAndEndTime(commandObject);
-
 			}
 			return EXECUTION_SET_SUCCESSFUL;
 		} catch (NumberFormatException e) {
@@ -237,9 +235,7 @@ public class EditCommand extends Command {
 		try {
 			int taskId = Integer.parseInt(commandObject.getTaskName());
 			logicEditorLogger.info("taskId: "+taskId);
-//			System.out.println("New name: "+commandObject.getNewName());
 			if(!commandObject.getNewName().equals("")) {
-//				System.out.println("New name: "+commandObject.getNewName());
 				rename(commandObject);
 			}
 			if (!commandObject.getDescription().equals("")) {
@@ -250,14 +246,13 @@ public class EditCommand extends Command {
 				logicEditorLogger.info("priority :"+commandObject.getPriority());
 				setPriority(commandObject);
 			}
-//			System.out.println("priority setted");
 			if (!commandObject.getReminder().equals("")) {
 				logicEditorLogger.info("reminder: "+commandObject.getReminder());
 				setReminder(commandObject);
 			}
 			if(!commandObject.getRecurrence().equals("")) {
-				logicEditorLogger.info("category: "+commandObject.getRecurrence());
-//				setRecurrence(commandObject);
+				logicEditorLogger.info("Recurring: "+commandObject.getRecurrence());
+				setRecurring(commandObject);
 			}
 			return EXECUTION_SET_SUCCESSFUL;
 		} catch (NumberFormatException e) {

@@ -29,7 +29,6 @@ public class StorageFilePath {
 	private static final String DEFAULT_PATH_LOCATION = System.getProperty("user.home") + "/Desktop" + "/filename.txt";
 	private static final String DEFAULT_FILE_NAME = "/filename.txt";
 	
-	private File file;
 	private FileReader reader;
 	private FileWriter writer;
 	
@@ -59,11 +58,11 @@ public class StorageFilePath {
 					bufferedOutput.flush();
 				}	
 			}
-			File oldFile = new File(oldFilePath);
 			fileInput.close();
 			bufferedInput.close();
 			fileOutput.close();
 			bufferedOutput.close();
+			File oldFile = new File(oldFilePath);
 			oldFile.delete();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -138,10 +137,10 @@ public class StorageFilePath {
 		if(isFilePathExist(newFilePath) && !oldFilePath.equals(newFilePath)) {
 			try {
 				writer = new FileWriter(FILE_CONFIGURATION);
-				dataTransfer(oldFilePath, newFilePath);
 				properties.setProperty(FILE_KEY, newFilePath);
 				properties.store(writer, FILE_HEADING);
 				writer.close();
+				dataTransfer(oldFilePath, newFilePath);
 			} catch (IOException e) {
 				return false;
 			}	
@@ -157,6 +156,7 @@ public class StorageFilePath {
 		try {
 			reader = new FileReader(FILE_CONFIGURATION);
 			properties.load(reader);
+			reader.close();
 		} catch (Exception e) {
 			System.out.println(ERROR_READ_DATA);
 		}

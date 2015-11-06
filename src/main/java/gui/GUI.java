@@ -56,25 +56,32 @@ public class GUI extends Application{
 	//Possible messages
 	private static final String MESSAGE_WELCOME = "Welcome to TankTask!";
 	private static final String MESSAGE_EMPTY = "List is empty";
+	private static final String MESSAGE_COMMAND_HELP = "Press F1 to see a list of commands";
+	
+	//Label contents constants
 	private static final String LIST_OVERDUE = "Overdue Tasks:";
 	private static final String LIST_TASKS = "ToDo:";
 	private static final String LIST_EVENTS = "Events:";
 	private static final String LIST_FLOATING = "Floating:";
 	private static final String LIST_TODAY = "Today's: ";
 	private static final String LIST_SEARCH = "Search Results:";
-	private static final String MESSAGE_COMMAND_HELP = "Press F1 to see a list of commands";
+	
+	//Possible commands retrieved from Logic.
 	private static final String COMMAND_SHOW_TASKS = "show todo";
 	private static final String COMMAND_SHOW_EVENTS = "show events";
 	private static final String COMMAND_SHOW_OVERDUE = "show overdue"; 
 	private static final String COMMAND_SHOW_FLOAT = "show float";
 	private static final String COMMAND_SEARCH = "search";
 	private static final String COMMAND_EXIT = "exit";
+	
+	//Hot key combinations
 	private final KeyCombination undo = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
 	private final KeyCombination redo = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);
 	private final KeyCombination shiftUp = new KeyCodeCombination(KeyCode.UP, KeyCombination.SHIFT_DOWN);
 	private final KeyCombination shiftDown= new KeyCodeCombination(KeyCode.DOWN, KeyCombination.SHIFT_DOWN);
 	private static final int COUNT_LIMIT = 10000;
 	
+	//necessary variables for nagivation purposes.
 	private static final int SCENE_MAIN = 1;
 	private static final int SCENE_FOCUS = 2;
 	private static final int NUM_TASKS = 1;
@@ -89,7 +96,8 @@ public class GUI extends Application{
 	private static boolean toggleFloat = false;
 	private static boolean noti = false;
 	private static boolean isHelp = false;
-
+	private static int commandIndex;
+	
 	private static GUIController controller;
 	private static HelpView help;
 	private static GridPane gridPane;
@@ -97,22 +105,23 @@ public class GUI extends Application{
 	private static Scene mainScene;	
 	private static String userCommands;
 	private static Console console;
-	private static TextArea consoleText;
 	private static PrintStream ps;
-	private static TextField userInput;
 	private static ArrayList<String> recentCommands;
-	private static int commandIndex;
-
+	
+	//List of nodes/children for the gridPane
+	private static TextArea consoleText;
+	private static TextField userInput;
+	//Specific nodes for Default View
 	private static Label tasks;
 	private static Label events;
 	private static Label floating;
-
 	private static ListView<TextFlow> listFloat;
 	private static ListView<TextFlow> listCate;
 	private static ListView<TextFlow> listTasks;
 	private static ListView<TextFlow> listEvents;
 	private static ListView<TextFlow> listOverdue;
 
+	//Specific nodes for Focus View
 	private static Label focusHeading;
 	private static Label detailsHeading;
 	private static TextArea detailField;
@@ -127,16 +136,16 @@ public class GUI extends Application{
 
         
 		controller = new GUIController();
+		for (int i = 0; i < COUNT_LIMIT; i++) {
+            double progress = (100 * i) / COUNT_LIMIT;
+            LauncherImpl.notifyPreloader(this, new GuiPreloader.ProgressNotification(progress));
+        }
 		help = new HelpView();
 		consoleText = new TextArea();
 		console = new Console(consoleText);
 		ps = new PrintStream(console, true);
 		recentCommands = new ArrayList<String>();
 		listFocus = new ListView<TextFlow>();
-		for (int i = 0; i < COUNT_LIMIT; i++) {
-            double progress = (100 * i) / COUNT_LIMIT;
-            LauncherImpl.notifyPreloader(this, new GuiPreloader.ProgressNotification(progress));
-        }
 		redirectOutput(ps);
 		displayStringToScreen(MESSAGE_WELCOME);
 		displayStringToScreen(MESSAGE_COMMAND_HELP);

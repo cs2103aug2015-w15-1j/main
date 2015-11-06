@@ -15,12 +15,13 @@ import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 //@@author A0126125R
 public class GuiPreloader extends Preloader {
 
     private static final double WIDTH = 400;
-    private static final double HEIGHT = 400;
+    private static final double HEIGHT = 300;
 
     private Stage preloaderStage;
     private Scene scene;
@@ -52,7 +53,16 @@ public class GuiPreloader extends Preloader {
     		BackgroundImage backgroundImage = new BackgroundImage(bgImage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
     		Background background = new Background(backgroundImage);
     		root.setBackground(background);
-
+    		root.setStyle(
+                    "-fx-padding: 5; " +
+                    "-fx-border-width:3; " +
+                    "-fx-border-color: " +
+                        "linear-gradient(" +
+                            "to bottom, " +
+                            "chocolate, " +
+                            "derive(chocolate, 70%)" +
+                        ");"
+            );
             scene = new Scene(root, WIDTH, HEIGHT);
         });
     }
@@ -65,6 +75,7 @@ public class GuiPreloader extends Preloader {
         
         // Set preloader scene and show stage.
         preloaderStage.setScene(scene);
+        preloaderStage.initStyle(StageStyle.UNDECORATED);
         scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
         preloaderStage.show();
     }
@@ -77,6 +88,7 @@ public class GuiPreloader extends Preloader {
         }
     }
 
+    //to check current status
     @Override
     public void handleStateChangeNotification(StateChangeNotification info) {
         // Handle state change notifications.
@@ -84,11 +96,11 @@ public class GuiPreloader extends Preloader {
         switch (type) {
             case BEFORE_LOAD:
                 // Called after MyPreloader#start is called.
-                System.out.println("BEFORE_LOAD");
+               // System.out.println("BEFORE_LOAD");
                 break;
             case BEFORE_INIT:
                 // Called before GUI#init is called.
-                System.out.println("BEFORE_INIT");
+               // System.out.println("BEFORE_INIT");
                 break;
             case BEFORE_START:
                 // Called after GUI#init and before GUI#start is called.      

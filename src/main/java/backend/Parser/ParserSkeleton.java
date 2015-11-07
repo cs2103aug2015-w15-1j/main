@@ -73,6 +73,14 @@ abstract class ParserSkeleton {
 	final String DEFAULT_STARTTIME = "9am";
 	final String DEFAULT_ENDTIME = "9pm";
 	
+	//The date frequencies that can be used in a date or in a task's recurrence
+	final String FREQUENCY_DAY = "day";
+	final String FREQUENCY_WEEK = "week";
+	final String FREQUENCY_MONTH = "month";
+	final String FREQUENCY_YEAR = "year";
+	final ArrayList<String> DATE_FREQUENCY = new ArrayList<String>( Arrays.asList(
+	FREQUENCY_DAY, FREQUENCY_WEEK, FREQUENCY_MONTH, FREQUENCY_YEAR) );
+	
 	//The two result types that require a multi-field result
 	final String RESULTTYPE_ADD = "add";
 	final String RESULTTYPE_SET = "set";
@@ -82,9 +90,23 @@ abstract class ParserSkeleton {
 	final String STATUS_INCOMPLETE = "incomplete";
 	final String STATUS_OKAY = "okay";
 	
+	//Java data types that are converted by DateParser
+	final String DATATYPE_DATE = "date";
+	final String DATATYPE_INTEGER = "integer";
+	final String DATATYPE_STRING = "string";
+	
 	//Special characters that are noted by Parser
 	final String SPACE_OF_ANY_LENGTH = " +";
 	final String QUOTATION_MARK = "\"";
+	final String ZERO = "0";
+	
+	//All the errors that can be detected by Parser
+	enum ERROR {
+		INVALID_WORD, INVALID_COMMAND, NO_COMMAND, DUPLICATE_COMMAND, EMPTY_FIELD,
+		INVALID_INDEX, NO_END_DATE, INVALID_PRIORITY, INVALID_DATE, CONFLICTING_DATES,
+		INVALID_FREQUENCY, INVALID_TASKTYPE, INVALID_SORTFIELD, INVALID_RESET, 
+		NO_DATE_FOR_RECURRENCE, INVALID_TIME, INVALID_DAYOFMONTH;
+	}
 	
 	String getFirst(String[] array){
 		return array[0];
@@ -164,6 +186,61 @@ abstract class ParserSkeleton {
 		}
 	}
 	
+	/*String getFirstLetter(String s){
+		return s.substring(1, s.length());
+	}*/
+	
+	int convertStringToInt(String str){
+		try {
+			return Integer.parseInt(str);
+		} catch (Exception e) {
+			//printParsingError(DATATYPE_STRING, str, DATATYPE_INTEGER);
+			return -1;
+		}
+	}
+
+	String capitalize(String word) {
+		return Character.toUpperCase(word.charAt(0)) + word.substring(1);
+	}
+
+	String removeFrontZero(String token){
+		if (token.startsWith(ZERO)) {
+			return token.substring(1, token.length());
+		}
+		return token;
+	}
+	
+	String mergeTokens(String[] tokens, int startIndex, int endIndex) {
+		String merged = "";
+		for (int i = startIndex; i < endIndex; i++) {
+			String token = tokens[i];
+			merged += token + " ";
+		}
+		return removeEndSpacesOrBrackets(merged);
+	}
+
+	String removeEndSpacesOrBrackets(String token) {
+		while (true){
+			if (token.startsWith(" ") || token.startsWith("[")) {
+				token = token.substring(1, token.length());
+				continue;
+			} 	
+			if (token.endsWith(" ") || token.startsWith("]")) {
+				token = token.substring(0, token.length()-1);
+				continue;
+			}
+			return token;
+		}
+	}
+
+	String removePluralOrPastTense(String token) {
+		token = token.toLowerCase();
+		if (token.length() > 1 && (token.endsWith("s") || token.endsWith("d"))) {
+			token = token.substring(0, token.length()-1);
+		}
+		return token;
+	}
+
 	boolean isNumber(String token) {
 		try {
 			Integer.parseInt(token);
@@ -172,31 +249,7 @@ abstract class ParserSkeleton {
 			return false;
 		}
 	}
-	
-	String getFirstLetter(String s){
-		return s.substring(1, s.length());
-	}
-	
-	int convertStringToInt(String str){
-		try {
-			return Integer.parseInt(str);
-		} catch (Exception e) {
-			System.out.println("DateParsingError: problem converting string '" + str + "' to int");
-			return -1;
-		}
-	}
 
-	String removeFrontZero(String token){
-		if (token.startsWith("0")) {
-			return token.substring(1, token.length());
-		}
-		return token;
-	}
-	
-	String capitalize(String word) {
-		return Character.toUpperCase(word.charAt(0)) + word.substring(1);
-	}
-	
 	boolean isCommandThatNoNeedContent(String token){
 		return COMMANDS_NO_CONTENT.contains(token);
 	}
@@ -213,26 +266,12 @@ abstract class ParserSkeleton {
 		return COMMANDS_NOT_ONE_SHOT.contains(token) || COMMANDS_NO_CONTENT.contains(token);
 	}
 
-	String mergeTokens(String[] tokens, int startIndex, int endIndex) {
-		String merged = "";
-		for (int i = startIndex; i < endIndex; i++) {
-			String token = tokens[i];
-			merged += token + " ";
-		}
-		return removeEndSpacesOrBrackets(merged);
+	boolean hasOnlyOneWord(String s){
+		return s.split(" ").length == 1;
 	}
-
-	String removeEndSpacesOrBrackets(String token) {
-		while (true){
-			if (token.startsWith(" ") || token.startsWith("[")) {
-				token = token.substring(1, token.length());
-			} 	
-			if (token.endsWith(" ") || token.startsWith("]")) {
-				return token.substring(0, token.length()-1);
-			} else {
-				return token;
-			}
-		}
+	
+	boolean canBeSplit(String s1, String s2){
+		return s1.split(s2).length > 1;
 	}
 	
 	String getStatus(ArrayList<String> parseResult) {
@@ -251,5 +290,9 @@ abstract class ParserSkeleton {
 		return !getStatus(result).equals(STATUS_INCOMPLETE);
 	}
 	
-	//abstract ArrayList<String> makeErrorResult(String error, String token);
+	void printParsingError(String src, String token, String dest){
+		System.out.println(String.format("ParsingError: problem converting %1$s '%2$s' to %3$s", src, token, dest));
+	}
+	
+	abstract ArrayList<String> makeErrorResult(ERROR error, String token);
 }

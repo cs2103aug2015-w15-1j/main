@@ -24,7 +24,7 @@ public class ParserVault extends ParserSkeleton{
 	private final ArrayList<String> COMMANDS_NEED_TASK_ONLY = new ArrayList<String>( Arrays.asList(
 	COMMAND_ADD, COMMAND_DELETE, COMMAND_DONE) );
 	
-	//Variants or short forms of some of the commands
+	//Variants or abbreviations of some of the commands
     private HashMap<String, ArrayList<String>> command_families = new HashMap<String, ArrayList<String>>(){
 		static final long serialVersionUID = 1L; {
 		put(COMMAND_DEADLINE, new ArrayList<String>( Arrays.asList("by", "dea")));
@@ -76,14 +76,6 @@ public class ParserVault extends ParserSkeleton{
 	//Fields that can be reset
 	private final ArrayList<String> FIELDS_CAN_RESET = new ArrayList<String>( 
 	Arrays.asList(FIELD_ALL, FIELD_DESCRIPTION, FIELD_DATE, FIELD_DEADLINE, FIELD_RECUR, FIELD_EVENT, FIELD_PRIORITY, FIELD_REMINDER) );	
-	
-	//The frequencies that a recurring task can recur on
-	private final String FREQUENCY_DAY = "day";
-	private final String FREQUENCY_WEEK = "week";
-	private final String FREQUENCY_MONTH = "month";
-	private final String FREQUENCY_YEAR = "year";
-	private final ArrayList<String> RECUR_FREQUENCY = new ArrayList<String>( Arrays.asList(
-	FREQUENCY_DAY, FREQUENCY_WEEK, FREQUENCY_MONTH, FREQUENCY_YEAR) );
     
 	//The task types recognised by Parser
 	private final String TASKTYPE_TODO = "TODO";
@@ -102,22 +94,8 @@ public class ParserVault extends ParserSkeleton{
 	private final String TASKTYPE_TODAY_ABBR = "D";
 	private final String TASKTYPE_COMPLETE_ABBR = "C";
     
-	//The errors that can be detected by ParserVault
-	enum ERROR {
-		INVALID_INDEX, EMPTY_FIELD, NO_END_DATE, INVALID_PRIORITY, INVALID_DATE, CONFLICTING_DATES,
-		INVALID_FREQUENCY, INVALID_TASKTYPE, INVALID_SORTFIELD, INVALID_RESET, NO_DATE_FOR_RECURRENCE;
-	}
-	
-	public void printCmd(){
-		for (String s: FIELDS_CAN_RESET){
-			//System.out.println("private final String FIELD_" + s.toUpperCase() + " = \"" + s + "\";");
-			System.out.print("FIELD_" + s.toUpperCase() + ", ");
-			//System.out.print("put(FIELD_" + s.toUpperCase() + ", \"\"); ");
-		}
-	}
-    
 	/**
-	 * This method marks the command as seen and stores it as the main command (if there isn't one) 
+	 * This method marks the command as seen and sets the result type
 	 */
 	void storeCommand(String token) {
 		String command = getContent(FIELD_RESULTTYPE);
@@ -131,7 +109,7 @@ public class ParserVault extends ParserSkeleton{
 	}
 
 	/**
-	 * This method stores the token into the field content and reset the growing token
+	 * This method stores the growing token into the field content and reset the growing token
 	 */
 	String storeToken(String token) {
 		if (!token.isEmpty()) {
@@ -232,17 +210,15 @@ public class ParserVault extends ParserSkeleton{
 		if (command.equals(COMMAND_RESET)) {
 			return makeResetResult(command, index, content);
 		}
-		if (isCommandThatNeedWords(command)) { //if first word is addcat or search
+		if (isCommandThatNeedWords(command)) { //if first word is filepath or search
 			return makeCommandWithContentResult(command, content);
-		}
-		if (isCommandButCannotBeInOneShot(command)) { //if first word is delete, done, or undone 
+		} else { //if first word is delete, done, or undone 
 			if (isNumber(index)) {
 				return makeCommandWithContentResult(command, index);
 			} else {
 				return makeErrorResult(ERROR.INVALID_INDEX, content);
 			}
 		}
-		return new ArrayList<String>( Arrays.asList(STATUS_INCOMPLETE));
 	}
 
 	/**
@@ -540,15 +516,7 @@ public class ParserVault extends ParserSkeleton{
 
 	private boolean isNotValidFrequency(String token){
 		token = removePluralOrPastTense(token);
-		return !RECUR_FREQUENCY.contains(token);
-	}
-
-	private String removePluralOrPastTense(String token) {
-		token = token.toLowerCase();
-		if (token.length() > 1 && (token.endsWith("s") || token.endsWith("d"))) {
-			token = token.substring(0, token.length()-1);
-		}
-		return token;
+		return !DATE_FREQUENCY.contains(token);
 	}
 	
 	private String getTaskType(String token){
@@ -613,7 +581,7 @@ public class ParserVault extends ParserSkeleton{
 		return token;
 	}
 	
-	//@Override
+	@Override
 	ArrayList<String> makeErrorResult(ERROR error, String token) {
 		ArrayList<String> result = new ArrayList<String>(); 
 		result.add(STATUS_ERROR);

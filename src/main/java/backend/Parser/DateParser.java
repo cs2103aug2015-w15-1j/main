@@ -19,7 +19,7 @@ public class DateParser extends ParserSkeleton{
 	private final ArrayList<String> DAYS_OF_WEEK = new ArrayList<String>( Arrays.asList(
 	"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday" ) );
 	
-	//List of months and their short-forms
+	//List of months and their abbreviations
 	private final ArrayList<String> MONTHS = new ArrayList<String>( Arrays.asList(
 	"january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december", 
 	"jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "oct", "nov", "dec") );
@@ -31,7 +31,7 @@ public class DateParser extends ParserSkeleton{
 	"april", "june", "september", "november") );
 	private final String FEBRUARY = "february";
 	
-	//Short-forms or numerical forms of the months
+	//Abbreviations or numerical forms of the months
     private HashMap<String, ArrayList<String>> month_families = new HashMap<String, ArrayList<String>>(){
 		static final long serialVersionUID = 1L; {
 		put("january", new ArrayList<String>( Arrays.asList("jan", "1")));
@@ -48,18 +48,47 @@ public class DateParser extends ParserSkeleton{
         put("december", new ArrayList<String>( Arrays.asList("dec", "12")));
     }};
 	
-    //The 
+    //Date/time formats that are used by DateParser
+	private final SimpleDateFormat DATEFORMAT_NATTY = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+	private final SimpleDateFormat DATEFORMAT_STANDARD = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
+	private final SimpleDateFormat DATEFORMAT_NO_MINUTE = new SimpleDateFormat("EEE, dd MMM yy, hha");
+	private final SimpleDateFormat DATEFORMAT_NO_TIME = new SimpleDateFormat("EEE, dd MMM yy");
+	private final SimpleDateFormat DATEFORMAT_DAY_AND_MONTH_ONLY = new SimpleDateFormat("dd MMM");
+	private final SimpleDateFormat DATEFORMAT_YEAR_ONLY = new SimpleDateFormat("yy");
+	private final SimpleDateFormat TIMEFORMAT_STANDARD  = new SimpleDateFormat("hh:mma");
+	private final SimpleDateFormat TIMEFORMAT_NO_MINUTE  = new SimpleDateFormat("hha");
+	
+	//The minimum abbreviation length accepted (eg. abbreviation of 'monday' can be 'mon' but not 'mo')
+	private final int MIN_LENGTH_OF_ABBR = 3;
+    
+	//Special characters/strings that are noted by DateParser and recognised by NATTY
+	private final String DATE_SEPARATOR_COMMA = ", ";
+	private final String DATE_SEPARATOR_SLASH = "/";
+	private final String DATE_SEPARATOR_HYPHEN = "-";
+	private final String TIME_SEPARATOR_COLON = ":";
+	private final String TIME_SEPARATOR_DOT = ".";
+	private final String CURRENT_CENTURY_FIRST_TWO_DIGITS = "20";
+	private final String PERIOD_AM = "am";
+	private final String PERIOD_PM = "pm";
+	private final String DATE_KEYWORD_LATER = "later";
+	private final String DATE_KEYWORD_NEXT = "next";
+	private final String DATE_KEYWORD_TODAY = "today";
+	private final String DATE_KEYWORD_TOMORROW = "tomorrow";
+	private final String DATE_KEYWORD_TOMORROW_ABBR = "tmr";
+	private final String TIME_KEYWORD_HOUR = "hour";
+	private final String TIME_KEYWORD_MINUTE = "minute";
+	ArrayList<String> DAY_RELATIVE = new ArrayList<String>( 
+			Arrays.asList(DATE_KEYWORD_TODAY, DATE_KEYWORD_TOMORROW, DATE_KEYWORD_TOMORROW_ABBR) );
+	
+    //A natural language date parser. Taken from http://natty.joestelmach.com/  
 	private final com.joestelmach.natty.Parser NATTY = new com.joestelmach.natty.Parser();
 	
-	//Force Natty parser to be initialized on dateParser creation by running dateParser once
+	//Force NATTY to be initialized upon DateParser creation by running parseDate once
 	public void init() {
     	String pi = "Mar 14 15 9.26pm";
     	parseDate(pi);
 	}
 	
-	/**
-	 * This method checks that a date string is valid and parses it into the default date format 
-	 */
 	String parseDate(String date) {
 		if (date.isEmpty()) {
 			return date;
@@ -85,11 +114,11 @@ public class DateParser extends ParserSkeleton{
 		
 		String parsedStart = parseDate(eventStart);
 		if (hasNoTime(eventStart)) {
-			eventStart = getDayMonthAndYear(parsedStart) + ", 9am";
+			eventStart = getDayMonthAndYear(parsedStart) + DATE_SEPARATOR_COMMA + DEFAULT_STARTTIME;
 		} else {
 			eventStart = parsedStart;
 		}
-		return new ArrayList<String>( Arrays.asList("OK", eventStart));
+		return new ArrayList<String>( Arrays.asList(STATUS_OKAY, eventStart));
 	}
 
 	ArrayList<String> parseEventEnd(String eventStart, String eventEnd) {
@@ -108,41 +137,12 @@ public class DateParser extends ParserSkeleton{
 		
 		eventEnd = makeEventEndComplete(eventStart, eventEnd);
 		
-		return new ArrayList<String>( Arrays.asList("OK", eventEnd));
+		return new ArrayList<String>( Arrays.asList(STATUS_OKAY, eventEnd));
 	}
-
-	/*String convertToRecurFormat(String freq, String dateString) {
-		switch (freq.toLowerCase()) {
-			case "day":
-			case "days":
-				//dateString = getTime(dateString);
-				dateString = minusOneYear(dateString);
-				if (isInThePast(dateString)) {
-					dateString = removeMinuteIfZero(plusOneDay(dateString, null));
-				}
-				break;
-			case "week":
-			case "weeks":
-				//dateString = getDayOfWeek(dateString) + " " + getTime(dateString);
-				String oneWeekBefore = minusOneWeek(dateString);
-				if (!isInThePast(oneWeekBefore)) {
-					dateString = oneWeekBefore;
-				}
-				break;
-			case "year":
-			case "years":
-				//dateString = getDayAndMonth(dateString);
-				break;
-			default:
-				break;
-		}
-		
-		return dateString;
-	}*/
 
 	ArrayList<String> isInvalidDate(String dateString){
 		if (dateString.isEmpty()) {
-			return new ArrayList<String>(Arrays.asList( "OK" ));
+			return new ArrayList<String>(Arrays.asList(STATUS_OKAY));
 		}
 		
 		ArrayList<String> dateBoundCheck = checkDateBound(dateString);
@@ -160,16 +160,16 @@ public class DateParser extends ParserSkeleton{
 			String parsedTime = getTime(parsedDate);
 			String timeString = getTimeFromString(dateString);
 			if (isNotMatchingTimes(parsedTime, timeString)) {
-				return makeErrorResult("InvalidTimeError", timeString);
+				return makeErrorResult(ERROR.INVALID_TIME, timeString);
 			}
 			if (!isValidHour(getHourFromTimeString(timeString))) {
-				return makeErrorResult("InvalidTimeError", timeString);
+				return makeErrorResult(ERROR.INVALID_TIME, timeString);
 			}
 			
-			return new ArrayList<String>(Arrays.asList( "OK" ));
+			return new ArrayList<String>(Arrays.asList(STATUS_OKAY));
 			
 		} catch (Exception e){
-			return makeErrorResult("InvalidDateError", dateString);
+			return makeErrorResult(ERROR.INVALID_DATE, dateString);
 		}
 	}
 
@@ -178,41 +178,34 @@ public class DateParser extends ParserSkeleton{
 		if (DAYS_OF_WEEK.contains(token)){
 			return true;
 		}
-		if (token.length() >= 3) {
+		if (token.length() >= MIN_LENGTH_OF_ABBR) {
 			for (String day: DAYS_OF_WEEK){
 				if (day.startsWith(token)) {
-					//System.out.println("t");
 					return true;
 				}
 			}
 		}
 		return false;
 	}
-
-	/*private boolean isDayOfWeek(String token) {
-		return DAYS_OF_WEEK.contains(token.toLowerCase());
-	}*/
 	
 	boolean isMonth(String token) {
-		if (isNumber(token) && getDateSymbol(token).isEmpty() && addSpaceBetweenDayAndMonth(token).split(" ").length == 1) {
+		if (isNumber(token) && getDateSymbol(token).isEmpty() && hasOnlyOneWord(addSpaceBetweenDayAndMonth(token))) {
 			return false;
 		}
-		token = token.toLowerCase();
 		token = convertMonthToDefault(token);
 		if (MONTHS.contains(token)){
 			return true;
 		}
 		for (String month: MONTHS) {
-			if (containsMonth(token, month)) {
+			if (hasMonth(token, month)) {
 				return true;
 			}
 		}
 		return false;
-		//return MONTHS.contains(token.toLowerCase());
 	}
 
 	boolean hasNoDate(String dateString) {
-		if (dateString.split("/").length > 1 || dateString.split("-").length > 1) {
+		if (canBeSplit(dateString, DATE_SEPARATOR_SLASH) || canBeSplit(dateString, DATE_SEPARATOR_HYPHEN)) {
 			return false;
 		} else {
 			ArrayList<String> tokens = new ArrayList<String>( Arrays.asList(dateString.split(" ") ));
@@ -251,24 +244,6 @@ public class DateParser extends ParserSkeleton{
 	boolean hasTime(String dateString) {
 		return !hasNoTime(dateString);
 	}
-	
-	String getNextNearestDate(int day){
-		String currDate = parseDate(getTomorrowDate() + " 9am"); 
-		int currDay;
-		/*if (isInThePast(currDate)) {
-			currDate = plusOneDay(currDate, null);
-		}*/
-		while ((currDay = getDayOfMonth(currDate)) != day) {
-			if (currDay < day) {
-				currDate = plusXDays(currDate, day-currDay);
-			} else {
-				String currMonth = getCurrentMonth();
-				currDate = plusXDays(currDate, getMaxDay(currMonth)-currDay+day);
-			}
-		}
-		//return currDate;
-		return getDayMonthAndYear(currDate);
-	}
 
 	String parseAndGetDayAndMonth(String dateString) {
 		dateString = parseDate(dateString);
@@ -300,12 +275,9 @@ public class DateParser extends ParserSkeleton{
 	}
 
 	private String standardizeDateFormat(String dateString) {
-		SimpleDateFormat nattyFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-		SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM yy, h:mma");
 		dateString = removeEndSpacesOrBrackets(dateString);
-		Date tempDate = convertStringToDate(dateString, nattyFormat);
-		dateString = standardFormat.format(tempDate);
-		return dateString;
+		Date tempDate = convertStringToDate(dateString, DATEFORMAT_NATTY);
+		return DATEFORMAT_STANDARD.format(tempDate);
 	}
 
 	private Date convertStringToDate(String dateString, SimpleDateFormat sdf){
@@ -313,52 +285,29 @@ public class DateParser extends ParserSkeleton{
 		try {
 			date = sdf.parse(dateString);
 		} catch (ParseException e) {
-			System.out.println("DateParsingError: problem parsing date string '"  + dateString + "' ");
+			printParsingError(DATATYPE_STRING, dateString, DATATYPE_DATE);
 			e.printStackTrace();
 		}
 		return date;
 	}
 
 	private Date convertStandardDateString(String dateString){
-		SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
-		SimpleDateFormat sdfNoMinute = new SimpleDateFormat("EEE, dd MMM yy, hha");
-		
 		Date date;
 		if (hasMinute(dateString)) {
-			date = convertStringToDate(dateString, sdf);
+			date = convertStringToDate(dateString, DATEFORMAT_STANDARD);
 		} else {
-			date = convertStringToDate(dateString, sdfNoMinute);
+			date = convertStringToDate(dateString, DATEFORMAT_NO_MINUTE);
 		}
 		
 		return date;
 	}
-	
-	private String formatStandardDateString(Date date){
-		SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
-		SimpleDateFormat sdfNoMinute = new SimpleDateFormat("EEE, dd MMM yy, hha");
-		
-		String dateString = "";
-		try {
-			dateString = sdf.format(date);
-		} catch (Exception e) {
-			try {
-				dateString = sdfNoMinute.format(date);
-			} catch (Exception e2) {
-				e.printStackTrace();
-			}
-		} 
-		return dateString;
-	}
 
 	private Date convertStandardTimeString(String timeString){
-		SimpleDateFormat stf = new SimpleDateFormat("hh:mma");
-		SimpleDateFormat stfNoMinute = new SimpleDateFormat("hha");
-		
 		Date time;
 		if (hasMinute(timeString)) {
-			time = convertStringToDate(timeString, stf);
+			time = convertStringToDate(timeString, TIMEFORMAT_STANDARD);
 		} else {
-			time = convertStringToDate(timeString, stfNoMinute);
+			time = convertStringToDate(timeString, TIMEFORMAT_NO_MINUTE);
 		}
 		
 		return time;
@@ -368,7 +317,7 @@ public class DateParser extends ParserSkeleton{
 		try {
 			return Integer.parseInt(timeString); 
 		} catch (NumberFormatException e) {
-			//System.out.println("TimeParsingError: problem converting time '" + timeString + "' to integer");
+			//printParsingError(DATATYPE_STRING, timeString, DATATYPE_INTEGER);
 			//e.printStackTrace();
 			return -1;
 		}
@@ -394,10 +343,10 @@ public class DateParser extends ParserSkeleton{
 					String day = ddmmyyDate[0];
 					String month = ddmmyyDate[1];
 					String year = "";
-					mmddyyDate += month + "/" + day;
+					mmddyyDate += month + DATE_SEPARATOR_SLASH + day;
 					if (ddmmyyDate.length == 3) {
 						year = ddmmyyDate[2];
-						mmddyyDate += "/" + year;
+						mmddyyDate += DATE_SEPARATOR_SLASH + year;
 					} 
 					mmddyyDate += " ";
 				}
@@ -411,17 +360,6 @@ public class DateParser extends ParserSkeleton{
 		return mmddyyDate;
 	}
 
-	private String removeLater(String date) {
-		String[] dateTokens = date.split(" ");
-		date = "";
-		for (String token: dateTokens) {
-			if (!token.equalsIgnoreCase("later")) {
-				date += token + " ";
-			}
-		}
-		return removeEndSpacesOrBrackets(date);
-	}
-
 	private String add20ToYear(String date) {
 		String[] dateTokens = date.split(" ");
 		String day = "";
@@ -431,14 +369,25 @@ public class DateParser extends ParserSkeleton{
 				if (day.isEmpty()) {
 					day = token;
 				} else if (token.length() != 4 && i != dateTokens.length-1 
-						&& !getNext(dateTokens, i).toLowerCase().equals("am") 
-						&& !getNext(dateTokens, i).toLowerCase().equals("pm")){
-					dateTokens[i] = "20" + token;
+						&& !getNext(dateTokens, i).toLowerCase().equals(PERIOD_AM) 
+						&& !getNext(dateTokens, i).toLowerCase().equals(PERIOD_PM)){
+					dateTokens[i] = CURRENT_CENTURY_FIRST_TWO_DIGITS + token;
 					break;
 				}
 			}
 		}
 		return mergeTokens(dateTokens, 0, dateTokens.length);
+	}
+
+	private String removeLater(String date) {
+		String[] dateTokens = date.split(" ");
+		date = "";
+		for (String token: dateTokens) {
+			if (!token.equalsIgnoreCase(DATE_KEYWORD_LATER)) {
+				date += token + " ";
+			}
+		}
+		return removeEndSpacesOrBrackets(date);
 	}
 
 	/**
@@ -452,8 +401,6 @@ public class DateParser extends ParserSkeleton{
 				date = setToCurrentYear(date);
 			}
 			if (year <= currYear) {
-				//String dayMonth = getDayAndMonth(date);
-				//if (isInThePast(dayMonth)) {
 				if (isInThePast(date)) {
 					date = plusOneYear(date);
 				}
@@ -463,7 +410,7 @@ public class DateParser extends ParserSkeleton{
 	}
 
 	private String removeMinuteIfZero(String dateString) {
-		if (dateString.contains(":")) {
+		if (dateString.contains(TIME_SEPARATOR_COLON)) {
 			String time = getTime(dateString);
 			int hour = getHour(time);
 			int minute = getMinute(time);
@@ -473,14 +420,14 @@ public class DateParser extends ParserSkeleton{
 				time = hour + period;
 			} else {
 				if (minute < 10) {
-					time = hour + ":0" + minute + period;
+					time = hour + TIME_SEPARATOR_COLON + ZERO + minute + period;
 				} else {
-					time = hour + ":" + minute + period;
+					time = hour + TIME_SEPARATOR_COLON + minute + period;
 				}
 			}
 			
-			String[] dateTokens = dateString.split(", ");
-			return getFirst(dateTokens) + ", " + getSecond(dateTokens) + ", " + time;
+			String[] dateTokens = dateString.split(DATE_SEPARATOR_COMMA);
+			return getFirst(dateTokens) + DATE_SEPARATOR_COMMA + getSecond(dateTokens) + DATE_SEPARATOR_COMMA + time;
 		} 
 		return dateString;
 	}
@@ -490,17 +437,16 @@ public class DateParser extends ParserSkeleton{
 		String startTime = getTime(eventStart);
 		
 		if (eventEnd.isEmpty()) {
-			eventEnd = startDate + ", 9pm";
+			eventEnd = startDate + DATE_SEPARATOR_COMMA + DEFAULT_ENDTIME;
 		} else if (hasNoDate(eventEnd)) {
 			String endTime = eventEnd;
 			if (startTimeIsNotBeforeEndTime(startTime, endTime)) {
-				SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yy");
-				startDate = plusOneDay(startDate, sdf);
+				startDate = plusOneDay(startDate, DATEFORMAT_NO_TIME);
 			} 
-			eventEnd = startDate + ", " + endTime;	
+			eventEnd = startDate + DATE_SEPARATOR_COMMA + endTime;	
 		} else if (hasNoTime(eventEnd)) {
 			String endDate = eventEnd;
-			eventEnd = endDate + ", 9pm";
+			eventEnd = endDate + DATE_SEPARATOR_COMMA + DEFAULT_ENDTIME;
 		}
 		
 		if (startDateIsAfterEndDate(eventStart, eventEnd)) {
@@ -521,65 +467,30 @@ public class DateParser extends ParserSkeleton{
 		return !startTimeDate.before(endTimeDate);
 	}
 
-	private String plusOneDay(String dateString, SimpleDateFormat sdf) {
-		Date date = new Date();
-		if (sdf == null) {
-			date = convertStandardDateString(dateString);
-		} else {
-			date = convertStringToDate(dateString, sdf);
-		}
-		
+	private Date adjustCalendar(int field, Date date, int length) {
 		Calendar c = Calendar.getInstance(); 
 		c.setTime(date); 
-		c.add(Calendar.DATE, 1);
+		c.add(field, length);
 		Date newDate = c.getTime();
-		
-		if (sdf == null) {
-			return formatStandardDateString(newDate);
-		} else {
-			return sdf.format(newDate);
-		}
+		return newDate;
 	}
-
-	private String plusXDays(String dateString, int day) {
-		Date date = convertStandardDateString(dateString);
-		Calendar c = Calendar.getInstance();
-		c.setTime(date);
-		c.add(Calendar.DATE, day);
-		date = c.getTime();
-		return removeMinuteIfZero(standardizeDateFormat(date.toString()));
+	
+	private String plusOneDay(String dateString, SimpleDateFormat sdf) {
+		Date date = new Date();
+		date = convertStringToDate(dateString, sdf);
+		date = adjustCalendar(Calendar.DATE, date, 1);
+		return sdf.format(date);
 	}
 	
 	private String plusOneYear(String dateString) {
 		Date date = convertStandardDateString(dateString);
-		Calendar c = Calendar.getInstance();
-		c.setTime(date);
-		c.add(Calendar.YEAR, 1);
-		date = c.getTime();
+		date = adjustCalendar(Calendar.YEAR, date, 1);
 		return removeMinuteIfZero(standardizeDateFormat(date.toString()));
 	}
-	
-	/*private String minusOneYear(String dateString) {
-		Date date = convertStandardDateString(dateString);
-		Calendar c = Calendar.getInstance();
-		c.setTime(date);
-		c.add(Calendar.YEAR, -1);
-		date = c.getTime();
-		return removeMinuteIfZero(standardizeDateFormat(date.toString()));
-	}*/
-	
-	/*private String minusOneWeek(String dateString) {
-		Date date = convertStandardDateString(dateString);
-		Calendar c = Calendar.getInstance();
-		c.setTime(date);
-		c.add(Calendar.WEEK_OF_MONTH, -1);
-		date = c.getTime();
-		return removeMinuteIfZero(standardizeDateFormat(date.toString()));
-	}*/
 
 	private String setToCurrentYear(String dateString) {
 		String currYear = Integer.toString(getCurrentYear());
-		String[] dateTokens = dateString.split(", ");
+		String[] dateTokens = dateString.split(DATE_SEPARATOR_COMMA);
 		
 		String ddMMMyy = getSecond(dateTokens);
 		String[] ddMMMyyTokens = ddMMMyy.split(" ");
@@ -588,67 +499,60 @@ public class DateParser extends ParserSkeleton{
 		String ddMMM = getFirst(ddMMMyyTokens) + " " + getSecond(ddMMMyyTokens);
 		String EEE = getDayOfWeek(parseDate(ddMMM + " " + getLast(dateTokens)));
 		
-		return EEE + ", " + ddMMMyy + ", " + getLast(dateTokens);
+		return EEE + DATE_SEPARATOR_COMMA + ddMMMyy + DATE_SEPARATOR_COMMA + getLast(dateTokens);
 	}
 
 	private String getDateSymbol(String date) {
-		if (date.contains("/")){
-			return "/";
-		} else if (date.contains("-")) {
-			return "-";
+		if (date.contains(DATE_SEPARATOR_SLASH)){
+			return DATE_SEPARATOR_SLASH;
+		} else if (date.contains(DATE_SEPARATOR_HYPHEN)) {
+			return DATE_SEPARATOR_HYPHEN;
 		} else {
 			return "";
 		}
 	}
 
 	private String getDayOfWeek(String dateString) {
-		String[] dateTokens = dateString.split(", ");
+		String[] dateTokens = dateString.split(DATE_SEPARATOR_COMMA);
 		return getFirst(dateTokens);
-	}
-
-	private int getDayOfMonth(String dateString) {
-		String[] dateTokens = dateString.split(", ");
-		String ddMMMyy = getSecond(dateTokens);
-		String[] ddMMMyyTokens = ddMMMyy.split(" ");
-		return convertStringToInt(getFirst(ddMMMyyTokens));
 	}
 	
 	private String getDayAndMonth(String dateString) {
-		String[] dateTokens = dateString.split(", ");
+		String[] dateTokens = dateString.split(DATE_SEPARATOR_COMMA);
 		String ddMMMyy = getSecond(dateTokens);
 		String[] ddMMMyyTokens = ddMMMyy.split(" ");
 		return getFirst(ddMMMyyTokens) + " " + getSecond(ddMMMyyTokens);
 	}
 	
 	private String getMonth(String dateString) {
-		String[] dateTokens = dateString.split(", ");
+		String[] dateTokens = dateString.split(DATE_SEPARATOR_COMMA);
 		String ddMMMyy = getSecond(dateTokens);
 		String[] ddMMMyyTokens = ddMMMyy.split(" ");
 		return getSecond(ddMMMyyTokens);
 	}
 
 	private int getYear(String dateString) {
-		String[] dateTokens = dateString.split(", ");
+		String[] dateTokens = dateString.split(DATE_SEPARATOR_COMMA);
 		String ddMMMyy = getSecond(dateTokens);
 		String[] ddMMMyyTokens = ddMMMyy.split(" ");
 		return Integer.parseInt(getLast(ddMMMyyTokens));
 	}
 
 	private String getDayMonthAndYear(String dateString) {
-		String[] dateTokens = dateString.split(", ");
-		return getFirst(dateTokens) + ", " + getSecond(dateTokens);
+		String[] dateTokens = dateString.split(DATE_SEPARATOR_COMMA);
+		return getFirst(dateTokens) + DATE_SEPARATOR_COMMA + getSecond(dateTokens);
 	}
 
 	private String getTime(String dateString) {
-		String[] dateTokens = dateString.split(", ");
+		String[] dateTokens = dateString.split(DATE_SEPARATOR_COMMA);
 		return getLast(dateTokens);
 	}
 
 	private String getTimeSymbol(String timeString) {
-		if (timeString.contains(":")){
-			return ":";
-		} else if (timeString.contains(".")) {
-			return "\\.";
+		if (timeString.contains(TIME_SEPARATOR_COLON)){
+			return TIME_SEPARATOR_COLON;
+		} else if (timeString.contains(TIME_SEPARATOR_DOT)) {
+			return "\\" + TIME_SEPARATOR_DOT;
 		} else {
 			return "";
 		}
@@ -656,7 +560,7 @@ public class DateParser extends ParserSkeleton{
 
 	private int getHour(String timeString) {
 		String[] timeTokens;
-		timeTokens = timeString.split(":");
+		timeTokens = timeString.split(TIME_SEPARATOR_COLON);
 		
 		int hour = convertTimeStringToInt(getFirst(timeTokens));
 		return hour;
@@ -664,20 +568,14 @@ public class DateParser extends ParserSkeleton{
 
 	private int getMinute(String timeString) {
 		String[] timeTokens;
-		timeTokens = timeString.split(":");
+		timeTokens = timeString.split(TIME_SEPARATOR_COLON);
 		if (timeTokens.length > 1) {
 			String minuteWithPeriod = getSecond(timeTokens);
 			String[] minuteToken;
 			if (isAM(timeString)) {
-				minuteToken = minuteWithPeriod.split("am");
-				if (getFirst(minuteToken).equals(minuteWithPeriod)) {
-					minuteToken = getSecond(timeTokens).split("AM");
-				}
+				minuteToken = minuteWithPeriod.toLowerCase().split(PERIOD_AM);
 			} else {
-				minuteToken = getSecond(timeTokens).split("pm");
-				if (getFirst(minuteToken).equals(minuteWithPeriod)) {
-					minuteToken = getSecond(timeTokens).split("PM");
-				}
+				minuteToken = getSecond(timeTokens).toLowerCase().split(PERIOD_PM);
 			}
 			return convertTimeStringToInt(getFirst(minuteToken));
 		} else {
@@ -687,12 +585,12 @@ public class DateParser extends ParserSkeleton{
 
 	private String getPeriod(String timeString){
 		if (isAM((timeString))) {
-			return "am";
+			return PERIOD_AM;
 		}
 		if (isPM((timeString))) {
-			return "pm";
+			return PERIOD_PM;
 		}
-		return "error";
+		return STATUS_ERROR;
 	}
 
 	private Date getCurrentDate() {
@@ -700,50 +598,75 @@ public class DateParser extends ParserSkeleton{
 		return now;
 	}
 	
-	private String getTomorrowDate() {
-		Date now = new Date();
-		Calendar c = Calendar.getInstance();
-		c.setTime(now);
-		c.add(Calendar.DATE, 1);
-		now = c.getTime();
-		return removeMinuteIfZero(standardizeDateFormat(now.toString()));
-	}
-
-	private String getCurrentMonth() {
-		SimpleDateFormat sdfDate = new SimpleDateFormat("MMM");
-	    Date now = new Date();
-	    return sdfDate.format(now);
-	}
-	
 	private int getCurrentYear() {
-		SimpleDateFormat sdfDate = new SimpleDateFormat("yy");
 	    Date now = new Date();
-	    String strDate = sdfDate.format(now);
+	    String strDate = DATEFORMAT_YEAR_ONLY.format(now);
 		return Integer.parseInt(strDate);
 	}
 
-	private boolean hasMinute(String time){
-		return time.split(":").length > 1;
+	private int getDayfromDateString(String token) {
+		String day = getFirst(token.split(getDateSymbol(token)));
+		try {
+			return Integer.parseInt(day);
+		} catch (NumberFormatException e) {
+			printParsingError(FREQUENCY_DAY, day, DATATYPE_INTEGER);
+			e.printStackTrace();
+			return -1;
+		}
 	}
 
-	
-	private boolean containsMonth (String token, String month){
-		return (token.startsWith(month) || token.endsWith(month));
+	private String getMonthfromDateString(String token) {
+		String sym = getDateSymbol(token);
+		if (!sym.isEmpty()) {
+			return getSecond(token.split(getDateSymbol(token)));
+		} else {
+			String[] tokens = token.split(" ");
+			if (isNumber(getFirst(tokens))) {
+				return getSecond(tokens);
+			} else {
+				return getFirst(tokens);
+			}
+		}
+	}
+
+	private String getTimeFromString(String dateString) {
+		ArrayList<String> dateTokens = new ArrayList<String>( Arrays.asList(dateString.split(" ")));
+		for (String token: dateTokens) {
+			if (isTimeFormat(token)) {
+				if (token.equalsIgnoreCase(PERIOD_AM) || token.equalsIgnoreCase(PERIOD_PM)) {
+					return getPrevious(dateTokens, token) + " " + token;
+				}
+				return token;
+			}
+		}
+		return "";
+	}
+
+	private String getHourFromTimeString(String timeString){
+		String sym = getTimeSymbol(timeString);
+		if (!sym.isEmpty()){
+			return getFirst(timeString.split(sym));
+		}
+		if (isAM(timeString)) {
+			String hour = getFirst(timeString.toLowerCase().split(PERIOD_AM));
+			return removeEndSpacesOrBrackets(hour);
+		}
+		if (isPM(timeString)) {
+			String hour = getFirst(timeString.toLowerCase().split(PERIOD_PM));
+			return removeEndSpacesOrBrackets(hour);
+		}
+		return timeString;
 	}
 
 	private boolean isDateKeyword(String token, ArrayList<String> tokenArray) {
-		//List of date keywords recognised by the date parser Natty
-		ArrayList<String> dateKeywords = new ArrayList<String>( Arrays.asList("today", "tomorrow", "tmr") );
-		if (dateKeywords.contains(token.toLowerCase())) {
+		if (DAY_RELATIVE.contains(token.toLowerCase())) {
 			return true;
 		} 
 		
-		//List of date keywords recognised by the Natty if it follows a number or the word 'next'
-		ArrayList<String> datePartialKeywords = new ArrayList<String>( Arrays.asList("day", "days", "week", "weeks") );
-		if (datePartialKeywords.contains(token.toLowerCase())) {
+		if (DATE_FREQUENCY.contains(removePluralOrPastTense(token.toLowerCase()))) {
 			String previousToken = getPrevious(tokenArray, token);
 			if (previousToken != null) {
-				if (isNumber(previousToken) || previousToken.equalsIgnoreCase("next")) {
+				if (isNumber(previousToken) || previousToken.equalsIgnoreCase(DATE_KEYWORD_NEXT)) {
 					return true;
 				}
 			}
@@ -755,26 +678,18 @@ public class DateParser extends ParserSkeleton{
 	private boolean isInThePast(String dateString){
 		Date date = new Date();
 		if (dateString.split(" ").length == 2) {
-			SimpleDateFormat dayAndMonthFormat = new SimpleDateFormat("dd MMM");
-			date = convertStringToDate(dateString, dayAndMonthFormat);
+			date = convertStringToDate(dateString, DATEFORMAT_DAY_AND_MONTH_ONLY);
 		} else
 			date = convertStandardDateString(dateString);
 		
 		Date now = getCurrentDate();
-		//System.out.println(now.toString());
-		//System.out.println(date.toString());
-		//System.out.println(now.after(date));
 		return now.after(date);
 	}
 
-	private boolean isAM(String time){
-		return time.toLowerCase().endsWith("am");
+	private boolean isddmmFormat(String token) {
+		return !getDateSymbol(token).isEmpty() && !getNumber(token).isEmpty();
 	}
 
-	private boolean isPM(String time){
-		return time.toLowerCase().endsWith("pm");
-	}
-	
 	private boolean isTimeFormat(String time){
 		return isAM(time) || isPM(time) || !getTimeSymbol(time).isEmpty();
 	}
@@ -782,9 +697,9 @@ public class DateParser extends ParserSkeleton{
 	private boolean isValid12HourTime(String token, ArrayList<String> tokens) {
 		String period;
 		if (isAM(token)) {
-			period = "am";
+			period = PERIOD_AM;
 		} else if (isPM(token)) {
-			period = "pm";
+			period = PERIOD_PM;
 		} else {
 			return false;
 		}
@@ -807,10 +722,10 @@ public class DateParser extends ParserSkeleton{
 
 	private boolean isValid24HourTime(String token) {
 		String timeSymbol;
-		if (token.contains(":")) {
-			timeSymbol = ":";
-		} else if (token.contains(".")) {
-			timeSymbol = ".";
+		if (token.contains(TIME_SEPARATOR_COLON)) {
+			timeSymbol = TIME_SEPARATOR_COLON;
+		} else if (token.contains(TIME_SEPARATOR_DOT)) {
+			timeSymbol = TIME_SEPARATOR_DOT;
 		} else {
 			return false;
 		}
@@ -820,10 +735,10 @@ public class DateParser extends ParserSkeleton{
 			String hour = getFirst(timeTokens);
 			String minute = getLast(timeTokens);
 			if (isAM(token)) {
-				minute = getFirst(minute.split("am"));
+				minute = getFirst(minute.split(PERIOD_AM));
 			}
 			if (isPM(token)) {
-				minute = getFirst(minute.split("pm"));
+				minute = getFirst(minute.split(PERIOD_PM));
 			}
 			if (isValidHour(hour) && isValidMinute(minute)) {
 				return true;
@@ -831,16 +746,26 @@ public class DateParser extends ParserSkeleton{
 		}
 		return false;
 	}
-	
+
+	private boolean isAM(String time){
+		return time.toLowerCase().endsWith(PERIOD_AM);
+	}
+
+	private boolean isPM(String time){
+		return time.toLowerCase().endsWith(PERIOD_PM);
+	}
+
 	private boolean isValidHour(String hour){
+		int minHour = 0;
+		int maxHour = 23;
 		if (hour.isEmpty()) {
 			return true;
 		}
 		try {
 			int min = Integer.parseInt(hour);
-			return min >= 0 && min <= 23;
+			return min >= minHour && min <= maxHour;
 		} catch (NumberFormatException e) {
-			System.out.println("TimeParsingError: problem converting hour '" + hour + "' to integer");
+			printParsingError(TIME_KEYWORD_HOUR, hour, DATATYPE_INTEGER);
 			e.printStackTrace();
 			return false;
 		}
@@ -851,12 +776,64 @@ public class DateParser extends ParserSkeleton{
 			int min = Integer.parseInt(minute);
 			return min >= 0 && min <= 60;
 		} catch (NumberFormatException e) {
-			System.out.println("TimeParsingError: problem converting minute '" + minute + "' to integer");
+			printParsingError(TIME_KEYWORD_MINUTE, minute, DATATYPE_INTEGER);
 			e.printStackTrace();
 			return false;
 		}
 	}
 	
+	private boolean isNotMatchingTimes(String parsedTime, String timeString) {
+		return !hasMinute(parsedTime) && (hasMinute(timeString) && !timeString.endsWith(ZERO));
+	}
+
+	private boolean hasMinute(String time){
+		return canBeSplit(time, TIME_SEPARATOR_COLON);
+	}
+
+	private boolean hasMonth (String token, String month){
+		return (token.startsWith(month) || token.endsWith(month));
+	}
+
+	private boolean hasNoSuchDayInMonth(int day, String month) {
+		month = removeFrontZero(month.toLowerCase());
+		if (has31Days(month)) {
+			return day > 31;
+		}
+		if (has30Days(month)) {
+			return day > 30;
+		}
+		if (isFebruary(month)) {
+			return day > 29;
+		}
+		return true;
+	}
+
+	private boolean has31Days(String month){
+		return MONTHS_WITH_31_DAYS.contains(convertMonthToDefault(month));
+	}
+
+	private boolean has30Days(String month){
+		return MONTHS_WITH_30_DAYS.contains(convertMonthToDefault(month));
+	}
+
+	private boolean isFebruary(String month){
+		return FEBRUARY.equals(convertMonthToDefault(month));
+	}
+
+	private int getMaxDay(String month){
+		month = month.toLowerCase();
+		if (has31Days(month)) {
+			return 31;
+		}
+		if (has30Days(month)) {
+			return 30;
+		}
+		if (isFebruary(month)) {
+			return 29;
+		}
+		return -1;
+	}
+
 	private String addSpaceBetweenDayAndMonth(String dateString) {
 		String[] dateTokens = dateString.split(" ");
 		findMonth:
@@ -864,7 +841,7 @@ public class DateParser extends ParserSkeleton{
 			String token = dateTokens[i];
 			token = token.toLowerCase();
 			for (String month: MONTHS) {
-				if (containsMonth(token, month) && !getNumber(token).isEmpty()){
+				if (hasMonth(token, month) && !getNumber(token).isEmpty()){
 					dateTokens[i] = getNumber(token) + " " + month;
 					break findMonth;
 				}
@@ -882,13 +859,13 @@ public class DateParser extends ParserSkeleton{
 			if (isddmmFormat(token)) {
 				day = getDayfromDateString(token);
 				month = getMonthfromDateString(token);
-				if (noSuchDayInMonth(day, month)) {
-					return makeErrorResult("InvalidDayOfMonthError", Integer.toString(day) + "/" + month);
+				if (hasNoSuchDayInMonth(day, month)) {
+					return makeErrorResult(ERROR.INVALID_DAYOFMONTH, Integer.toString(day) + DATE_SEPARATOR_SLASH + month);
 				}
 			}
 			if (isMonth(token)) {
 				token = addSpaceBetweenDayAndMonth(token);
-				if (token.split(" ").length > 1) {
+				if (canBeSplit(token, " ")) {
 	
 					day = convertStringToInt(getFirst(token));
 					month = getLast(token);
@@ -897,20 +874,20 @@ public class DateParser extends ParserSkeleton{
 					month = token;
 					if (isNumber(prev)) {
 						day = convertStringToInt(prev);
-						if (noSuchDayInMonth(day, month)) {
-							return makeErrorResult("InvalidDayOfMonthError", Integer.toString(day) + " " + month);
+						if (hasNoSuchDayInMonth(day, month)) {
+							return makeErrorResult(ERROR.INVALID_DAYOFMONTH, Integer.toString(day) + " " + month);
 						}
 					} else {
 						day = convertStringToInt(getNext(dateTokens, i));
-						if (noSuchDayInMonth(day, month)) {
-							return makeErrorResult("InvalidDayOfMonthError", month + " " + Integer.toString(day));
+						if (hasNoSuchDayInMonth(day, month)) {
+							return makeErrorResult(ERROR.INVALID_DAYOFMONTH, month + " " + Integer.toString(day));
 						}
 					}
 					
 				}
 			}
 		}
-		return new ArrayList<String>( Arrays.asList("OK"));
+		return new ArrayList<String>( Arrays.asList(STATUS_OKAY));
 	}
 
 	private String convertMonthToDefault(String token) {
@@ -924,123 +901,22 @@ public class DateParser extends ParserSkeleton{
 		return token;
 	}
 	
-	private boolean noSuchDayInMonth(int day, String month) {
-		month = removeFrontZero(month.toLowerCase());
-		if (has31Days(month)) {
-			return day > 31;
-		}
-		if (has30Days(month)) {
-			return day > 30;
-		}
-		if (isFebruary(month)) {
-			return day > 29;
-		}
-		return true;
-	}
-
-	private boolean has31Days(String month){
-		return MONTHS_WITH_31_DAYS.contains(convertMonthToDefault(month));
-	}
-	
-	private boolean has30Days(String month){
-		return MONTHS_WITH_30_DAYS.contains(convertMonthToDefault(month));
-	}
-	
-	private boolean isFebruary(String month){
-		return FEBRUARY.equals(convertMonthToDefault(month));
-	}
-	
-	private int getMaxDay(String month){
-		month = month.toLowerCase();
-		if (has31Days(month)) {
-			return 31;
-		}
-		if (has30Days(month)) {
-			return 30;
-		}
-		if (isFebruary(month)) {
-			return 29;
-		}
-		return -1;
-	}
-	
-	private boolean isddmmFormat(String token) {
-		return !getDateSymbol(token).isEmpty() && !getNumber(token).isEmpty();
-	}
-
-	private int getDayfromDateString(String token) {
-		try {
-			return Integer.parseInt(getFirst(token.split(getDateSymbol(token))));
-		} catch (NumberFormatException e) {
-			System.out.println("DateParsingError: problem converting day '" + getFirst(token.split(getDateSymbol(token))) + "' to integer");
-			e.printStackTrace();
-			return -1;
-		}
-	}
-	
-	private String getMonthfromDateString(String token) {
-		String sym = getDateSymbol(token);
-		if (!sym.isEmpty()) {
-			return getSecond(token.split(getDateSymbol(token)));
-		} else {
-			String[] tokens = token.split(" ");
-			if (isNumber(getFirst(tokens))) {
-				return getSecond(tokens);
-			} else {
-				return getFirst(tokens);
-			}
-		}
-	}
-	
-	private String getTimeFromString(String dateString) {
-		ArrayList<String> dateTokens = new ArrayList<String>( Arrays.asList(dateString.split(" ")));
-		for (String token: dateTokens) {
-			if (isTimeFormat(token)) {
-				if (token.equalsIgnoreCase("am") || token.equalsIgnoreCase("pm")) {
-					return getPrevious(dateTokens, token) + " " + token;
-				}
-				return token;
-			}
-		}
-		return "";
-	}
-
-	private String getHourFromTimeString(String timeString){
-		String sym = getTimeSymbol(timeString);
-		if (!sym.isEmpty()){
-			return getFirst(timeString.split(sym));
-		}
-		if (isAM(timeString)) {
-			String hour = getFirst(timeString.toLowerCase().split("am"));
-			return removeEndSpacesOrBrackets(hour);
-		}
-		if (isPM(timeString)) {
-			String hour = getFirst(timeString.toLowerCase().split("pm"));
-			return removeEndSpacesOrBrackets(hour);
-		}
-		return timeString;
-	}
-	
-	private boolean isNotMatchingTimes(String parsedTime, String timeString) {
-		return !hasMinute(parsedTime) && (hasMinute(timeString) && !timeString.endsWith("00"));
-	}
-
-	//@Override
-	ArrayList<String> makeErrorResult(String error, String token) {
+	@Override
+	ArrayList<String> makeErrorResult(ERROR error, String token) {
 		ArrayList<String> result = new ArrayList<String>(); 
-		result.add("error");
+		result.add(STATUS_ERROR);
 		
 		switch (error) {
-			case "InvalidDateError":
-				result.add(error + ": '" + token + "' is not an acceptable date format");
+			case INVALID_DATE:
+				result.add("InvalidDateError: '" + token + "' is not an acceptable date format");
 				break;
-			case "InvalidTimeError":
-				result.add(error + ": '" + token + "' is not an acceptable time format");
+			case INVALID_TIME:
+				result.add("InvalidTimeError: '" + token + "' is not an acceptable time format");
 				break;
-			case "InvalidDayOfMonthError":
+			case INVALID_DAYOFMONTH:
 				String month = getMonthfromDateString(token);
 				String defaultMonth = convertMonthToDefault(month);
-				result.add(error + ": The date '" + token + "' does not exist "
+				result.add("InvalidDayOfMonthError: The date '" + token + "' does not exist "
 						+ "(" + capitalize(defaultMonth) + " only has " + getMaxDay(defaultMonth) + " days!)");
 				break;
 			default:

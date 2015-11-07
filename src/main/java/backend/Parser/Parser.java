@@ -19,11 +19,6 @@ public class Parser extends ParserSkeleton{
 	private final ArrayList<String> MULTIFIELD_RESULT_TYPE = new ArrayList<String>( 
 	Arrays.asList(RESULTTYPE_ADD, RESULTTYPE_SET) );
 	
-	//The errors that can be detected by Parser Class
-	enum ERROR {
-		INVALID_WORD, INVALID_COMMAND, NO_COMMAND, DUPLICATE_COMMAND, EMPTY_FIELD;
-	}
-	
 	/**
 	 * This method parses the user input and returns an ArrayList of string tokens
 	 */
@@ -200,12 +195,12 @@ public class Parser extends ParserSkeleton{
 	private boolean canHaveMultipleFields(String token) {
 		return MULTIFIELD_RESULT_TYPE.contains(token);
 	}
-	
-	//@Override
+
+	@Override
 	ArrayList<String> makeErrorResult(ERROR error, String token) {
-		ArrayList<String> result = new ArrayList<String>(); 
-		result.add("error");
 		
+		ArrayList<String> result = new ArrayList<String>(); 
+		result.add(STATUS_ERROR);
 		switch (error) {
 			case INVALID_WORD:
 				result.add("InvalidWordError: '" + token + "' is not recognised as a command or index");

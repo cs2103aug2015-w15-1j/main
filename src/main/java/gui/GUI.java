@@ -63,7 +63,7 @@ public class GUI extends Application{
 	private static final String LIST_TASKS = "ToDo:";
 	private static final String LIST_EVENTS = "Events:";
 	private static final String LIST_FLOATING = "Floating:";
-	private static final String LIST_TODAY = "Today's: ";
+	private static final String LIST_TODAY = "Today's / Tomorrow's: ";
 	private static final String LIST_SEARCH = "Search Results:";
 	
 	//Possible commands retrieved from Logic.
@@ -71,6 +71,8 @@ public class GUI extends Application{
 	private static final String COMMAND_SHOW_EVENTS = "show events";
 	private static final String COMMAND_SHOW_OVERDUE = "show overdue"; 
 	private static final String COMMAND_SHOW_FLOAT = "show float";
+	private static final String COMMAND_SHOW_TODAY = "show today";
+	private static final String COMMAND_SHOW_COMPLETE = "show complete";
 	private static final String COMMAND_SEARCH = "search";
 	private static final String COMMAND_EXIT = "exit";
 	
@@ -677,7 +679,7 @@ public class GUI extends Application{
 		});
 	}
 
-	protected void showCompleted() {
+	protected static void showCompleted() {
 		try {
 			setUpGridContents();
 		} catch (IOException | JSONException | ParseException e) {
@@ -786,6 +788,14 @@ public class GUI extends Application{
 					setUpFocus();
 					refreshingFocus(currentList);
 					currentScene = SCENE_FOCUS;
+				} else if(display.equals(COMMAND_SHOW_TODAY)||display.equals("showD")){
+					currentPosition = 0;
+					currentList = NUM_TODAY_TASKS_EVENTS;
+					setUpFocus();
+					refreshingFocus(currentList);
+					currentScene = SCENE_FOCUS;
+				} else if(display.equals(COMMAND_SHOW_FLOAT)||display.equals("showC")){
+					showCompleted();
 				} else if(display.equals(COMMAND_SEARCH)){
 					currentPosition = 0;
 					currentList = NUM_SEARCH;

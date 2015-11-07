@@ -75,7 +75,7 @@ public class ParserVault extends ParserSkeleton{
 
 	//Fields that can be reset
 	private final ArrayList<String> FIELDS_CAN_RESET = new ArrayList<String>( 
-	Arrays.asList(FIELD_ALL, FIELD_DESCRIPTION, FIELD_DEADLINE, FIELD_RECUR, FIELD_EVENT, FIELD_PRIORITY, FIELD_REMINDER) );	
+	Arrays.asList(FIELD_ALL, FIELD_DESCRIPTION, FIELD_DATE, FIELD_DEADLINE, FIELD_RECUR, FIELD_EVENT, FIELD_PRIORITY, FIELD_REMINDER) );	
 	
 	//The frequencies that a recurring task can recur on
 	private final String FREQUENCY_DAY = "day";
@@ -398,6 +398,9 @@ public class ParserVault extends ParserSkeleton{
 		} else {
 			String fieldToReset = convertVariantToDefault(content);
 			if (isCommandThatCanBeReset(fieldToReset)) {
+				if (fieldToReset.equals(FIELD_DEADLINE) || fieldToReset.equals(FIELD_EVENT)) {
+					fieldToReset = FIELD_DATE;
+				}
 				storeToken(fieldToReset);
 				return makeSingleFieldResult();
 			} else {

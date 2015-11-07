@@ -128,7 +128,6 @@ public class StorageFilePath {
 		String[] tokenizeFrontSlash = filePath.split(FRONTSLASH);
 		String[] tokenizeBackSlash = filePath.split(BACKSLASH_2);
 		
-		System.out.println("FILEPATH: " + filePath);
 		if(filePath.contains(FRONTSLASH)) {
 			return tokenizeFrontSlash[tokenizeFrontSlash.length - 1];
 		} else if(filePath.contains(BACKSLASH_1)) {

@@ -13,12 +13,15 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import main.java.backend.Storage.Task.Task;
 
 public class StorageFormat {
+	
+	private static final String ERROR_SERIALIZE = "An error occured when serializing Task objects to text.";
+	private static final String ERROR_DESERIALIZE = "An error occured when deserializing text to Task objects.";
 
 	public StorageFormat() {
 
 	}
 
-	public String serialize(ArrayList<Task> allData) throws StorageException {
+	public String serialize(ArrayList<Task> allData) {
 		
 		String plaintext = new String();
 		try {
@@ -26,13 +29,13 @@ public class StorageFormat {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
 			plaintext = mapper.writeValueAsString(allData);
 		} catch (IOException e) {
-			throw new StorageException();
+			System.out.println(ERROR_SERIALIZE);
 		}
 		
 		return plaintext;
 	}
 
-	public ArrayList<Task> deserialize(String plaintext) throws StorageException {
+	public ArrayList<Task> deserialize(String plaintext) {
 
 		ArrayList<Task> allData = new ArrayList<Task>();
 		ObjectMapper mapper = new ObjectMapper();
@@ -42,7 +45,7 @@ public class StorageFormat {
 			allData = mapper.readValue(plaintext, 
 					new TypeReference<ArrayList<Task>>() {});
 		} catch (IOException e) {
-			throw new StorageException();
+			System.out.println(ERROR_DESERIALIZE);
 		}
 
 		return allData;

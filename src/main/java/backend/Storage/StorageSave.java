@@ -22,6 +22,10 @@ import main.java.backend.Storage.Task.Task;
 
 public class StorageSave extends StorageOperation {
 	
+	private static final String ERROR_FILE_WRITE = "An error occured when writing data from file.";
+	private static final String ERROR_FILE_CLOSE = "An error occured when closing file writer.";
+	private static final String ERROR_FILE_SAVE = "An error occured when saving data to file.";
+	
 	private BufferedWriter bufferedWriter;
 	private FileWriter textFileWriter;
 	
@@ -32,42 +36,41 @@ public class StorageSave extends StorageOperation {
 		filePath = storageFilePath.retrieve();
 	}
 
-	private void initializeWriter() throws StorageException {
+	private void initWriter() {
 		
-		textFile = new File(filePath);
 		try {
+			textFile = new File(filePath);
 			textFileWriter = new FileWriter(textFile);
+			bufferedWriter = new BufferedWriter(textFileWriter);
 		} catch (IOException e) {
-			throw new StorageException();
+			System.out.println(ERROR_FILE_WRITE);
 		}
-		bufferedWriter = new BufferedWriter(textFileWriter);
 	}
 
-	private void closeWriter() throws StorageException {
+	private void closeWriter() {
 		
 		try { 
 			bufferedWriter.flush();
 			textFileWriter.close();
 			bufferedWriter.close();
 		} catch (IOException e) {
-			throw new StorageException();
+			System.out.println(ERROR_FILE_CLOSE);
 		}
 	}
 	
 	public ArrayList<Task> execute(ArrayList<Task> allData) {
 		
+		initWriter();
+		
 		try {
-			initializeWriter();
-			
 			if(allData != null) {
 				bufferedWriter.write(storageFormat.serialize(allData));
 			}
-			
-			closeWriter();
-		} catch (IOException | StorageException e) {
-			e.getMessage();
+		} catch (IOException e) {
+			System.out.println(ERROR_FILE_SAVE);
 		}
 		
+		closeWriter();
 		return allData;
 	}
 }

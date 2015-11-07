@@ -4,7 +4,6 @@ package main.java.backend.Storage;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -25,6 +24,10 @@ import main.java.backend.Storage.Task.Task;
 
 public class StorageLoad extends StorageOperation {
 
+	private static final String ERROR_FILE_READ = "An error occured when reading data from file.";
+	private static final String ERROR_FILE_CLOSE = "An error occured when closing file reader.";
+	private static final String ERROR_FILE_LOAD = "An error occured when loading data from file.";
+	
 	private BufferedReader bufferedReader;
 	private FileReader textFileReader;
 
@@ -33,92 +36,50 @@ public class StorageLoad extends StorageOperation {
 		storageFormat = new StorageFormat();
 		storageFilePath = new StorageFilePath();
 		filePath = storageFilePath.retrieve();
-		initFile();
 	}
 
-	private void initFile() {
+	private void initReader() {
 
-		textFile = new File(filePath);
 		try {
-			createFile();
-			initReader();
-		} catch (StorageException e) {
-			e.getMessage();
-		}
-	}
-
-	private void createFile() throws StorageException {
-		if(!textFile.exists()) {
-			try {
+			textFile = new File(filePath);
+			
+			if(!textFile.exists()) {
 				textFile.createNewFile();
-			} catch (IOException e) {
-				throw new StorageException();
 			}
-		}
-	}
-
-	private void initReader() throws StorageException {
-		try {
+			
 			textFileReader = new FileReader(textFile);
-		} catch (FileNotFoundException e) {
-			throw new StorageException();
+			bufferedReader = new BufferedReader(textFileReader);
+		} catch (IOException e) {
+			System.out.println(ERROR_FILE_READ);
 		}
-		bufferedReader = new BufferedReader(textFileReader);
 	}
 
-	private void closeReader() throws StorageException {
+	private void closeReader()  {
+		
 		try {
 			textFileReader.close();
 			bufferedReader.close();
 		} catch (IOException e) {
-			throw new StorageException();
+			System.out.println(ERROR_FILE_CLOSE);
 		}
-	}
-
-	private boolean isFileEmpty() throws StorageException {    
-		initFile();
-		initReader();
-
-		try {
-			if (bufferedReader.readLine() == null) {
-				return true;
-			}
-		} catch (IOException e) {
-			throw new StorageException();
-		}
-
-		return false;
-	}
-
-	public String getAllTextsFromFile() throws StorageException {
-
-		String plainText = new String();
-		try {
-			plainText = new String(Files.readAllBytes
-					(Paths.get(filePath)), StandardCharsets.UTF_8);
-		} catch (IOException e) {
-			throw new StorageException();
-		}
-		
-		return plainText;
 	}
 
 	public ArrayList<Task> execute(ArrayList<Task> nullData) {
-		
-		ArrayList<Task> allData = new ArrayList<Task> ();
-		
-		try {
-			if(!isFileEmpty()) {
-				allData = storageFormat.deserialize(getAllTextsFromFile());
-			}
-			
-			closeReader();
-		} catch (StorageException e) {
-			e.getMessage();
-		}
-		
-		return allData;
 
+		ArrayList<Task> allData = new ArrayList<Task> ();
+		initReader();
+
+		try {
+			if(!(bufferedReader.readLine() == null)) {
+				allData = storageFormat.deserialize(new String(Files.readAllBytes
+						(Paths.get(filePath)), StandardCharsets.UTF_8));
+			} 
+		} catch (IOException e) {
+			System.out.println(ERROR_FILE_LOAD);
+		}
+
+		closeReader();
+		return allData;
 	}
 
 }

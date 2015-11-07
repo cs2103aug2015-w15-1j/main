@@ -1,4 +1,4 @@
- package main.java.gui;
+package main.java.gui;
 
 import java.util.ArrayList;
 
@@ -7,16 +7,16 @@ import main.java.backend.Storage.Task.Task;
 
 //@@author A0126125R
 public class GUIController {
-	
+
 	LogicFacade logicComponent;
-	
+
 	private final int NUM_TASKS = 1;
 	private final int NUM_EVENTS = 2;
 	private final int NUM_OVERDUE = 3;
 	private final int NUM_FLOAT = 4;
 	private final int NUM_TODAY_TASKS_EVENTS = 5;
 	private final int NUM_SEARCH = 6;
-	
+
 	private ArrayList<Task> getTasks;
 	private ArrayList<Task> getEvents;
 	private ArrayList<Task> getOverdue;
@@ -30,16 +30,16 @@ public class GUIController {
 	private ArrayList<Task> getSearch;
 	private ArrayList<Task> getReminders;
 
-	
+
 	public GUIController() {
-		
+
 		logicComponent = LogicFacade.getInstance();
-		
-	
+
+
 		retrieveAllData();
 		getFocusList = logicComponent.retrieveTaskData("toDo"); //default as tasks
 	}
-	
+
 	void retrieveAllData() {
 		getTasks = logicComponent.retrieveTaskData("upcomingToDo");
 		assert getTasks!=null;
@@ -61,24 +61,24 @@ public class GUIController {
 		//System.out.println(getSearch);
 		assert getSearch!=null;
 	}
-	
+
 	void retrieveCompletes() {
 		getCompletedTasks = logicComponent.retrieveTaskData("completedToDo");
 		getCompletedEvents = logicComponent.retrieveTaskData("pastEvents");
 		getCompletedFloat= logicComponent.retrieveTaskData("completedFloats");
 	}
-	
+
 	void retrieveTodays() {
 		//TO-DO
 		getTodayTasksEvents = logicComponent.retrieveTaskData("today");
 	}
-	
+
 	ArrayList<Task> retrieveTask() { //default view for most initialization
 		ArrayList<Task> list = logicComponent.retrieveTaskData("upcomingToDo");
 		assert list!= null;
 		return list;
 	}
-	
+
 	void determineList(int currentList) {
 		if(currentList==NUM_OVERDUE){
 			getFocusList = getOverdueList();
@@ -103,42 +103,42 @@ public class GUIController {
 	ArrayList<Task> getCompletedTasks() {
 		return getCompletedTasks;
 	}
-	
+
 	ArrayList<Task> getCompletedEvents() {
 		return getCompletedEvents;
 	}
-	
+
 	ArrayList<Task> getCompletedFloat() {
 		return getCompletedFloat;
 	}
-	
+
 	ArrayList<Task> getTasksList() {
 		return getTasks;
 	}
-	
+
 	ArrayList<Task> getEventsList() {
 		return getEvents;
 	}
-	
+
 	ArrayList<Task> getOverdueList() {
 		return getOverdue;
 	}
-	
+
 	ArrayList<Task> getFloatList() {
 		return getFloat;
 	}
-	
+
 	ArrayList<String> getCateList() {
 		return getCate;
 	}
 	ArrayList<Task> getFocusList() {
 		return getFocusList;
 	}
-	
+
 	ArrayList<Task> getToday() {
 		return getTodayTasksEvents;
 	}
-	
+
 	ArrayList<Task> getSearchList(){
 		return getSearch;
 	}
@@ -150,6 +150,7 @@ public class GUIController {
 		}
 		return true;
 	}
+
 	ArrayList<Task> getReminderList(){
 		return getReminders;
 	}

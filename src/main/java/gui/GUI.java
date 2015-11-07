@@ -82,10 +82,9 @@ public class GUI extends Application{
 	private final KeyCombination redo = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);
 	private final KeyCombination shiftUp = new KeyCodeCombination(KeyCode.UP, KeyCombination.SHIFT_DOWN);
 	private final KeyCombination shiftDown= new KeyCodeCombination(KeyCode.DOWN, KeyCombination.SHIFT_DOWN);
-	private static final int COUNT_LIMIT = 10000;
 	
 	//necessary variables for one-instance check
-	private File file = new File("flag");
+	private File file;
     private RandomAccessFile randomAccessFile;
     private FileLock fileLock;
     
@@ -106,19 +105,11 @@ public class GUI extends Application{
 	private static boolean isHelp = false;
 	private static int commandIndex;
 	
-	private static GUIController controller;
-	private static HelpView help;
-	private static GridPane gridPane;
-	private static Stage stage;
-	private static Scene mainScene;	
-	private static String userCommands;
-	private static Console console;
-	private static PrintStream ps;
-	private static ArrayList<String> recentCommands;
-	
-	//List of nodes/children for the gridPane
+	//List of nodes for the gridPane
+	//nodes for both Focus and default view
 	private static TextArea consoleText;
 	private static TextField userInput;
+	
 	//Specific nodes for Default View
 	private static Label tasks;
 	private static Label events;
@@ -134,11 +125,29 @@ public class GUI extends Application{
 	private static Label detailsHeading;
 	private static TextArea detailField;
 	private static ListView<TextFlow> listFocus;
+	
+	private static final int COUNT_LIMIT = 10000;
+	private static final int paneHeight = 600;
+	private static final int paneWidth = 1000;
+	private static GUIController controller;
+	private static HelpView help;
+	private static GridPane gridPane;
+	private static Stage stage;
+	private static Scene mainScene;	
+	private static String userCommands;
+	private static Console console;
+	private static PrintStream ps;
+	private static ArrayList<String> recentCommands;
+	
 
 	public static void main(String[] args) {
         LauncherImpl.launchApplication(GUI.class, GuiPreloader.class, args);
     }
 
+	/**
+	 * This method checks if TankTask is already running. 
+	 * It will close the new window in 3 second or when user press okay, whichever is earlier.
+	 */
 	@Override
 	public void init() throws Exception, FileNotFoundException, IOException, JSONException, ParseException{
 		file = new File("flag");
@@ -180,10 +189,9 @@ public class GUI extends Application{
 		recentCommands = new ArrayList<String>();
 		listFocus = new ListView<TextFlow>();
 		redirectOutput(ps);
-		displayStringToScreen(MESSAGE_WELCOME);
-		displayStringToScreen(MESSAGE_COMMAND_HELP);
+		System.out.println(MESSAGE_WELCOME);
+		System.out.println(MESSAGE_COMMAND_HELP);
 		controller.retrieveAllData();
-		
 	}
 
 	private static void redirectOutput(PrintStream stream){
@@ -192,8 +200,7 @@ public class GUI extends Application{
 	}
 
 	@Override
-	public void start(Stage primaryStage) throws Exception {
-		
+	public void start(Stage primaryStage) throws Exception {	
 		primaryStage.setTitle("TankTask");
 		setUpDefault();
 		setupUserInput();
@@ -253,7 +260,6 @@ public class GUI extends Application{
 	}
 
 	protected void runNoti() {
-		
 		String content = "";
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("REMINDER!");
@@ -272,7 +278,7 @@ public class GUI extends Application{
 		initGrid(); //setting up individual sizing
 		setUpGridContents();//setting up contents;
 		
-		mainScene = new Scene(gridPane,1000,600);
+		mainScene = new Scene(gridPane,paneWidth,paneHeight);
 		mainScene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 	}
 
@@ -499,10 +505,6 @@ public class GUI extends Application{
 		return listTask;
 	}
 
-	private static void displayStringToScreen(String getProcessedInput) {
-		System.out.println(getProcessedInput);
-	}
-
 	private static void refresh(){
 		//System.out.println("refreshing");
 		controller.retrieveAllData();
@@ -517,9 +519,6 @@ public class GUI extends Application{
 	}
 
 	private static void refreshingFocus(int currentListNum){
-		/*if (currentListNum == NUM_SEARCH){
-			controller.retrieveSearch();
-		}*/
 		controller.determineList(currentListNum);
 		try {
 			changeFocusList(currentListNum);
@@ -591,14 +590,14 @@ public class GUI extends Application{
 
 					refresh();
 
-					displayStringToScreen(response);
+					System.out.println(response);
 
 				} else if(redo.match(ke)){
 					String response = controller.executeCommand("redo");
 
 					refresh();
 
-					displayStringToScreen(response);
+					System.out.println(response);
 
 				}else if (ke.getCode().equals(KeyCode.F1)){
 					isHelp = true;
@@ -766,62 +765,74 @@ public class GUI extends Application{
 				userInput.clear();
 				System.out.println("Command: "+ userCommands);
 				String display = controller.executeCommand(userCommands);
-				if (display.equals("change")){
+				switch (display){
+				case "change" :
 					changeScene();
-				}
-				else if(display.equals(COMMAND_SHOW_OVERDUE)||display.equals("showO")){
+					break;
+				case COMMAND_SHOW_OVERDUE:
+				case "showO": 
 					currentPosition = 0;
 					currentList = NUM_OVERDUE;
 					setUpFocus();
 					refreshingFocus(currentList);
 					currentScene = SCENE_FOCUS;
-				}
-				else if(display.equals(COMMAND_SHOW_TASKS)||display.equals("showT")){
+					break;
+				case COMMAND_SHOW_TASKS:
+				case "showT" : 
 					currentPosition = 0;
 					currentList = NUM_TASKS;
 					setUpFocus();
 					refreshingFocus(currentList);
 					currentScene = SCENE_FOCUS;
-				}else if(display.equals(COMMAND_SHOW_EVENTS)||display.equals("showE")){
+					break;
+				case COMMAND_SHOW_EVENTS:
+				case "showE":
 					currentPosition = 0;
 					currentList = NUM_EVENTS;
 					setUpFocus();
 					refreshingFocus(currentList);
 					currentScene = SCENE_FOCUS;
-				}else if(display.equals(COMMAND_SHOW_FLOAT)||display.equals("showF")){
+					break;
+				case COMMAND_SHOW_FLOAT:
+				case "showF":
 					currentPosition = 0;
 					currentList = NUM_FLOAT;
 					setUpFocus();
 					refreshingFocus(currentList);
 					currentScene = SCENE_FOCUS;
-				} else if(display.equals(COMMAND_SHOW_TODAY)||display.equals("showD")){
+					break;
+				case COMMAND_SHOW_TODAY:
+				case "showD":
 					currentPosition = 0;
 					currentList = NUM_TODAY_TASKS_EVENTS;
 					setUpFocus();
 					refreshingFocus(currentList);
 					currentScene = SCENE_FOCUS;
-				} else if(display.equals(COMMAND_SHOW_COMPLETE)||display.equals("showC")){
+					break;
+				case COMMAND_SHOW_COMPLETE:
+				case "showC":
 					showCompleted();
-				} else if(display.equals(COMMAND_SEARCH)){
+					break;
+				case COMMAND_SEARCH: 
 					currentPosition = 0;
 					currentList = NUM_SEARCH;
 					setUpFocus();
 					refreshingFocus(currentList);
 					currentScene = SCENE_FOCUS;
-				} else if(display.equals(COMMAND_EXIT)){
+					break;
+				case COMMAND_EXIT: 
 					exit();
-				} else {
+					break;
+				default:
 					refresh();
-					displayStringToScreen(display);
-
-				}
+					System.out.println(display);
+				}	
 				controller.retrieveAllData();
 			}
 		}
 	}
 
 	private static void exit(){
-		System.out.println(isHelp);
 		if (isHelp){
 			help.close();
 			isHelp = false;

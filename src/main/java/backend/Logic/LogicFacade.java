@@ -130,15 +130,10 @@ public class LogicFacade {
 		if(!searchStack.isEmpty()) {
 			searchStack.peek().execute();
 			ArrayList<Task> searchResults = searchStack.peek().getSearchResults();
-			getterSubComponent.updateSearchResultsList(searchResults);
-			
+			getterSubComponent.updateSearchResultsList(searchResults);	
 		}
 		
 		return getterSubComponent.getSearchResultsList();
-	}
-	
-	public ArrayList<String> retrieveStringData(String dataType){
-		return getterSubComponent.retrieveStringData(dataType);
 	}
 	
 	public ArrayList<Task> retrieveTaskData(String dataType) {

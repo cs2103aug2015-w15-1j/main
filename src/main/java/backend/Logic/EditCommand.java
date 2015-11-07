@@ -189,7 +189,15 @@ public class EditCommand extends Command {
 	}
 	
 	//@@author A0126258A
-	private boolean taskExist(int taskIndex) {
+	private boolean taskExist(Command command) {
+		
+		int taskIndex = -1;
+		
+		if(command.getTaskName().isEmpty()) {
+			return true;
+		} else {
+			taskIndex = Integer.parseInt(this.getTaskName());
+		}
 		
 		for(Task task : taskList) {
 			if(taskIndex != -1 && task.getIndex() == taskIndex) {
@@ -491,7 +499,7 @@ public class EditCommand extends Command {
 		String feedbackString = RESET;
 		logicEditorLogger.info(LOGGER_COMMAND_FIELD + this.getCommandField());
 
-		if(taskExist(Integer.parseInt(this.getTaskName()))) {
+		if(taskExist(this)) {
 			switch(this.getCommandField()) {
 				case (COMMAND_PRIORITY) :
 					feedbackString = setPriority(this);

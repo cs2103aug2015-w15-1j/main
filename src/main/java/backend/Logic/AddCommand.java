@@ -69,56 +69,6 @@ public class AddCommand extends Command {
 		}
 	}
 
-	//@@author A0121284N
-	public String execute() {	
-		
-		String feedbackString = new String();
-		logicAdderLogger.info(LOGGER_COMMAND_EXECUTION + this.getCommandField());
-		
-		switch (this.getCommandField()) {
-			case (COMMAND_ADD_FLOAT) :
-				feedbackString = addTask(TaskType.FLOATING, this);
-				break;
-			case (COMMAND_ADD_TODO) :
-				feedbackString = addTask(TaskType.TODO, this);
-				break;	
-			case (COMMAND_ADD_EVENT) :
-				feedbackString = addTask(TaskType.EVENT, this);
-				break;
-		}
-		
-		logicAdderLogger.info(LOGGER_COMMAND_ADD + feedbackString);
-		currentState = storageComponent.load();
-		historySubComponent.push(currentState);
-		logHandler.close();
-		
-		return feedbackString;
-	}
-
-	//@@author A0121284N	
-	public String undo() {
-		
-		try {
-			ArrayList<Task> historyState = historySubComponent.undo();
-			storageComponent.save(historyState);
-			return EXECUTION_UNDO_SUCCESSFUL;
-		} catch (EmptyStackException e) {
-			return EXECUTION_COMMAND_UNSUCCESSFUL;
-		}
-	}
-
-	//@@author A0121284N
-	public String redo() {
-		
-		try {
-			ArrayList<Task> futureState = historySubComponent.redo();
-			storageComponent.save(futureState);
-			return EXECUTION_REDO_SUCCESSFUL;
-		} catch (EmptyStackException e) {
-			return EXECUTION_COMMAND_UNSUCCESSFUL;
-		}
-	}
-
 	//@@author A0126258A
 	private ArrayList<Task> generateTaskId() {
 
@@ -189,5 +139,55 @@ public class AddCommand extends Command {
 		storageComponent.save(taskList);
 
 		return String.format(EXECUTION_ADD_TASK_SUCCESSFUL, newTask.getName());
+	}
+	
+	//@@author A0121284N	
+	public String undo() {
+		
+		try {
+			ArrayList<Task> historyState = historySubComponent.undo();
+			storageComponent.save(historyState);
+			return EXECUTION_UNDO_SUCCESSFUL;
+		} catch (EmptyStackException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
+	}
+
+	//@@author A0121284N
+	public String redo() {
+		
+		try {
+			ArrayList<Task> futureState = historySubComponent.redo();
+			storageComponent.save(futureState);
+			return EXECUTION_REDO_SUCCESSFUL;
+		} catch (EmptyStackException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
+	}
+	
+	//@@author A0121284N
+	public String execute() {	
+		
+		String feedbackString = new String();
+		logicAdderLogger.info(LOGGER_COMMAND_EXECUTION + this.getCommandField());
+		
+		switch (this.getCommandField()) {
+			case (COMMAND_ADD_FLOAT) :
+				feedbackString = addTask(TaskType.FLOATING, this);
+				break;
+			case (COMMAND_ADD_TODO) :
+				feedbackString = addTask(TaskType.TODO, this);
+				break;	
+			case (COMMAND_ADD_EVENT) :
+				feedbackString = addTask(TaskType.EVENT, this);
+				break;
+		}
+		
+		logicAdderLogger.info(LOGGER_COMMAND_ADD + feedbackString);
+		currentState = storageComponent.load();
+		historySubComponent.push(currentState);
+		logHandler.close();
+		
+		return feedbackString;
 	}
 }

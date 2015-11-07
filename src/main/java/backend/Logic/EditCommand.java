@@ -14,6 +14,7 @@ import main.java.backend.Storage.Task.Task.TaskType;
 
 public class EditCommand extends Command {
 
+	private static final String EXECUTION_UNSUCCESSFUL = "Task index is invalid. Please try again.";
 	private static final String EXECUTION_SET_PRIORITY_SUCCESSFUL = "Task %1$s has been set to priority %2$s";
 	private static final String EXECUTION_SET_SUCCESSFUL = "Fields have been updated";
 	private static final String EXECUTION_DELETE_SUCCESSFUL = "Task %1$s has been deleted";
@@ -33,6 +34,15 @@ public class EditCommand extends Command {
 	
 	private static final String LOGGER_INIT_UNSUCCESSFUL = "Logger failed to initialise: ";
 	private static final String LOGGER_COMMAND_FIELD = "Get CommandField: ";
+	
+	private static final String LOGGER_TASKID = "TaskId: ";
+	private static final String LOGGER_DESCRIPTION = "Description: ";
+	private static final String LOGGER_PRIORITY = "Priority: ";
+	private static final String LOGGER_REMINDER = "Reminder: ";
+	private static final String LOGGER_RECURRING = "Recurring: ";
+	private static final String LOGGER_DEADLINE = "Deadline: ";
+	private static final String LOGGER_STARTDATE = "Start date: ";
+	private static final String LOGGER_ENDDATE = "End date: ";
 
 	private static final String COMMAND_PRIORITY = "priority";
 	private static final String COMMAND_ONESHOT_TASK = "setT";
@@ -93,109 +103,25 @@ public class EditCommand extends Command {
 	}
 
 	//@@author A0121284N
-	public String execute(){
-
-		String feedbackString = RESET;
-		logicEditorLogger.info(LOGGER_COMMAND_FIELD + this.getCommandField());
-
-		switch(this.getCommandField()) {
-			case (COMMAND_PRIORITY) :
-				feedbackString = setPriority(this);
-				break;
-			case (COMMAND_ONESHOT_TASK) :
-				feedbackString = setMultipleFieldsForTodo(this);
-				break;
-			case (COMMAND_ONESHOT_EVENT) :
-				feedbackString = setMultipleFieldsForEvents(this);
-				break;
-			case (COMMAND_ONESHOT_FLOAT) :
-				feedbackString = setMultipleFieldsForFloats(this);
-				break;
-			case (COMMAND_DELETE) :
-				feedbackString = delete(this);
-				break;
-			case (COMMAND_DELETE_ALL):
-				feedbackString = deleteAll(this);
-				break;
-			case (COMMAND_UNDONE) :
-				feedbackString = setUndone(this);
-				break;
-			case (COMMAND_DONE) :
-				feedbackString = setDone(this);
-				break;
-			case (COMMAND_REMINDER) :
-				feedbackString = setReminder(this);
-				break;
-			case (COMMAND_DESCRIPTION) :
-				feedbackString = setDescription(this);
-				break;
-			case (COMMAND_EVENT) :
-				feedbackString = setEventStartAndEndTime(this);
-				break;
-			case (COMMAND_DEADLINE) :
-				feedbackString = setDeadline(this);
-				break;
-			case (COMMAND_EVERY) :
-				feedbackString = setRecurring(this);
-				break;	
-			case (COMMAND_RENAME):
-				feedbackString = rename(this);
-				break;
-			case (COMMAND_RESET):
-				feedbackString = reset(this);
-				break;
-		}
-		
-		currentState = taskList;
-		historySubComponent.push(currentState);
-		logHandler.close();
-
-		return feedbackString;
-	}
-
-	//@@author A0121284N
-	public String undo() {
-		
-		try {
-			ArrayList<Task> historyState = historySubComponent.undo();
-			storageComponent.save(historyState);
-			return EXECUTION_UNDO_SUCCESSFUL;
-		} catch (EmptyStackException e) {
-			return EXECUTION_COMMAND_UNSUCCESSFUL;
-		}
-	}
-
-	//@@author A0121284N
-	public String redo() {
-		
-		try {
-			ArrayList<Task> futureState = historySubComponent.redo();
-			storageComponent.save(futureState);
-			return EXECUTION_REDO_SUCCESSFUL;
-		} catch (EmptyStackException e) {
-			return EXECUTION_COMMAND_UNSUCCESSFUL;
-		}
-	}
-
-	//@@author A0121284N
 	private String setMultipleFieldsForFloats(Command commandObject) {
 
 		try {
 			int taskId = Integer.parseInt(commandObject.getTaskName());
-			logicEditorLogger.info("taskId: "+taskId);
+			logicEditorLogger.info(LOGGER_TASKID + taskId);
+			
 			if(!commandObject.getNewName().isEmpty()) {
 				rename(commandObject);
 			}
 			if (!commandObject.getDescription().isEmpty()) {
-				logicEditorLogger.info("Description: "+ commandObject.getDescription());
+				logicEditorLogger.info(LOGGER_DESCRIPTION + commandObject.getDescription());
 				setDescription(commandObject);
 			}
 			if (!commandObject.getPriority().isEmpty()) {
-				logicEditorLogger.info("priority :"+commandObject.getPriority());
+				logicEditorLogger.info(LOGGER_PRIORITY + commandObject.getPriority());
 				setPriority(commandObject);
 			}
 			if (!commandObject.getReminder().isEmpty()) {
-				logicEditorLogger.info("reminder: "+commandObject.getReminder());
+				logicEditorLogger.info(LOGGER_REMINDER + commandObject.getReminder());
 				setReminder(commandObject);
 			}
 			return EXECUTION_SET_SUCCESSFUL;
@@ -207,17 +133,16 @@ public class EditCommand extends Command {
 	//@@author A0121284N
 	private String setMultipleFieldsForTodo(Command commandObject) {
 
-		logicEditorLogger.info("taskId: "+commandObject.getTaskName());
 		try {
 			setMultipleFieldsForFloats(commandObject);
 			
 			if(!commandObject.getRecurrence().isEmpty()) {
-				logicEditorLogger.info("category: "+commandObject.getRecurrence());
+				logicEditorLogger.info(LOGGER_RECURRING + commandObject.getRecurrence());
 				setRecurring(commandObject);
 			}
 			if (!commandObject.getEndDateAndTime().isEmpty()) {
 				setDeadline(commandObject);
-				logicEditorLogger.info("deadline :"+commandObject.getEndDateAndTime());
+				logicEditorLogger.info(LOGGER_DEADLINE + commandObject.getEndDateAndTime());
 			}
 			return EXECUTION_SET_SUCCESSFUL;
 		} catch (NumberFormatException e) {
@@ -232,11 +157,13 @@ public class EditCommand extends Command {
 			setMultipleFieldsForFloats(commandObject);
 			
 			if(!commandObject.getRecurrence().isEmpty()) {
-				logicEditorLogger.info("category: "+commandObject.getRecurrence());
+				logicEditorLogger.info(LOGGER_RECURRING +commandObject.getRecurrence());
 				setRecurring(commandObject);
 			}
 			if (!commandObject.getStartDateAndTime().isEmpty() && 
 					!commandObject.getEndDateAndTime().isEmpty()) {
+				logicEditorLogger.info(LOGGER_STARTDATE +commandObject.getStartDateAndTime());
+				logicEditorLogger.info(LOGGER_ENDDATE +commandObject.getStartDateAndTime());
 				setEventStartAndEndTime(commandObject);
 			}
 			return EXECUTION_SET_SUCCESSFUL;
@@ -259,6 +186,18 @@ public class EditCommand extends Command {
 		} else {
 			return Task.RecurrenceType.NONE;
 		} 
+	}
+	
+	//@@author A0126258A
+	private boolean taskExist(int taskIndex) {
+		
+		for(Task task : taskList) {
+			if(taskIndex != -1 && task.getIndex() == taskIndex) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	//@@author A0126258A
@@ -520,6 +459,95 @@ public class EditCommand extends Command {
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
+	}
+	
+	//@@author A0121284N
+	public String undo() {
+		
+		try {
+			ArrayList<Task> historyState = historySubComponent.undo();
+			storageComponent.save(historyState);
+			return EXECUTION_UNDO_SUCCESSFUL;
+		} catch (EmptyStackException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
+	}
+
+	//@@author A0121284N
+	public String redo() {
+		
+		try {
+			ArrayList<Task> futureState = historySubComponent.redo();
+			storageComponent.save(futureState);
+			return EXECUTION_REDO_SUCCESSFUL;
+		} catch (EmptyStackException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
+	}
+	
+	//@@author A0121284N
+	public String execute(){
+
+		String feedbackString = RESET;
+		logicEditorLogger.info(LOGGER_COMMAND_FIELD + this.getCommandField());
+
+		if(taskExist(Integer.parseInt(this.getTaskName()))) {
+			switch(this.getCommandField()) {
+				case (COMMAND_PRIORITY) :
+					feedbackString = setPriority(this);
+					break;
+				case (COMMAND_ONESHOT_TASK) :
+					feedbackString = setMultipleFieldsForTodo(this);
+					break;
+				case (COMMAND_ONESHOT_EVENT) :
+					feedbackString = setMultipleFieldsForEvents(this);
+					break;
+				case (COMMAND_ONESHOT_FLOAT) :
+					feedbackString = setMultipleFieldsForFloats(this);
+					break;
+				case (COMMAND_DELETE) :
+					feedbackString = delete(this);
+					break;
+				case (COMMAND_DELETE_ALL):
+					feedbackString = deleteAll(this);
+					break;
+				case (COMMAND_UNDONE) :
+					feedbackString = setUndone(this);
+					break;
+				case (COMMAND_DONE) :
+					feedbackString = setDone(this);
+					break;
+				case (COMMAND_REMINDER) :
+					feedbackString = setReminder(this);
+					break;
+				case (COMMAND_DESCRIPTION) :
+					feedbackString = setDescription(this);
+					break;
+				case (COMMAND_EVENT) :
+					feedbackString = setEventStartAndEndTime(this);
+					break;
+				case (COMMAND_DEADLINE) :
+					feedbackString = setDeadline(this);
+					break;
+				case (COMMAND_EVERY) :
+					feedbackString = setRecurring(this);
+					break;	
+				case (COMMAND_RENAME):
+					feedbackString = rename(this);
+					break;
+				case (COMMAND_RESET):
+					feedbackString = reset(this);
+					break;
+			} 
+		} else {
+			feedbackString = EXECUTION_UNSUCCESSFUL;
+		}
+
+		currentState = taskList;
+		historySubComponent.push(currentState);
+		logHandler.close();
+
+		return feedbackString;
 	}
 
 }

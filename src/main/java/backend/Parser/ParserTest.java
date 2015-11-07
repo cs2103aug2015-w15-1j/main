@@ -94,11 +94,6 @@ public class ParserTest {
 	    expected = new ArrayList<String>( Arrays.asList("addF", "PROJECT PROPOSAL", "", "", "", "") );
 	    executeTest();
 	    
-	    input = "addcat Work Stuffs";
-	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("addcat", "Work Stuffs") );
-	    executeTest();
-	    
 	    input = "1 by 12 Feb 3pm";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Fri, 12 Feb 16, 3pm") );
@@ -139,11 +134,6 @@ public class ParserTest {
 	    expected = new ArrayList<String>( Arrays.asList("showE") );
 	    executeTest();
 	    
-	    input = "show o";
-	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("showO") );
-	    executeTest();
-	    
 	    input = "show today";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("showToday") );
@@ -177,6 +167,11 @@ public class ParserTest {
 	    input = "sort by priority";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("sortP") );
+	    executeTest();
+	    
+	    input = "search meeting with boss";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("search", "meeting with boss") );
 	    executeTest();
 	    
 	    input = "filepath Desktop/TankTask/";
@@ -225,17 +220,10 @@ public class ParserTest {
 	    expected = new ArrayList<String>( Arrays.asList("addF", "Project Proposal search", "", "", "", "") );
 	    executeTest();
 	    
-	    //all other commands should be ignored when 'addcat' is in effect
-	    input = "addcat Work Stuffs done priority 100 description bla bla";
-	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("addcat", "Work Stuffs done priority 100"
-	    												+ " description bla bla") );
-	    executeTest();
-	    
 	    //all other commands should be ignored when 'search' is in effect
-	    input = "search Project Proposal priority 100";
+	    input = "search Project Proposal description bla bla every week";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("search", "Project Proposal priority 100") );
+	    expected = new ArrayList<String>( Arrays.asList("search", "Project Proposal description bla bla every week") );
 	    executeTest();
 	    
 	    //'addcat' should be ignored when 'add' is in effect
@@ -960,6 +948,22 @@ public class ParserTest {
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("deadline", "4", "Wed, 15 Sep 27, 10am") );
 	    executeTest();
+	    
+	    input = "4 from dec 22 10";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "4", "Tue, 22 Dec 15, 9am", "Tue, 22 Dec 15, 9pm") );
+	    executeTest();
+	    
+	    //Test whether confirmDateIsInfuture works properly
+	    input = "2 from 7 nov 10 12pm";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Mon, 07 Nov 16, 12pm", "Mon, 07 Nov 16, 9pm") );
+	    printTest();
+		
+	    input = "2 from 7 nov 10 5pm";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Sat, 07 Nov 15, 5pm", "Sat, 07 Nov 15, 9pm") );
+	    printTest();
 	}
 	
 	@Test

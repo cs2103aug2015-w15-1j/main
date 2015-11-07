@@ -10,27 +10,66 @@ import java.util.Arrays;
  */
 abstract class ParserSkeleton {
 	
+	//Command words that are accepted by the program
+	final String COMMAND_ADD = "add";
+	final String COMMAND_DEADLINE = "deadline";
+	final String COMMAND_DESCRIPTION = "description";
+	final String COMMAND_DELETE = "delete";
+	final String COMMAND_DELETEALL = "deleteAll";
+	final String COMMAND_DONE = "done";
+	final String COMMAND_EVENT = "event";
+	final String COMMAND_RECUR = "every";
+	final String COMMAND_EXIT = "exit";
+	final String COMMAND_FILEPATH = "filepath";
+	final String COMMAND_PRIORITY = "priority";
+	final String COMMAND_REDO = "redo";
+	final String COMMAND_REMINDER = "reminder";
+	final String COMMAND_RENAME = "rename";
+	final String COMMAND_RESET = "reset";
+	final String COMMAND_SEARCH = "search";
+	final String COMMAND_SHOW = "show";
+	final String COMMAND_SHOWDONE = "showDone";
+	final String COMMAND_SHOWE = "showE";
+	final String COMMAND_SHOWF = "showF";
+	final String COMMAND_SHOWO = "showO";
+	final String COMMAND_SHOWT = "showT";
+	final String COMMAND_SHOWTODAY = "showToday";
+	final String COMMAND_SORT = "sort";
+	final String COMMAND_SORTD = "sortD";
+	final String COMMAND_SORTN = "sortN";
+	final String COMMAND_SORTP = "sortP";
+	final String COMMAND_UNDO = "undo";
+	final String COMMAND_UNDONE = "undone";
+	
+	final String RESULTTYPE_ADD = "add";
+	final String RESULTTYPE_SET = "set";
+	final String RESULTTYPE_ERROR = "error";
+	
 	//List of all command words accepted by the program
 	final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList(
-	"add", "addcat", "category", "deadline", "description", "delete", "deleteAll", "done", "event", "every", 
-	"exit", "filepath", "priority", "redo", "reminder", "rename", "reset", "search", "setcol", "showcat",   
-	"show", "showDone", "showE", "showF", "showO", "showT", "showToday", "sort", "sortD", "sortN", "sortP", "undo", "undone") );
+	COMMAND_ADD, COMMAND_DEADLINE, COMMAND_DESCRIPTION, COMMAND_DELETE, COMMAND_DELETEALL, 
+	COMMAND_DONE, COMMAND_EVENT, COMMAND_RECUR, COMMAND_EXIT, COMMAND_FILEPATH, COMMAND_PRIORITY, 
+	COMMAND_REDO, COMMAND_REMINDER, COMMAND_RENAME, COMMAND_RESET, COMMAND_SEARCH, COMMAND_SHOW, 
+	COMMAND_SHOWDONE, COMMAND_SHOWE, COMMAND_SHOWF, COMMAND_SHOWO, COMMAND_SHOWT, COMMAND_SHOWTODAY, 
+	COMMAND_SORT, COMMAND_SORTD, COMMAND_SORTN, COMMAND_SORTP, COMMAND_UNDO, COMMAND_UNDONE ) );
 	
 	//Commands that work just by typing the command word (without additional content)
 	final ArrayList<String> COMMANDS_NO_CONTENT = new ArrayList<String>( Arrays.asList(
-	"deleteAll", "exit", "redo", "showDone", "showE", "showF", "showO", "showT", "showToday", "sortD", "sortN", "sortP", "undo") );
+	COMMAND_DELETEALL, COMMAND_EXIT, COMMAND_REDO, COMMAND_SHOWDONE, COMMAND_SHOWE, COMMAND_SHOWF, 
+	COMMAND_SHOWO, COMMAND_SHOWT, COMMAND_SHOWTODAY, COMMAND_SORTD, COMMAND_SORTN, COMMAND_SORTP, COMMAND_UNDO ) );
 	
 	//Commands that if appear first, will prevent other command keywords from having effect
 	final ArrayList<String> COMMANDS_DOMINATING = new ArrayList<String>( Arrays.asList(
-	"addcat", "delete", "done", "filepath", "reset", "search", "setcol", "show", "showcat", "sort", "undone") );
+	COMMAND_DELETE, COMMAND_DONE, COMMAND_FILEPATH, COMMAND_RESET, COMMAND_SEARCH, COMMAND_SHOW, 
+	COMMAND_SORT, COMMAND_UNDONE ) );
 	
 	//Commands that can accept any amount of words
 	final ArrayList<String> COMMANDS_NEED_WORDS = new ArrayList<String>( 
-	Arrays.asList("add", "addcat", "category", "description", "filepath", "search") );
+	Arrays.asList(COMMAND_ADD, COMMAND_DESCRIPTION, COMMAND_FILEPATH, COMMAND_SEARCH) );
 	
 	//Commands that cannot be part of a one-shot command
 	final ArrayList<String> COMMANDS_NOT_ONE_SHOT = new ArrayList<String>( 
-	Arrays.asList("delete", "done", "reset", "showcat", "undone") );	
+	Arrays.asList(COMMAND_DELETE, COMMAND_DONE, COMMAND_RESET, COMMAND_UNDONE) );	
 	
 	String getFirst(String[] array){
 		return array[0];
@@ -119,6 +158,10 @@ abstract class ParserSkeleton {
 		}
 	}
 	
+	String getFirstLetter(String s){
+		return s.substring(1, s.length());
+	}
+	
 	int convertStringToInt(String str){
 		try {
 			return Integer.parseInt(str);
@@ -203,9 +246,5 @@ abstract class ParserSkeleton {
 		return !getStatus(result).equals("incomplete");
 	}
 	
-	ArrayList<String> makeErrorResult(String error, String token) {
-		ArrayList<String> result = new ArrayList<String>(); 
-		result.add("error");
-		return result;
-	}
+	//abstract ArrayList<String> makeErrorResult(String error, String token);
 }

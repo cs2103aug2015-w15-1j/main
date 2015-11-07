@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import main.java.backend.Storage.Task.Task.TaskType;
+
 /**
  * ParserVault
  * Stores the contents of the parsed input and generates the result
@@ -19,9 +21,24 @@ public class ParserVault extends ParserSkeleton{
     	dateParser.parseDate(pi);
 	}
 
+	private final String FIELD_ALL = "all";
+	private final String FIELD_RESULTTYPE = "command";
+	private final String FIELD_TASK = "task";
+	private final String FIELD_DESCRIPTION = "description";
+	private final String FIELD_DEADLINE = COMMAND_DEADLINE;
+	private final String FIELD_EVENT = COMMAND_EVENT;
+	private final String FIELD_EVENTSTART = "eventStart";
+	private final String FIELD_EVENTEND = "eventEnd";
+	private final String FIELD_PRIORITY = COMMAND_PRIORITY;
+	private final String FIELD_REMINDER = COMMAND_REMINDER;
+	private final String FIELD_RECUR = COMMAND_RECUR;
+	private final String FIELD_RENAME = "rename";
+	private final String FIELD_RESET = "reset";
+	
 	//The default list of fields and the order in which their contents are put into result
 	private final ArrayList<String> FIELDS_DEFAULT = new ArrayList<String>( Arrays.asList(
-	"command", "task", "description", "deadline", "eventStart", "eventEnd", "priority", "reminder", "every", "rename") );
+	FIELD_RESULTTYPE, FIELD_TASK, FIELD_DESCRIPTION, FIELD_DEADLINE, FIELD_EVENTSTART, FIELD_EVENTEND, 
+	FIELD_PRIORITY, FIELD_REMINDER, FIELD_RECUR, FIELD_RENAME ) ); 
 	
 	//List of fields that are used in the current result
 	private ArrayList<String> fields = new ArrayList<String>(FIELDS_DEFAULT);
@@ -29,8 +46,9 @@ public class ParserVault extends ParserSkeleton{
 	//Stores the fields and their contents
 	private HashMap<String, String> fieldContent = new HashMap<String, String>(){
 		static final long serialVersionUID = 1L; {
-	    put("command",""); put("task", ""); put("description", ""); put("deadline", ""); put("event", ""); 
-	    put("priority",""); put("reminder", ""); put("category", ""); put("every", ""); put("rename", ""); put("reset", "");
+		put(FIELD_RESULTTYPE, ""); put(FIELD_TASK, ""); put(FIELD_DESCRIPTION, ""); put(FIELD_DEADLINE, ""); 
+		put(FIELD_EVENT, ""); put(FIELD_PRIORITY, ""); put(FIELD_REMINDER, ""); put(FIELD_RESET, "");
+		put(FIELD_RECUR, ""); put(FIELD_RENAME, "");
 	}};
 
 	//List of commands that have appeared in the parsed tokens
@@ -38,41 +56,60 @@ public class ParserVault extends ParserSkeleton{
 
 	//Commands that only need the task's name/index, no other content needed
 	private final ArrayList<String> COMMANDS_NEED_TASK_ONLY = new ArrayList<String>( Arrays.asList(
-	"add", "addcat", "delete", "done") );
+	COMMAND_ADD, COMMAND_DELETE, COMMAND_DONE) );
 
 	//Command fields that can be edited/reset
-	private final ArrayList<String> COMMANDS_CAN_RESET = new ArrayList<String>( 
-	Arrays.asList("all", "description", "deadline", "every", "event", "priority", "reminder", "category") );	
+	private final ArrayList<String> FIELDS_CAN_RESET = new ArrayList<String>( 
+	Arrays.asList(FIELD_ALL, FIELD_DESCRIPTION, FIELD_DEADLINE, FIELD_RECUR, FIELD_EVENT, FIELD_PRIORITY, FIELD_REMINDER) );	
+	
+	private final String FREQUENCY_DAY = "day";
+	private final String FREQUENCY_WEEK = "week";
+	private final String FREQUENCY_MONTH = "month";
+	private final String FREQUENCY_YEAR = "year";
 	
 	//How often a recurring task can recur
 	private final ArrayList<String> RECUR_FREQUENCY = new ArrayList<String>( Arrays.asList(
-	"day", "week", "month", "year") );
+	FREQUENCY_DAY, FREQUENCY_WEEK, FREQUENCY_MONTH, FREQUENCY_YEAR) );
 	
 	//Contains the variants or short forms of some of the commands
     private HashMap<String, ArrayList<String>> command_families = new HashMap<String, ArrayList<String>>(){
 		static final long serialVersionUID = 1L; {
-		put("category", new ArrayList<String>( Arrays.asList("cat")));
-		put("deadline", new ArrayList<String>( Arrays.asList("by", "dea")));
-		put("delete", new ArrayList<String>( Arrays.asList("del")));
-        put("description", new ArrayList<String>( Arrays.asList("des")));
-        put("event", new ArrayList<String>( Arrays.asList("from"))); 
-        put("every", new ArrayList<String>( Arrays.asList("recur"))); 
-        put("filepath", new ArrayList<String>( Arrays.asList("fp")));
-        put("priority", new ArrayList<String>( Arrays.asList("pri")));
-        put("reminder", new ArrayList<String>( Arrays.asList("rem")));
+		put(COMMAND_DEADLINE, new ArrayList<String>( Arrays.asList("by", "dea")));
+		put(COMMAND_DELETE, new ArrayList<String>( Arrays.asList("del")));
+        put(COMMAND_DESCRIPTION, new ArrayList<String>( Arrays.asList("des")));
+        put(COMMAND_EVENT, new ArrayList<String>( Arrays.asList("from"))); 
+        put(COMMAND_RECUR, new ArrayList<String>( Arrays.asList("recur"))); 
+        put(COMMAND_FILEPATH, new ArrayList<String>( Arrays.asList("fp")));
+        put(COMMAND_PRIORITY, new ArrayList<String>( Arrays.asList("pri")));
+        put(COMMAND_REMINDER, new ArrayList<String>( Arrays.asList("rem")));
     }};
-	
+    
+	private final String TASKTYPE_TODO = "todo";
+	private final String TASKTYPE_EVENT = "event";
+	private final String TASKTYPE_FLOATING = "floating";
+	private final String TASKTYPE_OVERDUE = "overdue";
+	private final String TASKTYPE_TODAY = "today";
+	private final String TASKTYPE_DONE = "done";
+    
+	public void printCmd(){
+		for (String s: FIELDS_CAN_RESET){
+			//System.out.println("private final String FIELD_" + s.toUpperCase() + " = \"" + s + "\";");
+			System.out.print("FIELD_" + s.toUpperCase() + ", ");
+			//System.out.print("put(FIELD_" + s.toUpperCase() + ", \"\"); ");
+		}
+	}
+    
 	/**
 	 * This method marks the command as seen and stores it as the main command (if there isn't one) 
 	 */
 	void storeCommand(String token) {
-		String command = getContent("command");
+		String command = getContent(FIELD_RESULTTYPE);
 		seenCommands.add(token);
 	
 		if (command.isEmpty()) {
-			storeContent("command", token);
+			storeContent(FIELD_RESULTTYPE, token);
 		} else if (!isCommandThatNeedTaskOnly(command)) {
-			storeContent("command", "set");
+			storeContent(FIELD_RESULTTYPE, RESULTTYPE_SET);
 		}
 	}
 
@@ -86,10 +123,10 @@ public class ParserVault extends ParserSkeleton{
 			String lastCommand = getLast(seenCommands);
 			String field;
 			
-			if (getContent("task").isEmpty()) {
-				field = "task";
+			if (getContent(FIELD_TASK).isEmpty()) {
+				field = FIELD_TASK;
 			} else if (isCommandThatNeedTaskOnly(lastCommand)) {
-				field = "task";
+				field = FIELD_TASK;
 			} else {
 				field = lastCommand;
 			}
@@ -137,7 +174,7 @@ public class ParserVault extends ParserSkeleton{
 	
 	String getContentOfCommand(String lastCommandSeen) {
 		if (isCommandThatNeedTaskOnly(lastCommandSeen)) {
-			return getContent("task");
+			return getContent(FIELD_TASK);
 		} else {
 			return getContent(lastCommandSeen);
 		}
@@ -156,7 +193,7 @@ public class ParserVault extends ParserSkeleton{
 	}
 
 	ArrayList<String> makeCommandWithContentResult(String command, String content){
-		if (command.equals("search")) {
+		if (command.equals(COMMAND_SEARCH)) {
 			content = parseSearchContent(content);
 		}
 		return new ArrayList<String>( Arrays.asList( command, content ) );
@@ -165,13 +202,13 @@ public class ParserVault extends ParserSkeleton{
 	ArrayList<String> makeDominantResult(String firstWord, String secondWord, String content) {
 		String command = firstWord;
 		String index = secondWord;
-		if (command.equals("show")) {
+		if (command.equals(COMMAND_SHOW)) {
 			return makeShowResult(command, content);
 		}
-		if (command.equals("sort")) {
+		if (command.equals(COMMAND_SORT)) {
 			return makeSortResult(command, content);
 		}
-		if (command.equals("reset")) {
+		if (command.equals(COMMAND_RESET)) {
 			return makeResetResult(command, index, content);
 		}
 		if (isCommandThatNeedWords(command)) { //if first word is addcat or search
@@ -191,65 +228,65 @@ public class ParserVault extends ParserSkeleton{
 	 * This method creates a short result (for non one-shot commands)
 	 */
 	ArrayList<String> makeSingleFieldResult() {
-		String command = getContent("command");
-		String index = getContent("task");
-		String content = getContent(command);
+		String resultType = getContent(FIELD_RESULTTYPE);
+		String index = getContent(FIELD_TASK);
+		String content = getContent(resultType);
 		
-		if (command.equals("every")) {
-			return makeRecurringResult(command, index, content);
+		if (resultType.equals(FIELD_RECUR)) {
+			return makeRecurringResult(resultType, index, content);
 		} 	
-		if (command.equals("event")) {
-			return makeEventResult(command, index, content);
+		if (resultType.equals(FIELD_EVENT)) {
+			return makeEventResult(resultType, index, content);
 		}
 		
-		if (command.equals("deadline") || command.equals("reminder")) {
-			ArrayList<String> parseResult = makeDateResult(command, content);
+		if (resultType.equals(FIELD_DEADLINE) || resultType.equals(FIELD_REMINDER)) {
+			ArrayList<String> parseResult = makeDateResult(resultType, content);
 			if (isErrorStatus(parseResult)) {
 				return parseResult;
 			}
 			String parsedDate = getLast(parseResult);
 			content = parsedDate;
 		}
-		if (command.equals("priority") && isNotValidPriority(content)) {
+		if (resultType.equals(FIELD_PRIORITY) && isNotValidPriority(content)) {
 			return makeErrorResult("InvalidPriorityError", content);
 		}
-		return new ArrayList<String>( Arrays.asList(command, index, content) );
+		return new ArrayList<String>( Arrays.asList(resultType, index, content) );
 	}
 
 	/**
 	 * This method creates a long result (for one-shot commands)
 	 */
 	ArrayList<String> makeMultiFieldResult() {
-		String command = getContent("command");
-		String index = getContent("task");
-		String deadline = getContent("deadline");
-		String event = getContent("event");
-		String reminder = getContent("reminder");
-		String priority = getContent("priority");
-		String recur = getContent("every");
-		if (command.equals("add")) {
-			fields.remove("rename");
+		String resultType = getContent(FIELD_RESULTTYPE);
+		String index = getContent(FIELD_TASK);
+		String deadline = getContent(FIELD_DEADLINE);
+		String event = getContent(FIELD_EVENT);
+		String reminder = getContent(FIELD_REMINDER);
+		String priority = getContent(FIELD_PRIORITY);
+		String recur = getContent(FIELD_RECUR);
+		if (resultType.equals(RESULTTYPE_ADD)) {
+			fields.remove(FIELD_RENAME);
 		}
 		
 		if (!priority.isEmpty() && isNotValidPriority(priority)) {
 			return makeErrorResult("InvalidPriorityError", priority);
 		}
 		if (!reminder.isEmpty()) {
-			ArrayList<String> parseResult = makeDateResult("reminder", reminder);
+			ArrayList<String> parseResult = makeDateResult(COMMAND_REMINDER, reminder);
 			if (isErrorStatus(parseResult)) {
 				return makeErrorResult("InvalidDateError", reminder);
 			}
 		}
 		if (!recur.isEmpty()) {
-			if (deadline.isEmpty() && event.isEmpty() && command.equals("add")) {
+			if (deadline.isEmpty() && event.isEmpty() && resultType.equals(RESULTTYPE_ADD)) {
 				return makeErrorResult("NoDateForRecurrenceError", recur);
 			}
-			ArrayList<String> parsedResult = makeRecurringResult(command, index, recur);
+			ArrayList<String> parsedResult = makeRecurringResult(resultType, index, recur);
 			if (isErrorStatus(parsedResult)) {
 				return parsedResult;
 			} else {
 				recur = getLast(parsedResult);
-				storeContent("every", recur);
+				storeContent(COMMAND_RECUR, recur);
 			}
 		}
 		if (!deadline.isEmpty() && !event.isEmpty()){
@@ -257,17 +294,17 @@ public class ParserVault extends ParserSkeleton{
 		}
 		
 		if (!deadline.isEmpty()) {
-			return makeMultiFieldResultWithDeadline(command, deadline);
+			return makeMultiFieldResultWithDeadline(resultType, deadline);
 		} else if (!event.isEmpty()) {
-			return makeMultiFieldResultWithEventDate(command, index, event);
+			return makeMultiFieldResultWithEventDate(resultType, index, event);
 		} else {
-			if (command.equals("add")) {
-				command += "F";
-				storeContent("command", command);
+			if (resultType.equals(RESULTTYPE_ADD)) {
+				resultType += "F";
+				storeContent(FIELD_RESULTTYPE, resultType);
 			}
-			fields.remove("deadline");
-			fields.remove("eventStart");
-			fields.remove("eventEnd");
+			fields.remove(FIELD_DEADLINE);
+			fields.remove(FIELD_EVENTSTART);
+			fields.remove(FIELD_EVENTEND);
 			return putFieldContentInResult();
 		}
 	}
@@ -279,8 +316,8 @@ public class ParserVault extends ParserSkeleton{
 	private ArrayList<String> putFieldContentInResult() {
 		ArrayList<String> result = new ArrayList<String>();
 		for (String field: fields) {
-			String para = getContent(field);
-			result.add(para);
+			String content = getContent(field);
+			result.add(content);
 		}
 		return result;
 	}
@@ -356,9 +393,9 @@ public class ParserVault extends ParserSkeleton{
 			return dateValidity;
 		}
 		if (dateParser.hasNoTime(date)) {
-			if (command.equals("deadline")) {
+			if (command.equals(COMMAND_DEADLINE)) {
 				date += " 23:59";
-			} else if (command.equals("reminder")){
+			} else if (command.equals(COMMAND_REMINDER)){
 				date += " 9am";
 			}
 		}
@@ -388,53 +425,40 @@ public class ParserVault extends ParserSkeleton{
 	private ArrayList<String> makeRecurringResult(String command, String name, String content){
 		String interval = "";
 		String freq = "";
-		String[] fieldTokens = content.split(" ");
 		if (isNumber(getFirst(content))) {
 			interval = getFirst(content);
 			freq = getSecond(content);
-			content = mergeTokens(fieldTokens, 2, fieldTokens.length);
 		} else {
 			interval = "1";
-			/*if (dateParser.isDayOfWeek(getFirst(content))) {
-				freq = "week";
-			} else {
-				freq = getFirst(content);
-				content = mergeTokens(fieldTokens, 1, fieldTokens.length);
-			}*/
 			freq = getFirst(content);
-			content = mergeTokens(fieldTokens, 1, fieldTokens.length);
 		}
 
 		if (isNotValidFrequency(freq)) {
 			return makeErrorResult("InvalidFrequencyError", freq);
 		}
 		freq = convertToDefaultFrequency(freq);
-		/*if (freq.equals("month")) {
-			int day = convertStringToInt(dayOfMonth);
-			String date = dateParser.getNextNearestDate(day);
-		}*/
 		return new ArrayList<String> ( Arrays.asList(command, name, interval + " " + freq) );
 	}
 
-	private ArrayList<String> makeMultiFieldResultWithDeadline(String command, String deadline) {
-		command += "T";
-		storeContent("command", command);
-		fields.remove("eventStart");
-		fields.remove("eventEnd");
+	private ArrayList<String> makeMultiFieldResultWithDeadline(String resultType, String deadline) {
+		resultType += "T";
+		storeContent(FIELD_RESULTTYPE, resultType);
+		fields.remove(FIELD_EVENTSTART);
+		fields.remove(FIELD_EVENTEND);
 		
-		ArrayList<String> parseResult = makeDateResult("deadline", deadline);
+		ArrayList<String> parseResult = makeDateResult(COMMAND_DEADLINE, deadline);
 		if (isErrorStatus(parseResult)) {
 			return parseResult;
 		}
 		return putFieldContentInResult();
 	}
 
-	private ArrayList<String> makeMultiFieldResultWithEventDate(String command, String index, String event) {
-		command += "E";
-		storeContent("command", command);
-		fields.remove("deadline");
+	private ArrayList<String> makeMultiFieldResultWithEventDate(String resultType, String index, String event) {
+		resultType += "E";
+		storeContent(FIELD_RESULTTYPE, resultType);
+		fields.remove(COMMAND_DEADLINE);
 		
-		ArrayList<String> parseResult = makeEventResult("event", index, event);
+		ArrayList<String> parseResult = makeEventResult(COMMAND_EVENT, index, event);
 		if (isErrorStatus(parseResult)) {
 			return parseResult;
 		}
@@ -472,7 +496,7 @@ public class ParserVault extends ParserSkeleton{
 	}
 
 	private boolean isCommandThatCanBeReset(String token) {
-		return COMMANDS_CAN_RESET.contains(token);
+		return FIELDS_CAN_RESET.contains(token);
 	}
 
 	private boolean isCommandThatNeedTaskOnly(String token){
@@ -504,50 +528,36 @@ public class ParserVault extends ParserSkeleton{
 		}
 		return freq;
 	}
-
-	/*private boolean isNotValidDayOfMonth(String token){
-		int maxDayOfMonth = 31;
-		if (isNumber(token)){
-			if (Integer.parseInt(token) <= maxDayOfMonth) {
-				return false;
-			}
-		}
-		return true;
-	}*/
-
+	
 	private String getTaskType(String token){
+		if (token.endsWith("s")) {
+			token = token.substring(0, token.length()-1);
+		}
 		switch (token.toLowerCase()) {
-		case "todo": 
-		case "todos":
-		case "t":
-			return "T";
-		case "event":
-		case "events":
-		case "e":
-			return "E";
-		case "floating":
-		case "floatings":
-		case "f":
-			return "F";
-		case "overdue":
-		case "o":
-			return "O";
-		case "today":
-			return "Today";
-		case "done":
-			return "Done";
-		default:
-			return "error";
+			case TASKTYPE_TODO: 
+				return "T";
+			case TASKTYPE_EVENT:
+				return "E";
+			case TASKTYPE_FLOATING:
+				return "F";
+			case TASKTYPE_OVERDUE:
+				return "O";
+			case TASKTYPE_TODAY:
+				return "Today";
+			case TASKTYPE_DONE:
+				return "Done";
+			default:
+				return RESULTTYPE_ERROR;
 		}
 	}
 
 	private String getSortField(String token){
 		switch (token.toLowerCase()) {
-		case "deadline":
+		case COMMAND_DEADLINE:
 		case "by deadline":
 		case "d":
 			return "D";
-		case "priority":
+		case COMMAND_PRIORITY:
 		case "by priority":
 		case "p":
 			return "P";
@@ -567,10 +577,10 @@ public class ParserVault extends ParserSkeleton{
 		return token;
 	}
 	
-	@Override
+	//@Override
 	ArrayList<String> makeErrorResult(String error, String token) {
 		ArrayList<String> result = new ArrayList<String>(); 
-		result.add("error");
+		result.add(RESULTTYPE_ERROR);
 		
 		switch (error) {
 			case "InvalidIndexError":
@@ -593,9 +603,6 @@ public class ParserVault extends ParserSkeleton{
 				break;
 			case "InvalidFrequencyError":
 				result.add(error + ": Please enter 'day'/'week'/'month'/'year' after 'every' to indicate the frequency");
-				break;
-			case "InvalidDayOfMonthError":
-				result.add(error + ": '" + token + "' is not between 1 to 31");
 				break;
 			case "InvalidTaskTypeError":
 				result.add(error + ": '" + token + "' is not 'todo', 'event' or 'floating'");

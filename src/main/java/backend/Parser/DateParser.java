@@ -108,12 +108,7 @@ public class DateParser extends ParserSkeleton{
 		return new ArrayList<String>( Arrays.asList("OK", eventEnd));
 	}
 
-	String convertToRecurFormat(String freq, String dateString) {
-		/*SimpleDateFormat standardFormat = new SimpleDateFormat("EEE, dd MMM yy, hh:mma");
-		SimpleDateFormat recurDayFormat = new SimpleDateFormat("hh:mma");
-		SimpleDateFormat recurWeekFormat = new SimpleDateFormat("EEE hh:mma");
-		SimpleDateFormat recurYearFormat = new SimpleDateFormat("dd MMM");*/
-		
+	/*String convertToRecurFormat(String freq, String dateString) {
 		switch (freq.toLowerCase()) {
 			case "day":
 			case "days":
@@ -140,7 +135,7 @@ public class DateParser extends ParserSkeleton{
 		}
 		
 		return dateString;
-	}
+	}*/
 
 	ArrayList<String> isInvalidDate(String dateString){
 		if (dateString.isEmpty()) {
@@ -432,9 +427,11 @@ public class DateParser extends ParserSkeleton{
 			if (isNumber(token)) {
 				if (day.isEmpty()) {
 					day = token;
-				} else if (token.length() != 4 && !getNext(dateTokens, i).toLowerCase().equals("am") 
+				} else if (token.length() != 4 && i != dateTokens.length-1 
+						&& !getNext(dateTokens, i).toLowerCase().equals("am") 
 						&& !getNext(dateTokens, i).toLowerCase().equals("pm")){
 					dateTokens[i] = "20" + token;
+					break;
 				}
 			}
 		}
@@ -451,10 +448,10 @@ public class DateParser extends ParserSkeleton{
 			if (year < currYear || year >= currYear + 5) {
 				date = setToCurrentYear(date);
 			}
-			
 			if (year <= currYear) {
-				String dayMonth = getDayAndMonth(date);
-				if (isInThePast(dayMonth)) {
+				//String dayMonth = getDayAndMonth(date);
+				//if (isInThePast(dayMonth)) {
+				if (isInThePast(date)) {
 					date = plusOneYear(date);
 				}
 			}
@@ -559,23 +556,23 @@ public class DateParser extends ParserSkeleton{
 		return removeMinuteIfZero(standardizeDateFormat(date.toString()));
 	}
 	
-	private String minusOneYear(String dateString) {
+	/*private String minusOneYear(String dateString) {
 		Date date = convertStandardDateString(dateString);
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
 		c.add(Calendar.YEAR, -1);
 		date = c.getTime();
 		return removeMinuteIfZero(standardizeDateFormat(date.toString()));
-	}
+	}*/
 	
-	private String minusOneWeek(String dateString) {
+	/*private String minusOneWeek(String dateString) {
 		Date date = convertStandardDateString(dateString);
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
 		c.add(Calendar.WEEK_OF_MONTH, -1);
 		date = c.getTime();
 		return removeMinuteIfZero(standardizeDateFormat(date.toString()));
-	}
+	}*/
 
 	private String setToCurrentYear(String dateString) {
 		String currYear = Integer.toString(getCurrentYear());
@@ -761,6 +758,9 @@ public class DateParser extends ParserSkeleton{
 			date = convertStandardDateString(dateString);
 		
 		Date now = getCurrentDate();
+		//System.out.println(now.toString());
+		//System.out.println(date.toString());
+		//System.out.println(now.after(date));
 		return now.after(date);
 	}
 
@@ -1008,17 +1008,11 @@ public class DateParser extends ParserSkeleton{
 			return getFirst(timeString.split(sym));
 		}
 		if (isAM(timeString)) {
-			String hour = getFirst(timeString.split("am"));
-			if (hour.equals(timeString)) {
-				hour = getFirst(timeString.split("AM"));
-			}
+			String hour = getFirst(timeString.toLowerCase().split("am"));
 			return removeEndSpacesOrBrackets(hour);
 		}
 		if (isPM(timeString)) {
-			String hour = getFirst(timeString.split("pm"));
-			if (hour.equals(timeString)) {
-				hour = getFirst(timeString.split("PM"));
-			}
+			String hour = getFirst(timeString.toLowerCase().split("pm"));
 			return removeEndSpacesOrBrackets(hour);
 		}
 		return timeString;
@@ -1028,7 +1022,7 @@ public class DateParser extends ParserSkeleton{
 		return !hasMinute(parsedTime) && (hasMinute(timeString) && !timeString.endsWith("00"));
 	}
 
-	@Override
+	//@Override
 	ArrayList<String> makeErrorResult(String error, String token) {
 		ArrayList<String> result = new ArrayList<String>(); 
 		result.add("error");

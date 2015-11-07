@@ -10,11 +10,15 @@ import java.util.Arrays;
  */
 public class Parser extends ParserSkeleton{
 	
-	private ParserVault parserVault = new ParserVault();
-    
+	ParserVault parserVault = new ParserVault();
+	
+	enum ERROR {
+		INVALID_WORD, INVALID_COMMAND, NO_COMMAND, DUPLICATE_COMMAND, EMPTY_FIELD;
+	};
+	
 	//Command that allow more than one field to be set at the same time
-	private final ArrayList<String> COMMANDS_ALLOW_MULTIPLE_FIELDS = new ArrayList<String>( 
-	Arrays.asList("add", "set") );
+	private final ArrayList<String> MULTIFIELD_RESULT_TYPE = new ArrayList<String>( 
+	Arrays.asList(RESULTTYPE_ADD, RESULTTYPE_SET) );
 	
 	//Tokens are 'merged' into a growingToken until they are stored into field content
 	private String growingToken = "";
@@ -45,10 +49,10 @@ public class Parser extends ParserSkeleton{
 			return parserVault.makeCommandOnlyResult(firstWord);
 		}
 		if (isCommandButHasNoContent(firstWord, inputWordCount)) {
-			return makeErrorResult("EmptyFieldError", firstWord);
+			return makeErrorResult(ERROR.EMPTY_FIELD, firstWord);
 		}
 		if (isNotCommandOrIndex(firstWord)) {
-			return makeErrorResult("InvalidWordError", firstWordOriginal);
+			return makeErrorResult(ERROR.INVALID_WORD, firstWordOriginal);
 		} 
 		if (isDominatingCommand(firstWord)) {
 			String content = mergeTokens(inputTokens, 1, inputTokens.length);
@@ -66,9 +70,9 @@ public class Parser extends ParserSkeleton{
 		}
 		if (isNumber(firstWord)) {
 			if (secondWord.isEmpty()) {
-				return makeErrorResult("NoCommandError", firstWord);
+				return makeErrorResult(ERROR.NO_COMMAND, firstWord);
 			} else if (isNotCommand(secondWord)) {
-				return makeErrorResult("InvalidCommandError", secondWordOriginal);
+				return makeErrorResult(ERROR.INVALID_COMMAND, secondWordOriginal);
 			}
 		}
 		return new ArrayList<String>( Arrays.asList( "incomplete" ));
@@ -115,18 +119,19 @@ public class Parser extends ParserSkeleton{
 			if (isLastWord(count, total) && isCommandThatNeedWords(lastCommandSeen)) {
 				growToken(originalToken);
 			} else if (isLastWord(count, total) && !isCommandButRepressed(token)){
-				return makeErrorResult("EmptyFieldError", originalToken);
+				return makeErrorResult(ERROR.EMPTY_FIELD, originalToken);
 			} else if (parserVault.isSeenCommand(token)) {
 				if (isCommandThatNeedWords(lastCommandSeen)) {
 					growingToken = parserVault.storeToken(originalToken);
 				} else {
-					return makeErrorResult("DuplicateCommandError", originalToken);
+					return makeErrorResult(ERROR.DUPLICATE_COMMAND, originalToken);
 				}
 			} else {
 				if (!lastCommandSeen.isEmpty()) {
 					String contentOfLastCommand = parserVault.getContentOfCommand(lastCommandSeen);
 					if (contentOfLastCommand.isEmpty()) {
-						return makeErrorResult("EmptyFieldError", lastCommandSeen);
+						System.out.println("hi");
+						return makeErrorResult(ERROR.EMPTY_FIELD, lastCommandSeen);
 					}
 				}
 				parserVault.storeCommand(token);
@@ -194,33 +199,34 @@ public class Parser extends ParserSkeleton{
 	}
 	
 	private boolean canHaveMultipleFields(String token) {
-		return COMMANDS_ALLOW_MULTIPLE_FIELDS.contains(token);
+		return MULTIFIELD_RESULT_TYPE.contains(token);
 	}
 	
-	@Override
-	ArrayList<String> makeErrorResult(String error, String token) {
+	//@Override
+	ArrayList<String> makeErrorResult(ERROR error, String token) {
 		ArrayList<String> result = new ArrayList<String>(); 
 		result.add("error");
 		
 		switch (error) {
-			case "InvalidWordError":
-				result.add(error + ": '" + token + "' is not recognised as a command or index");
+			case INVALID_WORD:
+				result.add("InvalidWordError: '" + token + "' is not recognised as a command or index");
 				break;
-			case "InvalidCommandError":
-				result.add(error + ": '" + token + "' is not recognised as a command");
+			case INVALID_COMMAND:
+				result.add("InvalidCommandError: '" + token + "' is not recognised as a command");
 				break;
-			case "NoCommandError":
-				result.add(error + ": Please enter a command after the task index '" + token + "'");
+			case NO_COMMAND:
+				result.add("NoCommandError: Please enter a command after the task index '" + token + "'");
 				break;
-			case "DuplicateCommandError":
-				result.add(error + ": Duplicate command '" + token + "'");
+			case DUPLICATE_COMMAND:
+				result.add("DuplicateCommandError: Duplicate command '" + token + "'");
 				break;
-			case "EmptyFieldError":
-				result.add(error + ": Please enter content for the command '" + token + "'");
+			case EMPTY_FIELD:
+				result.add("EmptyFieldError: Please enter content for the command '" + token + "'");
 				break;
 			default:
 				break; 
 		}
+		System.out.println(result);
 		return result;
 	}
 }

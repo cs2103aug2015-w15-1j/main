@@ -283,7 +283,22 @@ public class ParserTest {
 	    
 	    input = "1 reset deadline";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("reset", "1", "deadline") );
+	    expected = new ArrayList<String>( Arrays.asList("reset", "1", "date") );
+	    executeTest();
+	    
+	    input = "1 reset event";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("reset", "1", "date") );
+	    executeTest();
+	    
+	    input = "1 reset DATE";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("reset", "1", "date") );
+	    executeTest();
+	    
+	    input = "1 reset priority";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("reset", "1", "priority") );
 	    executeTest();
 	    
 	    input = "1 reset pri";

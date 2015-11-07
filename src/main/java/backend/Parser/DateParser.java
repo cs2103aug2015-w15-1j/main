@@ -14,28 +14,24 @@ import java.util.HashMap;
  * @@author A0121795B
  */
 public class DateParser extends ParserSkeleton{
-
+	
+	//List of days in a week
+	private final ArrayList<String> DAYS_OF_WEEK = new ArrayList<String>( Arrays.asList(
+	"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday" ) );
+	
 	//List of months and their short-forms
 	private final ArrayList<String> MONTHS = new ArrayList<String>( Arrays.asList(
 	"january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december", 
 	"jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "oct", "nov", "dec") );
 	
-	//List of days in a week and their short-forms
-	private final ArrayList<String> DAYS_OF_WEEK = new ArrayList<String>( Arrays.asList(
-	"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday" ) );
-	//"mon", "tue", "wed", "thu", "fri", "sat", "sun") );
-	
+	//Separate the months by the number of days
 	private final ArrayList<String> MONTHS_WITH_31_DAYS = new ArrayList<String>( Arrays.asList(
 	"january", "march", "may", "july", "august", "october", "december") );
-	//"jan", "mar", "jul", "aug", "oct", "dec"
-	//"1", "3", "5", "7", "8", "10", "12") );
-	
 	private final ArrayList<String> MONTHS_WITH_30_DAYS = new ArrayList<String>( Arrays.asList(
 	"april", "june", "september", "november") );
-	//"apr", "jun", "sep", "nov", "4", "6", "9", "11") );
-	
 	private final String FEBRUARY = "february";
 	
+	//Short-forms or numerical forms of the months
     private HashMap<String, ArrayList<String>> month_families = new HashMap<String, ArrayList<String>>(){
 		static final long serialVersionUID = 1L; {
 		put("january", new ArrayList<String>( Arrays.asList("jan", "1")));
@@ -52,7 +48,14 @@ public class DateParser extends ParserSkeleton{
         put("december", new ArrayList<String>( Arrays.asList("dec", "12")));
     }};
 	
+    //The 
 	private final com.joestelmach.natty.Parser NATTY = new com.joestelmach.natty.Parser();
+	
+	//Force Natty parser to be initialized on dateParser creation by running dateParser once
+	public void init() {
+    	String pi = "Mar 14 15 9.26pm";
+    	parseDate(pi);
+	}
 	
 	/**
 	 * This method checks that a date string is valid and parses it into the default date format 
@@ -365,7 +368,7 @@ public class DateParser extends ParserSkeleton{
 		try {
 			return Integer.parseInt(timeString); 
 		} catch (NumberFormatException e) {
-			System.out.println("TimeParsingError: problem converting time '" + timeString + "' to integer");
+			//System.out.println("TimeParsingError: problem converting time '" + timeString + "' to integer");
 			//e.printStackTrace();
 			return -1;
 		}

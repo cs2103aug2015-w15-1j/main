@@ -42,10 +42,6 @@ abstract class ParserSkeleton {
 	final String COMMAND_UNDO = "undo";
 	final String COMMAND_UNDONE = "undone";
 	
-	final String RESULTTYPE_ADD = "add";
-	final String RESULTTYPE_SET = "set";
-	final String RESULTTYPE_ERROR = "error";
-	
 	//List of all command words accepted by the program
 	final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList(
 	COMMAND_ADD, COMMAND_DEADLINE, COMMAND_DESCRIPTION, COMMAND_DELETE, COMMAND_DELETEALL, 
@@ -72,7 +68,23 @@ abstract class ParserSkeleton {
 	final ArrayList<String> COMMANDS_NOT_ONE_SHOT = new ArrayList<String>( 
 	Arrays.asList(COMMAND_DELETE, COMMAND_DONE, COMMAND_RESET, COMMAND_UNDONE) );	
 	
+	//The default times set by Parser if user never indicates the time
+	final String DEFAULT_DEADLINE = "11:59pm";
+	final String DEFAULT_STARTTIME = "9am";
+	final String DEFAULT_ENDTIME = "9pm";
+	
+	//The two result types that require a multi-field result
+	final String RESULTTYPE_ADD = "add";
+	final String RESULTTYPE_SET = "set";
+	
+	//Types of statuses that can be returned by a method
+	final String STATUS_ERROR = "error";
+	final String STATUS_INCOMPLETE = "incomplete";
+	final String STATUS_OKAY = "okay";
+	
+	//Special characters that are noted by Parser
 	final String SPACE_OF_ANY_LENGTH = " +";
+	final String QUOTATION_MARK = "\"";
 	
 	String getFirst(String[] array){
 		return array[0];
@@ -170,7 +182,6 @@ abstract class ParserSkeleton {
 			return Integer.parseInt(str);
 		} catch (Exception e) {
 			System.out.println("DateParsingError: problem converting string '" + str + "' to int");
-			//e.printStackTrace();
 			return -1;
 		}
 	}
@@ -202,10 +213,6 @@ abstract class ParserSkeleton {
 		return COMMANDS_NOT_ONE_SHOT.contains(token) || COMMANDS_NO_CONTENT.contains(token);
 	}
 
-	/**
-	 * This method merges all the tokens between the startIndex (including) and endIndex (excluding)
-	 * @return the merged tokens as a string
-	 */
 	String mergeTokens(String[] tokens, int startIndex, int endIndex) {
 		String merged = "";
 		for (int i = startIndex; i < endIndex; i++) {
@@ -215,9 +222,6 @@ abstract class ParserSkeleton {
 		return removeEndSpacesOrBrackets(merged);
 	}
 
-	/**
-	 * This method removes any spaces that are in front or at the back of the token
-	 */
 	String removeEndSpacesOrBrackets(String token) {
 		while (true){
 			if (token.startsWith(" ") || token.startsWith("[")) {
@@ -231,16 +235,12 @@ abstract class ParserSkeleton {
 		}
 	}
 	
-	/*boolean isSplitSuccessful(String token, String[] splitTokens) {
-		return splitTokens.length == 1 && !token.equals(getFirst(splitTokens));
-	}*/
-	
 	String getStatus(ArrayList<String> parseResult) {
 		return getFirst(parseResult);
 	}
 	
 	boolean isError(String content) {
-		return content.equals("error");
+		return content.equals(STATUS_ERROR);
 	}
 
 	boolean isErrorStatus(ArrayList<String> result) {
@@ -248,7 +248,7 @@ abstract class ParserSkeleton {
 	}
 
 	boolean isParsingCompleted(ArrayList<String> result) {
-		return !getStatus(result).equals("incomplete");
+		return !getStatus(result).equals(STATUS_INCOMPLETE);
 	}
 	
 	//abstract ArrayList<String> makeErrorResult(String error, String token);

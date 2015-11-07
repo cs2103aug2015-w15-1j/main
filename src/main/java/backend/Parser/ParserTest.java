@@ -467,6 +467,22 @@ public class ParserTest {
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("description", "1", "\"buy cat\" pet") );
 	    executeTest();
+	    
+	    //Ignore duplicate when user types 'recur every'
+	    input = "2 recur week";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("every", "2", "1 week") );
+	    executeTest();
+	    
+	    input = "2 recur every week";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("every", "2", "1 week") );
+	    executeTest();
+	    
+	    input = "2 recurring every 3 weeks";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("every", "2", "3 week") );
+	    executeTest();
 	}
 
 	@Test
@@ -994,6 +1010,17 @@ public class ParserTest {
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("event", "2", "Sat, 07 Nov 15, 5pm", "Sat, 07 Nov 15, 9pm") );
 	    printTest();
+	    
+	    //Make sure 'today' works for events
+	    input = "3 from today 10pm to today 11pm";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "3", getTodayDate() + " 15, 10pm", getTodayDate() + " 15, 11pm") );
+	    printTest();
+	    
+	    input = "3 from today 8am to today 10am";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "3", getTodayDate() + " 15, 8am", getTodayDate() + " 15, 10am") );
+	    printTest();
 	}
 	
 	@Test
@@ -1179,18 +1206,20 @@ public class ParserTest {
 	    //Parser should generate error when the content to show/sort/reset is invalid
 	    input = "show aaaaa";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidTaskTypeError: 'aaaaa' is not 'todo', 'event' or 'floating'") );
-	    printTest();
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidTaskTypeError: 'aaaaa' is not a valid task type "
+	    		+ "(please enter 'todo', 'event', 'floating', 'today', 'overdue' or 'complete')" ) );
+	    executeTest();
 	    
 	    input = "sort aaaaa";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidSortFieldError: 'aaaaa' is not 'deadline', 'name' or 'priority'") );
-	    printTest();
+	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidSortFieldError: 'aaaaa' is not a valid sort field "
+	    		+ "(please enter 'date', 'name' or 'priority')") );
+	    executeTest();
 	      
 	    input = "1 reset aaaaaaaaaa";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("error", "InvalidResetError: 'aaaaaaaaaa' is not a field that can be reset") );
-	    printTest();
+	    executeTest();
 	    
 	    //Test invalid time
 	    input = "4 from 20 Dec 2:60pm";
@@ -1266,7 +1295,7 @@ public class ParserTest {
 	    
 	    input = "add floating task every day";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("error", "NoDateForRecurrenceError: Cannot make task recur. Please set a deadline or start date for the task") );
+	    expected = new ArrayList<String>( Arrays.asList("error", "NoDateForRecurrenceError: Cannot make floating task recur. Please set a deadline or start date for the task") );
 	    executeTest();
 	}
 }

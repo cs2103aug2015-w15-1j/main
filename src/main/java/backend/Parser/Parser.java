@@ -12,17 +12,18 @@ public class Parser extends ParserSkeleton{
 	
 	ParserVault parserVault = new ParserVault();
 	
-	enum ERROR {
-		INVALID_WORD, INVALID_COMMAND, NO_COMMAND, DUPLICATE_COMMAND, EMPTY_FIELD;
-	};
+	//Tokens are 'merged' into a growingToken until they are stored into field content
+	private String growingToken = "";
 	
 	//Command that allow more than one field to be set at the same time
 	private final ArrayList<String> MULTIFIELD_RESULT_TYPE = new ArrayList<String>( 
 	Arrays.asList(RESULTTYPE_ADD, RESULTTYPE_SET) );
 	
-	//Tokens are 'merged' into a growingToken until they are stored into field content
-	private String growingToken = "";
-
+	//The errors that can be detected by Parser Class
+	enum ERROR {
+		INVALID_WORD, INVALID_COMMAND, NO_COMMAND, DUPLICATE_COMMAND, EMPTY_FIELD;
+	}
+	
 	/**
 	 * This method parses the user input and returns an ArrayList of string tokens
 	 */
@@ -39,9 +40,9 @@ public class Parser extends ParserSkeleton{
 	}
 	
 	private ArrayList<String> parseFirstTwoWords(String[] inputTokens) {
-		String firstWordOriginal = removeEndSpacesOrBrackets(getFirst(inputTokens));
+		String firstWordOriginal = getFirst(inputTokens);
 		String firstWord = parserVault.convertVariantToDefault(firstWordOriginal);
-		String secondWordOriginal = removeEndSpacesOrBrackets(getSecond(inputTokens));
+		String secondWordOriginal = getSecond(inputTokens);
 		String secondWord = parserVault.convertVariantToDefault(secondWordOriginal);
 		int inputWordCount = inputTokens.length;
 		if (isCommandThatNoNeedContent(firstWord)) {
@@ -74,7 +75,7 @@ public class Parser extends ParserSkeleton{
 				return makeErrorResult(ERROR.INVALID_COMMAND, secondWordOriginal);
 			}
 		}
-		return new ArrayList<String>( Arrays.asList( "incomplete" ));
+		return new ArrayList<String>( Arrays.asList(STATUS_INCOMPLETE));
 	}
 
 	private ArrayList<String> parseRemaining(String[] inputTokens) {
@@ -122,21 +123,20 @@ public class Parser extends ParserSkeleton{
 			} else if (parserVault.isSeenCommand(token)) {
 				if (isCommandThatNeedWords(lastCommandSeen)) {
 					growingToken = parserVault.storeToken(originalToken);
-				} else {
+				} else if (!token.equals(COMMAND_RECUR)){
 					return makeErrorResult(ERROR.DUPLICATE_COMMAND, originalToken);
 				}
 			} else {
 				if (!lastCommandSeen.isEmpty()) {
 					String contentOfLastCommand = parserVault.getContentOfCommand(lastCommandSeen);
 					if (contentOfLastCommand.isEmpty()) {
-						System.out.println("hi");
 						return makeErrorResult(ERROR.EMPTY_FIELD, lastCommandSeen);
 					}
 				}
 				parserVault.storeCommand(token);
 			}
 		}
-		return new ArrayList<String>( Arrays.asList( "OK" ));
+		return new ArrayList<String>( Arrays.asList(STATUS_OKAY));
 	}
 
 	private void growToken(String token) {
@@ -145,13 +145,13 @@ public class Parser extends ParserSkeleton{
 
 	private boolean checkForQuotes(boolean hasQuote, boolean quoteStart, String token, 
 			int count, String[] inputTokens) {
-		if (hasQuote && token.startsWith("\"")) {
+		if (hasQuote && token.startsWith(QUOTATION_MARK)) {
 			quoteStart = true;
 		}
 		
 		if (quoteStart == true) {
 			String previousToken = getPrevious(inputTokens, count);
-			if (previousToken.endsWith("\"")) {
+			if (previousToken.endsWith(QUOTATION_MARK)) {
 				quoteStart = false;
 			}
 		}
@@ -162,10 +162,10 @@ public class Parser extends ParserSkeleton{
 	private boolean hasQuotes(String[] inputTokens){
 		int quoteCommaCount = 0;
 		for (String token: inputTokens) {
-			if (token.startsWith("\"")) {
+			if (token.startsWith(QUOTATION_MARK)) {
 				quoteCommaCount++;
 			}
-			if (token.endsWith("\"")) {
+			if (token.endsWith(QUOTATION_MARK)) {
 				quoteCommaCount++;
 			}
 		}
@@ -225,7 +225,6 @@ public class Parser extends ParserSkeleton{
 			default:
 				break; 
 		}
-		System.out.println(result);
 		return result;
 	}
 }

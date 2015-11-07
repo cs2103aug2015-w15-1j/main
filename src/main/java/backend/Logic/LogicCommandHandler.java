@@ -133,7 +133,7 @@ public class LogicCommandHandler {
 	}
 	
 	private Command initFilePathCommand(ArrayList<String> parsedUserInput) {
-		Command filePathCommandObject = new FilePathCommand(Command.Type.FILEPATH,storageComponent);
+		Command filePathCommandObject = new FilePathCommand(Command.Type.FILEPATH, storageComponent);
 		filePathCommandObject.setFilePath(parsedUserInput.get(1));
 		return filePathCommandObject;
 	}
@@ -146,7 +146,7 @@ public class LogicCommandHandler {
 	}
 
 	private Command initViewCommand(ArrayList<String> parsedUserInput) {
-		ViewCommand viewCommandObject = new ViewCommand(Command.Type.VIEW,storageComponent);
+		ViewCommand viewCommandObject = new ViewCommand(Command.Type.VIEW, storageComponent);
 		viewCommandObject.setCommandField(parsedUserInput.get(0));
 		return viewCommandObject;
 	}
@@ -170,21 +170,21 @@ public class LogicCommandHandler {
 	}
 
 	private Command initSearchCommand(ArrayList<String> parsedUserInput) {
-		SearchCommand searchCommandObject = new SearchCommand(Command.Type.SEARCH,storageComponent);
+		SearchCommand searchCommandObject = new SearchCommand(Command.Type.SEARCH, storageComponent);
 		searchCommandObject.setCommandField(parsedUserInput.get(0));
 		searchCommandObject.setKeywords(parsedUserInput.get(1));
 		return searchCommandObject;
 	}
 
 	private Command initSortCommand(ArrayList<String> parsedUserInput) {
-		SortCommand sortCommandObject = new SortCommand(Command.Type.SORT,storageComponent);
+		SortCommand sortCommandObject = new SortCommand(Command.Type.SORT, storageComponent);
 		sortCommandObject.setSortField(parsedUserInput.get(0));
 		return sortCommandObject;
 	}
 
 	private Command initAddCommand(ArrayList<String> parsedUserInput) {
 		int inputLength = parsedUserInput.size();
-		AddCommand addCommandObject = new AddCommand(Command.Type.ADD,storageComponent,historySubComponent);
+		AddCommand addCommandObject = new AddCommand(Command.Type.ADD, storageComponent, historySubComponent);
 		addCommandObject.setCommandField(parsedUserInput.get(0));
 		addCommandObject.setTaskName(parsedUserInput.get(1));
 		addCommandObject.setDescription(parsedUserInput.get(2));
@@ -204,7 +204,7 @@ public class LogicCommandHandler {
 	}
 	
 	private Command initEditCommand(ArrayList<String> parsedUserInput) {
-		EditCommand editCommandObject = new EditCommand(Command.Type.EDIT,storageComponent,historySubComponent);
+		EditCommand editCommandObject = new EditCommand(Command.Type.EDIT, storageComponent, historySubComponent);
 		editCommandObject.setCommandField(parsedUserInput.get(0));
 		switch (parsedUserInput.get(0)) {
 			case ("set") :

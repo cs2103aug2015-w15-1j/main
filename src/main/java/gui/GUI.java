@@ -25,6 +25,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
@@ -83,6 +84,11 @@ public class GUI extends Application{
 	private final KeyCombination shiftDown= new KeyCodeCombination(KeyCode.DOWN, KeyCombination.SHIFT_DOWN);
 	private static final int COUNT_LIMIT = 10000;
 	
+	//necessary variables for one-instance check
+	private File file = new File("flag");
+    private RandomAccessFile randomAccessFile;
+    private FileLock fileLock;
+    
 	//necessary variables for nagivation purposes.
 	private static final int SCENE_MAIN = 1;
 	private static final int SCENE_FOCUS = 2;
@@ -134,9 +140,34 @@ public class GUI extends Application{
     }
 
 	@Override
-    public void init() throws Exception, FileNotFoundException, IOException, JSONException, ParseException{
+	public void init() throws Exception, FileNotFoundException, IOException, JSONException, ParseException{
+		file = new File("flag");
+		randomAccessFile = new RandomAccessFile(file, "rw");
+		fileLock = randomAccessFile.getChannel().tryLock();
+		//System.out.println(fileLock == null); //check whether file is locked.
+		if (fileLock == null) {
 
-        
+			Platform.runLater(new Runnable(){
+
+				@Override
+				public void run() {
+					Alert alert = new Alert(AlertType.WARNING);
+					alert.setTitle("WARNING!");
+					alert.setHeaderText(null);
+					alert.setContentText("TankTask is already opened in another window.");
+					alert.showAndWait().ifPresent(response -> {
+					     if (response == ButtonType.OK) {
+							Platform.exit();
+							System.exit(0);
+					     }
+					 });
+				}
+			});
+			Thread.sleep(3000);
+			Platform.exit();
+			System.exit(0);
+		}
+
 		controller = new GUIController();
 		for (int i = 0; i < COUNT_LIMIT; i++) {
             double progress = (100 * i) / COUNT_LIMIT;
@@ -162,14 +193,7 @@ public class GUI extends Application{
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		final File file = new File("flag");
-        final RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
-        final FileLock fileLock = randomAccessFile.getChannel().tryLock();
-       // System.out.println(fileLock == null); //check whether file is locked.
-        if (fileLock == null) {
-            Platform.exit();
-        }
-        
+		
 		primaryStage.setTitle("TankTask");
 		setUpDefault();
 		setupUserInput();
@@ -183,7 +207,7 @@ public class GUI extends Application{
 		
 		determineEvents();
 		reminders();
-		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+		stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 
             @Override
             public void handle(WindowEvent arg0) {
@@ -194,15 +218,15 @@ public class GUI extends Application{
                     fileLock.release();
                     randomAccessFile.close();
                     System.out.println("Closing");
+                    System.exit(0);
                 } catch (Exception ex) {
-                    System.out.print(ex.getMessage());
+                   ex.printStackTrace();
                 }
 
             }
-        });
-
-		
+        });	
 	}
+	
 	private void reminders(){
 		new Timer().schedule(
 			    new TimerTask() {
@@ -474,24 +498,6 @@ public class GUI extends Application{
 		ListView<TextFlow> listTask = new ListView<TextFlow>(tasks);
 		return listTask;
 	}
-	
-	//category no longer used. method is not needed.
-	/*private static ListView<TextFlow> getStringList(ArrayList<String> list){
-		assert list!=null;
-		ObservableList<TextFlow> tasks = FXCollections.observableArrayList();
-		for (int i=0;i<list.size();i++){
-			TextFlow flow = new TextFlow();
-			Text newlabel = new Text();
-			newlabel.setText(list.get(i));
-			flow.getChildren().add(newlabel);
-			flow.setMinWidth(1.0);
-			flow.setPrefWidth(1.0);
-			flow.setMaxWidth(10000.0);
-			tasks.add(flow);
-		}
-		ListView<TextFlow> listString = new ListView<TextFlow>(tasks);
-		return listString;
-	}*/
 
 	private static void displayStringToScreen(String getProcessedInput) {
 		System.out.println(getProcessedInput);
@@ -794,7 +800,7 @@ public class GUI extends Application{
 					setUpFocus();
 					refreshingFocus(currentList);
 					currentScene = SCENE_FOCUS;
-				} else if(display.equals(COMMAND_SHOW_FLOAT)||display.equals("showC")){
+				} else if(display.equals(COMMAND_SHOW_COMPLETE)||display.equals("showC")){
 					showCompleted();
 				} else if(display.equals(COMMAND_SEARCH)){
 					currentPosition = 0;
@@ -821,6 +827,7 @@ public class GUI extends Application{
 			isHelp = false;
 		}
 		Platform.exit();
+		System.exit(0);
 	}
 
 	private static void eventDown() throws IOException, JSONException, ParseException{
@@ -905,25 +912,6 @@ public class GUI extends Application{
 				GridPane.setConstraints(listFloat, 3, 1);
 				gridPane.getChildren().addAll(listFloat);
 			}
-			//toggle categories no longer in use.
-			/*
-			if (toggleFloat==false){
-				toggleFloat=true;
-				floating.setText("Categories:");
-				listCate = getStringList(controller.getCateList());
-				listCate.setFocusTraversable( false );
-				GridPane.setConstraints(listCate, 3, 1);
-				gridPane.getChildren().add(listCate);
-
-			} else{
-				toggleFloat = false;
-				floating.setText(LIST_FLOATING);
-				listFloat = convertList(controller.getFloatList());
-				listFloat.setFocusTraversable( false );
-				GridPane.setConstraints(listFloat, 3, 1);
-				gridPane.getChildren().add(listFloat);
-
-			}*/
 		}
 	}
 

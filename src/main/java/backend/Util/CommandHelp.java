@@ -108,7 +108,7 @@ public class CommandHelp {
 				+ "		\n			Example: 1 every year"
 				+ "\n"
 				+ "		\n	reset"
-				+ "		\n		Format: [Task Index] reset [Field (all/dea/event/des/pri/rem/cat)]"
+				+ "		\n		Format: [Task Index] reset [Field (all/dea/event/des/pri/rem)]"
 				+ "		\n			Example: 1 reset all"
 				+ "		\n			Example: 1 reset des"
 				+ "\n"
@@ -160,8 +160,8 @@ public class CommandHelp {
 				+ "\n"
 				+ "		\n	Set/Edit Information"
 				+ "		\n	Format [Task Index] [command1] [command1's content] [command 2] [command2's content]..."
-				+ "		\n	(Commands available are deadline/event, description, priority, reminder, category, rename)"
-				+ "		\n		Example: 1 pri 2 rem tomorrow 12pm cat hobbies des running out of fish food "
+				+ "		\n	(Commands available are deadline/event, description, priority, reminder, rename)"
+				+ "		\n		Example: 1 pri 2 rem tomorrow 12pm des running out of fish food "
 				+ "\n");
 		
 			fullList.add(add);
@@ -183,7 +183,7 @@ public class CommandHelp {
 		names.add("Search, Show, Sort");
 		names.add("Recurring, Reset, exit");
 		names.add("Rename task, Edit deadline & event dates");
-		names.add("Edit description & priority & reminders & category");
+		names.add("Edit description & priority & reminders");
 		names.add("Advance features: One Shot");
 		names.add("");
 	}

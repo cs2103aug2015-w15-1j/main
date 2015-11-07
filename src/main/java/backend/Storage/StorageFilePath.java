@@ -10,8 +10,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 
-import main.java.Main.Main;
-
 public class StorageFilePath {
 
 	private static final String ERROR_READ_DATA = "An error occured when retrieving data from config file.";

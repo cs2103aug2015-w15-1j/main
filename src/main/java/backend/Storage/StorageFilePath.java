@@ -130,7 +130,6 @@ public class StorageFilePath {
 		
 		System.out.println("FILEPATH: " + filePath);
 		if(filePath.contains(FRONTSLASH)) {
-			System.out.println("OHYEA: " + tokenizeFrontSlash[tokenizeFrontSlash.length - 1]);
 			return tokenizeFrontSlash[tokenizeFrontSlash.length - 1];
 		} else if(filePath.contains(BACKSLASH_1)) {
 			return tokenizeBackSlash[tokenizeBackSlash.length - 1];

@@ -2,7 +2,6 @@
 package main.java.backend.Logic;
 
 import java.util.ArrayList;
-import java.util.TreeMap;
 
 import main.java.backend.Storage.Task.Task;
 
@@ -25,21 +24,21 @@ public class Command {
 	private String endDateAndTime = "";
 	private String keywords = "";
 	private String newName = "";
+	private String errorMessage = "";
+	private String filePath = "";
 	private String resetField = "";
 
     // ================================================================
     // General set command methods
     // ================================================================
 	
-	public Command(Type typeInput) {
-		this.type = typeInput;
-	}
-	
-
 	public Command() {
 		
 	}
-
+	
+	public Command(Type typeInput) {
+		this.type = typeInput;
+	}
 
 	public void setCommandField(String commandInput) {
 		this.commandField = commandInput;
@@ -73,6 +72,22 @@ public class Command {
 		this.category = categoryInput;
 	}
 	
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+	
+	public void setKeywords(String keywordInput) {
+		this.keywords = keywordInput;
+	}
+	
+	public void setNewName(String name) {
+		this.newName = name;
+	}
+	
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
+	
     // ================================================================
     // Additional for events creation set command methods
     // ================================================================
@@ -88,9 +103,9 @@ public class Command {
     // ================================================================
     // Additional for tasks creation set command methods
     // ================================================================
-	
-	public void setKeywords(String keywordInput) {
-		this.keywords = keywordInput;
+
+	public void setResetField(String command) {
+		this.resetField = command;
 	}
 
 	public Type getType() {
@@ -141,11 +156,26 @@ public class Command {
 		return this.keywords;
 	}
 	
-	
 	public String getNewName() {
 		return this.newName;
 	}
+	
+	public String getResetField() {
+		return this.resetField;
+	}
 
+	public String getFilePath() {
+		return filePath;
+	}
+	
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+	
+	public ArrayList<Task> getSearchResults() {
+		return null;
+	}
+	
 	public String execute() {
 		return null;
 	}
@@ -157,46 +187,5 @@ public class Command {
 	public String redo() {
 		return null;
 	}
-
-
-	public void setNewName(String name) {
-		this.newName = name;
-		
-	}
 	
-	public void setErrorMessage(String string) {
-		// TODO Auto-generated method stub
-	}
-
-
-	public String getErrorMessage() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	public void setResetField(String command) {
-		this.resetField = command;
-	}
-	
-	public String getResetField() {
-		return this.resetField;
-	}
-
-
-	public ArrayList<Task> getSearchResults() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	public void setFilePath(String string) {
-		// TODO Auto-generated method stub
-	}
-
-
-	public String getFilePath() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

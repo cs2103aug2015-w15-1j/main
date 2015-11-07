@@ -8,9 +8,15 @@ import main.java.backend.Storage.Task.Task;
 
 public class SortCommand extends Command {
 	
+	private static final String EXECUTION_SORT_SUCCESSFUL = "All items sorted";
+	
+	private static final String SORT_NAME = "sortN";
+	private static final String SORT_PRIORITY = "sortP";
+	private static final String SORT_DATE = "sortD";
+	
 	private Storage storageComponent;
 	private String sortField = "";
-	ArrayList<Task> currentState;
+	private ArrayList<Task> currentState;
 
 	//@@author A0121284N
 	public SortCommand(Type typeInput, Storage storage) {
@@ -26,12 +32,9 @@ public class SortCommand extends Command {
 	
 	//@@author A0121284N
 	public String execute() {
-//		System.out.println("sortField: "+sortField);
-//		System.out.println("currentState+ "+currentState);
-		ArrayList<Task> sortedEvent = sort(sortField,currentState);
-//		System.out.println("sortedEvent "+sortedEvent);
+		ArrayList<Task> sortedEvent = sort(sortField, currentState);
 		storageComponent.save(sortedEvent);
-		return "All items sorted";
+		return EXECUTION_SORT_SUCCESSFUL;
 	}
 	
 	//@@author A0126258A
@@ -114,13 +117,13 @@ public class SortCommand extends Command {
 		ArrayList<Task> sortedTaskList = new ArrayList<Task> ();
 		
 		switch (field) {
-			case "sortN":
+			case SORT_NAME:
 				sortedTaskList = sortName(taskList);
 				break;
-			case "sortP":
+			case SORT_PRIORITY:
 				sortedTaskList = sortPriority(taskList);
 				break;
-			case "sortD":
+			case SORT_DATE:
 				sortedTaskList = sortDeadline(taskList);
 				break;
 		}

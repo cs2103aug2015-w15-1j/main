@@ -31,7 +31,7 @@ public class Task implements Comparable<Task> {
 	private String end;
 	private String reminder;
 
-	private TreeMap<String, SubTask> subTask;
+//	private TreeMap<String, SubTask> subTask;
 	
 	public Task () {
 		
@@ -61,7 +61,7 @@ public class Task implements Comparable<Task> {
 		this.start = start;
 		this.end = end;
 		this.reminder = reminder;
-		this.subTask = new TreeMap<String, SubTask> ();
+//		this.subTask = new TreeMap<String, SubTask> ();
 	}
 	
 	public TaskType getTaskType() {
@@ -168,13 +168,13 @@ public class Task implements Comparable<Task> {
 		this.end = end;
 	}
 	
-	public TreeMap<String, SubTask> getSubTask() {
-		return subTask;
-	}
-
-	public void setSubTask(TreeMap<String, SubTask> subTask) {
-		this.subTask = subTask;
-	}
+//	public TreeMap<String, SubTask> getSubTask() {
+//		return subTask;
+//	}
+//
+//	public void setSubTask(TreeMap<String, SubTask> subTask) {
+//		this.subTask = subTask;
+//	}
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

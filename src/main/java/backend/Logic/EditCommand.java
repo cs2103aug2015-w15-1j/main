@@ -13,7 +13,7 @@ import main.java.backend.Storage.Task.Task;
 import main.java.backend.Storage.Task.Task.TaskType;
 
 public class EditCommand extends Command {
-	
+
 	private static final String EXECUTION_SET_PRIORITY_SUCCESSFUL = "Task %1$s has been set to priority %2$s";
 	private static final String EXECUTION_SET_SUCCESSFUL = "Fields have been updated";
 	private static final String EXECUTION_DELETE_SUCCESSFUL = "Task %1$s has been deleted";
@@ -25,163 +25,197 @@ public class EditCommand extends Command {
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
 	private static final String EXECUTION_UNDONE_COMMAND_SUCCESSFUL = "Task %1$s is completed";
 	private static final String EXECUTION_DONE_COMMAND_SUCCESSFUL = "Task %1$s is not completed";
+	private static final String EXECUTION_RESET_SUCCESSFUL = "Field %1$s has been reset";
+	private static final String EXECUTION_RENAME_SUCCESSFUL = "Task %1$s has been renamed to %2$s";
+	private static final String EXECUTION_DELETE_ALL_SUCCESSFUL = "Everything has been deleted";
+	private static final String EXECUTION_REDO_SUCCESSFUL = "Redo successfully.";
+	private static final String EXECUTION_UNDO_SUCCESSFUL = "Undo successfully.";
 	
+	private static final String LOGGER_INIT_UNSUCCESSFUL = "Logger failed to initialise: ";
+	private static final String LOGGER_COMMAND_FIELD = "Get CommandField: ";
+
+	private static final String COMMAND_PRIORITY = "priority";
+	private static final String COMMAND_ONESHOT_TASK = "setT";
+	private static final String COMMAND_ONESHOT_EVENT = "setE";
+	private static final String COMMAND_ONESHOT_FLOAT = "set";
+	private static final String COMMAND_DELETE = "delete";
+	private static final String COMMAND_DELETE_ALL = "deleteAll";
+	private static final String COMMAND_UNDONE = "undone";
+	private static final String COMMAND_DONE = "done";
+	private static final String COMMAND_REMINDER = "reminder";
+	private static final String COMMAND_DESCRIPTION = "description";
+	private static final String COMMAND_EVENT = "event";
+	private static final String COMMAND_DEADLINE = "deadline";
+	private static final String COMMAND_EVERY = "every";
+	private static final String COMMAND_RENAME = "rename";
+	private static final String COMMAND_RESET = "reset";
+	private static final String COMMAND_DATE = "date";
+	private static final String COMMAND_ALL = "all";
+
 	private static final String RECURRING_DAY = "day";
 	private static final String RECURRING_WEEK = "week";
 	private static final String RECURRING_MONTH = "month";
 	private static final String RECURRING_YEAR = "year";
 	
+	private static final String RESET = "";
+
 	private static Logger logicEditorLogger = Logger.getGlobal();	
 	private FileHandler logHandler;
-	
+
 	private ArrayList<Task> taskList;
 	private ArrayList<Task> currentState;
 
 	private Storage storageComponent;
 	private History historySubComponent;
-	
+
 	//@@author A0121284N
 	public EditCommand(Type typeInput, Storage storage, History history) {
+
 		super(typeInput);
 		storageComponent = storage;
 		historySubComponent = history;
+		taskList = storageComponent.load();
 		initLogger();
 	}
-	
+
 	//@@author A0121284N
 	private void initLogger() {
-			
-			try {
-				logHandler = new FileHandler("TankTaskLog.txt",1000000000,10,true);
-				logHandler.setFormatter(new SimpleFormatter());
-				logicEditorLogger.addHandler(logHandler);
-				logicEditorLogger.setUseParentHandlers(false);
-				
-			} catch (SecurityException | IOException e) {
-				logicEditorLogger.warning("Logger failed to initialise: " + e.getMessage());
-			}
+
+		try {
+			logHandler = new FileHandler("TankTaskLog.txt",1000000000,10,true);
+			logHandler.setFormatter(new SimpleFormatter());
+			logicEditorLogger.addHandler(logHandler);
+			logicEditorLogger.setUseParentHandlers(false);
+
+		} catch (SecurityException | IOException e) {
+			logicEditorLogger.warning("Logger failed to initialise: " + e.getMessage());
 		}
-	
+	}
+
 	//@@author A0121284N
 	public String execute(){
-		String feedbackString = "";
-		logicEditorLogger.info("Get Command Field: "+this.getCommandField());
+
+		String feedbackString = RESET;
+		logicEditorLogger.info(LOGGER_COMMAND_FIELD + this.getCommandField());
+
 		switch(this.getCommandField()) {
-			case ("priority") :
+			case (COMMAND_PRIORITY) :
 				feedbackString = setPriority(this);
 				break;
-			case ("setT") :
-				feedbackString = setMultipleFieldsForTask(this);
+			case (COMMAND_ONESHOT_TASK) :
+				feedbackString = setMultipleFieldsForTodo(this);
 				break;
-			case ("setE") :
+			case (COMMAND_ONESHOT_EVENT) :
 				feedbackString = setMultipleFieldsForEvents(this);
 				break;
-			case ("set") :
+			case (COMMAND_ONESHOT_FLOAT) :
 				feedbackString = setMultipleFieldsForFloats(this);
 				break;
-			case ("delete") :
+			case (COMMAND_DELETE) :
 				feedbackString = delete(this);
 				break;
-			case ("deleteAll"):
+			case (COMMAND_DELETE_ALL):
 				feedbackString = deleteAll(this);
 				break;
-			case ("undone") :
+			case (COMMAND_UNDONE) :
 				feedbackString = setUndone(this);
 				break;
-			case ("done") :
+			case (COMMAND_DONE) :
 				feedbackString = setDone(this);
 				break;
-			case ("reminder") :
+			case (COMMAND_REMINDER) :
 				feedbackString = setReminder(this);
 				break;
-			case ("description") :
+			case (COMMAND_DESCRIPTION) :
 				feedbackString = setDescription(this);
 				break;
-			case ("event") :
+			case (COMMAND_EVENT) :
 				feedbackString = setEventStartAndEndTime(this);
 				break;
-			case ("deadline") :
+			case (COMMAND_DEADLINE) :
 				feedbackString = setDeadline(this);
 				break;
-			case ("every") :
+			case (COMMAND_EVERY) :
 				feedbackString = setRecurring(this);
 				break;	
-			case ("rename"):
+			case (COMMAND_RENAME):
 				feedbackString = rename(this);
 				break;
-			case ("reset"):
+			case (COMMAND_RESET):
 				feedbackString = reset(this);
+				break;
 		}
-		currentState = storageComponent.load();
+		
+		currentState = taskList;
 		historySubComponent.push(currentState);
 		logHandler.close();
+
 		return feedbackString;
 	}
-	
+
 	//@@author A0121284N
 	public String undo() {
+		
 		try {
 			ArrayList<Task> historyState = historySubComponent.undo();
 			storageComponent.save(historyState);
-			return "Undo successfully";
+			return EXECUTION_UNDO_SUCCESSFUL;
 		} catch (EmptyStackException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-	
+
 	//@@author A0121284N
 	public String redo() {
+		
 		try {
 			ArrayList<Task> futureState = historySubComponent.redo();
 			storageComponent.save(futureState);
-			return "Redo successfully";
+			return EXECUTION_REDO_SUCCESSFUL;
 		} catch (EmptyStackException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-	
-	//@@author A0126258A
-	private void setTaskId(ArrayList<Task> taskList) {
-		
-		Collections.sort(taskList);
-	
-		int newTaskId = 0;
-		
-		for(Task task : taskList) {
-			task.setTaskId(newTaskId);
-			newTaskId++;
-		}
-	}
-	
-	//@@author A0121284N
-	private String setMultipleFieldsForTask(Command commandObject) {
 
-		logicEditorLogger.info("taskId: "+commandObject.getTaskName());
+	//@@author A0121284N
+	private String setMultipleFieldsForFloats(Command commandObject) {
+
 		try {
 			int taskId = Integer.parseInt(commandObject.getTaskName());
 			logicEditorLogger.info("taskId: "+taskId);
-
-			if(!commandObject.getNewName().equals("")) {
-				logicEditorLogger.info("New Name: "+ commandObject.getNewName());
+			if(!commandObject.getNewName().isEmpty()) {
 				rename(commandObject);
 			}
-			if (!commandObject.getDescription().equals("")) {
+			if (!commandObject.getDescription().isEmpty()) {
 				logicEditorLogger.info("Description: "+ commandObject.getDescription());
 				setDescription(commandObject);
 			}
-			if (!commandObject.getPriority().equals("")) {
-				logicEditorLogger.info("Priority :"+commandObject.getPriority());
+			if (!commandObject.getPriority().isEmpty()) {
+				logicEditorLogger.info("priority :"+commandObject.getPriority());
 				setPriority(commandObject);
 			}
-			if (!commandObject.getReminder().equals("")) {
+			if (!commandObject.getReminder().isEmpty()) {
 				logicEditorLogger.info("reminder: "+commandObject.getReminder());
 				setReminder(commandObject);
 			}
-			if(!commandObject.getRecurrence().equals("")) {
+			return EXECUTION_SET_SUCCESSFUL;
+		} catch (NumberFormatException e) {
+			return EXECUTION_COMMAND_UNSUCCESSFUL;
+		}
+	}
+
+	//@@author A0121284N
+	private String setMultipleFieldsForTodo(Command commandObject) {
+
+		logicEditorLogger.info("taskId: "+commandObject.getTaskName());
+		try {
+			setMultipleFieldsForFloats(commandObject);
+			
+			if(!commandObject.getRecurrence().isEmpty()) {
 				logicEditorLogger.info("category: "+commandObject.getRecurrence());
 				setRecurring(commandObject);
 			}
-			if (!commandObject.getEndDateAndTime().equals("")) {
+			if (!commandObject.getEndDateAndTime().isEmpty()) {
 				setDeadline(commandObject);
 				logicEditorLogger.info("deadline :"+commandObject.getEndDateAndTime());
 			}
@@ -190,34 +224,19 @@ public class EditCommand extends Command {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-	
+
 	//@@author A0121284N
 	private String setMultipleFieldsForEvents(Command commandObject) {
 
 		try {
-			int taskId = Integer.parseInt(commandObject.getTaskName());
-			logicEditorLogger.info("taskId: "+taskId);
-			if(!commandObject.getNewName().equals("")) {
-				rename(commandObject);
-			}
-			if (!commandObject.getDescription().equals("")) {
-				logicEditorLogger.info("Description: "+ commandObject.getDescription());
-				setDescription(commandObject);
-			}
-			if (!commandObject.getPriority().equals("")) {
-				logicEditorLogger.info("priority :"+commandObject.getPriority());
-				setPriority(commandObject);
-			}
-			if (!commandObject.getReminder().equals("")) {
-				logicEditorLogger.info("reminder: "+commandObject.getReminder());
-				setReminder(commandObject);
-			}
-			if(!commandObject.getRecurrence().equals("")) {
+			setMultipleFieldsForFloats(commandObject);
+			
+			if(!commandObject.getRecurrence().isEmpty()) {
 				logicEditorLogger.info("category: "+commandObject.getRecurrence());
 				setRecurring(commandObject);
 			}
-			if (!commandObject.getStartDateAndTime().equals("") && 
-					!commandObject.getEndDateAndTime().equals("")) {
+			if (!commandObject.getStartDateAndTime().isEmpty() && 
+					!commandObject.getEndDateAndTime().isEmpty()) {
 				setEventStartAndEndTime(commandObject);
 			}
 			return EXECUTION_SET_SUCCESSFUL;
@@ -225,34 +244,7 @@ public class EditCommand extends Command {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-	
-	//@@author A0121284N
-	private String setMultipleFieldsForFloats(Command commandObject) {
 
-		try {
-			int taskId = Integer.parseInt(commandObject.getTaskName());
-			logicEditorLogger.info("taskId: "+taskId);
-			if(!commandObject.getNewName().equals("")) {
-				rename(commandObject);
-			}
-			if (!commandObject.getDescription().equals("")) {
-				logicEditorLogger.info("Description: "+ commandObject.getDescription());
-				setDescription(commandObject);
-			}
-			if (!commandObject.getPriority().equals("")) {
-				logicEditorLogger.info("priority :"+commandObject.getPriority());
-				setPriority(commandObject);
-			}
-			if (!commandObject.getReminder().equals("")) {
-				logicEditorLogger.info("reminder: "+commandObject.getReminder());
-				setReminder(commandObject);
-			}
-			return EXECUTION_SET_SUCCESSFUL;
-		} catch (NumberFormatException e) {
-			return EXECUTION_COMMAND_UNSUCCESSFUL;
-		}
-	}
-	
 	//@@author A0126258A
 	private Task.RecurrenceType getRecurrenceType(String recurrenceType) {
 
@@ -270,100 +262,110 @@ public class EditCommand extends Command {
 	}
 	
 	//@@author A0126258A
+	private void setTaskId(ArrayList<Task> taskList) {
+
+		Collections.sort(taskList);
+
+		int newTaskId = 0;
+
+		for(Task task : taskList) {
+			task.setTaskId(newTaskId);
+			newTaskId++;
+		}
+	}
+
+	//@@author A0126258A
 	private Task.TaskType getTaskType(Task task) {
-		
+
 		if(!task.getEnd().isEmpty()) {
 			return Task.TaskType.TODO;
 		} else {
 			return Task.TaskType.FLOATING;
 		}
 	}
-	
+
 	//@@author A0126258A
 	private int getTaskId(int taskIndex) {
-		
-		ArrayList<Task> taskList = storageComponent.load();
-		
+
 		int taskId = -1;
 		for(Task task : taskList) {
 			if(task.getIndex() == taskIndex) {
 				taskId = task.getTaskId();
 			}
 		}
-		
+
 		return taskId;
 	}
 	
+
+	//@@author A0121284N
+	private String reset(Command commandObject) {
+		
+		int taskIndex = Integer.parseInt(commandObject.getTaskName());
+		int taskId = getTaskId(taskIndex);
+		String resetField = commandObject.getResetField();
+		
+		switch(resetField) {
+			case COMMAND_PRIORITY :
+				taskList.get(taskId).setPriority(0);
+				break;
+			case COMMAND_DESCRIPTION :
+				taskList.get(taskId).setDescription(RESET);
+				break;
+			case COMMAND_REMINDER :
+				taskList.get(taskId).setReminder(RESET);
+				break;
+			case COMMAND_DATE :
+				taskList.get(taskId).setTaskType(TaskType.FLOATING);
+				taskList.get(taskId).setStart(RESET);
+				taskList.get(taskId).setEnd(RESET);
+				break;
+			case COMMAND_ALL :
+				taskList.get(taskId).setTaskType(TaskType.FLOATING);
+				taskList.get(taskId).setStart(RESET);
+				taskList.get(taskId).setEnd(RESET);
+				taskList.get(taskId).setPriority(0);
+				taskList.get(taskId).setDescription(RESET);
+				taskList.get(taskId).setReminder(RESET);
+				break;
+		}
+		
+		storageComponent.save(taskList);
+		return String.format(EXECUTION_RESET_SUCCESSFUL, resetField);
+	}
+
 	//@@author A0121284N
 	private String delete(Command commandObject) {
+		
 		try{
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			int taskId = getTaskId(taskIndex);
 
-			taskList = storageComponent.load();
-			Task toBeRemoved = taskList.remove(taskId);
+			taskList.remove(taskId);
 			setTaskId(taskList);
 			storageComponent.save(taskList);
-			if(toBeRemoved != null) {
-				return String.format(EXECUTION_DELETE_SUCCESSFUL, taskIndex);
-			} else {
-				return EXECUTION_COMMAND_UNSUCCESSFUL;
-			}
+			
+			return String.format(EXECUTION_DELETE_SUCCESSFUL, taskIndex);
 		} catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-	
-	//@@author A0121284N
-	private String reset(Command commandObject) {
-		taskList = storageComponent.load();
-		int taskIndex = Integer.parseInt(commandObject.getTaskName());
-		int taskId = getTaskId(taskIndex);
-		String resetField = commandObject.getResetField();
-//		System.out.println(resetField);
-		switch(resetField) {
-			case "priority" :
-				taskList.get(taskId).setPriority(0);
-				break;
-			case "description" :
-				taskList.get(taskId).setDescription("");
-				break;
-			case "reminder" :
-				taskList.get(taskId).setReminder("");
-				break;
-			case "date" :
-				taskList.get(taskId).setTaskType(TaskType.FLOATING);
-				taskList.get(taskId).setStart("");
-				taskList.get(taskId).setEnd("");
-				break;
-			case "all" :
-				taskList.get(taskId).setTaskType(TaskType.FLOATING);
-				taskList.get(taskId).setStart("");
-				taskList.get(taskId).setEnd("");
-				taskList.get(taskId).setPriority(0);
-				taskList.get(taskId).setDescription("");
-				taskList.get(taskId).setReminder("");
-				break;
-		}
-		storageComponent.save(taskList);
-		return String.format("Field %1$s has been reset", resetField);
-	}
-	
+
 	//@@author A0121284N
 	private String deleteAll(EditCommand editCommand) {
-		taskList = storageComponent.load();
+		
 		storageComponent.save(null);
-		return "Everything has been deleted";
+		return EXECUTION_DELETE_ALL_SUCCESSFUL;
 	}
 
 	//@@author A0121284N
 	private String setPriority(Command commandObject){
+		
 		try {
-			taskList = storageComponent.load();
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			int priority = Integer.parseInt(commandObject.getPriority());
 			int taskId = getTaskId(taskIndex);
-			
+
 			taskList.get(taskId).setPriority(priority);
 			storageComponent.save(taskList);	
 
@@ -372,25 +374,27 @@ public class EditCommand extends Command {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-	
+
 	//@@author A0121284N
 	private String rename(Command commandObject) {
-		taskList = storageComponent.load();
+		
+		String newName = commandObject.getNewName();
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
 		int taskId = getTaskId(taskIndex);
-		String newName = commandObject.getNewName();
+		
 		taskList.get(taskId).setName(newName);
 		storageComponent.save(taskList);
-		return String.format("Task %1$s has been renamed to %2$s", taskIndex, newName);
+		
+		return String.format(EXECUTION_RENAME_SUCCESSFUL, taskIndex, newName);
 	}
 
 	//@@author A0121284N
 	private String setUndone(Command commandObject) {
+		
 		try {
-			taskList = storageComponent.load();
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			int taskId = getTaskId(taskIndex);
-			
+
 			taskList.get(taskId).setDone(false);
 			storageComponent.save(taskList);
 
@@ -399,14 +403,14 @@ public class EditCommand extends Command {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-	
+
 	//@@author A0121284N
 	private String setDone(Command commandObject) {
+		
 		try {
-			taskList = storageComponent.load();
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			int taskId = getTaskId(taskIndex);
-			
+
 			taskList.get(taskId).setDone(true);
 			taskList.get(taskId).setIndex(-1);
 			storageComponent.save(taskList);
@@ -416,30 +420,32 @@ public class EditCommand extends Command {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-	
+
 	//@@author A0121284N
 	private String setReminder(Command commandObject) {
+		
 		try {
-			taskList = storageComponent.load();
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			String reminder = commandObject.getReminder();
 			int taskId = getTaskId(taskIndex);
+			
 			taskList.get(taskId).setReminder(reminder);
 			storageComponent.save(taskList);
 
-			return String.format(EXECUTION_SET_REMINDER_SUCCESSFUL,taskIndex,reminder);
+			return String.format(EXECUTION_SET_REMINDER_SUCCESSFUL, taskIndex, reminder);
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-	
+
 	//@@author A0121284N
 	private String setDescription(Command commandObject) {
+		
 		try {
-			taskList = storageComponent.load();
-			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			String description = commandObject.getDescription();
+			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			int taskId = getTaskId(taskIndex);
+			
 			taskList.get(taskId).setDescription(description);
 			storageComponent.save(taskList);
 
@@ -448,72 +454,69 @@ public class EditCommand extends Command {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-	
+
 	//@@author A0121284N
 	private String setEventStartAndEndTime(Command commandObject) {
+		
 		try {
-			taskList = storageComponent.load();
-			int eventIndex = Integer.parseInt(commandObject.getTaskName());
 			String start = commandObject.getStartDateAndTime();
 			String end = commandObject.getEndDateAndTime();
+			int eventIndex = Integer.parseInt(commandObject.getTaskName());
 			int taskId = getTaskId(eventIndex);
+			
 			Task task = taskList.get(taskId);
-
-			Command command = new Command();
-			command.setTaskName(Integer.toString(eventIndex));
 			task.setTaskType(Task.TaskType.EVENT);
 			task.setStart(start);
 			task.setEnd(end);
 			setTaskId(taskList);
 			storageComponent.save(taskList);
 
-			return String.format(EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL, eventIndex,start,end);
+			return String.format(EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL, 
+					eventIndex, start, end);
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-	
+
 	//@@author A0121284N
 	private String setDeadline(Command commandObject) {
+		
 		try {
-			taskList = storageComponent.load();
-			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			String end = commandObject.getEndDateAndTime();
+			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			int taskId = getTaskId(taskIndex);
 			Task task = taskList.get(taskId);
 
-			Command command = new Command();
-			command.setTaskName(Integer.toString(taskIndex));
-			task.setStart("");
+			task.setStart(RESET);
 			task.setEnd(end);
 			task.setTaskType(getTaskType(task));
 			setTaskId(taskList);
 			storageComponent.save(taskList);
-			
+
 			return String.format(EXECUTION_SET_DEADLINE_SUCCESSFUL, taskIndex, end);
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}
-	
+
 	//@@author A0126258A
 	private String setRecurring(Command commandObject) {
+		
 		try {
-			taskList = storageComponent.load();
-			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			String[] recurrence = commandObject.getRecurrence().split(" ");
 			int recurrenceFrequency = Integer.parseInt(recurrence[0]);
 			String recurrenceType = recurrence[1];
+			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			int taskId = getTaskId(taskIndex);
+		
 			Task task = taskList.get(taskId);
-			Command command = new Command();
-			command.setTaskName(Integer.toString(taskIndex));
 			task.setRecurrenceFrequency(recurrenceFrequency);
 			task.setRecurrenceType(getRecurrenceType(recurrenceType));
 			setTaskId(taskList);
 			storageComponent.save(taskList);
-			
-			return String.format(EXECUTION_SET_RECURRING_SUCCESSFUL, taskIndex, recurrenceFrequency + " " + recurrenceType);
+
+			return String.format(EXECUTION_SET_RECURRING_SUCCESSFUL, taskIndex, 
+					recurrenceFrequency + ", " + recurrenceType);
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}

@@ -32,10 +32,10 @@ public class AddCommand extends Command {
 	private static final String COMMAND_ADD_TODO = "addT";
 	private static final String COMMAND_ADD_EVENT = "addE";
 	
-	private static final String RECUR_DAY = "day";
-	private static final String RECUR_WEEK = "week";
-	private static final String RECUR_MONTH = "month";
-	private static final String RECUR_YEAR = "year";
+	private static final String RECURRING_DAY = "day";
+	private static final String RECURRING_WEEK = "week";
+	private static final String RECURRING_MONTH = "month";
+	private static final String RECURRING_YEAR = "year";
 
 	private ArrayList<Task> taskList;
 	private ArrayList<Task> currentState;
@@ -138,13 +138,13 @@ public class AddCommand extends Command {
 	//@@author A0126258A
 	private RecurrenceType getRecurrence(String recurrence) {
 
-		if(recurrence.equals(RECUR_DAY)) {
+		if(recurrence.equals(RECURRING_DAY)) {
 			return RecurrenceType.DAY;
-		} else if(recurrence.equals(RECUR_WEEK)) {
+		} else if(recurrence.equals(RECURRING_WEEK)) {
 			return RecurrenceType.WEEK;
-		} else if(recurrence.equals(RECUR_MONTH)) {
+		} else if(recurrence.equals(RECURRING_MONTH)) {
 			return RecurrenceType.MONTH;
-		} else if(recurrence.equals(RECUR_YEAR)) {
+		} else if(recurrence.equals(RECURRING_YEAR)) {
 			return RecurrenceType.YEAR;
 		}
 

@@ -11,6 +11,8 @@ public class Constant {
 	private static final SimpleDateFormat standardFormatNoMinute = 
 			new SimpleDateFormat("EEE, dd MMM yy, hha");
 	
+	private static final String COLON = ":";
+	
 	private Constant() {
 		// Prevent Constant from being instantiated
 	}
@@ -21,7 +23,7 @@ public class Constant {
 		Date tempDateTime = new Date();
 		
 		try {
-			if(dateTime.contains(":")) {
+			if(dateTime.contains(COLON)) {
 				tempDateTime = standardFormat.parse(dateTime);
 			} else {
 				tempDateTime = standardFormatNoMinute.parse(dateTime);

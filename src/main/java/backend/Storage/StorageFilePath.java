@@ -24,11 +24,10 @@ public class StorageFilePath {
 	private static final String BACKSLASH_2 = "\\\\";
 	private static final String BACKSLASH_3 = "\\\\+";
 	
-	// TODO: Change default file path
-	private static final String DEFAULT_PATH_LOCATION = System.getProperty("user.home") + "/Desktop" + "/filename.txt";
-	//private static final String DEFAULT_PATH_LOCATION = new File(".").getAbsolutePath();
 	private static final String DEFAULT_FILE_NAME = "/filename.txt";
 	private static final String DEFAULT_FILE_EXTENTION = ".txt";
+	private static final String DEFAULT_PATH_LOCATION = new File(".").getAbsolutePath().replace(".", "") 
+			+ DEFAULT_FILE_NAME.replace(FRONTSLASH, "");
 	
 	private FileReader reader;
 	private FileWriter writer;

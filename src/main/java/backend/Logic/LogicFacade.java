@@ -20,7 +20,7 @@ public class LogicFacade {
 	private static Storage storageComponent;
 	private static Observer getterSubComponent;
 	private static History historySubComponent;
-	private static Logger logicControllerLogger = Logger.getGlobal();	
+	private static Logger logicFacadeLogger = Logger.getGlobal();	
 	private FileHandler logHandler;
 	private static Parser parserComponent;
 	private static LogicCommandHandler logicCommandHandler;
@@ -54,20 +54,20 @@ public class LogicFacade {
 	
 	private void initLogger() {
 		try {
-			logHandler = new FileHandler("TankTaskLog.txt",true);
+			logHandler = new FileHandler("TankTaskLog.txt",1000000000,10,true);
 			logHandler.setFormatter(new SimpleFormatter());
-			logicControllerLogger.addHandler(logHandler);
-			logicControllerLogger.setUseParentHandlers(false);
+			logicFacadeLogger.addHandler(logHandler);
+			logicFacadeLogger.setUseParentHandlers(false);
 			
 		} catch (SecurityException | IOException e) {
-			logicControllerLogger.warning("Logger failed to initialise: " + e.getMessage());
+			logicFacadeLogger.warning("Logger failed to initialise: " + e.getMessage());
 		}
 	}
 	
 	public String execute(String userInput) {
 		try {
 			ArrayList<String> parsedUserInput = parserComponent.parseInput(userInput);
-			System.out.println("Parsed User Input" + parsedUserInput);
+			logicFacadeLogger.info("Parsed User Input" + parsedUserInput);
 			Command commandObject = logicCommandHandler.parse(parsedUserInput);
 			String feedbackString = "";
 			switch (commandObject.getType()) {
@@ -94,7 +94,7 @@ public class LogicFacade {
 					feedbackString = commandObject.execute();
 					break;
 				case EXIT :
-					System.exit(0);
+					exit();
 				default :
 					feedbackString = commandObject.execute();
 					historyStack.push(commandObject);
@@ -107,6 +107,12 @@ public class LogicFacade {
 		}
 	}
 	
+	private void exit() {
+		historySubComponent.exit();
+		logicCommandHandler.exit();
+		System.exit(0);
+	}
+
 	public ArrayList<String> retrieveStringData(String dataType){
 		return getterSubComponent.retrieveStringData(dataType);
 	}

@@ -1,8 +1,13 @@
 //@@author A0121284N
 package main.java.backend.Logic;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+
 import main.java.backend.Storage.Storage;
 
 public class LogicCommandHandler {
@@ -27,9 +32,13 @@ public class LogicCommandHandler {
 	private static final String[] sortKeywords = new String[] {"sortN", "sortP","sortD"};
 	private static final String[] viewKeywords = new String[] {"showCat", "show floating", "showC",
 			"showD", "show todo", "show events", "show overdue", "showT", "showE", "showO", "showF"};
+	private static Logger logicCommandHandlerLogger = Logger.getGlobal();	
+	private FileHandler logHandler;
+	
 	private LogicCommandHandler(Storage storage, History history) {
 		storageComponent = storage;
 		historySubComponent = history;
+		initLogger();
 	}
 
 	public static LogicCommandHandler getInstance(Storage storage, History history) {
@@ -38,11 +47,30 @@ public class LogicCommandHandler {
 		}
 		return commandHandler;
 	}
+	
+	public void exit() {
+		logHandler.close();
+		System.exit(0);
+	}
+	
+	//@@author A0121284N
+			private void initLogger() {
+					
+					try {
+						logHandler = new FileHandler("TankTaskLog.txt",1000000000,10,true);
+						logHandler.setFormatter(new SimpleFormatter());
+						logicCommandHandlerLogger.addHandler(logHandler);
+						logicCommandHandlerLogger.setUseParentHandlers(false);
+						
+					} catch (SecurityException | IOException e) {
+						logicCommandHandlerLogger.warning("Logger failed to initialise: " + e.getMessage());
+					}
+				}
 
 	public Command parse(ArrayList<String> parsedUserInput) {
-		System.out.println("Command from parser: "+parsedUserInput.get(0));
+		logicCommandHandlerLogger.info("Command from parser: "+parsedUserInput.get(0));
 		String determinedCommandType = determineCommandType(parsedUserInput.get(0));
-//		System.out.println("determined Command Type: "+determinedCommandType);
+		logicCommandHandlerLogger.info("determined Command Type: "+determinedCommandType);
 		Command commandObject = new Command();
 		switch (determinedCommandType) {
 			case COMMAND_ADD :

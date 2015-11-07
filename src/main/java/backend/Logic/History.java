@@ -38,13 +38,18 @@ public class History {
 	private void initLogger() {
 		
 		try {
-			logHandler = new FileHandler("TankTaskLog.txt",true);
+			logHandler = new FileHandler("TankTaskLog.txt",1000000000,10,true);
 			logHandler.setFormatter(new SimpleFormatter());
 			historyLogger.addHandler(logHandler);
 			historyLogger.setUseParentHandlers(false);
 		} catch (SecurityException | IOException e) {
 			historyLogger.warning("History failed to initialise: " + e.getMessage());
 		}
+	}
+	
+	public void exit() {
+		logHandler.close();
+		System.exit(0);
 	}
 
 	public void push(ArrayList<Task> currentState) {

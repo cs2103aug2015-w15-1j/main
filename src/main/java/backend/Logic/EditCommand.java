@@ -52,7 +52,7 @@ public class EditCommand extends Command {
 	private void initLogger() {
 			
 			try {
-				logHandler = new FileHandler("TankTaskLog.txt",true);
+				logHandler = new FileHandler("TankTaskLog.txt",1000000000,10,true);
 				logHandler.setFormatter(new SimpleFormatter());
 				logicEditorLogger.addHandler(logHandler);
 				logicEditorLogger.setUseParentHandlers(false);
@@ -114,6 +114,7 @@ public class EditCommand extends Command {
 		}
 		currentState = storageComponent.load();
 		historySubComponent.push(currentState);
+		logHandler.close();
 		return feedbackString;
 	}
 	

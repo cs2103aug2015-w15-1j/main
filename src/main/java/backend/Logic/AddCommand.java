@@ -1,8 +1,12 @@
 package main.java.backend.Logic;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EmptyStackException;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
@@ -13,7 +17,6 @@ public class AddCommand extends Command {
 	
 	private static final String EXECUTION_ADD_TASK_SUCCESSFUL = "Task %1$s has been added";
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
-	private static final String CATEGORY_DEFAULT = "default";
 	
 	private ArrayList<Task> taskList;
 	private ArrayList<Task> currentState;
@@ -21,17 +24,35 @@ public class AddCommand extends Command {
 	private Storage storageComponent;
 	private History historySubComponent;
 	
+	private static Logger logicAdderLogger = Logger.getGlobal();	
+	private FileHandler logHandler;
+	
 	//@@author A0121284N
 	public AddCommand(Type typeInput, Storage storage, History history) {
 		super(typeInput);
 		storageComponent = storage;
 		historySubComponent = history;
+		initLogger();
 	}
+	
+	//@@author A0121284N
+		private void initLogger() {
+				
+				try {
+					logHandler = new FileHandler("TankTaskLog.txt",1000000000,10,true);
+					logHandler.setFormatter(new SimpleFormatter());
+					logicAdderLogger.addHandler(logHandler);
+					logicAdderLogger.setUseParentHandlers(false);
+					
+				} catch (SecurityException | IOException e) {
+					logicAdderLogger.warning("Logger failed to initialise: " + e.getMessage());
+				}
+			}
 	
 	//@@author A0121284N
 	public String execute() {	
 		String feedbackString = new String();
-		System.out.println("execute commandObject.getCommandField: "+this.getCommandField());
+		logicAdderLogger.info("execute commandObject.getCommandField: "+this.getCommandField());
 		switch (this.getCommandField()) {
 			case ("addF") :
 				feedbackString = addTask(TaskType.FLOATING, this);
@@ -43,9 +64,10 @@ public class AddCommand extends Command {
 				feedbackString = addTask(TaskType.EVENT, this);
 				break;
 		}
-		System.out.println("feedbackString in AddCommandObject: "+ feedbackString);
+		logicAdderLogger.info("feedbackString in AddCommandObject: "+ feedbackString);
 		currentState = storageComponent.load();
 		historySubComponent.push(currentState);
+		logHandler.close();
 		return feedbackString;
 	}
 	
@@ -115,15 +137,6 @@ public class AddCommand extends Command {
 		}
 	}
 	
-	//@@author A0121284N
-	private String getCategoryName(String categoryName) {
-		
-		if(categoryName.isEmpty()) {
-			return CATEGORY_DEFAULT;
-		} else {
-			return categoryName;
-		}
-	}
 	//@@author A0126258A
 	private Task getTask(TaskType taskType, Command command) {
 		

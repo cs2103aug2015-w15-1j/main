@@ -330,12 +330,7 @@ public class EditCommand extends Command {
 			case "reminder" :
 				taskList.get(taskId).setReminder("");
 				break;
-			case "deadline" :
-				taskList.get(taskId).setTaskType(TaskType.FLOATING);
-				taskList.get(taskId).setStart("");
-				taskList.get(taskId).setEnd("");
-				break;
-			case "event" :
+			case "date" :
 				taskList.get(taskId).setTaskType(TaskType.FLOATING);
 				taskList.get(taskId).setStart("");
 				taskList.get(taskId).setEnd("");

@@ -12,7 +12,6 @@ public class FilePathCommand extends Command {
 	private Storage storageComponent;
 
 	public FilePathCommand(Type typeInput, Storage storage) {
-		
 		super(typeInput);
 		storageComponent = storage;
 	}

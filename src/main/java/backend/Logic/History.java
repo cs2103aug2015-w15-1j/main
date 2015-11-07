@@ -13,14 +13,19 @@ import main.java.backend.Storage.Task.Task;
 
 public class History {
 	
-	Stack<ArrayList<Task>> stateUndo = new Stack<ArrayList<Task>>();
-	Stack<ArrayList<Task>> stateRedo = new Stack<ArrayList<Task>>();
+	private static final String LOGGER_CURRENT_STATE = "Received current state: ";
+	private static final String LOGGER_STACK_TOP = "Top of the stack: ";
+	private static final String LOGGER_STACK_SIZE = "Stack size after push: ";
+	private static final String LOGGER_STACK_SIZE_AFTER_POP = "Stack size after push: ";
+	private static final String LOGGER_ERROR_EMPTY_STACK = "Error Occured: Stack is empty";
 	
 	private static Logger historyLogger = Logger.getGlobal();	
 	private static History historyObject;
 	
-	private FileHandler logHandler;
+	private Stack<ArrayList<Task>> stateUndo = new Stack<ArrayList<Task>>();
+	private Stack<ArrayList<Task>> stateRedo = new Stack<ArrayList<Task>>();
 	
+	private FileHandler logHandler;
 	
 	private History() {
 		initLogger();
@@ -54,10 +59,10 @@ public class History {
 
 	public void push(ArrayList<Task> currentState) {
 		
-		historyLogger.info("Received current state "+ currentState);
+		historyLogger.info(LOGGER_CURRENT_STATE + currentState);
 		stateUndo.push(currentState);
-		historyLogger.info("What's at the top of the stack? "+stateUndo.peek());
-		historyLogger.info("History stack size after push: "+stateUndo.size());
+		historyLogger.info(LOGGER_STACK_TOP + stateUndo.peek());
+		historyLogger.info(LOGGER_STACK_SIZE + stateUndo.size());
 	}
 
 	public ArrayList<Task> undo() {
@@ -67,12 +72,12 @@ public class History {
 		}
 		
 		try {
-			historyLogger.info("What's at the top of the stack? "+stateUndo.peek());
+			historyLogger.info(LOGGER_STACK_TOP + stateUndo.peek());
 			stateRedo.push(stateUndo.pop());
-			historyLogger.info("what's left in stack"+stateUndo.peek());
-			historyLogger.info("History stack size after pop: "+stateUndo.size());
+			historyLogger.info(LOGGER_STACK_TOP + stateUndo.peek());
+			historyLogger.info(LOGGER_STACK_SIZE_AFTER_POP + stateUndo.size());
 		} catch(EmptyStackException e) {
-			historyLogger.warning("Error Occured: Stack is empty");
+			historyLogger.warning(LOGGER_ERROR_EMPTY_STACK);
 			return null;
 		}
 		
@@ -86,12 +91,12 @@ public class History {
 		}
 		
 		try {
-			historyLogger.info("What's at the top of the stack? "+stateRedo.peek());
+			historyLogger.info(LOGGER_STACK_TOP + stateRedo.peek());
 			stateUndo.push(stateRedo.pop());
-			historyLogger.info("what's left in stack"+stateUndo.peek());
-			historyLogger.info("History stack size after pop: "+stateUndo.size());
+			historyLogger.info(LOGGER_STACK_TOP + stateUndo.peek());
+			historyLogger.info(LOGGER_STACK_SIZE_AFTER_POP + stateUndo.size());
 		} catch(EmptyStackException e) {
-			historyLogger.warning("Error Occured: Stack is empty");
+			historyLogger.warning(LOGGER_ERROR_EMPTY_STACK);
 			return null;
 		}
 

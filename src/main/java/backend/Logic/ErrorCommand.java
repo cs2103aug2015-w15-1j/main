@@ -6,7 +6,6 @@ public class ErrorCommand extends Command {
 
 	public ErrorCommand(Type typeInput) {
 		super(typeInput);
-		// TODO Auto-generated constructor stub
 	}
 
 	public void setErrorMessage(String message) {

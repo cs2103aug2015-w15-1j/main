@@ -332,6 +332,7 @@ public class EditCommand extends Command {
 				break;
 			case "deadline" :
 				taskList.get(taskId).setTaskType(TaskType.FLOATING);
+				taskList.get(taskId).setStart("");
 				taskList.get(taskId).setEnd("");
 				break;
 			case "event" :

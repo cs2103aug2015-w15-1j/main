@@ -102,7 +102,7 @@ public class LogicFacade {
 			}
 			getterSubComponent.updateIndex();
 			return feedbackString;
-		} catch (EmptyStackException e) {
+		} catch (NullPointerException | EmptyStackException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}
 	}

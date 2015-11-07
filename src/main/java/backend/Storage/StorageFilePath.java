@@ -10,6 +10,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 
+import main.java.Main.Main;
+
 public class StorageFilePath {
 
 	private static final String ERROR_READ_DATA = "An error occured when retrieving data from config file.";
@@ -26,6 +28,7 @@ public class StorageFilePath {
 	
 	// TODO: Change default file path
 	private static final String DEFAULT_PATH_LOCATION = System.getProperty("user.home") + "/Desktop" + "/filename.txt";
+	//private static final String DEFAULT_PATH_LOCATION = new File(".").getAbsolutePath();
 	private static final String DEFAULT_FILE_NAME = "/filename.txt";
 	private static final String DEFAULT_FILE_EXTENTION = ".txt";
 	
@@ -39,7 +42,6 @@ public class StorageFilePath {
 		
 		properties = new Properties();
 	}
-	
 	
 	//@@author A0121284N
 	private void dataTransfer(String oldFilePath, String newFilePath) {
@@ -116,17 +118,45 @@ public class StorageFilePath {
 	private String appendTextFile(String newFilePath) {
 		
 		if(!newFilePath.contains(DEFAULT_FILE_EXTENTION)) {
-			return replaceSlash(newFilePath) + DEFAULT_FILE_NAME;
+			return newFilePath + addSlash(newFilePath);
 		} else {
 			return newFilePath;
 		}
 	}
 	
 	//@@author A0126258A
-	private String replaceSlash(String newFilePath) {
+	private String getFileName() {
 		
-		if(newFilePath.endsWith(FRONTSLASH) || newFilePath.endsWith(BACKSLASH_1)) {
-			return newFilePath.substring(0, newFilePath.length() - 1);
+		String filePath = retrieve();
+		String[] tokenizeFrontSlash = filePath.split(FRONTSLASH);
+		String[] tokenizeBackSlash = filePath.split(BACKSLASH_2);
+		
+		System.out.println("FILEPATH: " + filePath);
+		if(filePath.contains(FRONTSLASH)) {
+			System.out.println("OHYEA: " + tokenizeFrontSlash[tokenizeFrontSlash.length - 1]);
+			return tokenizeFrontSlash[tokenizeFrontSlash.length - 1];
+		} else if(filePath.contains(BACKSLASH_1)) {
+			return tokenizeBackSlash[tokenizeBackSlash.length - 1];
+		}
+		
+		return DEFAULT_FILE_NAME;
+	}
+	
+	//@@author A0126258A
+	private String addSlash(String newFilePath) {
+		
+		if(newFilePath.contains(FRONTSLASH) 
+				&& !newFilePath.endsWith(FRONTSLASH)) {
+			return FRONTSLASH + getFileName();
+		} else if(newFilePath.contains(FRONTSLASH) 
+				&& newFilePath.endsWith(FRONTSLASH)) {
+			return getFileName();
+		} else if(newFilePath.contains(BACKSLASH_1) 
+				&& !newFilePath.endsWith(BACKSLASH_1)) {
+			return BACKSLASH_1 + getFileName();
+		} else if(newFilePath.contains(BACKSLASH_1) 
+				&& newFilePath.endsWith(BACKSLASH_1)) {
+			return getFileName();
 		} else {
 			return newFilePath;
 		}

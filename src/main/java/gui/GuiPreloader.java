@@ -29,12 +29,15 @@ public class GuiPreloader extends Preloader {
     private Label progress;
 
     public GuiPreloader() {
-       // System.out.println("MyPreloader constructor called, thread: " + Thread.currentThread().getName());
+        // Constructor is called before everything.
+        System.out.println("MyPreloader constructor called, thread: " + Thread.currentThread().getName());
     }
 
     @Override
     public void init() throws Exception {
-       // System.out.println("MyPreloader#init (could be used to initialize preloader view), thread: " + Thread.currentThread().getName());
+        System.out.println("MyPreloader#init (could be used to initialize preloader view), thread: " + Thread.currentThread().getName());
+
+        // If preloader has complex UI it's initialization can be done in MyPreloader#init
         Platform.runLater(() -> {
             Label title = new Label("Firing up your TankTask, please wait...");
             title.setTextAlignment(TextAlignment.CENTER);
@@ -70,7 +73,7 @@ public class GuiPreloader extends Preloader {
 
         this.preloaderStage = primaryStage;
         
-       // Set preloader scene and show stage.
+        // Set preloader scene and show stage.
         preloaderStage.setScene(scene);
         preloaderStage.initStyle(StageStyle.UNDECORATED);
         scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
@@ -91,13 +94,16 @@ public class GuiPreloader extends Preloader {
         // Handle state change notifications.
         StateChangeNotification.Type type = info.getType();
         switch (type) {
-            case BEFORE_LOAD: //checking purposes
-               // System.out.println("current = BEFORE_LOAD");
+            case BEFORE_LOAD:
+                // Called after MyPreloader#start is called.
+               // System.out.println("BEFORE_LOAD");
                 break;
-            case BEFORE_INIT: //checking purposes
-               // System.out.println("current = BEFORE_INIT");
+            case BEFORE_INIT:
+                // Called before GUI#init is called.
+               // System.out.println("BEFORE_INIT");
                 break;
             case BEFORE_START:
+                // Called after GUI#init and before GUI#start is called.      
                 preloaderStage.hide();
                 break;
         }

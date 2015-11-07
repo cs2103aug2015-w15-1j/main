@@ -63,8 +63,11 @@ public class HelpView {
 		currentView=-3;
 		pop = new Stage();
 		pane = new GridPane();
-		
-		pop.setTitle("help");
+		Image image = new Image(GUI.class.getResourceAsStream("Resources/background.png"));
+		BackgroundSize backgroundSize = new BackgroundSize(100, 100, true, true, true,true);
+		BackgroundImage backgroundImage = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
+		Background background = new Background(backgroundImage);
+		pane.setBackground(background);
 		comp = new VBox();
 		comp2 = new VBox();
 		content = new VBox();
@@ -72,35 +75,6 @@ public class HelpView {
 		HBox rightNavi = new HBox();
 		leftNavi.setAlignment(Pos.TOP_LEFT);
 		rightNavi.setAlignment(Pos.TOP_RIGHT);
-		customisePane();
-		content();
-		hotKey(comp,comp2, pane);
-		leftSide(leftNavi);
-		rightSide(rightNavi);
-		setBackground();
-		setConstraints(leftNavi, rightNavi);
-		
-		pane.setGridLinesVisible(false); //checking
-		pane.getChildren().addAll(leftNavi,rightNavi);
-		Scene stageScene = new Scene(pane, 800, 600);
-		Image icon = new Image(getClass().getResourceAsStream("tank.png")); 
-		pop.getIcons().add(icon);
-		stageScene.getStylesheets().add(getClass().getResource("HelpStyle.css").toExternalForm());
-		pop.setScene(stageScene);
-		pop.show();
-		
-		determineEvents(pop, stageScene);
-	}
-
-	private void setBackground() {
-		Image image = new Image(GUI.class.getResourceAsStream("Resources/background.png"));
-		BackgroundSize backgroundSize = new BackgroundSize(100, 100, true, true, true,true);
-		BackgroundImage backgroundImage = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
-		Background background = new Background(backgroundImage);
-		pane.setBackground(background);
-	}
-
-	private void customisePane() {
 		ColumnConstraints column1 = new ColumnConstraints();
 		column1.setPercentWidth(30);
 		ColumnConstraints column2 = new ColumnConstraints();
@@ -113,9 +87,13 @@ public class HelpView {
 		content.setPadding(new Insets(20,20,20,20));
 		comp.setPadding(new Insets(20,20,20,20));
 		comp2.setPadding(new Insets(20,20,20,20));
-	}
-
-	private void setConstraints(HBox leftNavi, HBox rightNavi) {
+		pop.setTitle("help");
+		
+		content();
+		hotKey(comp,comp2, pane);
+		leftSide(leftNavi);
+		rightSide(rightNavi);
+		
 		GridPane.setConstraints(content,0,0);
 		GridPane.setConstraints(comp,0,0);
 		GridPane.setConstraints(comp2,0,0);
@@ -124,6 +102,17 @@ public class HelpView {
 		GridPane.setColumnSpan(comp, 2);
 		GridPane.setColumnSpan(comp2, 2);
 		GridPane.setColumnSpan(leftNavi, 2);
+		
+		pane.setGridLinesVisible(false); //checking
+		pane.getChildren().addAll(leftNavi,rightNavi);
+		Scene stageScene = new Scene(pane, 800, 600);
+		Image icon = new Image(getClass().getResourceAsStream("tank.png")); 
+		pop.getIcons().add(icon);
+		stageScene.getStylesheets().add(getClass().getResource("HelpStyle.css").toExternalForm());
+		pop.setScene(stageScene);
+		pop.show();
+		
+		determineEvents(pop, stageScene);
 	}
 	
 	private void content(){

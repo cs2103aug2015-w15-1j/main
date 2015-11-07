@@ -94,6 +94,11 @@ public class ParserTest {
 	    expected = new ArrayList<String>( Arrays.asList("addF", "PROJECT PROPOSAL", "", "", "", "") );
 	    executeTest();
 	    
+	    input = "1     deadline     30  December     23:59";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Wed, 30 Dec 15, 11:59pm") );
+	    executeTest();
+	    
 	    input = "1 by 12 Feb 3pm";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Fri, 12 Feb 16, 3pm") );
@@ -136,17 +141,37 @@ public class ParserTest {
 	    
 	    input = "show today";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("showToday") );
+	    expected = new ArrayList<String>( Arrays.asList("showD") );
 	    executeTest();
 	    
-	    input = "showdone";
+	    input = "show d";
 	    actual = parser.parseInput(input);
-	    expected = new ArrayList<String>( Arrays.asList("showDone") );
+	    expected = new ArrayList<String>( Arrays.asList("showD") );
+	    executeTest();
+	    
+	    input = "show done";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("showC") );
+	    executeTest();
+	    
+	    input = "show completed";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("showC") );
+	    executeTest();
+	    
+	    input = "SHOW COMPLETED";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("showC") );
 	    executeTest();
 	    
 	    input = "sortp";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("sortP") );
+	    executeTest();
+	    
+	    input = "sort date";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("sortD") );
 	    executeTest();
 	    
 	    input = "sort deadline";
@@ -167,6 +192,11 @@ public class ParserTest {
 	    input = "sort by priority";
 	    actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("sortP") );
+	    executeTest();
+	    
+	    input = "sort N";
+	    actual = parser.parseInput(input);
+	    expected = new ArrayList<String>( Arrays.asList("sortN") );
 	    executeTest();
 	    
 	    input = "search meeting with boss";
@@ -484,7 +514,7 @@ public class ParserTest {
 	    executeTest();
 	    
 	    //Test whether a full date and time works
-		input = "1 deadline 12/3/2016 04:56:22";
+		input = "1 deadline 12/3/2016 04:56";
 		actual = parser.parseInput(input);
 	    expected = new ArrayList<String>( Arrays.asList("deadline", "1", "Sat, 12 Mar 16, 4:56am") );
 	    executeTest();

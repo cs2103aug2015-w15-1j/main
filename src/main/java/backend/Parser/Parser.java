@@ -28,7 +28,7 @@ public class Parser extends ParserSkeleton{
 	 */
 	public ArrayList<String> parseInput(String input){
 		parserVault.resetContents();
-		String[] inputTokens = input.split(" ");
+		String[] inputTokens = input.split(SPACE_OF_ANY_LENGTH);
 		ArrayList<String> firstTwoWordsParsed = parseFirstTwoWords(inputTokens);
 		
 		if (isParsingCompleted(firstTwoWordsParsed)) {
@@ -39,12 +39,11 @@ public class Parser extends ParserSkeleton{
 	}
 	
 	private ArrayList<String> parseFirstTwoWords(String[] inputTokens) {
-		String firstWordOriginal = getFirst(inputTokens);
+		String firstWordOriginal = removeEndSpacesOrBrackets(getFirst(inputTokens));
 		String firstWord = parserVault.convertVariantToDefault(firstWordOriginal);
-		String secondWordOriginal = getSecond(inputTokens);
+		String secondWordOriginal = removeEndSpacesOrBrackets(getSecond(inputTokens));
 		String secondWord = parserVault.convertVariantToDefault(secondWordOriginal);
 		int inputWordCount = inputTokens.length;
-		
 		if (isCommandThatNoNeedContent(firstWord)) {
 			return parserVault.makeCommandOnlyResult(firstWord);
 		}
@@ -101,8 +100,8 @@ public class Parser extends ParserSkeleton{
 		}
 		
 		growingToken = parserVault.storeToken(growingToken);
-		String command = parserVault.getContent("command");
-		if (canHaveMultipleFields(command)) {
+		String resultType = parserVault.getResultType();
+		if (canHaveMultipleFields(resultType)) {
 			return parserVault.makeMultiFieldResult();
 		} else {
 			return parserVault.makeSingleFieldResult();
@@ -194,7 +193,7 @@ public class Parser extends ParserSkeleton{
 	}
 
 	private boolean isCommandButRepressed(String token) {
-		String mainCommand = parserVault.getContent("command");
+		String mainCommand = parserVault.getResultType();
 		return !mainCommand.isEmpty() && (isDominatingCommand(token) || isCommandThatNoNeedContent(token));
 	}
 	

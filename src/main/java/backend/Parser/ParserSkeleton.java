@@ -17,7 +17,8 @@ abstract class ParserSkeleton {
 	final String COMMAND_DELETE = "delete";
 	final String COMMAND_DELETEALL = "deleteAll";
 	final String COMMAND_DONE = "done";
-	final String COMMAND_EVENT = "event";
+	final String COMMAND_EVENTSTART = "event";
+	final String COMMAND_EVENTEND = "to";
 	final String COMMAND_RECUR = "every";
 	final String COMMAND_EXIT = "exit";
 	final String COMMAND_FILEPATH = "filepath";
@@ -28,12 +29,12 @@ abstract class ParserSkeleton {
 	final String COMMAND_RESET = "reset";
 	final String COMMAND_SEARCH = "search";
 	final String COMMAND_SHOW = "show";
-	final String COMMAND_SHOWDONE = "showDone";
-	final String COMMAND_SHOWE = "showE";
-	final String COMMAND_SHOWF = "showF";
-	final String COMMAND_SHOWO = "showO";
-	final String COMMAND_SHOWT = "showT";
-	final String COMMAND_SHOWTODAY = "showToday";
+	final String COMMAND_SHOWCOMPLETE = "showC";
+	final String COMMAND_SHOWTODAY = "showD";
+	final String COMMAND_SHOWEVENT = "showE";
+	final String COMMAND_SHOWFLOATING = "showF";
+	final String COMMAND_SHOWOVERDUE = "showO";
+	final String cOMMAND_SHOWTODO = "showT";
 	final String COMMAND_SORT = "sort";
 	final String COMMAND_SORTD = "sortD";
 	final String COMMAND_SORTN = "sortN";
@@ -48,15 +49,15 @@ abstract class ParserSkeleton {
 	//List of all command words accepted by the program
 	final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList(
 	COMMAND_ADD, COMMAND_DEADLINE, COMMAND_DESCRIPTION, COMMAND_DELETE, COMMAND_DELETEALL, 
-	COMMAND_DONE, COMMAND_EVENT, COMMAND_RECUR, COMMAND_EXIT, COMMAND_FILEPATH, COMMAND_PRIORITY, 
+	COMMAND_DONE, COMMAND_EVENTSTART, COMMAND_RECUR, COMMAND_EXIT, COMMAND_FILEPATH, COMMAND_PRIORITY, 
 	COMMAND_REDO, COMMAND_REMINDER, COMMAND_RENAME, COMMAND_RESET, COMMAND_SEARCH, COMMAND_SHOW, 
-	COMMAND_SHOWDONE, COMMAND_SHOWE, COMMAND_SHOWF, COMMAND_SHOWO, COMMAND_SHOWT, COMMAND_SHOWTODAY, 
+	COMMAND_SHOWCOMPLETE, COMMAND_SHOWEVENT, COMMAND_SHOWFLOATING, COMMAND_SHOWOVERDUE, cOMMAND_SHOWTODO, COMMAND_SHOWTODAY, 
 	COMMAND_SORT, COMMAND_SORTD, COMMAND_SORTN, COMMAND_SORTP, COMMAND_UNDO, COMMAND_UNDONE ) );
 	
 	//Commands that work just by typing the command word (without additional content)
 	final ArrayList<String> COMMANDS_NO_CONTENT = new ArrayList<String>( Arrays.asList(
-	COMMAND_DELETEALL, COMMAND_EXIT, COMMAND_REDO, COMMAND_SHOWDONE, COMMAND_SHOWE, COMMAND_SHOWF, 
-	COMMAND_SHOWO, COMMAND_SHOWT, COMMAND_SHOWTODAY, COMMAND_SORTD, COMMAND_SORTN, COMMAND_SORTP, COMMAND_UNDO ) );
+	COMMAND_DELETEALL, COMMAND_EXIT, COMMAND_REDO, COMMAND_SHOWCOMPLETE, COMMAND_SHOWEVENT, COMMAND_SHOWFLOATING, 
+	COMMAND_SHOWOVERDUE, cOMMAND_SHOWTODO, COMMAND_SHOWTODAY, COMMAND_SORTD, COMMAND_SORTN, COMMAND_SORTP, COMMAND_UNDO ) );
 	
 	//Commands that if appear first, will prevent other command keywords from having effect
 	final ArrayList<String> COMMANDS_DOMINATING = new ArrayList<String>( Arrays.asList(
@@ -70,6 +71,8 @@ abstract class ParserSkeleton {
 	//Commands that cannot be part of a one-shot command
 	final ArrayList<String> COMMANDS_NOT_ONE_SHOT = new ArrayList<String>( 
 	Arrays.asList(COMMAND_DELETE, COMMAND_DONE, COMMAND_RESET, COMMAND_UNDONE) );	
+	
+	final String SPACE_OF_ANY_LENGTH = " +";
 	
 	String getFirst(String[] array){
 		return array[0];
@@ -216,19 +219,21 @@ abstract class ParserSkeleton {
 	 * This method removes any spaces that are in front or at the back of the token
 	 */
 	String removeEndSpacesOrBrackets(String token) {
-		if (token.startsWith(" ") || token.startsWith("[")) {
-			token =  token.substring(1, token.length());
-		} 	
-		if (token.endsWith(" ") || token.startsWith("]")) {
-			return token.substring(0, token.length()-1);
-		} else {
-			return token;
+		while (true){
+			if (token.startsWith(" ") || token.startsWith("[")) {
+				token = token.substring(1, token.length());
+			} 	
+			if (token.endsWith(" ") || token.startsWith("]")) {
+				return token.substring(0, token.length()-1);
+			} else {
+				return token;
+			}
 		}
 	}
-
-	boolean isSplitSuccessful(String token, String[] splitTokens) {
+	
+	/*boolean isSplitSuccessful(String token, String[] splitTokens) {
 		return splitTokens.length == 1 && !token.equals(getFirst(splitTokens));
-	}
+	}*/
 	
 	String getStatus(ArrayList<String> parseResult) {
 		return getFirst(parseResult);

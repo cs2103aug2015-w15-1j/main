@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import main.java.backend.Storage.Task.Task.TaskType;
-
 /**
  * ParserVault
  * Stores the contents of the parsed input and generates the result
@@ -22,11 +20,11 @@ public class ParserVault extends ParserSkeleton{
 	}
 
 	private final String FIELD_ALL = "all";
-	private final String FIELD_RESULTTYPE = "command";
+	private final String FIELD_RESULTTYPE = "resultType";
 	private final String FIELD_TASK = "task";
 	private final String FIELD_DESCRIPTION = "description";
 	private final String FIELD_DEADLINE = COMMAND_DEADLINE;
-	private final String FIELD_EVENT = COMMAND_EVENT;
+	private final String FIELD_EVENT = COMMAND_EVENTSTART;
 	private final String FIELD_EVENTSTART = "eventStart";
 	private final String FIELD_EVENTEND = "eventEnd";
 	private final String FIELD_PRIORITY = COMMAND_PRIORITY;
@@ -34,6 +32,12 @@ public class ParserVault extends ParserSkeleton{
 	private final String FIELD_RECUR = COMMAND_RECUR;
 	private final String FIELD_RENAME = "rename";
 	private final String FIELD_RESET = "reset";
+	
+	private final String FIELD_DATE = "date";
+	private final String FIELD_DATE_ABBR = "D";
+	private final String FIELD_NAME = "name";
+	private final String FIELD_NAME_ABBR = "N";
+	private final String FIELD_PRIORITY_ABBR = "P";
 	
 	//The default list of fields and the order in which their contents are put into result
 	private final ArrayList<String> FIELDS_DEFAULT = new ArrayList<String>( Arrays.asList(
@@ -77,19 +81,26 @@ public class ParserVault extends ParserSkeleton{
 		put(COMMAND_DEADLINE, new ArrayList<String>( Arrays.asList("by", "dea")));
 		put(COMMAND_DELETE, new ArrayList<String>( Arrays.asList("del")));
         put(COMMAND_DESCRIPTION, new ArrayList<String>( Arrays.asList("des")));
-        put(COMMAND_EVENT, new ArrayList<String>( Arrays.asList("from"))); 
+        put(COMMAND_EVENTSTART, new ArrayList<String>( Arrays.asList("from"))); 
         put(COMMAND_RECUR, new ArrayList<String>( Arrays.asList("recur"))); 
         put(COMMAND_FILEPATH, new ArrayList<String>( Arrays.asList("fp")));
         put(COMMAND_PRIORITY, new ArrayList<String>( Arrays.asList("pri")));
         put(COMMAND_REMINDER, new ArrayList<String>( Arrays.asList("rem")));
     }};
     
-	private final String TASKTYPE_TODO = "todo";
-	private final String TASKTYPE_EVENT = "event";
-	private final String TASKTYPE_FLOATING = "floating";
-	private final String TASKTYPE_OVERDUE = "overdue";
-	private final String TASKTYPE_TODAY = "today";
-	private final String TASKTYPE_DONE = "done";
+	private final String TASKTYPE_TODO = "TODO";
+	private final String TASKTYPE_EVENT = "EVENT";
+	private final String TASKTYPE_FLOATING = "FLOATING";
+	private final String TASKTYPE_OVERDUE = "OVERDUE";
+	private final String TASKTYPE_TODAY = "TODAY";
+	private final String TASKTYPE_DONE = "DONE";
+	private final String TASKTYPE_COMPLETE = "COMPLETE";
+	private final String TASKTYPE_TODO_ABBR = "T";
+	private final String TASKTYPE_EVENT_ABBR = "E";
+	private final String TASKTYPE_FLOATING_ABBR = "F";
+	private final String TASKTYPE_OVERDUE_ABBR = "O";
+	private final String TASKTYPE_TODAY_ABBR = "D";
+	private final String TASKTYPE_COMPLETE_ABBR = "C";
     
 	public void printCmd(){
 		for (String s: FIELDS_CAN_RESET){
@@ -180,6 +191,10 @@ public class ParserVault extends ParserSkeleton{
 		}
 	}
 
+	String getResultType() {
+		return getContent(FIELD_RESULTTYPE);
+	}
+	
 	String getLastSeenCommand(){
 		return getLast(seenCommands);
 	}
@@ -327,7 +342,7 @@ public class ParserVault extends ParserSkeleton{
 	 * @return the start and end date/time in an array
 	 */
 	private ArrayList<String> getEventStartAndEnd(String event) {
-		String[] eventTokens = event.split(" to ", 2);
+		String[] eventTokens = event.split(COMMAND_EVENTEND, 2);
 		String eventStart = getFirst(eventTokens);
 		String eventEnd = "";
 		if (eventTokens.length > 1) {
@@ -372,7 +387,7 @@ public class ParserVault extends ParserSkeleton{
 	private ArrayList<String> makeResetResult(String command, String index, String content) {
 		storeToken(index);
 		storeCommand(command);
-		String[] contentTokens = content.split(" ");
+		String[] contentTokens = content.split(SPACE_OF_ANY_LENGTH);
 		content = mergeTokens(contentTokens, 1, contentTokens.length);
 		if (content.isEmpty()) {
 			return makeErrorResult("EmptyFieldError", command);
@@ -406,7 +421,7 @@ public class ParserVault extends ParserSkeleton{
 	}
 
 	private ArrayList<String> makeEventResult(String command, String index, String event) {
-		if (event.endsWith("to")) {
+		if (event.endsWith(COMMAND_EVENTEND)) {
 			return makeErrorResult("NoEndDateError", event);
 		}
 		ArrayList<String> parsedEvent = getEventStartAndEnd(event);
@@ -416,8 +431,8 @@ public class ParserVault extends ParserSkeleton{
 		
 		String eventStart = getFirst(parsedEvent);
 		String eventEnd = getLast(parsedEvent);
-		storeContent("eventStart", eventStart);
-		storeContent("eventEnd", eventEnd);
+		storeContent(FIELD_EVENTSTART, eventStart);
+		storeContent(FIELD_EVENTEND, eventEnd);
 		
 		return new ArrayList<String>( Arrays.asList(command, index, eventStart, eventEnd) );
 	}
@@ -458,7 +473,7 @@ public class ParserVault extends ParserSkeleton{
 		storeContent(FIELD_RESULTTYPE, resultType);
 		fields.remove(COMMAND_DEADLINE);
 		
-		ArrayList<String> parseResult = makeEventResult(COMMAND_EVENT, index, event);
+		ArrayList<String> parseResult = makeEventResult(COMMAND_EVENTSTART, index, event);
 		if (isErrorStatus(parseResult)) {
 			return parseResult;
 		}
@@ -466,7 +481,7 @@ public class ParserVault extends ParserSkeleton{
 	}
 
 	private String parseSearchContent(String content) {
-		String[] contentTokens = content.split(" ");
+		String[] contentTokens = content.split(SPACE_OF_ANY_LENGTH);
 		String result = "";
 		String date = "";
 		for (String token: contentTokens) {
@@ -477,7 +492,7 @@ public class ParserVault extends ParserSkeleton{
 			}
 		}
 		if (!date.isEmpty()) {
-			int dateLength = date.split(" ").length;
+			int dateLength = date.split(SPACE_OF_ANY_LENGTH).length;
 			if (dateParser.isDayOfWeek(getFirst(date)) && dateParser.hasTime(date) && dateLength == 2) {
 				date = dateParser.parseAndGetDayOfWeekAndTime(date); 
 			} else if (dateParser.hasDate(date) && dateParser.hasTime(date)) {
@@ -530,22 +545,30 @@ public class ParserVault extends ParserSkeleton{
 	}
 	
 	private String getTaskType(String token){
-		if (token.endsWith("s")) {
+		token = token.toUpperCase();
+		if (token.length() > 1 && (token.endsWith("S") || token.endsWith("D"))) {
 			token = token.substring(0, token.length()-1);
 		}
-		switch (token.toLowerCase()) {
+		switch (token) {
 			case TASKTYPE_TODO: 
-				return "T";
+			case TASKTYPE_TODO_ABBR:
+				return TASKTYPE_TODO_ABBR;
 			case TASKTYPE_EVENT:
-				return "E";
+			case TASKTYPE_EVENT_ABBR:
+				return TASKTYPE_EVENT_ABBR;
 			case TASKTYPE_FLOATING:
-				return "F";
+			case TASKTYPE_FLOATING_ABBR:
+				return TASKTYPE_FLOATING_ABBR;
 			case TASKTYPE_OVERDUE:
-				return "O";
+			case TASKTYPE_OVERDUE_ABBR:
+				return TASKTYPE_OVERDUE_ABBR;
 			case TASKTYPE_TODAY:
-				return "Today";
+			case TASKTYPE_TODAY_ABBR:
+				return TASKTYPE_TODAY_ABBR;
 			case TASKTYPE_DONE:
-				return "Done";
+			case TASKTYPE_COMPLETE:	
+			case TASKTYPE_COMPLETE_ABBR:
+				return TASKTYPE_COMPLETE_ABBR;
 			default:
 				return RESULTTYPE_ERROR;
 		}
@@ -553,20 +576,28 @@ public class ParserVault extends ParserSkeleton{
 
 	private String getSortField(String token){
 		switch (token.toLowerCase()) {
-		case COMMAND_DEADLINE:
-		case "by deadline":
-		case "d":
-			return "D";
-		case COMMAND_PRIORITY:
-		case "by priority":
-		case "p":
-			return "P";
-		case "name":
-		case "by name":
-		case "n":
-			return "N";
-		default:
-			return "error";
+			case FIELD_DATE:
+			case "by " + FIELD_DATE:
+			case FIELD_DEADLINE:
+			case "by " + FIELD_DEADLINE:
+				return FIELD_DATE_ABBR;
+			case FIELD_NAME:
+			case "by " + FIELD_NAME:
+				return FIELD_NAME_ABBR;
+			case FIELD_PRIORITY:
+			case "by " + FIELD_PRIORITY:
+				return FIELD_PRIORITY_ABBR;
+			default:
+				switch (token.toUpperCase()) {
+					case FIELD_DATE_ABBR:
+						return FIELD_DATE_ABBR;
+					case FIELD_NAME_ABBR:
+						return FIELD_NAME_ABBR;
+					case FIELD_PRIORITY_ABBR:
+						return FIELD_PRIORITY_ABBR;
+					default:
+						return RESULTTYPE_ERROR;
+				}
 		}
 	}
 

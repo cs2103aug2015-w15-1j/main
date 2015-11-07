@@ -88,33 +88,6 @@ public class SortCommand extends Command {
 	}
 	
 	//@@author A0126258A
-	private ArrayList<Task> sortStart(ArrayList<Task> taskList) {
-		
-		Collections.sort(taskList, new Comparator<Task> () {
-			@Override
-			public int compare(Task left, Task right) {
-				if(Constant.stringToMillisecond(left.getStart())
-						< Constant.stringToMillisecond(right.getStart())) {
-					return -1;
-				} else if(Constant.stringToMillisecond(left.getStart()) 
-						> Constant.stringToMillisecond(right.getStart())) {
-					return 1;
-				} else if(Constant.stringToMillisecond(left.getEnd())
-						< Constant.stringToMillisecond(right.getEnd())) {
-					return -1;
-				} else if(Constant.stringToMillisecond(left.getEnd()) 
-						> Constant.stringToMillisecond(right.getEnd())) {
-					return 1;
-				} else {
-					return 0;
-				}
-			}
-		});
-		
-		return generateTaskId(taskList);
-	}
-	
-	//@@author A0126258A
 	private ArrayList<Task> sortDeadline(ArrayList<Task> taskList) {
 		
 		Collections.sort(taskList, new Comparator<Task> () {
@@ -146,9 +119,6 @@ public class SortCommand extends Command {
 				break;
 			case "sortP":
 				sortedTaskList = sortPriority(taskList);
-				break;
-			case "sortS":
-				sortedTaskList = sortStart(taskList);
 				break;
 			case "sortD":
 				sortedTaskList = sortDeadline(taskList);

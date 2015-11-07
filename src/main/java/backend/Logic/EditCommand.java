@@ -66,7 +66,6 @@ public class EditCommand extends Command {
 	public String execute(){
 		String feedbackString = "";
 		logicEditorLogger.info("Get Command Field: "+this.getCommandField());
-//		System.out.println("Get Command Field: "+this.getCommandField());
 		switch(this.getCommandField()) {
 			case ("priority") :
 				feedbackString = setPriority(this);
@@ -122,8 +121,6 @@ public class EditCommand extends Command {
 	public String undo() {
 		try {
 			ArrayList<Task> historyState = historySubComponent.undo();
-//			System.out.println("Future state: "+futureState);
-//			System.out.println("Current state: "+currentState);
 			storageComponent.save(historyState);
 			return "Undo successfully";
 		} catch (EmptyStackException e) {
@@ -162,9 +159,9 @@ public class EditCommand extends Command {
 		try {
 			int taskId = Integer.parseInt(commandObject.getTaskName());
 			logicEditorLogger.info("taskId: "+taskId);
-//			System.out.println("New name: "+commandObject.getNewName());
+
 			if(!commandObject.getNewName().equals("")) {
-//				System.out.println("New name: "+commandObject.getNewName());
+				logicEditorLogger.info("New Name: "+ commandObject.getNewName());
 				rename(commandObject);
 			}
 			if (!commandObject.getDescription().equals("")) {
@@ -172,7 +169,7 @@ public class EditCommand extends Command {
 				setDescription(commandObject);
 			}
 			if (!commandObject.getPriority().equals("")) {
-				logicEditorLogger.info("priority :"+commandObject.getPriority());
+				logicEditorLogger.info("Priority :"+commandObject.getPriority());
 				setPriority(commandObject);
 			}
 			if (!commandObject.getReminder().equals("")) {
@@ -200,7 +197,6 @@ public class EditCommand extends Command {
 			int taskId = Integer.parseInt(commandObject.getTaskName());
 			logicEditorLogger.info("taskId: "+taskId);
 			if(!commandObject.getNewName().equals("")) {
-//				System.out.println("New name: "+commandObject.getNewName());
 				rename(commandObject);
 			}
 			if (!commandObject.getDescription().equals("")) {
@@ -250,10 +246,6 @@ public class EditCommand extends Command {
 				logicEditorLogger.info("reminder: "+commandObject.getReminder());
 				setReminder(commandObject);
 			}
-//			if(!commandObject.getRecurrence().equals("")) {
-//				logicEditorLogger.info("Recurring: "+commandObject.getRecurrence());
-//				setRecurring(commandObject);
-//			}
 			return EXECUTION_SET_SUCCESSFUL;
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
@@ -390,7 +382,6 @@ public class EditCommand extends Command {
 		int taskIndex = Integer.parseInt(commandObject.getTaskName());
 		int taskId = getTaskId(taskIndex);
 		String newName = commandObject.getNewName();
-//		System.out.println(newName);
 		taskList.get(taskId).setName(newName);
 		storageComponent.save(taskList);
 		return String.format("Task %1$s has been renamed to %2$s", taskIndex, newName);
@@ -473,11 +464,9 @@ public class EditCommand extends Command {
 
 			Command command = new Command();
 			command.setTaskName(Integer.toString(eventIndex));
-			//delete(command);
 			task.setTaskType(Task.TaskType.EVENT);
 			task.setStart(start);
 			task.setEnd(end);
-			//taskList.add(task);
 			setTaskId(taskList);
 			storageComponent.save(taskList);
 
@@ -498,11 +487,9 @@ public class EditCommand extends Command {
 
 			Command command = new Command();
 			command.setTaskName(Integer.toString(taskIndex));
-			//delete(command);
 			task.setStart("");
 			task.setEnd(end);
 			task.setTaskType(getTaskType(task));
-			//taskList.add(task);
 			setTaskId(taskList);
 			storageComponent.save(taskList);
 			
@@ -519,20 +506,13 @@ public class EditCommand extends Command {
 			int taskIndex = Integer.parseInt(commandObject.getTaskName());
 			String[] recurrence = commandObject.getRecurrence().split(" ");
 			int recurrenceFrequency = Integer.parseInt(recurrence[0]);
-//			System.out.println("Recurrence Frequency: "+recurrenceFrequency);
 			String recurrenceType = recurrence[1];
-//			System.out.println("Recurrence Type: "+recurrenceType);
-			String date = commandObject.getStartDateAndTime();
-//			System.out.println("StartDateAndTime: "+date);
 			int taskId = getTaskId(taskIndex);
 			Task task = taskList.get(taskId);
-
 			Command command = new Command();
 			command.setTaskName(Integer.toString(taskIndex));
-			//delete(command);
 			task.setRecurrenceFrequency(recurrenceFrequency);
 			task.setRecurrenceType(getRecurrenceType(recurrenceType));
-			//taskList.add(task);
 			setTaskId(taskList);
 			storageComponent.save(taskList);
 			

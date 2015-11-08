@@ -192,8 +192,8 @@ public class StorageFilePath {
 	
 	//@@author A0126258A
 	/**
-	 * Append front(mac) or back(windows) slash if
-	 * the new file path provided by the user does not
+	 * Append frontslash or backslash if the
+	 * new file path provided by the user does not
 	 * have file name specified, and no slashes typed 
 	 * at the last character of the file path.
 	 * 

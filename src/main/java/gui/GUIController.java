@@ -21,7 +21,6 @@ public class GUIController {
 	private ArrayList<Task> getEvents;
 	private ArrayList<Task> getOverdue;
 	private ArrayList<Task> getFloat;
-	private ArrayList<String> getCate;
 	private ArrayList<Task> getTodayTasksEvents;
 	private ArrayList<Task> getFocusList;
 	private ArrayList<Task> getCompletedTasks;
@@ -49,8 +48,6 @@ public class GUIController {
 		assert getOverdue!=null;
 		getFloat = logicComponent.retrieveTaskData("floating");
 		assert getFloat!=null;
-		getCate = logicComponent.retrieveStringData("categories");
-		assert getCate!=null;
 		retrieveTodays();
 		retrieveCompletes();
 		retrieveSearch();
@@ -128,9 +125,6 @@ public class GUIController {
 		return getFloat;
 	}
 	
-	ArrayList<String> getCateList() {
-		return getCate;
-	}
 	ArrayList<Task> getFocusList() {
 		return getFocusList;
 	}

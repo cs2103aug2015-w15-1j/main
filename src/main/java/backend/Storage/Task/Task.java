@@ -253,7 +253,7 @@ public class Task implements Comparable<Task> {
 			sb.append(PRINT_REMINDER + reminder + PRINT_NEW_LINE);
 		}
 		
-		if(!recurrenceType.equals(recurrenceType.NONE)) {
+		if(!recurrenceType.equals(RecurrenceType.NONE)) {
 			
 			String plural = PRINT_EMPTY;
 			

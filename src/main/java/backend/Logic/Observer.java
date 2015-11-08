@@ -52,7 +52,6 @@ public class Observer {
 	private ArrayList<Task> getFloat;
 	private ArrayList<Task> getTodayTasks;
 	private ArrayList<Task> getTodayEvents;
-	private ArrayList<Task> getFocusList;
 	
 	private ArrayList<Task> getCompletedTasks;
 	private ArrayList<Task> getCompletedEvents;
@@ -79,13 +78,13 @@ public class Observer {
 	//@@author A0121284N
 	private void retrieveAllData(){
 		getTasks = retrieveTaskData(RETRIEVE_UPCOMING_TODO);
-		assert getTasks!=null;
+		assert getTasks != null;
 		getEvents = retrieveTaskData(RETRIEVE_UPCOMING_EVENTS);
-		assert getEvents!=null;
+		assert getEvents != null;
 		getOverdue = retrieveTaskData(RETRIEVE_OVERDUE);
-		assert getOverdue!=null;
+		assert getOverdue != null;
 		getFloat = retrieveTaskData(RETRIEVE_FLOAT);
-		assert getFloat!=null;
+		assert getFloat != null;
 		retrieveTodays();
 		retrieveCompletes();
 	}
@@ -94,7 +93,7 @@ public class Observer {
 	private void retrieveCompletes(){
 		getCompletedTasks = retrieveTaskData(RETRIEVE_COMPLETED_TODO);
 		getCompletedEvents = retrieveTaskData(RETRIEVE_PAST_EVENTS);
-		getCompletedFloat= retrieveTaskData(RETRIEVE_COMPLETED_FLOAT);
+		getCompletedFloat = retrieveTaskData(RETRIEVE_COMPLETED_FLOAT);
 	}
 	
 	//@@author A0121284N

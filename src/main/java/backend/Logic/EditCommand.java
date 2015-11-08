@@ -18,6 +18,7 @@ public class EditCommand extends Command {
 	private static final String EXECUTION_DELETE_SUCCESSFUL = "Task %1$s has been deleted";
 	private static final String EXECUTION_SET_DEADLINE_SUCCESSFUL = "Task %1$s deadline has been set to %2$s";
 	private static final String EXECUTION_SET_RECURRING_SUCCESSFUL = "Task %1$s recurring has been set to %2$s";
+	private static final String EXECUTION_SET_RECURRING_UNSUCCESSFUL = "Unable to recur floating tasks";
 	private static final String EXECUTION_SET_EVENT_START_AND_END_TIME_SUCCESSFUL = "Event %1$s has been setted to %2$s till %3$s";
 	private static final String EXECUTION_SET_DESCRIPTION_SUCCESSFUL = "Description for task %1$s has been set";
 	private static final String EXECUTION_SET_REMINDER_SUCCESSFUL = "Reminder for Task %1$s has been set to be at %2$s";
@@ -437,10 +438,15 @@ public class EditCommand extends Command {
 			int taskId = getTaskId(taskIndex);
 		
 			Task task = taskList.get(taskId);
-			task.setRecurrenceFrequency(recurrenceFrequency);
-			task.setRecurrenceType(getRecurrenceType(recurrenceType));
-			setTaskId(taskList);
-			storageComponent.save(taskList);
+			
+			if(!task.getTaskType().equals(TaskType.FLOATING)) {
+				task.setRecurrenceFrequency(recurrenceFrequency);
+				task.setRecurrenceType(getRecurrenceType(recurrenceType));
+				setTaskId(taskList);
+				storageComponent.save(taskList);
+			} else {
+				return EXECUTION_SET_RECURRING_UNSUCCESSFUL;
+			}
 
 			return String.format(EXECUTION_SET_RECURRING_SUCCESSFUL, taskIndex, 
 					recurrenceFrequency + ", " + recurrenceType);

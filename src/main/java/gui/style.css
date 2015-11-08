@@ -81,3 +81,8 @@
 	-fx-text-fill: #E41B17;
 	-fx-font-size: 16px;
 }
+#border{ 
+	-fx-border-width:3;
+    -fx-border-color: linear-gradient(to top,#336699,derive(#336699, 60%));
+	-fx-padding: 6;
+}

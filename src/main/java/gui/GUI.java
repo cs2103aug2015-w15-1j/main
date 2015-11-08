@@ -1,4 +1,3 @@
-
 package main.java.gui;
 
 import java.io.File;
@@ -53,12 +52,12 @@ import main.java.backend.Storage.Task.Task;
 
 //@@author A0126125R
 public class GUI extends Application{
-	
+
 	//Possible messages
 	private static final String MESSAGE_WELCOME = "Welcome to TankTask!";
 	private static final String MESSAGE_EMPTY = "List is empty";
 	private static final String MESSAGE_COMMAND_HELP = "Press F1 to see a list of commands";
-	
+
 	//Label contents constants
 	private static final String LIST_OVERDUE = "Overdue Tasks:";
 	private static final String LIST_TASKS = "ToDo:";
@@ -66,7 +65,11 @@ public class GUI extends Application{
 	private static final String LIST_FLOATING = "Floating:";
 	private static final String LIST_TODAY = "Today's / Tomorrow's: ";
 	private static final String LIST_SEARCH = "Search Results:";
+	private static final String LIST_COMPLETE_TODO = "Completed ToDo:";
+	private static final String LIST_COMPLETE_EVENTS = "Completed Events:";
+	private static final String LIST_COMPLETE_FLOAT = "COmpleted Floating:";
 	
+
 	//Possible commands retrieved from Logic.
 	private static final String COMMAND_SHOW_TASKS = "show todo";
 	private static final String COMMAND_SHOW_EVENTS = "show events";
@@ -76,19 +79,19 @@ public class GUI extends Application{
 	private static final String COMMAND_SHOW_COMPLETE = "show complete";
 	private static final String COMMAND_SEARCH = "search";
 	private static final String COMMAND_EXIT = "exit";
-	
+
 	//Hot key combinations
-	private final KeyCombination undo = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
-	private final KeyCombination redo = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);
-	private final KeyCombination shiftUp = new KeyCodeCombination(KeyCode.UP, KeyCombination.SHIFT_DOWN);
-	private final KeyCombination shiftDown= new KeyCodeCombination(KeyCode.DOWN, KeyCombination.SHIFT_DOWN);
-	private static final int COUNT_LIMIT = 10000;
-	
+	private final KeyCombination UNDO = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
+	private final KeyCombination REDO = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);
+	private final KeyCombination SHIFTUP = new KeyCodeCombination(KeyCode.UP, KeyCombination.SHIFT_DOWN);
+	private final KeyCombination SHIFTDOWN= new KeyCodeCombination(KeyCode.DOWN, KeyCombination.SHIFT_DOWN);
+
+
 	//necessary variables for one-instance check
-	private File file = new File("flag");
-    private RandomAccessFile randomAccessFile;
-    private FileLock fileLock;
-    
+	private File file;
+	private RandomAccessFile randomAccessFile;
+	private FileLock fileLock;
+
 	//necessary variables for nagivation purposes.
 	private static final int SCENE_MAIN = 1;
 	private static final int SCENE_FOCUS = 2;
@@ -98,24 +101,14 @@ public class GUI extends Application{
 	private static final int NUM_FLOAT = 4;
 	private static final int NUM_TODAY_TASKS_EVENTS = 5;
 	private static final int NUM_SEARCH = 6;
-	private static int currentList = 1;
-	private static int currentPosition = 0;
-	private static int currentScene = 1;
-	private static boolean toggleFloat = false;
-	private static boolean noti = false;
-	private static boolean isHelp = false;
+	private static int currentList;
+	private static int currentPosition;
+	private static int currentScene;
+	private static boolean toggleFloat;
+	private static boolean noti;
+	private static boolean isHelp;
 	private static int commandIndex;
-	
-	private static GUIController controller;
-	private static HelpView help;
-	private static GridPane gridPane;
-	private static Stage stage;
-	private static Scene mainScene;	
-	private static String userCommands;
-	private static Console console;
-	private static PrintStream ps;
-	private static ArrayList<String> recentCommands;
-	
+
 	//List of nodes/children for the gridPane
 	private static TextArea consoleText;
 	private static TextField userInput;
@@ -135,10 +128,25 @@ public class GUI extends Application{
 	private static TextArea detailField;
 	private static ListView<TextFlow> listFocus;
 
-	public static void main(String[] args) {
-        LauncherImpl.launchApplication(GUI.class, GuiPreloader.class, args);
-    }
+	private static GUIController controller;
+	private static HelpView help;
+	private static GridPane gridPane;
+	private static Stage stage;
+	private static Scene mainScene;	
+	private static String userCommands;
+	private static Console console;
+	private static PrintStream ps;
+	private static ArrayList<String> recentCommands;
+	private static final int COUNT_LIMIT = 10000;
 
+	public static void main(String[] args) {
+		LauncherImpl.launchApplication(GUI.class, GuiPreloader.class, args);
+	}
+	
+	/**
+	 * This method checks if TankTask is already running.
+	 * If yes, it will terminate program in 3 seconds.
+	 */
 	@Override
 	public void init() throws Exception, FileNotFoundException, IOException, JSONException, ParseException{
 		file = new File("flag");
@@ -156,11 +164,11 @@ public class GUI extends Application{
 					alert.setHeaderText(null);
 					alert.setContentText("TankTask is already opened in another window.");
 					alert.showAndWait().ifPresent(response -> {
-					     if (response == ButtonType.OK) {
+						if (response == ButtonType.OK) {
 							Platform.exit();
 							System.exit(0);
-					     }
-					 });
+						}
+					});
 				}
 			});
 			Thread.sleep(3000);
@@ -170,30 +178,31 @@ public class GUI extends Application{
 
 		controller = new GUIController();
 		for (int i = 0; i < COUNT_LIMIT; i++) {
-            double progress = (100 * i) / COUNT_LIMIT;
-            LauncherImpl.notifyPreloader(this, new GuiPreloader.ProgressNotification(progress));
-        }
+			double progress = (100 * i) / COUNT_LIMIT;
+			LauncherImpl.notifyPreloader(this, new GuiPreloader.ProgressNotification(progress));
+		}
 		help = new HelpView();
 		consoleText = new TextArea();
 		console = new Console(consoleText);
 		ps = new PrintStream(console, true);
 		recentCommands = new ArrayList<String>();
 		listFocus = new ListView<TextFlow>();
+		currentList = 1;
+		currentPosition = 0;
+		currentScene = 1;
+		toggleFloat = false;
+		noti = false;
+		isHelp = false;
 		redirectOutput(ps);
-		displayStringToScreen(MESSAGE_WELCOME);
-		displayStringToScreen(MESSAGE_COMMAND_HELP);
+		System.out.println(MESSAGE_WELCOME);
+		System.out.println(MESSAGE_COMMAND_HELP);
 		controller.retrieveAllData();
-		
-	}
 
-	private static void redirectOutput(PrintStream stream){
-		System.setOut(stream);
-	//	System.setErr(stream); //error codes are not shown in console.
 	}
-
+	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		
+
 		primaryStage.setTitle("TankTask");
 		setUpDefault();
 		setupUserInput();
@@ -204,94 +213,69 @@ public class GUI extends Application{
 		primaryStage.setScene(mainScene);
 		stage = primaryStage;
 		stage.show();
-		
+
 		determineEvents();
 		reminders();
 		stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 
-            @Override
-            public void handle(WindowEvent arg0) {
-                try {
-                	if (isHelp){
-                		help.close();
-                	}
-                    fileLock.release();
-                    randomAccessFile.close();
-                    System.out.println("Closing");
-                    System.exit(0);
-                } catch (Exception ex) {
-                   ex.printStackTrace();
-                }
+			@Override
+			public void handle(WindowEvent arg0) {
+				try {
+					if (isHelp){
+						help.close();
+					}
+					fileLock.release();
+					randomAccessFile.close();
+					System.out.println("Closing");
+					System.exit(0);
+				} catch (Exception ex) {
+					System.out.println("error at start: ");
+					ex.getMessage();
+				}
 
-            }
-        });	
+			}
+		});	
+	}
+
+	private static void redirectOutput(PrintStream stream){
+		System.setOut(stream);
+		//	System.setErr(stream); //error codes are not shown in console.
 	}
 	
-	private void reminders(){
-		new Timer().schedule(
-			    new TimerTask() {
-
-			        @Override
-			        public void run() {
-			        	Platform.runLater(new Runnable(){
-
-			    			@Override
-			    			public void run() {
-			    				noti = controller.getNoti();
-			    				// System.out.println("reminder check"); //checks that it runs into the method every minute
-						           if (noti){
-						            	runNoti();
-						            }
-						           else {
-						        	   refresh();
-						           }
-			    			}
-			    			});
-			           
-			        }
-			    }, 500L, 60000L);
-	}
-
-	protected void runNoti() {
-		
-		String content = "";
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("REMINDER!");
-		alert.setHeaderText(null);
-		ArrayList<Task> reminders = controller.getReminderList();
-		for (int i=0;i<reminders.size();i++){
-			content+=reminders.get(i).reminderPrint();
-		}
-		alert.setContentText(content);
-		alert.showAndWait();
-		refresh();
-	}
-
+	/**
+	 * This method sets up the default view on GUI
+	 * 
+	 * @throws IOException thrown when file not found.
+	 * @throws JSONException
+	 * @throws ParseException
+	 */
 	private void setUpDefault() throws IOException, JSONException, ParseException{
 		setUpGrid(); //general info
 		initGrid(); //setting up individual sizing
 		setUpGridContents();//setting up contents;
-		
+	
 		mainScene = new Scene(gridPane,1000,600);
 		mainScene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 	}
 
-	private static void setUpGridContents() throws IOException, JSONException, ParseException {
-		gridPane.getChildren().removeAll(focusHeading, detailsHeading, listFocus, detailField);
-		setUpHeadings();	
-		setUpContents();
-	}
-
-	private static void setUpFocus(){
-		gridPane.getChildren().removeAll(floating, tasks, events,
-				listCate, listFloat,listTasks,listEvents);
-
-		try {
-			setUpFocusHeadings();
-			setUpFocusContents();
-		} catch (IOException | JSONException | ParseException e) {
-			e.printStackTrace();
-		}
+	private void initGrid() {
+		ColumnConstraints column1 = new ColumnConstraints();
+		column1.setPercentWidth(24);
+		ColumnConstraints column2 = new ColumnConstraints();
+		column2.setPercentWidth(13);
+		ColumnConstraints column3 = new ColumnConstraints();
+		column3.setPercentWidth(39);
+		ColumnConstraints column4 = new ColumnConstraints();
+		column4.setPercentWidth(24);
+		gridPane.getColumnConstraints().addAll(column1, column2, column3,column4);
+	
+		RowConstraints row1 = new RowConstraints();
+		row1.setPercentHeight(7);
+		RowConstraints row2 = new RowConstraints();
+		row2.setPercentHeight(75);
+		RowConstraints row3 = new RowConstraints();
+		row3.setPercentHeight(12);
+		gridPane.getRowConstraints().addAll(row1,row2,row3);
 	}
 
 	private void setUpGrid() {
@@ -309,49 +293,10 @@ public class GUI extends Application{
 		gridPane.setPrefSize(1000, 600);
 	}
 
-	private void initGrid() {
-		ColumnConstraints column1 = new ColumnConstraints();
-		column1.setPercentWidth(24);
-		ColumnConstraints column2 = new ColumnConstraints();
-		column2.setPercentWidth(13);
-		ColumnConstraints column3 = new ColumnConstraints();
-		column3.setPercentWidth(39);
-		ColumnConstraints column4 = new ColumnConstraints();
-		column4.setPercentWidth(24);
-		gridPane.getColumnConstraints().addAll(column1, column2, column3,column4);
-
-		RowConstraints row1 = new RowConstraints();
-		row1.setPercentHeight(7);
-		RowConstraints row2 = new RowConstraints();
-		row2.setPercentHeight(75);
-		RowConstraints row3 = new RowConstraints();
-		row3.setPercentHeight(12);
-		gridPane.getRowConstraints().addAll(row1,row2,row3);
-	}
-
-	private static void setUpConsole() {
-		consoleText.setEditable(false);
-		consoleText.setDisable(true);
-		consoleText.setFocusTraversable(false);
-		consoleText.setStyle("-fx-focus-color: transparent;");
-		consoleText.getStyleClass().add("txtarea");
-		consoleText.getStyleClass().add("txtarea .scroll-pane");
-		
-		consoleText.setWrapText(true);
-		GridPane.setColumnSpan(consoleText, 4);
-		GridPane.setConstraints(consoleText, 0, 2);
-		gridPane.getChildren().add(consoleText);
-	}
-
-	private static void setupUserInput() {
-		//userInput
-		userInput = new TextField();
-		userInput.setStyle("-fx-focus-color: transparent;");
-		userInput.getStyleClass().add("user");
-
-		GridPane.setColumnSpan(userInput, 4);
-		GridPane.setConstraints(userInput, 0, 3);
-		gridPane.getChildren().add(userInput);
+	private static void setUpGridContents() throws IOException, JSONException, ParseException {
+		gridPane.getChildren().removeAll(focusHeading, detailsHeading, listFocus, detailField);
+		setUpHeadings();	
+		setUpContents();
 	}
 
 	private static void setUpHeadings(){
@@ -369,7 +314,7 @@ public class GUI extends Application{
 		events = new Label(LIST_EVENTS);
 		events.setId("mylabel");
 		GridPane.setConstraints(events, 2, 0);
-
+	
 		gridPane.getChildren().addAll(floating, tasks, events);
 	}
 
@@ -379,46 +324,23 @@ public class GUI extends Application{
 		//tasks		
 		listTasks = convertList(controller.getTasksList());
 		GridPane.setColumnSpan(listTasks, 2);
-		listTasks.setFocusTraversable( false );
-		
-		listTasks.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent event) {
-                event.consume();
-            }
-        });
 		GridPane.setConstraints(listTasks, 0, 1);
-
+		removeTaskClicks();
+		
 		//Events
 		listEvents = convertList(controller.getEventsList());
-		listEvents.setFocusTraversable( false );
-		listEvents.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent event) {
-                event.consume();
-            }
-        });
 		GridPane.setConstraints(listEvents, 2, 1);
-
+		removeEventClicks();
+		
 		gridPane.getChildren().addAll(listTasks,listEvents);
-
+	
 		//Overdue shows only if there is any overdue tasks
 		if (controller.getOverdueList().size()!=0){
 			toggleFloat = false;
 			floating.setText("Overdue:");
 			listOverdue = convertList(controller.getOverdueList());
-			listOverdue.setFocusTraversable(false);
-			listOverdue.setId("listOverdue");
-			listOverdue.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-
-	            @Override
-	            public void handle(MouseEvent event) {
-	                event.consume();
-	            }
-	        });
 			GridPane.setConstraints(listOverdue, 3,1);
+			removeOverdueClicks();
 			gridPane.getChildren().addAll(listOverdue);
 		}
 		else{
@@ -426,18 +348,91 @@ public class GUI extends Application{
 			toggleFloat = true;
 			floating.setText(LIST_FLOATING);
 			listFloat = convertList(controller.getFloatList());
-			listFloat.setFocusTraversable( false );
-			listFloat.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-
-	            @Override
-	            public void handle(MouseEvent event) {
-	                event.consume();
-	            }
-	        });
+			removeFloatClicks();
 			GridPane.setConstraints(listFloat, 3, 1);
 			gridPane.getChildren().addAll(listFloat);
 		}
+	
+	}
 
+	private static void removeFloatClicks() {
+		listFloat.setFocusTraversable(false);
+		listFloat.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				event.consume();
+			}
+		});
+	}
+
+	private static void removeEventClicks() {
+		listEvents.setFocusTraversable( false );
+		listEvents.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+	
+			@Override
+			public void handle(MouseEvent event) {
+				event.consume();
+			}
+		});
+	}
+
+	private static void removeOverdueClicks() {
+		listOverdue.setFocusTraversable(false);
+		listOverdue.setId("listOverdue");
+		listOverdue.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				event.consume();
+			}
+		});
+	}
+
+	private static void removeTaskClicks() {
+		listTasks.setFocusTraversable( false );
+		listTasks.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				event.consume();
+			}
+		});
+	}
+
+	private static void setUpConsole() {
+		consoleText.setEditable(false);
+		consoleText.setDisable(true);
+		consoleText.setFocusTraversable(false);
+		consoleText.setStyle("-fx-focus-color: transparent;");
+		consoleText.getStyleClass().add("txtarea");
+		consoleText.getStyleClass().add("txtarea .scroll-pane");
+	
+		consoleText.setWrapText(true);
+		GridPane.setColumnSpan(consoleText, 4);
+		GridPane.setConstraints(consoleText, 0, 2);
+		gridPane.getChildren().add(consoleText);
+	}
+
+	private static void setupUserInput() {
+		//userInput
+		userInput = new TextField();
+		userInput.setStyle("-fx-focus-color: transparent;");
+		userInput.getStyleClass().add("user");
+	
+		GridPane.setColumnSpan(userInput, 4);
+		GridPane.setConstraints(userInput, 0, 3);
+		gridPane.getChildren().add(userInput);
+	}
+
+	private static void setUpFocus(){
+		gridPane.getChildren().removeAll(floating, tasks, events,
+				listCate, listFloat,listTasks,listEvents);
+
+		try {
+			setUpFocusHeadings();
+			setUpFocusContents();
+		} catch (IOException | JSONException | ParseException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private static void setUpFocusHeadings(){
@@ -499,11 +494,7 @@ public class GUI extends Application{
 		return listTask;
 	}
 
-	private static void displayStringToScreen(String getProcessedInput) {
-		System.out.println(getProcessedInput);
-	}
-
-	private static void refresh(){
+	private static void refreshAll(){
 		//System.out.println("refreshing");
 		controller.retrieveAllData();
 		if (currentScene == SCENE_MAIN){
@@ -517,9 +508,6 @@ public class GUI extends Application{
 	}
 
 	private static void refreshingFocus(int currentListNum){
-		/*if (currentListNum == NUM_SEARCH){
-			controller.retrieveSearch();
-		}*/
 		controller.determineList(currentListNum);
 		try {
 			changeFocusList(currentListNum);
@@ -537,11 +525,11 @@ public class GUI extends Application{
 		listFocus.setMouseTransparent( false );
 		listFocus.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
 
-            @Override
-            public void handle(MouseEvent event) {
-                event.consume();
-            }
-        });
+			@Override
+			public void handle(MouseEvent event) {
+				event.consume();
+			}
+		});
 		listFocus.scrollTo(currentPosition);
 		listFocus.getSelectionModel().select(currentPosition);
 		GridPane.setConstraints(listFocus, 0, 1);
@@ -549,21 +537,27 @@ public class GUI extends Application{
 	}
 
 	private static void changeFocusListDetails(int headNum){
-
-		if (headNum == NUM_OVERDUE){
+		switch(headNum){
+		case NUM_OVERDUE:
 			focusHeading.setText(LIST_OVERDUE);
-		} else if (headNum == NUM_TASKS){
+			break;
+		case NUM_TASKS:
 			focusHeading.setText(LIST_TASKS);
-		} else if (headNum == NUM_EVENTS){
+			break;
+		case NUM_EVENTS:
 			focusHeading.setText(LIST_EVENTS);
-		} else if (headNum == NUM_FLOAT){
+			break;
+		case NUM_FLOAT:
 			focusHeading.setText(LIST_FLOATING);
-		} else if (headNum == NUM_TODAY_TASKS_EVENTS){
+			break;
+		case NUM_TODAY_TASKS_EVENTS:
 			focusHeading.setText(LIST_TODAY);
-		} else if (headNum == NUM_SEARCH){
+			break;
+		case NUM_SEARCH:
 			focusHeading.setText(LIST_SEARCH);
+			break;
 		}
-		
+
 		assert controller.getFocusList()!=null;
 
 		if(controller.getFocusList().isEmpty()){
@@ -573,34 +567,77 @@ public class GUI extends Application{
 		detailField.setText(controller.getFocusList().get(currentPosition).printFull());
 	}
 
+	private void reminders(){
+		new Timer().schedule(
+				new TimerTask() {
+	
+					@Override
+					public void run() {
+						Platform.runLater(new Runnable(){
+	
+							@Override
+							public void run() {
+								noti = controller.getNoti();
+								// System.out.println("reminder check"); //checks that it runs into the method every minute
+								if (noti){
+									runNoti();
+								}
+								else {
+									refreshAll();
+								}
+							}
+						});
+	
+					}
+				}, 500L, 60000L);
+	}
+
+	protected void runNoti() {
+	
+		String content = "";
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("REMINDER!");
+		alert.setHeaderText(null);
+		ArrayList<Task> reminders = controller.getReminderList();
+		for (int i=0;i<reminders.size();i++){
+			content+=reminders.get(i).reminderPrint();
+		}
+		alert.setContentText(content);
+		alert.showAndWait();
+		refreshAll();
+	}
+
 	private void determineEvents(){
 		userInput.setOnKeyPressed(new EventHandler<KeyEvent>()
 		{
 			@Override
 			public void handle(KeyEvent ke)
 			{	
-				
+
 				if (ke.getCode().equals(KeyCode.ENTER))
 				{
-					userInputCommands();	
+					runUserInputEvents();	
 
 				} else if(ke.getCode().equals(KeyCode.TAB)){
 					changeScene();
-				} else if(undo.match(ke)){
+				} else if(UNDO.match(ke)){
 					String response = controller.executeCommand("undo");
 
-					refresh();
+					refreshAll();
 
-					displayStringToScreen(response);
+					System.out.println(response);
 
-				} else if(redo.match(ke)){
+				} else if(REDO.match(ke)){
 					String response = controller.executeCommand("redo");
 
-					refresh();
+					refreshAll();
 
-					displayStringToScreen(response);
+					System.out.println(response);
 
 				}else if (ke.getCode().equals(KeyCode.F1)){
+					if (isHelp){
+						help.toFront();
+					}
 					isHelp = true;
 					help.helpPopUp();
 				} else if(ke.getCode().equals(KeyCode.F2)){
@@ -614,121 +651,100 @@ public class GUI extends Application{
 				} else if(ke.getCode().equals(KeyCode.F4)){
 					showCompleted();
 				} else if (ke.getCode().equals(KeyCode.ESCAPE)){
-				
+
 					controller.executeCommand("exit");
-				} else 	if (shiftUp.match(ke)){
-						if (!recentCommands.isEmpty()){
-							userInput.setText(recentCommands.get(commandIndex));
-							commandIndex--;
-							if (commandIndex<0){
-								commandIndex = 0;
-							}
-						}
-					} else if (shiftDown.match(ke)){
-						if (!recentCommands.isEmpty()){
-							commandIndex++;
-							if (commandIndex>recentCommands.size()-1){
-								commandIndex = recentCommands.size()-1;
-							}
-							userInput.setText(recentCommands.get(commandIndex));
-						}
-						if (currentScene==SCENE_FOCUS){
-							try {
-								eventDown();
-							} catch (IOException | JSONException | ParseException e) {
-								e.printStackTrace();
-							}
+				} else 	if (SHIFTUP.match(ke)){
+					if (!recentCommands.isEmpty()){
+						userInput.setText(recentCommands.get(commandIndex));
+						commandIndex--;
+						if (commandIndex<0){
+							commandIndex = 0;
 						}
 					}
-					if (currentScene == SCENE_FOCUS){
+				} else if (SHIFTDOWN.match(ke)){
+					if (!recentCommands.isEmpty()){
+						commandIndex++;
+						if (commandIndex>recentCommands.size()-1){
+							commandIndex = recentCommands.size()-1;
+						}
+						userInput.setText(recentCommands.get(commandIndex));
+					}
+					if (currentScene==SCENE_FOCUS){
 						try {
-							changeFocusList(currentList);
-						} catch (IOException | JSONException | ParseException e2) {
-							e2.printStackTrace();
+							runEventDown();
+						} catch (IOException | JSONException | ParseException e) {
+							e.printStackTrace();
 						}
-						changeFocusListDetails(currentList);
+					}
+				}
+				if (currentScene == SCENE_FOCUS){
+					try {
+						changeFocusList(currentList);
+					} catch (IOException | JSONException | ParseException e2) {
+						e2.printStackTrace();
+					}
+					changeFocusListDetails(currentList);
 
-						refresh();
+					refreshAll();
 
-						if (ke.getCode().equals(KeyCode.DOWN))
-						{	
-							try {
-								eventDown();
-							} catch (IOException | JSONException | ParseException e) {
-								e.printStackTrace();
-							}
+					if (ke.getCode().equals(KeyCode.DOWN))
+					{	
+						try {
+							runEventDown();
+						} catch (IOException | JSONException | ParseException e) {
+							e.printStackTrace();
 						}
-						if (ke.getCode().equals(KeyCode.UP)){
-							try {
-								eventUp();
-							} catch (IOException | JSONException | ParseException e) {
-								e.printStackTrace();
-							}
+					}
+					if (ke.getCode().equals(KeyCode.UP)){
+						try {
+							runEventUp();
+						} catch (IOException | JSONException | ParseException e) {
+							e.printStackTrace();
 						}
-						if (ke.getCode().equals(KeyCode.LEFT)){
-							try {
-								eventLeft();
-							} catch (IOException | JSONException | ParseException e) {
+					}
+					if (ke.getCode().equals(KeyCode.LEFT)){
+						try {
+							runEventLeft();
+						} catch (IOException | JSONException | ParseException e) {
 							e.printStackTrace();
 						}
 					}
 					if (ke.getCode().equals(KeyCode.RIGHT)){
 						try {
-							eventRight();
+							runEventRight();
 						} catch (IOException | JSONException | ParseException e) {
 							e.printStackTrace();
 						}
 					}
 				}
 			}
-			
+
 		});
 	}
 
-	protected static void showCompleted() {
-		try {
-			setUpGridContents();
-		} catch (IOException | JSONException | ParseException e) {
-			e.printStackTrace();
+	private static void toggleFloat() throws IOException, JSONException, ParseException{
+		if (currentScene == SCENE_MAIN && !controller.getOverdueList().isEmpty()){
+			controller.retrieveAllData();
+			gridPane.getChildren().removeAll(listFloat);
+	
+			if (toggleFloat == true ){
+				toggleFloat = false;
+				floating.setText("Overdue:");
+				listOverdue = convertList(controller.getOverdueList());
+				removeOverdueClicks();
+				listOverdue.setId("listOverdue");
+				GridPane.setConstraints(listOverdue, 3,1);
+				gridPane.getChildren().addAll(listOverdue);
+			}
+			else{
+				toggleFloat = true;
+				floating.setText(LIST_FLOATING);
+				listFloat = convertList(controller.getFloatList());
+				removeFloatClicks();
+				GridPane.setConstraints(listFloat, 3, 1);
+				gridPane.getChildren().addAll(listFloat);
+			}
 		}
-		currentScene = SCENE_MAIN;
-		tasks.setText("Completed Tasks: ");
-		events.setText("Completed Events: ");
-		floating.setText("Completed Floating: ");
-		gridPane.getChildren().removeAll(listTasks,listEvents,listFloat);
-		listTasks = convertList(controller.getCompletedTasks());
-		listTasks.setFocusTraversable(false);
-		listTasks.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent event) {
-                event.consume();
-            }
-        });
-		listEvents = convertList(controller.getCompletedEvents());
-		listEvents.setFocusTraversable(false);
-		listEvents.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent event) {
-                event.consume();
-            }
-        });
-		listFloat = convertList(controller.getCompletedFloat());
-		listFloat.setFocusTraversable(false);
-		listFloat.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent event) {
-                event.consume();
-            }
-        });
-		GridPane.setConstraints(listTasks, 0, 1);
-		GridPane.setColumnSpan(listTasks, 2);
-		GridPane.setConstraints(listEvents, 2, 1);
-		GridPane.setConstraints(listFloat, 3, 1);
-		gridPane.getChildren().addAll(listTasks,listEvents,listFloat);
-		
 	}
 
 	private void showTodayTasksEvents() {
@@ -738,9 +754,38 @@ public class GUI extends Application{
 		currentScene = SCENE_FOCUS;
 	}
 
+	protected static void showCompleted() {
+		try {
+			setUpGridContents();
+		} catch (IOException | JSONException | ParseException e) {
+			e.printStackTrace();
+		}
+		currentScene = SCENE_MAIN;
+		tasks.setText(LIST_COMPLETE_TODO);
+		events.setText(LIST_COMPLETE_EVENTS);
+		floating.setText(LIST_COMPLETE_FLOAT);
+		gridPane.getChildren().removeAll(listTasks,listEvents,listFloat);
+		
+		listTasks = convertList(controller.getCompletedTasks());
+		removeTaskClicks();
+		
+		listEvents = convertList(controller.getCompletedEvents());
+		removeEventClicks();
+		
+		listFloat = convertList(controller.getCompletedFloat());
+		removeFloatClicks();
+		
+		GridPane.setConstraints(listTasks, 0, 1);
+		GridPane.setColumnSpan(listTasks, 2);
+		GridPane.setConstraints(listEvents, 2, 1);
+		GridPane.setConstraints(listFloat, 3, 1);
+		gridPane.getChildren().addAll(listTasks,listEvents,listFloat);
+	
+	}
+
 	private static void changeScene() {
 		if (currentScene == SCENE_MAIN){
-			
+
 			setUpFocus();
 			refreshingFocus(currentList);
 
@@ -756,7 +801,7 @@ public class GUI extends Application{
 		}
 	}
 
-	private static void userInputCommands(){
+	private static void runUserInputEvents(){
 		if (!userInput.getText().isEmpty()){
 			userCommands = userInput.getText();
 			userCommands = userCommands.trim();
@@ -766,58 +811,115 @@ public class GUI extends Application{
 				userInput.clear();
 				System.out.println("Command: "+ userCommands);
 				String display = controller.executeCommand(userCommands);
-				if (display.equals("change")){
+				switch (display){
+				case "change":
 					changeScene();
-				}
-				else if(display.equals(COMMAND_SHOW_OVERDUE)||display.equals("showO")){
+				break;
+				case COMMAND_SHOW_OVERDUE:
+				case "showO":
 					currentPosition = 0;
 					currentList = NUM_OVERDUE;
 					setUpFocus();
 					refreshingFocus(currentList);
 					currentScene = SCENE_FOCUS;
-				}
-				else if(display.equals(COMMAND_SHOW_TASKS)||display.equals("showT")){
+				break;
+				case COMMAND_SHOW_TASKS:
+				case "showT":
 					currentPosition = 0;
 					currentList = NUM_TASKS;
 					setUpFocus();
 					refreshingFocus(currentList);
 					currentScene = SCENE_FOCUS;
-				}else if(display.equals(COMMAND_SHOW_EVENTS)||display.equals("showE")){
+				break;
+				case COMMAND_SHOW_EVENTS:
+				case "showE":
 					currentPosition = 0;
 					currentList = NUM_EVENTS;
 					setUpFocus();
 					refreshingFocus(currentList);
 					currentScene = SCENE_FOCUS;
-				}else if(display.equals(COMMAND_SHOW_FLOAT)||display.equals("showF")){
+				break;
+				case COMMAND_SHOW_FLOAT:
+				case "showF":
 					currentPosition = 0;
 					currentList = NUM_FLOAT;
 					setUpFocus();
 					refreshingFocus(currentList);
 					currentScene = SCENE_FOCUS;
-				} else if(display.equals(COMMAND_SHOW_TODAY)||display.equals("showD")){
+				break;
+				case COMMAND_SHOW_TODAY:
+				case "showD":
 					currentPosition = 0;
 					currentList = NUM_TODAY_TASKS_EVENTS;
 					setUpFocus();
 					refreshingFocus(currentList);
 					currentScene = SCENE_FOCUS;
-				} else if(display.equals(COMMAND_SHOW_COMPLETE)||display.equals("showC")){
+				break;
+				case COMMAND_SHOW_COMPLETE:
+				case "showC":
 					showCompleted();
-				} else if(display.equals(COMMAND_SEARCH)){
+				break;
+				case COMMAND_SEARCH:
 					currentPosition = 0;
 					currentList = NUM_SEARCH;
 					setUpFocus();
 					refreshingFocus(currentList);
 					currentScene = SCENE_FOCUS;
-				} else if(display.equals(COMMAND_EXIT)){
+				break;
+				case COMMAND_EXIT:
 					exit();
-				} else {
-					refresh();
-					displayStringToScreen(display);
+				break;
+				default:
+					refreshAll();
+					System.out.println(display);
 
 				}
 				controller.retrieveAllData();
 			}
 		}
+	}
+
+	private static void updateFocus() {
+		refreshingFocus(currentList);
+		listFocus.scrollTo(currentPosition);
+		listFocus.getSelectionModel().select(currentPosition);
+	}
+
+	private static void runEventDown() throws IOException, JSONException, ParseException{
+		currentPosition++;
+		changeFocusList(currentList);
+
+		if (currentPosition>=controller.getFocusList().size()){
+			currentPosition = controller.getFocusList().size()-1;  
+		}
+		updateFocus();
+
+	}
+
+	private static void runEventUp() throws IOException, JSONException, ParseException{
+		currentPosition--;
+		if (currentPosition<0){
+			currentPosition = 0;  
+		}
+		updateFocus();
+	}
+
+	private static void runEventLeft() throws IOException, JSONException, ParseException{
+		currentList--;
+		currentPosition=0;
+		if(currentList<=0){
+			currentList=1;
+		}
+		updateFocus();
+	}
+
+	private static void runEventRight() throws IOException, JSONException, ParseException{
+		currentList++;
+		currentPosition=0;
+		if(currentList>6){
+			currentList=6;
+		}
+		updateFocus();
 	}
 
 	private static void exit(){
@@ -828,91 +930,6 @@ public class GUI extends Application{
 		}
 		Platform.exit();
 		System.exit(0);
-	}
-
-	private static void eventDown() throws IOException, JSONException, ParseException{
-		currentPosition++;
-		changeFocusList(currentList);
-
-		if (currentPosition>=controller.getFocusList().size()){
-			currentPosition = controller.getFocusList().size()-1;  
-		}
-		changeFocusListDetails(currentList);
-		listFocus.scrollTo(currentPosition);
-		listFocus.getSelectionModel().select(currentPosition);
-
-	}
-
-	private static void eventUp() throws IOException, JSONException, ParseException{
-		currentPosition--;
-		if (currentPosition<0){
-			currentPosition = 0;  
-		}
-		refreshingFocus(currentList);
-		listFocus.scrollTo(currentPosition);
-		listFocus.getSelectionModel().select(currentPosition);
-	}
-
-	private static void eventLeft() throws IOException, JSONException, ParseException{
-		currentList--;
-		currentPosition=0;
-		if(currentList<=0){
-			currentList=1;
-		}
-		refreshingFocus(currentList);
-		listFocus.scrollTo(currentPosition);
-		listFocus.getSelectionModel().select(currentPosition);
-	}
-
-	private static void eventRight() throws IOException, JSONException, ParseException{
-		currentList++;
-		currentPosition=0;
-		if(currentList>6){
-			currentList=6;
-		}
-		refreshingFocus(currentList);
-		listFocus.scrollTo(currentPosition);
-		listFocus.getSelectionModel().select(currentPosition);
-	}
-
-	private static void toggleFloat() throws IOException, JSONException, ParseException{
-		if (currentScene == SCENE_MAIN && !controller.getOverdueList().isEmpty()){
-			controller.retrieveAllData();
-			gridPane.getChildren().removeAll(listFloat);
-			
-			if (toggleFloat == true ){
-				toggleFloat = false;
-				floating.setText("Overdue:");
-				listOverdue = convertList(controller.getOverdueList());
-				listOverdue.setFocusTraversable(false);
-				listOverdue.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-
-		            @Override
-		            public void handle(MouseEvent event) {
-		                event.consume();
-		            }
-		        });
-				listOverdue.setId("listOverdue");
-				GridPane.setConstraints(listOverdue, 3,1);
-				gridPane.getChildren().addAll(listOverdue);
-			}
-			else{
-				//floating
-				toggleFloat = true;
-				floating.setText(LIST_FLOATING);
-				listFloat = convertList(controller.getFloatList());
-				listFloat.setFocusTraversable( false );
-				listFloat.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-
-		            @Override
-		            public void handle(MouseEvent event) {
-		                event.consume();
-		            }
-		        });
-				GridPane.setConstraints(listFloat, 3, 1);
-				gridPane.getChildren().addAll(listFloat);
-			}
-		}
 	}
 
 }

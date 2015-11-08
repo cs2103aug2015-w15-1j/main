@@ -10,6 +10,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 
+/**
+ * This class manipulates the file path of the text file where all 
+ * data are saved. It allows users to change the file path of the text 
+ * file by simply providing the file path with or without file text name.
+ * 
+ * @author A0126258A
+ *
+ */
+
 public class StorageFilePath {
 
 	private static final String ERROR_READ_DATA = "An error occured when retrieving data from config file.";
@@ -41,6 +50,12 @@ public class StorageFilePath {
 	}
 	
 	//@@author A0121284N
+	/**
+	 * Transfers all data from current file to new file.
+	 * 
+	 * @param oldFilePath		File path of current file
+	 * @param newFilePath		File path of new file
+	 */
 	private void dataTransfer(String oldFilePath, String newFilePath) {
 	
 		byte[] buffer = new byte[10000];
@@ -69,6 +84,15 @@ public class StorageFilePath {
 	}
 	
 	//@@author A0126258A
+	/**
+	 * Removes file name to check if new file path exist
+	 * before transferring data over to the new file path.
+	 * 
+	 * @param tokenize		Tokenize the file path to remove last token (file name)
+	 * @param slash			Token to represent front or back slash to distinguish 
+	 * 						mac or windows file path
+	 * @return				Returns filepath with file name removed	
+	 */
 	private String removeFileName(String[] tokenize, String slash) {
 		
 		String filePath = new String();
@@ -82,6 +106,13 @@ public class StorageFilePath {
 	}
 	
 	//@@author A0126258A
+	/**
+	 * Check if file path exist before transferring data 
+	 * over from current file to new file
+	 * 
+	 * @param filePath		New file path provided by user.
+	 * @return				Returns true if exist, else false.
+	 */
 	private boolean isFilePathExist(String filePath) {
 		
 		filePath = filePath.replace(BACKSLASH_1, BACKSLASH_2);
@@ -100,6 +131,12 @@ public class StorageFilePath {
 	}
 	
 	//@@author A0126258A
+	/**
+	 * Retrieves current file path of the text file
+	 * where all data is saved.
+	 * 
+	 * @return		Current file path
+	 */
 	private String retrieveFilePath() {
 		
 		String filePath = properties.getProperty(FILE_KEY);
@@ -112,6 +149,15 @@ public class StorageFilePath {
 	}
 	
 	//@@author A0126258A
+	/**
+	 * Append the previous set text file name to the 
+	 * new file path provided by the user if the user
+	 * did not specify the name of the text file for
+	 * the new file path.
+	 * 
+	 * @param newFilePath		New file path to transfer data over.
+	 * @return					New file path with name of text file attached.
+	 */
 	private String appendTextFile(String newFilePath) {
 		
 		if(!newFilePath.contains(DEFAULT_FILE_EXTENTION)) {
@@ -122,6 +168,13 @@ public class StorageFilePath {
 	}
 	
 	//@@author A0126258A
+	/**
+	 * Retrieves the file name of current file path 
+	 * if the user did not specify file name in the
+	 * new file path.
+	 * 
+	 * @return			Current name of text file
+	 */
 	private String getFileName() {
 		
 		String filePath = retrieve();
@@ -138,6 +191,15 @@ public class StorageFilePath {
 	}
 	
 	//@@author A0126258A
+	/**
+	 * Append front(mac) or back(windows) slash if
+	 * the new file path provided by the user does not
+	 * have file name specified, and no slashes typed 
+	 * at the last character of the file path.
+	 * 
+	 * @param newFilePath		New file path provided by user.
+	 * @return					Proper file path with all required slashes.
+	 */
 	private String addSlash(String newFilePath) {
 		
 		if(newFilePath.contains(FRONTSLASH) 
@@ -158,6 +220,11 @@ public class StorageFilePath {
 	}
 	
 	//@@author A0126258A
+	/**
+	 * Retrieves the current file path of data storage.
+	 * 
+	 * @return		Current file path
+	 */
 	public String retrieve() {
 		
 		try {

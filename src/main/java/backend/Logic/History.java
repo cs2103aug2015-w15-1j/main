@@ -1,15 +1,13 @@
 //@@author A0121284N
 package main.java.backend.Logic;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.Stack;
-import java.util.logging.FileHandler;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 import main.java.backend.Storage.Task.Task;
+import main.java.backend.Util.LoggerGlobal;
 
 public class History {
 	
@@ -19,17 +17,14 @@ public class History {
 	private static final String LOGGER_STACK_SIZE_AFTER_POP = "Stack size after push: ";
 	private static final String LOGGER_ERROR_EMPTY_STACK = "Error Occured: Stack is empty";
 	
-	private static Logger historyLogger = Logger.getGlobal();	
+	private static final Logger historyLogger = LoggerGlobal.getLogger();	
 	private static History historyObject;
 	
 	private Stack<ArrayList<Task>> stateUndo = new Stack<ArrayList<Task>>();
 	private Stack<ArrayList<Task>> stateRedo = new Stack<ArrayList<Task>>();
 	
-	private FileHandler logHandler;
-	
 	private History() {
-		initLogger();
-		historyLogger.info("Logic component initialised successfully");
+		
 	}
 	
 	public static History getInstance() {
@@ -40,20 +35,7 @@ public class History {
 		return historyObject;
 	}
 	
-	private void initLogger() {
-		
-		try {
-			logHandler = new FileHandler("TankTaskLog.txt",1000000000,10,true);
-			logHandler.setFormatter(new SimpleFormatter());
-			historyLogger.addHandler(logHandler);
-			historyLogger.setUseParentHandlers(false);
-		} catch (SecurityException | IOException e) {
-			historyLogger.warning("History failed to initialise: " + e.getMessage());
-		}
-	}
-	
 	public void exit() {
-		logHandler.close();
 		System.exit(0);
 	}
 

@@ -1,20 +1,17 @@
 //@@author A0121284N
 package main.java.backend.Logic;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.logging.FileHandler;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-
 import main.java.backend.Storage.Storage;
+import main.java.backend.Util.LoggerGlobal;
 
 public class LogicCommandHandler {
-	private static LogicCommandHandler commandHandler;
-	private static Storage storageComponent;
-	private static History historySubComponent;
+	
 	private static final String COMMAND_ADD = "add";
+	private static final String COMMAND_ADD_TODO = "addT";
+	private static final String COMMAND_ADD_EVENT = "addE";
 	private static final String COMMAND_EDIT = "edit";
 	private static final String COMMAND_SORT = "sort";
 	private static final String COMMAND_SEARCH = "search";
@@ -24,6 +21,21 @@ public class LogicCommandHandler {
 	private static final String COMMAND_REDO = "redo";
 	private static final String COMMAND_ERROR = "error";
 	private static final String COMMAND_FILEPATH = "filepath";
+	
+	private static final String COMMAND_SET_FLOAT = "set";
+	private static final String COMMAND_SET_TODO = "setT";
+	private static final String COMMAND_SET_EVENT = "setE";
+	private static final String COMMAND_DEADLINE = "deadline";
+	private static final String COMMAND_EVENT = "event";
+	private static final String COMMAND_DESCRIPTION = "description";
+	private static final String COMMAND_REMINDER = "reminder";
+	private static final String COMMAND_PRIORITY = "priority";
+	private static final String COMMAND_RENAME = "rename";
+	private static final String COMMAND_RESET = "reset";
+	private static final String COMMAND_RECUR = "every";
+	
+	private static final String EMPTY = "";
+	
 	private static final String[] addKeywords = new String[] {"addF", "addT",
 			"addE", "adds", "addcat"};
 	private static final String[] editKeywords = new String[] {"set", "setT", 
@@ -32,13 +44,16 @@ public class LogicCommandHandler {
 	private static final String[] sortKeywords = new String[] {"sortN", "sortP","sortD"};
 	private static final String[] viewKeywords = new String[] {"showCat", "show floating", "showC",
 			"showD", "show todo", "show events", "show overdue", "showT", "showE", "showO", "showF"};
-	private static Logger logicCommandHandlerLogger = Logger.getGlobal();	
-	private FileHandler logHandler;
+	
+	private static Logger logicCommandHandlerLogger = LoggerGlobal.getLogger();	
+	
+	private static LogicCommandHandler commandHandler;
+	private static Storage storageComponent;
+	private static History historySubComponent;
 	
 	private LogicCommandHandler(Storage storage, History history) {
 		storageComponent = storage;
 		historySubComponent = history;
-		initLogger();
 	}
 
 	public static LogicCommandHandler getInstance(Storage storage, History history) {
@@ -49,23 +64,8 @@ public class LogicCommandHandler {
 	}
 	
 	public void exit() {
-		logHandler.close();
 		System.exit(0);
 	}
-	
-	//@@author A0121284N
-			private void initLogger() {
-					
-					try {
-						logHandler = new FileHandler("TankTaskLog.txt",1000000000,10,true);
-						logHandler.setFormatter(new SimpleFormatter());
-						logicCommandHandlerLogger.addHandler(logHandler);
-						logicCommandHandlerLogger.setUseParentHandlers(false);
-						
-					} catch (SecurityException | IOException e) {
-						logicCommandHandlerLogger.warning("Logger failed to initialise: " + e.getMessage());
-					}
-				}
 
 	public Command parse(ArrayList<String> parsedUserInput) {
 		logicCommandHandlerLogger.info("Command from parser: "+parsedUserInput.get(0));
@@ -181,99 +181,92 @@ public class LogicCommandHandler {
 		sortCommandObject.setSortField(parsedUserInput.get(0));
 		return sortCommandObject;
 	}
+	
+	private void setCommand(Command editCommandObject, String description,
+			String priority, String reminder, String startDateAndTime, String endDateAndTime, 
+			String recurrence, String newName) {
+		
+		editCommandObject.setDescription(description);
+		editCommandObject.setPriority(priority);
+		editCommandObject.setEndDateAndTime(startDateAndTime);
+		editCommandObject.setEndDateAndTime(endDateAndTime);
+		editCommandObject.setReminder(reminder);
+		editCommandObject.setRecurrence(recurrence);
+		editCommandObject.setNewName(newName);	
+	}
 
 	private Command initAddCommand(ArrayList<String> parsedUserInput) {
 		int inputLength = parsedUserInput.size();
-		AddCommand addCommandObject = new AddCommand(Command.Type.ADD, storageComponent, historySubComponent);
+		AddCommand addCommandObject = new AddCommand(Command.Type.ADD, 
+				storageComponent, historySubComponent);
 		addCommandObject.setCommandField(parsedUserInput.get(0));
 		addCommandObject.setTaskName(parsedUserInput.get(1));
-		addCommandObject.setDescription(parsedUserInput.get(2));
-		addCommandObject.setRecurrence(parsedUserInput.get(inputLength-1));
-		addCommandObject.setReminder(parsedUserInput.get(inputLength-2));
-		addCommandObject.setPriority(parsedUserInput.get(inputLength-3));
+		
+		setCommand(addCommandObject, parsedUserInput.get(2),
+				parsedUserInput.get(inputLength-3), parsedUserInput.get(inputLength-2), 
+				EMPTY, EMPTY, parsedUserInput.get(inputLength-1), EMPTY);
+
 		switch (parsedUserInput.get(0)){
-			case ("addT"):
+			case (COMMAND_ADD_TODO):
 				addCommandObject.setEndDateAndTime(parsedUserInput.get(3));
 				break;
-			case ("addE"):
+			case (COMMAND_ADD_EVENT):
 				addCommandObject.setStartDateAndTime(parsedUserInput.get(3));
 				addCommandObject.setEndDateAndTime(parsedUserInput.get(4));
 				break;
 		}
 		return addCommandObject;
 	}
-	
+
 	private Command initEditCommand(ArrayList<String> parsedUserInput) {
-		EditCommand editCommandObject = new EditCommand(Command.Type.EDIT, storageComponent, historySubComponent);
+		EditCommand editCommandObject = new EditCommand(Command.Type.EDIT, 
+				storageComponent, historySubComponent);
+		
 		editCommandObject.setCommandField(parsedUserInput.get(0));
+		if(parsedUserInput.size() > 1) {
+			editCommandObject.setTaskName(parsedUserInput.get(1));
+		}
+
 		switch (parsedUserInput.get(0)) {
-			case ("set") :
-				editCommandObject.setTaskName(parsedUserInput.get(1));
-				editCommandObject.setDescription(parsedUserInput.get(2));
-				editCommandObject.setPriority(parsedUserInput.get(3));
-				editCommandObject.setReminder(parsedUserInput.get(4));
-				editCommandObject.setRecurrence(parsedUserInput.get(5));
-				editCommandObject.setNewName(parsedUserInput.get(6));
+			case (COMMAND_SET_FLOAT) :
+				setCommand(editCommandObject, parsedUserInput.get(2),
+						parsedUserInput.get(3), parsedUserInput.get(4), EMPTY, EMPTY, 
+						parsedUserInput.get(5), parsedUserInput.get(6));
 				break;
-			case ("setT") :
-				editCommandObject.setTaskName(parsedUserInput.get(1));
-				editCommandObject.setDescription(parsedUserInput.get(2));
-				editCommandObject.setEndDateAndTime(parsedUserInput.get(3));
-				editCommandObject.setPriority(parsedUserInput.get(4));
-				editCommandObject.setReminder(parsedUserInput.get(5));
-				editCommandObject.setRecurrence(parsedUserInput.get(6));
-				editCommandObject.setNewName(parsedUserInput.get(7));
+			case (COMMAND_SET_TODO) :
+				setCommand(editCommandObject, parsedUserInput.get(2),
+						parsedUserInput.get(4), parsedUserInput.get(5), EMPTY, 
+						parsedUserInput.get(3), parsedUserInput.get(6), parsedUserInput.get(7));
 				break;
-			case ("setE") :
-				editCommandObject.setTaskName(parsedUserInput.get(1));
-				editCommandObject.setDescription(parsedUserInput.get(2));
-				editCommandObject.setStartDateAndTime(parsedUserInput.get(3));
-				editCommandObject.setEndDateAndTime(parsedUserInput.get(4));
-				editCommandObject.setPriority(parsedUserInput.get(5));
-				editCommandObject.setReminder(parsedUserInput.get(6));
-				editCommandObject.setRecurrence(parsedUserInput.get(7));
-				editCommandObject.setNewName(parsedUserInput.get(8));
+			case (COMMAND_SET_EVENT) :
+				setCommand(editCommandObject, parsedUserInput.get(2),
+						parsedUserInput.get(5), parsedUserInput.get(6), 
+						parsedUserInput.get(3), parsedUserInput.get(4), 
+						parsedUserInput.get(7), parsedUserInput.get(8));
 				break;
-			case ("deadline") :
-				editCommandObject.setTaskName(parsedUserInput.get(1));
+			case (COMMAND_DEADLINE) :
 				editCommandObject.setEndDateAndTime(parsedUserInput.get(2));
 				break;
-			case ("event") :
-				editCommandObject.setTaskName(parsedUserInput.get(1));
+			case (COMMAND_EVENT) :
 				editCommandObject.setStartDateAndTime(parsedUserInput.get(2));
 				editCommandObject.setEndDateAndTime(parsedUserInput.get(3));
 				break;
-			case ("description") :
-				editCommandObject.setTaskName(parsedUserInput.get(1));
+			case (COMMAND_DESCRIPTION) :
 				editCommandObject.setDescription(parsedUserInput.get(2));
-			 	break;
-			case ("reminder") :
-				editCommandObject.setTaskName(parsedUserInput.get(1));
+				break;
+			case (COMMAND_REMINDER) :
 				editCommandObject.setReminder(parsedUserInput.get(2));
 				break;
-			case ("priority") :
-				editCommandObject.setTaskName(parsedUserInput.get(1));
+			case (COMMAND_PRIORITY) :
 				editCommandObject.setPriority(parsedUserInput.get(2));
 				break;
-			case ("rename") :
-				editCommandObject.setTaskName(parsedUserInput.get(1));
+			case (COMMAND_RENAME) :
 				editCommandObject.setNewName(parsedUserInput.get(2));
 				break;
-			case("reset") :
-				editCommandObject.setTaskName(parsedUserInput.get(1));
+			case(COMMAND_RESET) :
 				editCommandObject.setResetField(parsedUserInput.get(2));
 				break;
-			case("delete") :
-				editCommandObject.setTaskName(parsedUserInput.get(1));
-				break;
-			case("done") :
-				editCommandObject.setTaskName(parsedUserInput.get(1));
-				break;
-			case ("undone") :
-				editCommandObject.setTaskName(parsedUserInput.get(1));
-				break;
-			case ("every") :
-				editCommandObject.setTaskName(parsedUserInput.get(1));
+			case (COMMAND_RECUR) :
 				editCommandObject.setRecurrence(parsedUserInput.get(2));
 				break;
 		}

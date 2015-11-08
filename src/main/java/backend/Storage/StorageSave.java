@@ -10,7 +10,6 @@ import java.util.ArrayList;
 
 import main.java.backend.Storage.Task.Task;
 
-
 /**
  * This class parse Java object back to JSON format 
  * to be saved in the file as text when there is any 

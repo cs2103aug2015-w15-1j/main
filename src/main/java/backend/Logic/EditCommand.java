@@ -1,16 +1,14 @@
 package main.java.backend.Logic;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EmptyStackException;
-import java.util.logging.FileHandler;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
 import main.java.backend.Storage.Task.Task.TaskType;
+import main.java.backend.Util.LoggerGlobal;
 
 public class EditCommand extends Command {
 
@@ -32,9 +30,7 @@ public class EditCommand extends Command {
 	private static final String EXECUTION_REDO_SUCCESSFUL = "Redo successfully.";
 	private static final String EXECUTION_UNDO_SUCCESSFUL = "Undo successfully.";
 	
-	private static final String LOGGER_INIT_UNSUCCESSFUL = "Logger failed to initialise: ";
 	private static final String LOGGER_COMMAND_FIELD = "Get CommandField: ";
-	
 	private static final String LOGGER_TASKID = "TaskId: ";
 	private static final String LOGGER_DESCRIPTION = "Description: ";
 	private static final String LOGGER_PRIORITY = "Priority: ";
@@ -68,9 +64,8 @@ public class EditCommand extends Command {
 	private static final String RECURRING_YEAR = "year";
 	
 	private static final String RESET = "";
-
-	private static Logger logicEditorLogger = Logger.getGlobal();	
-	private FileHandler logHandler;
+	
+	private static final Logger logicEditorLogger = LoggerGlobal.getLogger();
 
 	private ArrayList<Task> taskList;
 	private ArrayList<Task> currentState;
@@ -85,21 +80,6 @@ public class EditCommand extends Command {
 		storageComponent = storage;
 		historySubComponent = history;
 		taskList = storageComponent.load();
-		initLogger();
-	}
-
-	//@@author A0121284N
-	private void initLogger() {
-
-		try {
-			logHandler = new FileHandler("TankTaskLog.txt",1000000000,10,true);
-			logHandler.setFormatter(new SimpleFormatter());
-			logicEditorLogger.addHandler(logHandler);
-			logicEditorLogger.setUseParentHandlers(false);
-
-		} catch (SecurityException | IOException e) {
-			logicEditorLogger.warning("Logger failed to initialise: " + e.getMessage());
-		}
 	}
 
 	//@@author A0121284N
@@ -553,7 +533,6 @@ public class EditCommand extends Command {
 
 		currentState = taskList;
 		historySubComponent.push(currentState);
-		logHandler.close();
 
 		return feedbackString;
 	}

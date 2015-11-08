@@ -1,8 +1,6 @@
 //@@author A0126258A
 package main.java.backend.Storage.Task;
 
-import java.util.TreeMap;
-
 import main.java.backend.Logic.Constant;
 
 public class Task implements Comparable<Task> {
@@ -14,6 +12,19 @@ public class Task implements Comparable<Task> {
 	public enum RecurrenceType {
 		NONE, DAY, WEEK, MONTH, YEAR;
 	}
+	
+	private static final String PRINT_PRIORITY_LEVEL = "*";
+	private static final String PRINT_DESCRIPTION = "Description: ";
+	private static final String PRINT_DEADLINE = "Deadline: ";
+	private static final String PRINT_FROM = "From: ";
+	private static final String PRINT_TO = "To: ";
+	private static final String PRINT_REMINDER = "Reminder: ";
+	private static final String PRINT_RECURRING = "Recurring every: ";
+	private static final String PRINT_EMPTY = "";
+	private static final String PRINT_SPACE = " ";
+	private static final String PRINT_DOT = ". ";
+	private static final String PRINT_PLURAL = "s";
+	private static final String PRINT_NEW_LINE = System.getProperty("line.separator");
 	
 	private TaskType taskType;
 	private RecurrenceType recurrenceType;
@@ -30,8 +41,6 @@ public class Task implements Comparable<Task> {
 	private String start;
 	private String end;
 	private String reminder;
-
-//	private TreeMap<String, SubTask> subTask;
 	
 	public Task () {
 		
@@ -61,7 +70,6 @@ public class Task implements Comparable<Task> {
 		this.start = start;
 		this.end = end;
 		this.reminder = reminder;
-//		this.subTask = new TreeMap<String, SubTask> ();
 	}
 	
 	public TaskType getTaskType() {
@@ -168,122 +176,96 @@ public class Task implements Comparable<Task> {
 		this.end = end;
 	}
 	
-//	public TreeMap<String, SubTask> getSubTask() {
-//		return subTask;
-//	}
-//
-//	public void setSubTask(TreeMap<String, SubTask> subTask) {
-//		this.subTask = subTask;
-//	}
-
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(indexForPrinting+". ");
-		if(name!=""){
-			sb.append(name + " ");
-		}
-		if(priority !=-1){
-			for (int i=0;i<priority;i++){
-			sb.append("*");
-			}
-		}
-		sb.append(System.getProperty("line.separator"));
-		if (start!=""){
-			sb.append(start + System.getProperty("line.separator"));
-		}
-		if(end!=""){
-			sb.append(end + System.getProperty("line.separator"));
-		}
-		if(reminder!=""){
-			sb.append("Reminder has been set." + System.getProperty("line.separator"));
-		}
-		if(!recurrenceType.equals(recurrenceType.NONE)) {
-			
-			String plural = "";
-			
-			if(recurrenceFrequency > 1) {
-				plural = "s";
-			}
-			
-			sb.append("Recurring every: " + recurrenceFrequency 
-					+ " " + recurrenceType.toString().toLowerCase() + plural
-					+ System.getProperty("line.separator"));
-		}
-		return sb.toString();
-	}
-	
 	public String printFull() {
-		StringBuilder sb = new StringBuilder();
-		//sb.append(indexForPrinting+". ");
-		if(name!=""){
-			sb.append(name + " ");
-		}
-		if(priority !=-1){
-			for (int i=0;i<priority;i++){
-			sb.append("*");
-			}
-		}
-		sb.append(System.getProperty("line.separator"));
-		if (description!=""){
-			sb.append("Description: "+description + System.getProperty("line.separator"));
-		}
-		if(start !=""){
-			sb.append("From: "+start + System.getProperty("line.separator"));
-		}
-		if (end!=""){
-			if(start!=""){
-				sb.append ("To: ");
-			}
-			else{
-				sb.append("Deadline: ");
-			}
-			sb.append(end + System.getProperty("line.separator"));
-		}
-		if (reminder!=""){
-			sb.append("Reminder: "+ reminder + System.getProperty("line.separator"));
-		}
-		
-		if(!recurrenceType.equals(recurrenceType.NONE)) {
-			
-			String plural = "";
-			
-			if(recurrenceFrequency > 1) {
-				plural = "s";
-			}
-			
-			sb.append("Recurring every: " + recurrenceFrequency 
-					+ " " + recurrenceType.toString().toLowerCase() + plural
-					+ System.getProperty("line.separator"));
-		}
-		
-		return sb.toString();
+		return toString();
 	}
 	
 	public String reminderPrint() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(indexForPrinting+". ");
-		if(name!=""){
-			sb.append(name + " ");
+		
+		if(!name.isEmpty()){
+			sb.append(name + PRINT_SPACE);
 		}
+		
 		if(priority !=-1){
-			for (int i=0;i<priority;i++){
-			sb.append("*");
+			for (int i = 0; i < priority; i++){
+				sb.append(PRINT_PRIORITY_LEVEL);
 			}
+			sb.append(PRINT_NEW_LINE);
 		}
-		sb.append(System.getProperty("line.separator"));
-		if(start !=""){
-			sb.append("From: "+start + System.getProperty("line.separator"));
+		
+		if(!start.isEmpty()){
+			sb.append(PRINT_FROM + start + PRINT_NEW_LINE);
 		}
-		if (end!=""){
-			if(start!=""){
-				sb.append ("To: ");
+		
+		if (!end.isEmpty()){
+			if(!start.isEmpty()){
+				sb.append (PRINT_TO);
 			}
 			else{
-				sb.append("Deadline: ");
+				sb.append(PRINT_DEADLINE);
 			}
-			sb.append(end + System.getProperty("line.separator"));
+			sb.append(end + PRINT_NEW_LINE);
 		}
 			
+		return sb.toString();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		
+		if(indexForPrinting != -1) {
+			sb.append(indexForPrinting + PRINT_DOT);
+		}
+		
+		if(!name.isEmpty()){
+			sb.append(name + PRINT_SPACE);
+		}
+		
+		if(priority !=-1){
+			for (int i = 0; i < priority; i++){
+				sb.append(PRINT_PRIORITY_LEVEL);
+			}
+		}
+		
+		sb.append(PRINT_NEW_LINE);
+		
+		if (!description.isEmpty()){
+			sb.append(PRINT_DESCRIPTION + description + PRINT_NEW_LINE);
+		}
+		
+		if(!start.isEmpty()){
+			sb.append(PRINT_FROM + start + PRINT_NEW_LINE);
+		}
+		
+		if (!end.isEmpty()){
+			if(!start.isEmpty()){
+				sb.append (PRINT_TO);
+			}
+			else{
+				sb.append(PRINT_DEADLINE);
+			}
+			sb.append(end + PRINT_NEW_LINE);
+		}
+		
+		if (!reminder.isEmpty()){
+			sb.append(PRINT_REMINDER + reminder + PRINT_NEW_LINE);
+		}
+		
+		if(!recurrenceType.equals(recurrenceType.NONE)) {
+			
+			String plural = PRINT_EMPTY;
+			
+			if(recurrenceFrequency > 1) {
+				plural = PRINT_PLURAL;
+			}
+			
+			sb.append(PRINT_RECURRING + recurrenceFrequency 
+					+ PRINT_SPACE + recurrenceType.toString().toLowerCase() 
+					+ plural + PRINT_NEW_LINE);
+		}
+		
 		return sb.toString();
 	}
 	

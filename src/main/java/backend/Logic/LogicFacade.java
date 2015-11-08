@@ -1,33 +1,29 @@
 //@@author A0121284N
 package main.java.backend.Logic;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EmptyStackException;
 import java.util.Stack;
-import java.util.logging.FileHandler;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 import main.java.backend.Parser.Parser;
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.StorageFacade;
 import main.java.backend.Storage.Task.Task;
+import main.java.backend.Util.LoggerGlobal;
 
 public class LogicFacade {
 	
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
-	
 	private static final String LOGGER_PARSED_INPUT = "Parsed User Input";
+	
+	private static Logger logicFacadeLogger = LoggerGlobal.getLogger();	
 	
 	private static LogicFacade logicFacade;
 	
 	private Storage storageComponent;
 	private Observer getterSubComponent;
 	private History historySubComponent;
-	private Logger logicFacadeLogger = Logger.getGlobal();	
-	private FileHandler logHandler;
 	private Parser parserComponent;
 	private LogicCommandHandler logicCommandHandler;
 	
@@ -38,7 +34,6 @@ public class LogicFacade {
 	
 	private LogicFacade() {
 		
-		initLogger();
 		storageComponent = new StorageFacade();
 		historySubComponent = History.getInstance();
 		logicCommandHandler = LogicCommandHandler.getInstance(storageComponent, historySubComponent);
@@ -50,6 +45,7 @@ public class LogicFacade {
 		searchStack = new Stack<Command>();
 		currentState = storageComponent.load();
 		historySubComponent.push(currentState);
+		LoggerGlobal.initLogger();
 	}
 	
 	public static LogicFacade getInstance() {
@@ -58,19 +54,6 @@ public class LogicFacade {
 			logicFacade = new LogicFacade();
 		}
 		return logicFacade;
-	}
-	
-	private void initLogger() {
-		
-		try {
-			logHandler = new FileHandler("TankTaskLog.txt",1000000000,10,true);
-			logHandler.setFormatter(new SimpleFormatter());
-			logicFacadeLogger.addHandler(logHandler);
-			logicFacadeLogger.setUseParentHandlers(false);
-			
-		} catch (SecurityException | IOException e) {
-			logicFacadeLogger.warning("Logger failed to initialise: " + e.getMessage());
-		}
 	}
 	
 	public String execute(String userInput) {

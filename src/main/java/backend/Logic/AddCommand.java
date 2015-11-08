@@ -1,17 +1,15 @@
 package main.java.backend.Logic;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EmptyStackException;
-import java.util.logging.FileHandler;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 import main.java.backend.Storage.Storage;
 import main.java.backend.Storage.Task.Task;
 import main.java.backend.Storage.Task.Task.RecurrenceType;
 import main.java.backend.Storage.Task.Task.TaskType;
+import main.java.backend.Util.LoggerGlobal;
 
 public class AddCommand extends Command {
 
@@ -20,13 +18,8 @@ public class AddCommand extends Command {
 	private static final String EXECUTION_UNDO_SUCCESSFUL = "Undo successfully.";
 	private static final String EXECUTION_COMMAND_UNSUCCESSFUL = "Invalid Command. Please try again.";
 
-	private static final String LOGGER_INIT_UNSUCCESSFUL = "Logger failed to initialise: ";
 	private static final String LOGGER_COMMAND_EXECUTION = "Execute commandObject.getCommandField: ";
 	private static final String LOGGER_COMMAND_ADD = "FeedbackString in AddCommandObject: ";
-	
-	private static final String LOGGER_FILE_NAME = "TankTaskLog.txt";
-	private static final int LOGGER_LIMIT = 1000000000;
-	private static final int LOGGER_COUNT = 10;
 	
 	private static final String COMMAND_ADD_FLOAT = "addF";
 	private static final String COMMAND_ADD_TODO = "addT";
@@ -37,14 +30,13 @@ public class AddCommand extends Command {
 	private static final String RECURRING_MONTH = "month";
 	private static final String RECURRING_YEAR = "year";
 
+	private static final Logger logicAdderLogger = LoggerGlobal.getLogger();
+	
 	private ArrayList<Task> taskList;
 	private ArrayList<Task> currentState;
 
 	private Storage storageComponent;
 	private History historySubComponent;
-
-	private static Logger logicAdderLogger = Logger.getGlobal();	
-	private FileHandler logHandler;
 
 	//@@author A0121284N
 	public AddCommand(Type typeInput, Storage storage, History history) {
@@ -52,21 +44,6 @@ public class AddCommand extends Command {
 		super(typeInput);
 		storageComponent = storage;
 		historySubComponent = history;
-		initLogger();
-	}
-
-	//@@author A0121284N
-	private void initLogger() {
-
-		try {
-			logHandler = new FileHandler(LOGGER_FILE_NAME, LOGGER_LIMIT, LOGGER_COUNT, true);
-			logHandler.setFormatter(new SimpleFormatter());
-			logicAdderLogger.addHandler(logHandler);
-			logicAdderLogger.setUseParentHandlers(false);
-
-		} catch (SecurityException | IOException e) {
-			logicAdderLogger.warning(LOGGER_INIT_UNSUCCESSFUL + e.getMessage());
-		}
 	}
 
 	//@@author A0126258A
@@ -186,7 +163,6 @@ public class AddCommand extends Command {
 		logicAdderLogger.info(LOGGER_COMMAND_ADD + feedbackString);
 		currentState = storageComponent.load();
 		historySubComponent.push(currentState);
-		logHandler.close();
 		
 		return feedbackString;
 	}

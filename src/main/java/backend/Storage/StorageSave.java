@@ -19,7 +19,7 @@ import main.java.backend.Storage.Task.Task;
  * 
  */
 
-public class StorageSave extends StorageOperation {
+public class StorageSave extends StorageExecution {
 	
 	private static final String ERROR_FILE_WRITE = "An error occured when writing data from file.";
 	private static final String ERROR_FILE_CLOSE = "An error occured when closing file writer.";

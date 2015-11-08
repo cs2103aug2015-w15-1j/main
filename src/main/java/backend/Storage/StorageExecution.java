@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 import main.java.backend.Storage.Task.Task;
 
-public abstract class StorageOperation {
+public abstract class StorageExecution {
 
 	public String filePath;
 	public File textFile;

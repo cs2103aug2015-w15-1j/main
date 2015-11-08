@@ -22,7 +22,7 @@ import main.java.backend.Storage.Task.Task;
  * 
  */
 
-public class StorageLoad extends StorageOperation {
+public class StorageLoad extends StorageExecution {
 
 	private static final String ERROR_FILE_READ = "An error occured when reading data from file.";
 	private static final String ERROR_FILE_CLOSE = "An error occured when closing file reader.";

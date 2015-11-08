@@ -29,12 +29,6 @@ public class StorageFormat {
 
 	}
 
-	/**
-	 * Serialize all Task objects to JSON text format.
-	 * 
-	 * @param allData			All data in Task objects form.
-	 * @return					Task objects in JSON format.
-	 */
 	public String serialize(ArrayList<Task> allData) {
 		
 		String plaintext = new String();
@@ -49,12 +43,6 @@ public class StorageFormat {
 		return plaintext;
 	}
 
-	/**
-	 * Deserialize plaintext format (JSON) back to Task objects.
-	 * 
-	 * @param plaintext			Task objects in JSON format.
-	 * @return					All data in Task object form.
-	 */
 	public ArrayList<Task> deserialize(String plaintext) {
 
 		ArrayList<Task> allData = new ArrayList<Task>();

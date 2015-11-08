@@ -176,43 +176,8 @@ public class Task implements Comparable<Task> {
 		this.end = end;
 	}
 	
+	//@@author A0126125R
 	public String printFull() {
-		return toString();
-	}
-	
-	public String reminderPrint() {
-		StringBuilder sb = new StringBuilder();
-		
-		if(!name.isEmpty()){
-			sb.append(name + PRINT_SPACE);
-		}
-		
-		if(priority !=-1){
-			for (int i = 0; i < priority; i++){
-				sb.append(PRINT_PRIORITY_LEVEL);
-			}
-			sb.append(PRINT_NEW_LINE);
-		}
-		
-		if(!start.isEmpty()){
-			sb.append(PRINT_FROM + start + PRINT_NEW_LINE);
-		}
-		
-		if (!end.isEmpty()){
-			if(!start.isEmpty()){
-				sb.append (PRINT_TO);
-			}
-			else{
-				sb.append(PRINT_DEADLINE);
-			}
-			sb.append(end + PRINT_NEW_LINE);
-		}
-			
-		return sb.toString();
-	}
-
-	@Override
-	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		
 		if(indexForPrinting != -1) {
@@ -269,6 +234,94 @@ public class Task implements Comparable<Task> {
 		return sb.toString();
 	}
 	
+	//@@author A0126125R
+	public String reminderPrint() {
+		StringBuilder sb = new StringBuilder();
+		
+		if(!name.isEmpty()){
+			sb.append(name + PRINT_SPACE);
+		}
+		
+		if(priority !=-1){
+			for (int i = 0; i < priority; i++){
+				sb.append(PRINT_PRIORITY_LEVEL);
+			}
+			sb.append(PRINT_NEW_LINE);
+		}
+		
+		if(!start.isEmpty()){
+			sb.append(PRINT_FROM + start + PRINT_NEW_LINE);
+		}
+		
+		if (!end.isEmpty()){
+			if(!start.isEmpty()){
+				sb.append (PRINT_TO);
+			}
+			else{
+				sb.append(PRINT_DEADLINE);
+			}
+			sb.append(end + PRINT_NEW_LINE);
+		}
+			
+		return sb.toString();
+	}
+
+	//@@author A0126125R
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		
+		if(indexForPrinting != -1) {
+			sb.append(indexForPrinting + PRINT_DOT);
+		}
+		
+		if(!name.isEmpty()){
+			sb.append(name + PRINT_SPACE);
+		}
+		
+		if(priority != -1){
+			for (int i = 0; i < priority; i++){
+				sb.append(PRINT_PRIORITY_LEVEL);
+			}
+		}
+		
+		sb.append(PRINT_NEW_LINE);
+		
+		if(!start.isEmpty()){
+			sb.append(PRINT_FROM + start + PRINT_NEW_LINE);
+		}
+		
+		if (!end.isEmpty()){
+			if(!start.isEmpty()){
+				sb.append (PRINT_TO);
+			}
+			else{
+				sb.append(PRINT_DEADLINE);
+			}
+			sb.append(end + PRINT_NEW_LINE);
+		}
+		
+		if (!reminder.isEmpty()){
+			sb.append(PRINT_REMINDER + reminder + PRINT_NEW_LINE);
+		}
+		
+		if(!recurrenceType.equals(RecurrenceType.NONE)) {
+			
+			String plural = PRINT_EMPTY;
+			
+			if(recurrenceFrequency > 1) {
+				plural = PRINT_PLURAL;
+			}
+			
+			sb.append(PRINT_RECURRING + recurrenceFrequency 
+					+ PRINT_SPACE + recurrenceType.toString().toLowerCase() 
+					+ plural + PRINT_NEW_LINE);
+		}
+		
+		return sb.toString();
+	}
+	
+	//@@author A0126258A
 	@Override
 	public boolean equals(Object o) {
 		
@@ -291,6 +344,7 @@ public class Task implements Comparable<Task> {
 				&& this.reminder.equals(task.getReminder());
 	}
 	
+	//@@author A0126258A
 	@Override
 	public int compareTo(Task o) {
 		if(Constant.stringToMillisecond(getStart())

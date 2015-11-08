@@ -2,6 +2,7 @@
 
 import java.util.ArrayList;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -31,50 +32,96 @@ import main.java.backend.Util.HotkeyHelp;
 
 //@@author A0126125R
 public class HelpView {
-	Stage pop;
+	private final int numDoubleKeyInstruction = 4;
+	Stage stage;
+	Scene scene;
 	CommandHelp command;
-	HotkeyHelp hotkey;
+	HotkeyHelp hotKey;
 	Text leftText;
 	Text rightText;
 	GridPane pane;
-	VBox comp;
-	VBox comp2;
-	VBox content;
+	VBox oneKey; //for one-key shortcuts
+	VBox twoKey; //for two-key shortcuts
+	VBox content; //content page
 	ListView<String> showList;
 	int currentView;
 	ArrayList<ArrayList<String>> fullList;
 	ArrayList<String> textList;
 	
 	public HelpView(){
-		hotkey = new HotkeyHelp();
+		hotKey = new HotkeyHelp();
 		leftText = new Text();
 		rightText = new Text();
 		fullList = new ArrayList<ArrayList<String>>();
 		command = new CommandHelp();
+		Platform.runLater(new Runnable(){
+			
+			@Override
+			public void run() {
+				setUpAllContents();
+			}
+		});
+	}
+	
+	public void helpPopUp() {
 		
+		stage.show();
+		determineEvents(stage, scene);
+	}
+
+	private void setUpAllContents() {
+		stage = new Stage();
+		currentView=-3;
+		pane = new GridPane();
+		oneKey = new VBox();
+		twoKey = new VBox();
+		content = new VBox();
 		fullList = command.getSplitList();
 		textList = command.getSplitNaming();
 		assert fullList!=null && !fullList.isEmpty();
 		assert textList!=null && !textList.isEmpty();
+		HBox leftNavi = new HBox();
+		HBox rightNavi = new HBox();
+		leftNavi.setAlignment(Pos.TOP_LEFT);
+		rightNavi.setAlignment(Pos.TOP_RIGHT);
 		
+		stage.setTitle("help");
+		setUpBackground();
+		setUpContentPage();
+		setHotKeyContents(oneKey,twoKey, pane);
+		setUpLeftText(leftNavi);
+		setUpRightText(rightNavi);
+		
+		setUpGridConstraints(leftNavi, rightNavi);
+		
+		pane.setGridLinesVisible(false); //checking
+		pane.getChildren().addAll(leftNavi,rightNavi);
+		Scene stageScene = new Scene(pane, 800, 600);
+		scene = stageScene;
+		Image icon = new Image(getClass().getResourceAsStream("tank.png")); 
+		stage.getIcons().add(icon);
+		scene.getStylesheets().add(getClass().getResource("HelpStyle.css").toExternalForm());
+		stage.setScene(scene);
 	}
-	
-	public void helpPopUp() {
-		currentView=-3;
-		pop = new Stage();
-		pane = new GridPane();
+
+	private void setUpBackground() {
 		Image image = new Image(GUI.class.getResourceAsStream("Resources/background.png"));
 		BackgroundSize backgroundSize = new BackgroundSize(100, 100, true, true, true,true);
 		BackgroundImage backgroundImage = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
 		Background background = new Background(backgroundImage);
 		pane.setBackground(background);
-		comp = new VBox();
-		comp2 = new VBox();
-		content = new VBox();
-		HBox leftNavi = new HBox();
-		HBox rightNavi = new HBox();
-		leftNavi.setAlignment(Pos.TOP_LEFT);
-		rightNavi.setAlignment(Pos.TOP_RIGHT);
+	}
+
+	private void setUpGridConstraints(HBox leftNavi, HBox rightNavi) {
+		GridPane.setConstraints(content,0,0);
+		GridPane.setConstraints(oneKey,0,0);
+		GridPane.setConstraints(twoKey,0,0);
+		GridPane.setConstraints(leftNavi,0,1);
+		GridPane.setConstraints(rightNavi,1,1);
+		GridPane.setColumnSpan(oneKey, 2);
+		GridPane.setColumnSpan(twoKey, 2);
+		GridPane.setColumnSpan(leftNavi, 2);
+		
 		ColumnConstraints column1 = new ColumnConstraints();
 		column1.setPercentWidth(30);
 		ColumnConstraints column2 = new ColumnConstraints();
@@ -85,37 +132,11 @@ public class HelpView {
 		row1.setPercentHeight(95);
 		pane.getRowConstraints().addAll(row1);
 		content.setPadding(new Insets(20,20,20,20));
-		comp.setPadding(new Insets(20,20,20,20));
-		comp2.setPadding(new Insets(20,20,20,20));
-		pop.setTitle("help");
-		
-		content();
-		hotKey(comp,comp2, pane);
-		leftSide(leftNavi);
-		rightSide(rightNavi);
-		
-		GridPane.setConstraints(content,0,0);
-		GridPane.setConstraints(comp,0,0);
-		GridPane.setConstraints(comp2,0,0);
-		GridPane.setConstraints(leftNavi,0,1);
-		GridPane.setConstraints(rightNavi,1,1);
-		GridPane.setColumnSpan(comp, 2);
-		GridPane.setColumnSpan(comp2, 2);
-		GridPane.setColumnSpan(leftNavi, 2);
-		
-		pane.setGridLinesVisible(false); //checking
-		pane.getChildren().addAll(leftNavi,rightNavi);
-		Scene stageScene = new Scene(pane, 800, 600);
-		Image icon = new Image(getClass().getResourceAsStream("tank.png")); 
-		pop.getIcons().add(icon);
-		stageScene.getStylesheets().add(getClass().getResource("HelpStyle.css").toExternalForm());
-		pop.setScene(stageScene);
-		pop.show();
-		
-		determineEvents(pop, stageScene);
+		oneKey.setPadding(new Insets(20,20,20,20));
+		twoKey.setPadding(new Insets(20,20,20,20));
 	}
 	
-	private void content(){
+	private void setUpContentPage(){
 		Text contentText = new Text();
 		contentText.setText("Help contents: \n");
 		contentText.getStyleClass().add("customHeading");
@@ -141,7 +162,7 @@ public class HelpView {
 		pane.getChildren().add(content);
 	}
 	
-	private void leftSide(HBox leftNavi) {
+	private void setUpLeftText(HBox leftNavi) {
 		Image image = new Image(GUI.class.getResourceAsStream("Resources/left.png"));
 		ImageView imageview = new ImageView();
 		imageview.setImage(image);
@@ -150,7 +171,7 @@ public class HelpView {
 		leftText.setText("");
 		leftNavi.getChildren().addAll(imageview,leftText);
 	}
-	private void rightSide(HBox rightNavi) {
+	private void setUpRightText(HBox rightNavi) {
 		Image image2 = new Image(GUI.class.getResourceAsStream("Resources/right.png"));
 		ImageView imageview2 = new ImageView();
 		imageview2.setImage(image2);
@@ -159,13 +180,55 @@ public class HelpView {
 		rightText.setText("2-keys shortcuts");
 		rightNavi.getChildren().addAll(rightText, imageview2);
 	}
-	private void determineEvents(Stage pop, Scene stageScene) {
-		stageScene.setOnKeyPressed(new EventHandler<KeyEvent>(){
+	private void setHotKeyContents(VBox oneKey,VBox twoKey, GridPane pane) {
+		ArrayList<String>imageNames = hotKey.getResourceList();	
+		ArrayList<String> help = hotKey.retrieveHotkey();
+		int j=0;
+		for  (int i =0 ;i<help.size();i++) {
+			HBox box = new HBox();
+			if (i<help.size()-numDoubleKeyInstruction){ //only contains 1 key shortcuts
+				ImageView imv = new ImageView();
+				Image image = new Image(GUI.class.getResourceAsStream(imageNames.get(i)));
+				imv.setImage(image);
+				imv.setFitWidth(47);
+				imv.setPreserveRatio(true);
+				Label label = new Label();
+				label.setText(help.get(i));
+				label.setWrapText(true);
+				box.getChildren().addAll(imv,label);
+				oneKey.getChildren().add(box);
+				j=i;
+			} else { //only contains 2 key shortcuts
+				HBox box2 = new HBox();
+				box2.setAlignment(Pos.CENTER);
+				ImageView newimv = new ImageView();
+				Image newimage = new Image(HelpView.class.getResourceAsStream(imageNames.get(++j)));
+				newimv.setImage(newimage);
+				newimv.setFitWidth(45);
+				newimv.setPreserveRatio(true);
+				ImageView newimv2 = new ImageView();
+				Image newimage2 = new Image(HelpView.class.getResourceAsStream(imageNames.get(++j)));
+				newimv2.setImage(newimage2);
+				newimv2.setFitWidth(45);
+				newimv2.setPreserveRatio(true);
+				Label label = new Label();
+				label.setText(help.get(i));
+				label.setWrapText(true);
+				box2.getChildren().addAll(newimv,newimv2);
+				box.getChildren().addAll(box2,label);
+				twoKey.getChildren().add(box);
+			}
+			
+		}
+	}
 
+	private void determineEvents(Stage stage, Scene stageScene) {
+		stageScene.setOnKeyPressed(new EventHandler<KeyEvent>(){
+	
 			@Override
 			public void handle(KeyEvent event) {
 				if (event.getCode().equals(KeyCode.F1)){
-					pop.close();
+					close();
 				} else if (event.getCode().equals(KeyCode.RIGHT)){
 					currentView++;
 					if (currentView>=fullList.size()){
@@ -206,25 +269,26 @@ public class HelpView {
 					currentView = 7;
 					changeContents();
 				}
-
+	
 			}
-
+	
 		});
 	}
+
 	private void changeContents() {
 		
-		pane.getChildren().removeAll(content,showList,comp,comp2);
+		pane.getChildren().removeAll(content,showList,oneKey,twoKey);
 		if (currentView==-3){
 			pane.getChildren().add(content);
 			leftText.setText("");
 			rightText.setText("1-key shortcuts");
 			
 		} else if (currentView==-2){
-			pane.getChildren().addAll(comp);
+			pane.getChildren().addAll(oneKey);
 			leftText.setText("Content Page");
 			rightText.setText("2-keys shortcuts");
 		}else if(currentView==-1){
-			pane.getChildren().addAll(comp2);
+			pane.getChildren().addAll(twoKey);
 			leftText.setText("1-key shortcuts");
 			rightText.setText("command help");
 		}else{
@@ -239,49 +303,12 @@ public class HelpView {
 			rightText.setText(textList.get(currentView+2));
 		}
 	}
-	private void hotKey(VBox comp,VBox comp2, GridPane pane) {
-		ArrayList<String>imageNames = hotkey.getResourceList();	
-		ArrayList<String> help = hotkey.retrieveHotkey();
-		int j=0;
-		for  (int i =0 ;i<help.size();i++) {
-			HBox box = new HBox();
-			if (i<help.size()-4){ //only contains 1 key shortcuts
-				ImageView imv = new ImageView();
-				Image image = new Image(GUI.class.getResourceAsStream(imageNames.get(i)));
-				imv.setImage(image);
-				imv.setFitWidth(47);
-				imv.setPreserveRatio(true);
-				Label label = new Label();
-				label.setText(help.get(i));
-				label.setWrapText(true);
-				box.getChildren().addAll(imv,label);
-				comp.getChildren().add(box);
-				j=i;
-			} else { //only contains 2 key shortcuts
-				HBox box2 = new HBox();
-				box2.setAlignment(Pos.CENTER);
-				ImageView newimv = new ImageView();
-				Image newimage = new Image(HelpView.class.getResourceAsStream(imageNames.get(++j)));
-				newimv.setImage(newimage);
-				newimv.setFitWidth(45);
-				newimv.setPreserveRatio(true);
-				ImageView newimv2 = new ImageView();
-				Image newimage2 = new Image(HelpView.class.getResourceAsStream(imageNames.get(++j)));
-				newimv2.setImage(newimage2);
-				newimv2.setFitWidth(45);
-				newimv2.setPreserveRatio(true);
-				Label label = new Label();
-				label.setText(help.get(i));
-				label.setWrapText(true);
-				box2.getChildren().addAll(newimv,newimv2);
-				box.getChildren().addAll(box2,label);
-				comp2.getChildren().add(box);
-			}
-			
-		}
-	}
 
 	public void close() {
-		pop.close();
+		stage.close();
+	}
+
+	public void toFront() {
+		stage.toFront();
 	}
 }

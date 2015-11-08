@@ -54,8 +54,6 @@ public class GUIController {
 	}
 	void retrieveSearch(){
 		getSearch = logicComponent.retrieveSearchData();
-		//System.out.println("Search results starts here");
-		//System.out.println(getSearch);
 		assert getSearch!=null;
 	}
 	

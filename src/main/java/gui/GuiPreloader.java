@@ -29,15 +29,11 @@ public class GuiPreloader extends Preloader {
     private Label progress;
 
     public GuiPreloader() {
-        // Constructor is called before everything.
-        System.out.println("MyPreloader constructor called, thread: " + Thread.currentThread().getName());
     }
-
+    
+    //@@author A0126125R -reused
     @Override
     public void init() throws Exception {
-        System.out.println("MyPreloader#init (could be used to initialize preloader view), thread: " + Thread.currentThread().getName());
-
-        // If preloader has complex UI it's initialization can be done in MyPreloader#init
         Platform.runLater(() -> {
             Label title = new Label("Firing up your TankTask, please wait...");
             title.setTextAlignment(TextAlignment.CENTER);
@@ -53,24 +49,15 @@ public class GuiPreloader extends Preloader {
     		BackgroundImage backgroundImage = new BackgroundImage(bgImage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
     		Background background = new Background(backgroundImage);
     		root.setBackground(background);
-    		root.setStyle(
-                    "-fx-padding: 5; " +
-                    "-fx-border-width:3; " +
-                    "-fx-border-color: " +
-                        "linear-gradient(" +
-                            "to bottom, " +
-                            "chocolate, " +
-                            "derive(chocolate, 70%)" +
-                        ");"
-            );
+
             scene = new Scene(root, WIDTH, HEIGHT);
+            scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+            root.setId("border");
         });
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        System.out.println("MyPreloader#start (showing preloader stage), thread: " + Thread.currentThread().getName());
-
         this.preloaderStage = primaryStage;
         
         // Set preloader scene and show stage.
@@ -82,7 +69,6 @@ public class GuiPreloader extends Preloader {
 
     @Override
     public void handleApplicationNotification(PreloaderNotification info) {
-        // Handle application notification in this point (see GUI#init).
         if (info instanceof ProgressNotification) {
             progress.setText(((ProgressNotification) info).getProgress() + "%");
         }
@@ -95,15 +81,10 @@ public class GuiPreloader extends Preloader {
         StateChangeNotification.Type type = info.getType();
         switch (type) {
             case BEFORE_LOAD:
-                // Called after MyPreloader#start is called.
-               // System.out.println("BEFORE_LOAD");
                 break;
             case BEFORE_INIT:
-                // Called before GUI#init is called.
-               // System.out.println("BEFORE_INIT");
                 break;
             case BEFORE_START:
-                // Called after GUI#init and before GUI#start is called.      
                 preloaderStage.hide();
                 break;
         }

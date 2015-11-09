@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class TestTankTask {
+public class TankTaskSystemTest {
 	private static GuiController testTankTask = new GuiController();
 	private static String result = "";
 
@@ -142,13 +142,13 @@ public class TestTankTask {
 	@Test 
 	public void testAddOldDeadline() {
 		result = testTankTask.executeCommand("add old stuff deadline 24/12/1995");
-		assertEquals(result,"Task old stuff has been added");
+		assertEquals(result, "Task old stuff has been added");
 	}
 	
 	@Test 
 	public void testAddOldDeadlineTwo() {
 		result = testTankTask.executeCommand("add old stuff deadline 24 dec 95");
-		assertEquals(result,"Task old stuff has been added");
+		assertEquals(result, "Task old stuff has been added");
 	}
 	
 	@Test
@@ -350,35 +350,35 @@ public class TestTankTask {
 	public void testAddRecurrenceEventDay() {
 		testTankTask.executeCommand("add Send a Sweet Dreams SMS to beloved girlfriend from 11:55PM to 11:59PM");
 		result = testTankTask.executeCommand("1 every day");
-		assertEquals(result,"Task 1 recurring has been set to 1 day");
+		assertEquals(result, "Task 1 recurring has been set to 1 day");
 	}
 	
 	@Test
 	public void testAddRecurrenceEventDayWithDuplicate() {
 		testTankTask.executeCommand("add Send a Sweet Dreams SMS to beloved girlfriend from 11:55PM to 11:59PM");
 		result = testTankTask.executeCommand("1 every day des Must do this every day");
-		assertEquals(result,"Fields have been updated");
+		assertEquals(result, "Fields have been updated");
 	}
 	
 	@Test
 	public void testAddRecurrenceEventThreeDay() {
 		testTankTask.executeCommand("add Update Supervisor on work progress from wed 9am to 10am");
 		result = testTankTask.executeCommand("1 every 3 days");
-		assertEquals(result,"Task 1 recurring has been set to 3 day");
+		assertEquals(result, "Task 1 recurring has been set to 3 day");
 	}
 	
 	@Test
 	public void testAddRecurrenceEventWeek() {
 		testTankTask.executeCommand("add Have a homecooked dinner with beloved girlfriend from saturday 6pm to 10pm");
 		result = testTankTask.executeCommand("1 every week");
-		assertEquals(result,"Task 1 recurring has been set to 1 week");
+		assertEquals(result, "Task 1 recurring has been set to 1 week");
 	}
 	
 	@Test
 	public void testAddRecurrenceEventEveryTwoWeek() {
 		testTankTask.executeCommand("add Have a team meeting from 0800 to 10");
 		result = testTankTask.executeCommand("1 every 2 week");
-		assertEquals(result,"Task 1 recurring has been set to 2 week");
+		assertEquals(result, "Task 1 recurring has been set to 2 week");
 	}
 	
 	@Test

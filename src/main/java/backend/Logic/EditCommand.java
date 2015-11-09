@@ -286,7 +286,7 @@ public class EditCommand extends Command {
 		return EXECUTION_DELETE_ALL_SUCCESSFUL;
 	}
 
-	//@@author A0121284N
+	//@@author A0126258A
 	private String setPriority(Command commandObject){
 		
 		try {
@@ -316,7 +316,7 @@ public class EditCommand extends Command {
 		return String.format(EXECUTION_RENAME_SUCCESSFUL, taskIndex, newName);
 	}
 
-	//@@author A0121284N
+	//@@author A0126258A
 	private String setUndone(Command commandObject) {
 		
 		try {
@@ -332,7 +332,7 @@ public class EditCommand extends Command {
 		}
 	}
 
-	//@@author A0121284N
+	//@@author A0126258A
 	private String setDone(Command commandObject) {
 		
 		try {
@@ -349,7 +349,7 @@ public class EditCommand extends Command {
 		}
 	}
 
-	//@@author A0121284N
+	//@@author A0126258A
 	private String setReminder(Command commandObject) {
 		
 		try {
@@ -366,7 +366,7 @@ public class EditCommand extends Command {
 		}
 	}
 
-	//@@author A0121284N
+	//@@author A0126258A
 	private String setDescription(Command commandObject) {
 		
 		try {
@@ -383,7 +383,7 @@ public class EditCommand extends Command {
 		}
 	}
 
-	//@@author A0121284N
+	//@@author A0126258A
 	private String setEventStartAndEndTime(Command commandObject) {
 		
 		try {
@@ -406,7 +406,7 @@ public class EditCommand extends Command {
 		}
 	}
 
-	//@@author A0121284N
+	//@@author A0126258A
 	private String setDeadline(Command commandObject) {
 		
 		try {

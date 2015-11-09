@@ -1,5 +1,5 @@
 //@author A0126258A
-package storage;
+package main.java.backend.Storage;
 
 import static org.junit.Assert.*;
 

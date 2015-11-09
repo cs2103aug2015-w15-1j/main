@@ -1,5 +1,5 @@
-package main.java.gui;
 //@@author A0121284N
+package main.java.gui;
 
 import static org.junit.Assert.*;
 

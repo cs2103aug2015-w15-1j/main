@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 /**
  * DateParser
- * Specialized parser that parses date to standard format
+ * Specialized parser that parses string to standard date format
  * @@author A0121795B
  */
 public class DateParser extends ParserSkeleton{
@@ -24,7 +24,7 @@ public class DateParser extends ParserSkeleton{
 	"january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december", 
 	"jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "oct", "nov", "dec") );
 	
-	//Separate the months by the number of days
+	//Categorise the months by the number of days
 	private final ArrayList<String> MONTHS_WITH_31_DAYS = new ArrayList<String>( Arrays.asList(
 	"january", "march", "may", "july", "august", "october", "december") );
 	private final ArrayList<String> MONTHS_WITH_30_DAYS = new ArrayList<String>( Arrays.asList(
@@ -54,20 +54,19 @@ public class DateParser extends ParserSkeleton{
 	private final SimpleDateFormat DATEFORMAT_NO_MINUTE = new SimpleDateFormat("EEE, dd MMM yy, hha");
 	private final SimpleDateFormat DATEFORMAT_NO_TIME = new SimpleDateFormat("EEE, dd MMM yy");
 	private final SimpleDateFormat DATEFORMAT_DAY_AND_MONTH_ONLY = new SimpleDateFormat("dd MMM");
-	private final SimpleDateFormat DATEFORMAT_YEAR_ONLY = new SimpleDateFormat("yy");
+	private final SimpleDateFormat DATEFORMAT_YEAR_ONLY = new SimpleDateFormat("yyyy");
 	private final SimpleDateFormat TIMEFORMAT_STANDARD  = new SimpleDateFormat("hh:mma");
 	private final SimpleDateFormat TIMEFORMAT_NO_MINUTE  = new SimpleDateFormat("hha");
 	
 	//The minimum abbreviation length accepted (eg. abbreviation of 'monday' can be 'mon' but not 'mo')
 	private final int MIN_LENGTH_OF_ABBR = 3;
     
-	//Special characters/strings that are noted by DateParser and recognised by NATTY
+	//Special characters/words that are noted by DateParser and recognised by NATTY
 	private final String DATE_SEPARATOR_COMMA = ", ";
 	private final String DATE_SEPARATOR_SLASH = "/";
 	private final String DATE_SEPARATOR_HYPHEN = "-";
 	private final String TIME_SEPARATOR_COLON = ":";
 	private final String TIME_SEPARATOR_DOT = ".";
-	private final String CURRENT_CENTURY_FIRST_TWO_DIGITS = "20";
 	private final String PERIOD_AM = "am";
 	private final String PERIOD_PM = "pm";
 	private final String DATE_KEYWORD_LATER = "later";
@@ -83,12 +82,15 @@ public class DateParser extends ParserSkeleton{
     //A natural language date parser. Taken from http://natty.joestelmach.com/  
 	private final com.joestelmach.natty.Parser NATTY = new com.joestelmach.natty.Parser();
 	
-	//Force NATTY to be initialized upon DateParser creation by running parseDate once
-	public void init() {
+	public DateParser() {
+		//Force NATTY to set up upon DateParser creation by running NATTY once
     	String pi = "Mar 14 15 9.26pm";
-    	parseDate(pi);
+    	parseDateWithNatty(pi);
 	}
 	
+	/**
+	 * This method parses a string (that resembles a date) into a standardized date format
+	 */
 	String parseDate(String date) {
 		if (date.isEmpty()) {
 			return date;
@@ -97,7 +99,7 @@ public class DateParser extends ParserSkeleton{
 		date = swapDayAndMonth(date);
 		date = removeLater(date);
 		date = addSpaceBetweenDayAndMonth(date);
-		date = add20ToYear(date);
+		date = addFirstTwoDigitsToYear(date);
 		
 		String parsedDate = parseDateWithNatty(date);
 		parsedDate = standardizeDateFormat(parsedDate);
@@ -245,11 +247,6 @@ public class DateParser extends ParserSkeleton{
 		return !hasNoTime(dateString);
 	}
 
-	String parseAndGetDayAndMonth(String dateString) {
-		dateString = parseDate(dateString);
-		return getDayAndMonth(dateString);
-	}
-	
 	String parseAndGetTime(String dateString) {
 		dateString = parseDate(dateString);
 		return getTime(dateString);
@@ -270,6 +267,11 @@ public class DateParser extends ParserSkeleton{
 		return getMonth(dateString);
 	}
 	
+	String parseAndGetDayAndMonth(String dateString) {
+		dateString = parseDate(dateString);
+		return getDayAndMonth(dateString);
+	}
+
 	private String parseDateWithNatty(String date) {
 		return NATTY.parse(date).get(0).getDates().toString();
 	}
@@ -360,7 +362,7 @@ public class DateParser extends ParserSkeleton{
 		return mmddyyDate;
 	}
 
-	private String add20ToYear(String date) {
+	private String addFirstTwoDigitsToYear(String date) {
 		String[] dateTokens = date.split(" ");
 		String day = "";
 		for (int i = 0; i < dateTokens.length; i++){
@@ -371,7 +373,7 @@ public class DateParser extends ParserSkeleton{
 				} else if (token.length() != 4 && i != dateTokens.length-1 
 						&& !getNext(dateTokens, i).toLowerCase().equals(PERIOD_AM) 
 						&& !getNext(dateTokens, i).toLowerCase().equals(PERIOD_PM)){
-					dateTokens[i] = CURRENT_CENTURY_FIRST_TWO_DIGITS + token;
+					dateTokens[i] = getCurrentYearFirstTwoDigits() + token;
 					break;
 				}
 			}
@@ -396,7 +398,7 @@ public class DateParser extends ParserSkeleton{
 	private String confirmDateIsInFuture(String date) {
 		if (isInThePast(date)) {
 			int year = getYear(date);
-			int currYear = getCurrentYear();
+			int currYear = getCurrentYearLastTwoDigits();
 			if (year < currYear || year >= currYear + 5) {
 				date = setToCurrentYear(date);
 			}
@@ -440,7 +442,7 @@ public class DateParser extends ParserSkeleton{
 			eventEnd = startDate + DATE_SEPARATOR_COMMA + DEFAULT_ENDTIME;
 		} else if (hasNoDate(eventEnd)) {
 			String endTime = eventEnd;
-			if (startTimeIsNotBeforeEndTime(startTime, endTime)) {
+			if (isStartTimeNotBeforeEndTime(startTime, endTime)) {
 				startDate = plusOneDay(startDate, DATEFORMAT_NO_TIME);
 			} 
 			eventEnd = startDate + DATE_SEPARATOR_COMMA + endTime;	
@@ -449,22 +451,10 @@ public class DateParser extends ParserSkeleton{
 			eventEnd = endDate + DATE_SEPARATOR_COMMA + DEFAULT_ENDTIME;
 		}
 		
-		if (startDateIsAfterEndDate(eventStart, eventEnd)) {
+		if (isStartDateAfterEndDate(eventStart, eventEnd)) {
 			eventEnd = plusOneYear(eventEnd);
 		}
 		return eventEnd;
-	}
-
-	private boolean startDateIsAfterEndDate(String startDateString, String endDateString){
-		Date startDate = convertStandardDateString(startDateString);
-		Date endDate = convertStandardDateString(endDateString);
-		return startDate.after(endDate);
-	}
-
-	private boolean startTimeIsNotBeforeEndTime(String startTime, String endTime){
-		Date startTimeDate = convertStandardTimeString(startTime);
-		Date endTimeDate = convertStandardTimeString(endTime);
-		return !startTimeDate.before(endTimeDate);
 	}
 
 	private Date adjustCalendar(int field, Date date, int length) {
@@ -489,7 +479,7 @@ public class DateParser extends ParserSkeleton{
 	}
 
 	private String setToCurrentYear(String dateString) {
-		String currYear = Integer.toString(getCurrentYear());
+		String currYear = Integer.toString(getCurrentYearLastTwoDigits());
 		String[] dateTokens = dateString.split(DATE_SEPARATOR_COMMA);
 		
 		String ddMMMyy = getSecond(dateTokens);
@@ -598,12 +588,19 @@ public class DateParser extends ParserSkeleton{
 		return now;
 	}
 	
-	private int getCurrentYear() {
+	private String getCurrentYearFirstTwoDigits() {
 	    Date now = new Date();
 	    String strDate = DATEFORMAT_YEAR_ONLY.format(now);
+	    return strDate.substring(0, 2);
+	}
+	
+	private int getCurrentYearLastTwoDigits() {
+	    Date now = new Date();
+	    String strDate = DATEFORMAT_YEAR_ONLY.format(now);
+	    strDate = strDate.substring(2, strDate.length());
 		return Integer.parseInt(strDate);
 	}
-
+	
 	private int getDayfromDateString(String token) {
 		String day = getFirst(token.split(getDateSymbol(token)));
 		try {
@@ -658,6 +655,37 @@ public class DateParser extends ParserSkeleton{
 		return timeString;
 	}
 
+	private boolean isStartDateAfterEndDate(String startDateString, String endDateString){
+		Date startDate = convertStandardDateString(startDateString);
+		Date endDate = convertStandardDateString(endDateString);
+		return startDate.after(endDate);
+	}
+
+	private boolean isStartTimeNotBeforeEndTime(String startTime, String endTime){
+		Date startTimeDate = convertStandardTimeString(startTime);
+		Date endTimeDate = convertStandardTimeString(endTime);
+		return !startTimeDate.before(endTimeDate);
+	}
+
+	private boolean isInThePast(String dateString){
+		Date date = new Date();
+		if (dateString.split(" ").length == 2) {
+			date = convertStringToDate(dateString, DATEFORMAT_DAY_AND_MONTH_ONLY);
+		} else
+			date = convertStandardDateString(dateString);
+		
+		Date now = getCurrentDate();
+		return now.after(date);
+	}
+
+	private boolean isDayMonthFormat(String token) {
+		return !getDateSymbol(token).isEmpty() && !getNumber(token).isEmpty();
+	}
+
+	private boolean isTimeFormat(String time){
+		return isAM(time) || isPM(time) || !getTimeSymbol(time).isEmpty();
+	}
+
 	private boolean isDateKeyword(String token, ArrayList<String> tokenArray) {
 		if (DAY_RELATIVE.contains(token.toLowerCase())) {
 			return true;
@@ -673,25 +701,6 @@ public class DateParser extends ParserSkeleton{
 		} 
 		
 		return false;
-	}
-
-	private boolean isInThePast(String dateString){
-		Date date = new Date();
-		if (dateString.split(" ").length == 2) {
-			date = convertStringToDate(dateString, DATEFORMAT_DAY_AND_MONTH_ONLY);
-		} else
-			date = convertStandardDateString(dateString);
-		
-		Date now = getCurrentDate();
-		return now.after(date);
-	}
-
-	private boolean isddmmFormat(String token) {
-		return !getDateSymbol(token).isEmpty() && !getNumber(token).isEmpty();
-	}
-
-	private boolean isTimeFormat(String time){
-		return isAM(time) || isPM(time) || !getTimeSymbol(time).isEmpty();
 	}
 
 	private boolean isValid12HourTime(String token, ArrayList<String> tokens) {
@@ -856,7 +865,7 @@ public class DateParser extends ParserSkeleton{
 			String token = dateTokens[i];
 			int day = -1;
 			String month = "";
-			if (isddmmFormat(token)) {
+			if (isDayMonthFormat(token)) {
 				day = getDayfromDateString(token);
 				month = getMonthfromDateString(token);
 				if (hasNoSuchDayInMonth(day, month)) {

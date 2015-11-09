@@ -5,9 +5,6 @@ import main.java.backend.Storage.Storage;
 
 public class FilePathCommand extends Command {
 	
-	private static final String EXECUTION_FILEPATH_SUCCESSFUL = "File path is updated successfully.";
-	private static final String EXECUTION_FILEPATH_UNSUCCESSFUL = "Invalid file path. Please try again";
-	
 	private String filepath;
 	private Storage storageComponent;
 
@@ -25,15 +22,7 @@ public class FilePathCommand extends Command {
 	}
 	
 	public String execute() {
-		
-		boolean isExecuted = storageComponent.updateFilePath(filepath);
-		
-		if (isExecuted) {
-			return EXECUTION_FILEPATH_SUCCESSFUL;
-		} else {
-			return EXECUTION_FILEPATH_UNSUCCESSFUL;
-		}
-		
+		return storageComponent.updateFilePath(filepath);
 	}
 
 }

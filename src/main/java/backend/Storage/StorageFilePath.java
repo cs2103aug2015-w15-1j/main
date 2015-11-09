@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Properties;
 
 /**
@@ -21,6 +22,10 @@ import java.util.Properties;
 
 public class StorageFilePath {
 
+	private static final String EXECUTION_FILEPATH_SUCCESSFUL = "File path is updated successfully to %1$s";
+	private static final String EXECUTION_FILEPATH_UNSUCCESSFUL = "Invalid file path. Please try again";
+	private static final String EXECUTION_FILEPATH_DUPLICATE = "File is already in %1$s. Please try again with a new file path.";
+	
 	private static final String ERROR_READ_DATA = "An error occured when retrieving data from config file.";
 	private static final String ERROR_TRANSFER_DATA = "An error occured when transfering data from config file.";
 	
@@ -56,7 +61,7 @@ public class StorageFilePath {
 	 * @param oldFilePath		File path of current file
 	 * @param newFilePath		File path of new file
 	 */
-	private void dataTransfer(String oldFilePath, String newFilePath) {
+	private boolean dataTransfer(String oldFilePath, String newFilePath) {
 	
 		byte[] buffer = new byte[10000];
 		try {
@@ -77,10 +82,11 @@ public class StorageFilePath {
 			bufferedInput.close();
 			bufferedOutput.close();
 			oldFile.delete();
+			return true;
 		} catch (IOException e) {
 			System.out.println(ERROR_TRANSFER_DATA);
+			return false;
 		}
-		
 	}
 	
 	//@@author A0126258A
@@ -238,26 +244,29 @@ public class StorageFilePath {
 	}
 
 	//@@author A0126258A
-	public boolean execute(String newFilePath) {
+	public String execute(String newFilePath) {
 
 		String oldFilePath = retrieve();
 		newFilePath = appendTextFile(newFilePath);
-		
-		if(isFilePathExist(newFilePath) && !oldFilePath.equals(newFilePath)) {
+		boolean isTransferred = false;
+
+		if(oldFilePath.equals(newFilePath)) {
+			return String.format(EXECUTION_FILEPATH_DUPLICATE, newFilePath);
+		} else if(isFilePathExist(newFilePath)) {
 			try {
 				writer = new FileWriter(FILE_CONFIGURATION);
-				dataTransfer(oldFilePath, newFilePath);
+				isTransferred = dataTransfer(oldFilePath, newFilePath);
 				properties.setProperty(FILE_KEY, newFilePath);
 				properties.store(writer, FILE_HEADING);
 				writer.close();
 			} catch (IOException e) {
-				return false;
+				return EXECUTION_FILEPATH_UNSUCCESSFUL;
 			}	
-		} else {
-			return false;
-		}
+		} else if(!isTransferred) {
+			return EXECUTION_FILEPATH_UNSUCCESSFUL;
+		} 
 		
-		return true;
+		return String.format(EXECUTION_FILEPATH_SUCCESSFUL, newFilePath);
 	}
 
 }

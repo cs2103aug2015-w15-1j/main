@@ -14,6 +14,6 @@ public interface Storage {
 	
 	public void save(ArrayList<Task> allData);
 	
-	public boolean updateFilePath(String newFilePath);
+	public String updateFilePath(String newFilePath);
 	
 }

@@ -3,6 +3,7 @@
 package main.java.backend.Storage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import main.java.backend.Storage.Task.Task;
 
@@ -40,9 +41,9 @@ public class StorageFacade implements Storage {
 	}
 	
 	@Override
-	public boolean updateFilePath(String newFilePath) {
-		boolean isSuccess = filePath.execute(newFilePath);
+	public String updateFilePath(String newFilePath) {
+		String result = filePath.execute(newFilePath);
 		reinit();
-		return isSuccess;
+		return result;
 	}
  }

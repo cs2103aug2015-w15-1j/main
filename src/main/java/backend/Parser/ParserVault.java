@@ -13,18 +13,14 @@ public class ParserVault extends ParserSkeleton{
 	
 	private DateParser dateParser = new DateParser();
 
-	ParserVault() {
-		dateParser.init();
-	}
-
-	//List of commands that have appeared in the parsed tokens
+	//List of command words that have appeared in the parsed tokens
 	private ArrayList<String> seenCommands = new ArrayList<String>();
 
-	//Commands that only need the task's name/index, no other content needed
+	//Command words that only need the task's name/index, no other content needed
 	private final ArrayList<String> COMMANDS_NEED_TASK_ONLY = new ArrayList<String>( Arrays.asList(
 	COMMAND_ADD, COMMAND_DELETE, COMMAND_DONE) );
 	
-	//Variants or abbreviations of some of the commands
+	//Variants or abbreviations of some of the command words
     private HashMap<String, ArrayList<String>> command_families = new HashMap<String, ArrayList<String>>(){
 		static final long serialVersionUID = 1L; {
 		put(COMMAND_DEADLINE, new ArrayList<String>( Arrays.asList("by", "dea")));
@@ -77,7 +73,7 @@ public class ParserVault extends ParserSkeleton{
 	private final ArrayList<String> FIELDS_CAN_RESET = new ArrayList<String>( 
 	Arrays.asList(FIELD_ALL, FIELD_DESCRIPTION, FIELD_DATE, FIELD_DEADLINE, FIELD_RECUR, FIELD_EVENT, FIELD_PRIORITY, FIELD_REMINDER) );	
     
-	//The task types recognised by Parser
+	//The task types that are recognised by Parser
 	private final String TASKTYPE_TODO = "TODO";
 	private final String TASKTYPE_EVENT = "EVENT";
 	private final String TASKTYPE_FLOATING = "FLOATING";
@@ -222,7 +218,7 @@ public class ParserVault extends ParserSkeleton{
 	}
 
 	/**
-	 * This method creates a short result (for non one-shot commands)
+	 * This method creates a result that only has one field (for non one-shot commands)
 	 */
 	ArrayList<String> makeSingleFieldResult() {
 		String resultType = getContent(FIELD_RESULTTYPE);
@@ -251,7 +247,7 @@ public class ParserVault extends ParserSkeleton{
 	}
 
 	/**
-	 * This method creates a long result (for one-shot commands)
+	 * This method creates a result that has multiple fields (for one-shot commands)
 	 */
 	ArrayList<String> makeMultiFieldResult() {
 		String resultType = getContent(FIELD_RESULTTYPE);
@@ -320,7 +316,8 @@ public class ParserVault extends ParserSkeleton{
 	}
 
 	/**
-	 * This method gets the individual start and end date/time of an event and put them into separate fields
+	 * This method splits the event date/time to get the start and end date/time
+	 * and stores them under separate fields
 	 * @return the start and end date/time in an array
 	 */
 	private ArrayList<String> getEventStartAndEnd(String event) {
@@ -463,6 +460,10 @@ public class ParserVault extends ParserSkeleton{
 		return putFieldContentInResult();
 	}
 
+	/**
+	 * This method checks if any part of the search content can be interpreted as a date
+	 * and convert that part into standardized date formats
+	 */
 	private String parseSearchContent(String content) {
 		String[] contentTokens = content.split(SPACE_OF_ANY_LENGTH);
 		String result = "";

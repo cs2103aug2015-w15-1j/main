@@ -70,7 +70,15 @@ public class Gui extends Application {
 	private static final double WIDTH_MAX = 10000.0;
 	private static final double WIDTH_MIN = 1.0;
 	private static final int COUNT_LIMIT = 10000;
-	
+	private static final int SCENE_MAIN = 1;
+	private static final int SCENE_FOCUS = 2;
+	private static final int NUM_TASKS = 1;
+	private static final int NUM_EVENTS = 2;
+	private static final int NUM_OVERDUE = 3;
+	private static final int NUM_FLOAT = 4;
+	private static final int NUM_TODAY_TASKS_EVENTS = 5;
+	private static final int NUM_SEARCH = 6;
+
 	// Possible messages
 	private static final String MESSAGE_WELCOME = "Welcome to TankTask!";
 	private static final String MESSAGE_EMPTY = "List is empty";
@@ -98,25 +106,12 @@ public class Gui extends Application {
 	private static final String COMMAND_EXIT = "exit";
 
 	// Hot key combinations
-	private final KeyCombination UNDO = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
-	private final KeyCombination REDO = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);
-	private final KeyCombination SHIFTUP = new KeyCodeCombination(KeyCode.UP, KeyCombination.SHIFT_DOWN);
-	private final KeyCombination SHIFTDOWN = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.SHIFT_DOWN);
-
-	// necessary variables for one-instance check
-	private File file;
-	private RandomAccessFile randomAccessFile;
-	private FileLock fileLock;
+	private static final KeyCombination UNDO = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
+	private static final KeyCombination REDO = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);
+	private static final KeyCombination SHIFTUP = new KeyCodeCombination(KeyCode.UP, KeyCombination.SHIFT_DOWN);
+	private static final KeyCombination SHIFTDOWN = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.SHIFT_DOWN);
 
 	// necessary variables for navigation purposes.
-	private static final int SCENE_MAIN = 1;
-	private static final int SCENE_FOCUS = 2;
-	private static final int NUM_TASKS = 1;
-	private static final int NUM_EVENTS = 2;
-	private static final int NUM_OVERDUE = 3;
-	private static final int NUM_FLOAT = 4;
-	private static final int NUM_TODAY_TASKS_EVENTS = 5;
-	private static final int NUM_SEARCH = 6;
 	private static int currentList;
 	private static int currentPosition;
 	private static int currentScene;
@@ -137,7 +132,6 @@ public class Gui extends Application {
 	private static ListView<TextFlow> listTasks;
 	private static ListView<TextFlow> listEvents;
 	private static ListView<TextFlow> listOverdue;
-
 	// Specific nodes for Focus View
 	private static Label focusHeading;
 	private static Label detailsHeading;
@@ -153,7 +147,11 @@ public class Gui extends Application {
 	private static Console console;
 	private static PrintStream ps;
 	private static ArrayList<String> recentCommands;
-	
+
+	// necessary variables for one-instance check
+	private File file;
+	private RandomAccessFile randomAccessFile;
+	private FileLock fileLock;
 
 	public static void main(String[] args) {
 		LauncherImpl.launchApplication(Gui.class, GuiPreloader.class, args);

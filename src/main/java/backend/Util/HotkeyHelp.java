@@ -4,11 +4,11 @@ import java.util.ArrayList;
 
 //@@author A0126125R
 public class HotkeyHelp {
-	
-	String f1,f2 ,f3, f4, esc, tab,up,down,left,right,ctrlz,ctrly,shiftup,shiftdown;
+
+	String f1, f2, f3, f4, esc, tab, up, down, left, right, ctrlz, ctrly, shiftup, shiftdown;
 	ArrayList<String> help;
 	ArrayList<String> name;
-	
+
 	public HotkeyHelp() {
 		f1 = "Press 'F1' to toggle help";
 		f2 = "Press 'F2' to toggle between floating and overdue tasks (if any)";
@@ -24,11 +24,11 @@ public class HotkeyHelp {
 		ctrly = "use 'ctrl'+'Y' to redo";
 		shiftup = "use 'shift' + 'up' arrow to get recent commands";
 		shiftdown = "use 'shift' + 'down' arrow to get recent commands";
-		
+
 		addAll();
 		resourceList();
 	}
-	
+
 	private void resourceList() {
 		name = new ArrayList<String>();
 		name.add("Resources/f1.png");
@@ -49,7 +49,6 @@ public class HotkeyHelp {
 		name.add("Resources/up.png");
 		name.add("Resources/shift.png");
 		name.add("Resources/down.png");
-		
 	}
 
 	private void addAll() {
@@ -69,11 +68,12 @@ public class HotkeyHelp {
 		help.add(shiftup);
 		help.add(shiftdown);
 	}
-	
+
 	public ArrayList<String> retrieveHotkey() {
 		return help;
 	}
-	public ArrayList<String> getResourceList(){
+
+	public ArrayList<String> getResourceList() {
 		return name;
 	}
 }

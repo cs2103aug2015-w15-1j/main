@@ -279,7 +279,7 @@ public class Task implements Comparable<Task> {
 	//@@author A0126125R
 	public String reminderPrint() {
 		StringBuilder sb = new StringBuilder();
-		
+		sb.append(indexForPrinting + PRINT_DOT);
 		if(!name.isEmpty()){
 			sb.append(name + PRINT_SPACE);
 		}

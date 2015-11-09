@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.application.Preloader;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
@@ -13,7 +12,7 @@ import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextAlignment;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -26,18 +25,17 @@ public class GuiPreloader extends Preloader {
     private Stage preloaderStage;
     private Scene scene;
 
-    private Label progress;
+    private Text progress;
 
     public GuiPreloader() {
     }
     
-    //@@author A0126125R -reused
+    //@@author A0126125R
     @Override
     public void init() throws Exception {
         Platform.runLater(() -> {
-            Label title = new Label("Firing up your TankTask, please wait...");
-            title.setTextAlignment(TextAlignment.CENTER);
-            progress = new Label("0%");
+            Text title = new Text("Firing up your TankTask, please wait...");
+            progress = new Text("0%");
             Image tank = new Image(getClass().getResourceAsStream("tank.png"));
             ImageView image = new ImageView(tank);
             image.setFitWidth(250);
@@ -68,9 +66,9 @@ public class GuiPreloader extends Preloader {
     }
 
     @Override
-    public void handleApplicationNotification(PreloaderNotification info) {
-        if (info instanceof ProgressNotification) {
-            progress.setText(((ProgressNotification) info).getProgress() + "%");
+    public void handleApplicationNotification(PreloaderNotification percentage) {
+        if (percentage instanceof ProgressNotification) {
+            progress.setText(((ProgressNotification) percentage).getProgress() + "%");
         }
     }
 

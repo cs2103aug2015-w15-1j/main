@@ -13,7 +13,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
@@ -32,7 +31,17 @@ import main.java.backend.Util.HotkeyHelp;
 
 //@@author A0126125R
 public class HelpView {
-	private final int numDoubleKeyInstruction = 4;
+	private final int NUM_DOUBLE_KEY_INSTRUCT = 4;
+	private final int LIST_NUM_CONTENT = -3;
+	private final int LIST_NUM_ADD = 0;
+	private final int LIST_NUM_DONE = 1;
+	private final int LIST_NUM_DELETE = 2;
+	private final int LIST_NUM_SHOW = 3;
+	private final int LIST_NUM_EVERY = 4;
+	private final int LIST_NUM_RENAME = 5;
+	private final int LIST_NUM_DES = 6;
+	private final int LIST_NUM_ONESHOT = 7;
+
 	Stage stage;
 	Scene scene;
 	CommandHelp command;
@@ -71,6 +80,19 @@ public class HelpView {
 
 	private void setUpAllContents() {
 		stage = new Stage();
+		initContent();
+		Scene stageScene = new Scene(pane, 800, 600);
+		scene = stageScene;
+		Image icon = new Image(getClass().getResourceAsStream("tank.png")); 
+		stage.getIcons().add(icon);
+		scene.getStylesheets().add(getClass().getResource("HelpStyle.css").toExternalForm());
+		stage.setScene(scene);
+	}
+
+	/**
+	 * this method creates new object and sets up contents
+	 */
+	private void initContent() {
 		currentView=-3;
 		pane = new GridPane();
 		oneKey = new VBox();
@@ -96,12 +118,6 @@ public class HelpView {
 		
 		pane.setGridLinesVisible(false); //checking
 		pane.getChildren().addAll(leftNavi,rightNavi);
-		Scene stageScene = new Scene(pane, 800, 600);
-		scene = stageScene;
-		Image icon = new Image(getClass().getResourceAsStream("tank.png")); 
-		stage.getIcons().add(icon);
-		scene.getStylesheets().add(getClass().getResource("HelpStyle.css").toExternalForm());
-		stage.setScene(scene);
 	}
 
 	private void setUpBackground() {
@@ -186,7 +202,7 @@ public class HelpView {
 		int j=0;
 		for  (int i =0 ;i<help.size();i++) {
 			HBox box = new HBox();
-			if (i<help.size()-numDoubleKeyInstruction){ //only contains 1 key shortcuts
+			if (i<help.size()-NUM_DOUBLE_KEY_INSTRUCT){ //only contains 1 key shortcuts
 				ImageView imv = new ImageView();
 				Image image = new Image(Gui.class.getResourceAsStream(imageNames.get(i)));
 				imv.setImage(image);
@@ -227,49 +243,63 @@ public class HelpView {
 	
 			@Override
 			public void handle(KeyEvent event) {
-				if (event.getCode().equals(KeyCode.F1)){
+				switch(event.getCode()){
+				case F1:
 					close();
-				} else if (event.getCode().equals(KeyCode.RIGHT)){
+				break;
+				case RIGHT: 
 					currentView++;
 					if (currentView>=fullList.size()){
 						currentView = fullList.size()-1;
 					}
 					changeContents();
-				} else if (event.getCode().equals(KeyCode.LEFT)){
+				break;
+				case LEFT:
 					currentView--;
-					if (currentView<-3){
-						currentView = -3;
+					if (currentView<LIST_NUM_CONTENT){
+						currentView = LIST_NUM_CONTENT;
 					}
 					changeContents();
-				} else if (event.getCode().equals(KeyCode.DIGIT0)){
-					currentView = -3;
+				break;
+				case DIGIT0:
+					currentView = LIST_NUM_CONTENT;
 					changeContents();
-				} else if (event.getCode().equals(KeyCode.DIGIT1)){
-					currentView = 0;
+				break;
+				case DIGIT1:
+					currentView = LIST_NUM_ADD;
 					changeContents();
-				} else if (event.getCode().equals(KeyCode.DIGIT2)){
-					currentView = 1;
+				break;
+				case DIGIT2:
+					currentView = LIST_NUM_DONE;
 					changeContents();
-				} else if (event.getCode().equals(KeyCode.DIGIT3)){
-					currentView = 2;
+				break;
+				case DIGIT3:
+					currentView = LIST_NUM_DELETE;
 					changeContents();
-				} else if (event.getCode().equals(KeyCode.DIGIT4)){
-					currentView = 3;
+				break;
+				case DIGIT4:
+					currentView = LIST_NUM_SHOW;
 					changeContents();
-				} else if (event.getCode().equals(KeyCode.DIGIT5)){
-					currentView = 4;
+				break;
+				case DIGIT5:
+					currentView = LIST_NUM_EVERY;
 					changeContents();
-				} else if (event.getCode().equals(KeyCode.DIGIT6)){
-					currentView = 5;
+				break;
+				case DIGIT6:
+					currentView = LIST_NUM_RENAME;
 					changeContents();
-				} else if (event.getCode().equals(KeyCode.DIGIT7)){
-					currentView = 6;
+				break;
+				case DIGIT7:
+					currentView = LIST_NUM_DES;
 					changeContents();
-				} else if (event.getCode().equals(KeyCode.DIGIT8)){
-					currentView = 7;
+				break;
+				case DIGIT8:
+					currentView = LIST_NUM_ONESHOT;
 					changeContents();
+				break;
+				default:
+				break;
 				}
-	
 			}
 	
 		});

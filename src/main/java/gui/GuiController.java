@@ -33,8 +33,6 @@ public class GuiController {
 	public GuiController() {
 		
 		logicComponent = LogicFacade.getInstance();
-		
-	
 		retrieveAllData();
 		getFocusList = logicComponent.retrieveTaskData("toDo"); //default as tasks
 	}
@@ -73,7 +71,11 @@ public class GuiController {
 		assert list!= null;
 		return list;
 	}
-	
+	/**
+	 * this method fit the corresponding list into focus list
+	 * 
+	 * @param currentList
+	 */
 	void determineList(int currentList) {
 		if(currentList==NUM_OVERDUE){
 			getFocusList = getOverdueList();

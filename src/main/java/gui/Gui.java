@@ -63,11 +63,11 @@ public class Gui extends Application{
 	private static final String LIST_TASKS = "ToDo:";
 	private static final String LIST_EVENTS = "Events:";
 	private static final String LIST_FLOATING = "Floating:";
-	private static final String LIST_TODAY = "Today's / Tomorrow's: ";
+	private static final String LIST_TODAY = "Today / Tomorrow: ";
 	private static final String LIST_SEARCH = "Search Results:";
 	private static final String LIST_COMPLETE_TODO = "Completed ToDo:";
 	private static final String LIST_COMPLETE_EVENTS = "Completed Events:";
-	private static final String LIST_COMPLETE_FLOAT = "COmpleted Floating:";
+	private static final String LIST_COMPLETE_FLOAT = "Completed Floating:";
 	
 
 	//Possible commands retrieved from Logic.

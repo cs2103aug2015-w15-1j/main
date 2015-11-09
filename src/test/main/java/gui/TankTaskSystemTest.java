@@ -3,6 +3,8 @@ package main.java.gui;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -979,6 +981,27 @@ public class TankTaskSystemTest {
 		result = testTankTask.executeCommand("show test");
 		assertEquals(result, "InvalidTaskTypeError: 'test' is not a valid task type "
 				+ "(please enter 'todo', 'event', 'floating', 'today', 'overdue' or 'complete')");
+	}
+	
+	@Test
+	public void testUpdateFile() {
+		String fileName = System.getProperty("user.home") + "/Desktop" + "/test.txt";
+		result = testTankTask.executeCommand("filepath " + fileName);
+		assertEquals(result, String.format("File path is updated successfully to %1$s", fileName));
+	}
+	
+	@Test
+	public void testUpdateFileDuplicate() {
+		String fileName = System.getProperty("user.home") + "/Desktop" + "/filename.txt";
+		result = testTankTask.executeCommand("filepath " + fileName);
+		result = testTankTask.executeCommand("filepath " + fileName);
+		assertEquals(result, String.format("File is already in %1$s. Please try again with a new file path.", fileName));
+	}
+	
+	@Test
+	public void testUpdateFileError() {
+		result = testTankTask.executeCommand("filepath " + "/Desktop");
+		assertEquals(result, "Invalid file path. Please try again");
 	}
 
 }

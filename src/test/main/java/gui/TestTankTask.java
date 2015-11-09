@@ -35,6 +35,7 @@ public class TestTankTask {
 	 */
 	@Before
 	public void setUp() throws Exception {
+		testTankTask.executeCommand("deleteAll");
 	}
 
 	/**
@@ -176,7 +177,7 @@ public class TestTankTask {
 	
 	@Test
 	public void testAddEventWithEndTimeEarlierThanStartTimeThree() {
-		result = testTankTask.executeCommand("add Go on a date with beloved girlfriend event 12:30 25 12 15 to 12:30");
+		result = testTankTask.executeCommand("add Go on a date with beloved girlfriend event 12:30 25/12/15 to 12:30");
 		assertEquals(result, "Task Go on a date with beloved girlfriend has been added");
 	}
 	
@@ -244,91 +245,98 @@ public class TestTankTask {
 	public void testAddRecurrenceToDoDay() {
 		testTankTask.executeCommand("add Call beloved girlfriend deadline 10pm today");
 		result = testTankTask.executeCommand("1 every day");
-		assertEquals(result, "Task 1 recurring has been set to 1, day");
+		assertEquals(result, "Task 1 recurring has been set to 1 day");
 	}
 	
 	@Test
 	public void testAddRecurrenceToDoEveryFortyDays() {
 		testTankTask.executeCommand("add Cut hair deadline 10pm");
 		result = testTankTask.executeCommand("1 every 40 days");
-		assertEquals(result, "Task 1 recurring has been set to 40, day");
+		assertEquals(result, "Task 1 recurring has been set to 40 day");
 	}
 	
 	@Test
 	public void testAddRecurrenceToDoDayAnotherWay() {
 		testTankTask.executeCommand("add Call beloved girlfriend deadline 10pm");
 		result = testTankTask.executeCommand("1 recur day");
-		assertEquals(result, "Task 1 recurring has been set to 1, day");
+		assertEquals(result, "Task 1 recurring has been set to 1 day");
 	}
 	
 	@Test
 	public void testAddRecurrenceToDoWeek() {
 		testTankTask.executeCommand("add Watch movie with beloved girlfriend from Sunday 6pm to 10pm");
 		result = testTankTask.executeCommand("1 every week");
-		assertEquals(result, "Task 1 recurring has been set to 1, week");
+		assertEquals(result, "Task 1 recurring has been set to 1 week");
 	}
 	
 	@Test
 	public void testAddRecurrenceToDoEveryTwoWeek() {
 		testTankTask.executeCommand("add Clean house from Sunday 6am to 10am");
 		result = testTankTask.executeCommand("1 every 2 weeks");
-		assertEquals(result, "Task 1 recurring has been set to 2, week");
+		assertEquals(result, "Task 1 recurring has been set to 2 week");
 	}
 	
 	@Test
 	public void testAddRecurrenceToDoWeekAnotherWay() {
 		testTankTask.executeCommand("add Watch movie with beloved girlfriend from Sunday 6pm to 10pm");
 		result = testTankTask.executeCommand("1 recur week");
-		assertEquals(result, "Task 1 recurring has been set to 1, week");
+		assertEquals(result, "Task 1 recurring has been set to 1 week");
 	}
 	
 	@Test
 	public void testAddRecurrenceToDoMonth() {
+		testTankTask.executeCommand("add Celebrate Monthsary with beloved girlfriend from 16 nov");
+		result = testTankTask.executeCommand("1 every month");
+		assertEquals(result, "Task 1 recurring has been set to 1 month");
+	}
+	
+	@Test
+	public void testAddRecurrenceFloatingMonthFail() {
 		testTankTask.executeCommand("add Celebrate Monthsary with beloved girlfriend 16 nov");
 		result = testTankTask.executeCommand("1 every month");
-		assertEquals(result, "Task 1 recurring has been set to 1, month");
+		assertEquals(result, "Unable to recur floating tasks");
 	}
 	
 	@Test
 	public void testAddRecurrenceToDoEverySixMonth() {
 		testTankTask.executeCommand("add Visit mum's grave to tidy it deadline 22 dec");
 		result = testTankTask.executeCommand("1 every 6 months");
-		assertEquals(result, "Task 1 recurring has been set to 6, month");
+		assertEquals(result, "Task 1 recurring has been set to 6 month");
 	}
 	
 	@Test
 	public void testAddRecurrenceToDoMonthAnotherWay() {
-		testTankTask.executeCommand("add Celebrate Monthsary with beloved girlfriend 16 nov");
+		testTankTask.executeCommand("add Celebrate Monthsary with beloved girlfriend deadline 16 nov");
 		result = testTankTask.executeCommand("1 recur month");
-		assertEquals(result, "Task 1 recurring has been set to 1, month");
+		assertEquals(result, "Task 1 recurring has been set to 1 month");
 	}
 	
 	@Test
 	public void testAddRecurrenceToDoYear() {
-		testTankTask.executeCommand("add Celebrate Anniversary with beloved girlfriend 16 nov");
+		testTankTask.executeCommand("add Celebrate Anniversary with beloved girlfriend deadline 16 nov");
 		result = testTankTask.executeCommand("1 every year");
-		assertEquals(result, "Task 1 recurring has been set to 1, year");
+		assertEquals(result, "Task 1 recurring has been set to 1 year");
 	}
 	
 	@Test
 	public void testAddRecurrenceToDoYearAnotherWay() {
-		testTankTask.executeCommand("add Celebrate Anniversary with beloved girlfriend 16 nov");
+		testTankTask.executeCommand("add Celebrate Anniversary with beloved girlfriend deadline 16 nov");
 		result = testTankTask.executeCommand("1 recur year");
-		assertEquals(result, "Task 1 recurring has been set to 1, year");
+		assertEquals(result, "Task 1 recurring has been set to 1 year");
 	}
 	
 	@Test
 	public void testAddRecurrenceToDoTwoYears() {
-		testTankTask.executeCommand("add Get new laptop 15 nov");
+		testTankTask.executeCommand("add Get new laptop deadline 15 nov");
 		result = testTankTask.executeCommand("1 every 2 year");
-		assertEquals(result, "Task 1 recurring has been set to 2, year");
+		assertEquals(result, "Task 1 recurring has been set to 2 year");
 	}
 	
 	@Test
 	public void testAddRecurrenceToDoTwoYearsWithS() {
-		testTankTask.executeCommand("add Get new laptop 15 nov");
+		testTankTask.executeCommand("add Get new laptop deadline 15 nov");
 		result = testTankTask.executeCommand("1 every 2 years");
-		assertEquals(result, "Task 1 recurring has been set to 2, year");
+		assertEquals(result, "Task 1 recurring has been set to 2 year");
 	}
 	
 	@Test
@@ -342,7 +350,7 @@ public class TestTankTask {
 	public void testAddRecurrenceEventDay() {
 		testTankTask.executeCommand("add Send a Sweet Dreams SMS to beloved girlfriend from 11:55PM to 11:59PM");
 		result = testTankTask.executeCommand("1 every day");
-		assertEquals(result,"Task 1 recurring has been set to 1, day");
+		assertEquals(result,"Task 1 recurring has been set to 1 day");
 	}
 	
 	@Test
@@ -356,56 +364,56 @@ public class TestTankTask {
 	public void testAddRecurrenceEventThreeDay() {
 		testTankTask.executeCommand("add Update Supervisor on work progress from wed 9am to 10am");
 		result = testTankTask.executeCommand("1 every 3 days");
-		assertEquals(result,"Task 1 recurring has been set to 3, day");
+		assertEquals(result,"Task 1 recurring has been set to 3 day");
 	}
 	
 	@Test
 	public void testAddRecurrenceEventWeek() {
-		testTankTask.executeCommand("add Have a homecooked dinner with beloved girlfriend from 6pm to 10pm");
+		testTankTask.executeCommand("add Have a homecooked dinner with beloved girlfriend from saturday 6pm to 10pm");
 		result = testTankTask.executeCommand("1 every week");
-		assertEquals(result,"Task 1 recurring has been set to 1, week");
+		assertEquals(result,"Task 1 recurring has been set to 1 week");
 	}
 	
 	@Test
 	public void testAddRecurrenceEventEveryTwoWeek() {
 		testTankTask.executeCommand("add Have a team meeting from 0800 to 10");
 		result = testTankTask.executeCommand("1 every 2 week");
-		assertEquals(result,"Task 1 recurring has been set to 2, week");
+		assertEquals(result,"Task 1 recurring has been set to 2 week");
 	}
 	
 	@Test
 	public void testAddRecurrenceEventMonth() {
 		testTankTask.executeCommand("add Have monthsary date with beloved girlfriend from 16/11/15 12:00 to 10:00");
 		result = testTankTask.executeCommand("1 every month");
-		assertEquals(result,"Task 1 recurring has been set to 1, month");
+		assertEquals(result,"Task 1 recurring has been set to 1 month");
 	}
 	
 	@Test
 	public void testAddRecurrenceEventEveryThreeMonth() {
 		testTankTask.executeCommand("add Have team bonding activities from sat 1200 to 1000");
 		result = testTankTask.executeCommand("1 every 3 month");
-		assertEquals(result,"Task 1 recurring has been set to 3, month");
+		assertEquals(result,"Task 1 recurring has been set to 3 month");
 	}
 	
 	@Test
 	public void testAddRecurrenceEventYear() {
 		testTankTask.executeCommand("add Celebrate Anniversary with beloved girlfriend from 16-11-15 12.00 to 22.00");
 		result = testTankTask.executeCommand("1 every year");
-		assertEquals(result,"Task 1 recurring has been set to 1, year");
+		assertEquals(result,"Task 1 recurring has been set to 1 year");
 	}
 	
 	@Test
 	public void testAddRecurrenceEventEveryFiveYear() {
 		testTankTask.executeCommand("add Celebrate Anniversary with beloved girlfriend from 16/11 12pm to 10pm");
 		result = testTankTask.executeCommand("1 every 5 years");
-		assertEquals(result,"Task 1 recurring has been set to 5, year");
+		assertEquals(result,"Task 1 recurring has been set to 5 year");
 	}
 	
 	@Test
 	public void testAddRecurrenceEventEveryFiveYearWithExtraCharacters() {
 		testTankTask.executeCommand("add Celebrate Anniversary with beloved girlfriend from 16/11 12pm to 10pm");
 		result = testTankTask.executeCommand("1 every 5 years aaaaaa");
-		assertEquals(result,"Task 1 recurring has been set to 5, year");
+		assertEquals(result,"Task 1 recurring has been set to 5 year");
 	}
 	
 	@Test

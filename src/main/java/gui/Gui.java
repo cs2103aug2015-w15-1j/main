@@ -51,7 +51,7 @@ import javafx.stage.WindowEvent;
 import main.java.backend.Storage.Task.Task;
 
 //@@author A0126125R
-public class GUI extends Application{
+public class Gui extends Application{
 
 	//Possible messages
 	private static final String MESSAGE_WELCOME = "Welcome to TankTask!";
@@ -128,7 +128,7 @@ public class GUI extends Application{
 	private static TextArea detailField;
 	private static ListView<TextFlow> listFocus;
 
-	private static GUIController controller;
+	private static GuiController controller;
 	private static HelpView help;
 	private static GridPane gridPane;
 	private static Stage stage;
@@ -140,7 +140,7 @@ public class GUI extends Application{
 	private static final int COUNT_LIMIT = 10000;
 
 	public static void main(String[] args) {
-		LauncherImpl.launchApplication(GUI.class, GuiPreloader.class, args);
+		LauncherImpl.launchApplication(Gui.class, GuiPreloader.class, args);
 	}
 	
 	/**
@@ -176,7 +176,7 @@ public class GUI extends Application{
 			System.exit(0);
 		}
 
-		controller = new GUIController();
+		controller = new GuiController();
 		for (int i = 0; i < COUNT_LIMIT; i++) {
 			double progress = (100 * i) / COUNT_LIMIT;
 			LauncherImpl.notifyPreloader(this, new GuiPreloader.ProgressNotification(progress));
@@ -280,7 +280,7 @@ public class GUI extends Application{
 
 	private void setUpGrid() {
 		gridPane = new GridPane();
-		Image image = new Image(GUI.class.getResourceAsStream("Resources/background.png"));
+		Image image = new Image(Gui.class.getResourceAsStream("Resources/background.png"));
 		BackgroundSize backgroundSize = new BackgroundSize(100, 100, true, true, true,true);
 		BackgroundImage backgroundImage = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
 		Background background = new Background(backgroundImage);

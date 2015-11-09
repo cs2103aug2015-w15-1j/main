@@ -105,7 +105,7 @@ public class HelpView {
 	}
 
 	private void setUpBackground() {
-		Image image = new Image(GUI.class.getResourceAsStream("Resources/background.png"));
+		Image image = new Image(Gui.class.getResourceAsStream("Resources/background.png"));
 		BackgroundSize backgroundSize = new BackgroundSize(100, 100, true, true, true,true);
 		BackgroundImage backgroundImage = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
 		Background background = new Background(backgroundImage);
@@ -163,7 +163,7 @@ public class HelpView {
 	}
 	
 	private void setUpLeftText(HBox leftNavi) {
-		Image image = new Image(GUI.class.getResourceAsStream("Resources/left.png"));
+		Image image = new Image(Gui.class.getResourceAsStream("Resources/left.png"));
 		ImageView imageview = new ImageView();
 		imageview.setImage(image);
 		imageview.setFitWidth(30);
@@ -172,7 +172,7 @@ public class HelpView {
 		leftNavi.getChildren().addAll(imageview,leftText);
 	}
 	private void setUpRightText(HBox rightNavi) {
-		Image image2 = new Image(GUI.class.getResourceAsStream("Resources/right.png"));
+		Image image2 = new Image(Gui.class.getResourceAsStream("Resources/right.png"));
 		ImageView imageview2 = new ImageView();
 		imageview2.setImage(image2);
 		imageview2.setFitWidth(30);
@@ -188,7 +188,7 @@ public class HelpView {
 			HBox box = new HBox();
 			if (i<help.size()-numDoubleKeyInstruction){ //only contains 1 key shortcuts
 				ImageView imv = new ImageView();
-				Image image = new Image(GUI.class.getResourceAsStream(imageNames.get(i)));
+				Image image = new Image(Gui.class.getResourceAsStream(imageNames.get(i)));
 				imv.setImage(image);
 				imv.setFitWidth(47);
 				imv.setPreserveRatio(true);

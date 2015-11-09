@@ -44,7 +44,7 @@ public class GuiPreloader extends Preloader {
             image.setPreserveRatio(true);
             VBox root = new VBox(image,title, progress);
             root.setAlignment(Pos.CENTER);
-    		Image bgImage = new Image(GUI.class.getResourceAsStream("Resources/background.png"));
+    		Image bgImage = new Image(Gui.class.getResourceAsStream("Resources/background.png"));
     		BackgroundSize backgroundSize = new BackgroundSize(100, 100, true, true, true,true);
     		BackgroundImage backgroundImage = new BackgroundImage(bgImage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
     		Background background = new Background(backgroundImage);

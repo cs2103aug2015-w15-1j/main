@@ -6,7 +6,7 @@ import main.java.backend.Logic.LogicFacade;
 import main.java.backend.Storage.Task.Task;
 
 //@@author A0126125R
-public class GUIController {
+public class GuiController {
 	
 	LogicFacade logicComponent;
 	
@@ -30,7 +30,7 @@ public class GUIController {
 	private ArrayList<Task> getReminders;
 
 	
-	public GUIController() {
+	public GuiController() {
 		
 		logicComponent = LogicFacade.getInstance();
 		

@@ -70,7 +70,7 @@ public class StorageLoad extends StorageExecution {
 		initReader();
 
 		try {
-			if(!(bufferedReader.readLine() == null)) {
+			if(bufferedReader.readLine() != null) {
 				allData = storageFormat.deserialize(new String(Files.readAllBytes
 						(Paths.get(filePath)), StandardCharsets.UTF_8));
 			} 

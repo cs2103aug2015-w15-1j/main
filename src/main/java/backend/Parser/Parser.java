@@ -5,17 +5,17 @@ import java.util.Arrays;
 
 /**
  * Parser
- * Parses user input and return result to Logic Component
+ * Parses user input and returns result to Logic Component
  * @@author A0121795B
  */
 public class Parser extends ParserSkeleton{
 	
 	ParserVault parserVault = new ParserVault();
 	
-	//Tokens are 'merged' into a growingToken until they are stored into field content
+	//Tokens are used to 'grow' (merged into) a growingToken until it is stored into field content
 	private String growingToken = "";
 	
-	//Command that allow more than one field to be set at the same time
+	//Result types that include more than one field
 	private final ArrayList<String> MULTIFIELD_RESULT_TYPE = new ArrayList<String>( 
 	Arrays.asList(RESULTTYPE_ADD, RESULTTYPE_SET) );
 	

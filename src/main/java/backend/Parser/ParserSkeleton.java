@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 /**
  * ParserSkeleton
- * Contains basic methods and data shared within Parser component
+ * This is an abstract class that contains basic methods and data shared within the Parser component
  * @@author A0121795B
  */
 abstract class ParserSkeleton {
@@ -44,27 +44,27 @@ abstract class ParserSkeleton {
 	
 	//List of all command words accepted by the program
 	final ArrayList<String> COMMANDS = new ArrayList<String>( Arrays.asList(
-	COMMAND_ADD, COMMAND_DEADLINE, COMMAND_DESCRIPTION, COMMAND_DELETE, COMMAND_DELETEALL, 
+	COMMAND_ADD, COMMAND_DEADLINE, COMMAND_DELETE, COMMAND_DELETEALL, COMMAND_DESCRIPTION,
 	COMMAND_DONE, COMMAND_EVENTSTART, COMMAND_RECUR, COMMAND_EXIT, COMMAND_FILEPATH, COMMAND_PRIORITY, 
 	COMMAND_REDO, COMMAND_REMINDER, COMMAND_RENAME, COMMAND_RESET, COMMAND_SEARCH, COMMAND_SHOW, 
-	COMMAND_SHOWCOMPLETE, COMMAND_SHOWEVENT, COMMAND_SHOWFLOATING, COMMAND_SHOWOVERDUE, cOMMAND_SHOWTODO, COMMAND_SHOWTODAY, 
-	COMMAND_SORT, COMMAND_SORTD, COMMAND_SORTN, COMMAND_SORTP, COMMAND_UNDO, COMMAND_UNDONE ) );
+	COMMAND_SHOWCOMPLETE, COMMAND_SHOWEVENT, COMMAND_SHOWFLOATING, COMMAND_SHOWOVERDUE, cOMMAND_SHOWTODO, 
+	COMMAND_SHOWTODAY, COMMAND_SORT, COMMAND_SORTD, COMMAND_SORTN, COMMAND_SORTP, COMMAND_UNDO, COMMAND_UNDONE ) );
 	
-	//Commands that work just by typing the command word (without additional content)
+	//Command words that work by just typing the command word (without additional content)
 	final ArrayList<String> COMMANDS_NO_CONTENT = new ArrayList<String>( Arrays.asList(
 	COMMAND_DELETEALL, COMMAND_EXIT, COMMAND_REDO, COMMAND_SHOWCOMPLETE, COMMAND_SHOWEVENT, COMMAND_SHOWFLOATING, 
 	COMMAND_SHOWOVERDUE, cOMMAND_SHOWTODO, COMMAND_SHOWTODAY, COMMAND_SORTD, COMMAND_SORTN, COMMAND_SORTP, COMMAND_UNDO ) );
 	
-	//Commands that if appear first, will prevent other command keywords from having effect
+	//Command words that if appear first, will prevent other command words from having effect
 	final ArrayList<String> COMMANDS_DOMINATING = new ArrayList<String>( Arrays.asList(
 	COMMAND_DELETE, COMMAND_DONE, COMMAND_FILEPATH, COMMAND_RESET, COMMAND_SEARCH, COMMAND_SHOW, 
 	COMMAND_SORT, COMMAND_UNDONE ) );
 	
-	//Commands that can accept any amount of words
+	//Command words that can accept any amount of words
 	final ArrayList<String> COMMANDS_NEED_WORDS = new ArrayList<String>( 
 	Arrays.asList(COMMAND_ADD, COMMAND_DESCRIPTION, COMMAND_FILEPATH, COMMAND_SEARCH) );
 	
-	//Commands that cannot be part of a one-shot command
+	//Command words that cannot be part of a one-shot command
 	final ArrayList<String> COMMANDS_NOT_ONE_SHOT = new ArrayList<String>( 
 	Arrays.asList(COMMAND_DELETE, COMMAND_DONE, COMMAND_RESET, COMMAND_UNDONE) );	
 	
@@ -73,7 +73,7 @@ abstract class ParserSkeleton {
 	final String DEFAULT_STARTTIME = "9am";
 	final String DEFAULT_ENDTIME = "9pm";
 	
-	//The date frequencies that can be used in a date or in a task's recurrence
+	//The date frequencies that can be used to specify a date or a task's recurrence
 	final String FREQUENCY_DAY = "day";
 	final String FREQUENCY_WEEK = "week";
 	final String FREQUENCY_MONTH = "month";
@@ -90,7 +90,7 @@ abstract class ParserSkeleton {
 	final String STATUS_INCOMPLETE = "incomplete";
 	final String STATUS_OKAY = "okay";
 	
-	//Java data types that are converted by DateParser
+	//Java data types that are converted by Parser
 	final String DATATYPE_DATE = "date";
 	final String DATATYPE_INTEGER = "integer";
 	final String DATATYPE_STRING = "string";
@@ -186,10 +186,10 @@ abstract class ParserSkeleton {
 		}
 	}
 	
-	/*String getFirstLetter(String s){
-		return s.substring(1, s.length());
-	}*/
-	
+	String getStatus(ArrayList<String> parseResult) {
+		return getFirst(parseResult);
+	}
+
 	int convertStringToInt(String str){
 		try {
 			return Integer.parseInt(str);
@@ -203,13 +203,6 @@ abstract class ParserSkeleton {
 		return Character.toUpperCase(word.charAt(0)) + word.substring(1);
 	}
 
-	String removeFrontZero(String token){
-		if (token.startsWith(ZERO)) {
-			return token.substring(1, token.length());
-		}
-		return token;
-	}
-	
 	String mergeTokens(String[] tokens, int startIndex, int endIndex) {
 		String merged = "";
 		for (int i = startIndex; i < endIndex; i++) {
@@ -219,6 +212,13 @@ abstract class ParserSkeleton {
 		return removeEndSpacesOrBrackets(merged);
 	}
 
+	String removeFrontZero(String token){
+		if (token.startsWith(ZERO)) {
+			return token.substring(1, token.length());
+		}
+		return token;
+	}
+	
 	String removeEndSpacesOrBrackets(String token) {
 		while (true){
 			if (token.startsWith(" ") || token.startsWith("[")) {
@@ -272,10 +272,6 @@ abstract class ParserSkeleton {
 	
 	boolean canBeSplit(String s1, String s2){
 		return s1.split(s2).length > 1;
-	}
-	
-	String getStatus(ArrayList<String> parseResult) {
-		return getFirst(parseResult);
 	}
 	
 	boolean isError(String content) {

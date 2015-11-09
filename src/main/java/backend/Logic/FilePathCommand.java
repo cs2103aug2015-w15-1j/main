@@ -1,8 +1,6 @@
 //@@author A0121284N
 package main.java.backend.Logic;
 
-import java.util.HashMap;
-
 import main.java.backend.Storage.Storage;
 
 public class FilePathCommand extends Command {
@@ -24,15 +22,7 @@ public class FilePathCommand extends Command {
 	}
 	
 	public String execute() {
-		
-		 HashMap<Boolean, String> isExecuted = storageComponent.updateFilePath(filepath);
-		
-		if (isExecuted.containsKey(true)) {
-			return isExecuted.get(true);
-		} else {
-			return isExecuted.get(false);
-		}
-		
+		return storageComponent.updateFilePath(filepath);
 	}
 
 }

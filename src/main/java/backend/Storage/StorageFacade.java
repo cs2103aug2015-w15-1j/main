@@ -41,8 +41,8 @@ public class StorageFacade implements Storage {
 	}
 	
 	@Override
-	public  HashMap<Boolean, String> updateFilePath(String newFilePath) {
-		HashMap<Boolean, String> result = filePath.execute(newFilePath);
+	public String updateFilePath(String newFilePath) {
+		String result = filePath.execute(newFilePath);
 		reinit();
 		return result;
 	}

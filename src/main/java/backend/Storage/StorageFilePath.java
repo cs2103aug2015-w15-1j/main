@@ -244,16 +244,14 @@ public class StorageFilePath {
 	}
 
 	//@@author A0126258A
-	public HashMap<Boolean, String> execute(String newFilePath) {
+	public String execute(String newFilePath) {
 
-		HashMap<Boolean, String> result = new HashMap<Boolean, String>();
 		String oldFilePath = retrieve();
 		newFilePath = appendTextFile(newFilePath);
 		boolean isTransferred = false;
 
 		if(oldFilePath.equals(newFilePath)) {
-			result.put(false, String.format(EXECUTION_FILEPATH_DUPLICATE, newFilePath));
-			return result;
+			return String.format(EXECUTION_FILEPATH_DUPLICATE, newFilePath);
 		} else if(isFilePathExist(newFilePath)) {
 			try {
 				writer = new FileWriter(FILE_CONFIGURATION);
@@ -262,15 +260,13 @@ public class StorageFilePath {
 				properties.store(writer, FILE_HEADING);
 				writer.close();
 			} catch (IOException e) {
-				result.put(false, EXECUTION_FILEPATH_UNSUCCESSFUL);
-				return result;
+				return EXECUTION_FILEPATH_UNSUCCESSFUL;
 			}	
 		} else if(!isTransferred) {
-			result.put(false, EXECUTION_FILEPATH_UNSUCCESSFUL);
-			return result;
+			return EXECUTION_FILEPATH_UNSUCCESSFUL;
 		} 
-		result.put(true, String.format(EXECUTION_FILEPATH_SUCCESSFUL, newFilePath));
-		return result;
+		
+		return String.format(EXECUTION_FILEPATH_SUCCESSFUL, newFilePath);
 	}
 
 }

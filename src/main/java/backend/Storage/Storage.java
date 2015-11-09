@@ -3,7 +3,6 @@
 package main.java.backend.Storage;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import main.java.backend.Storage.Task.Task;;
 
@@ -15,6 +14,6 @@ public interface Storage {
 	
 	public void save(ArrayList<Task> allData);
 	
-	public HashMap<Boolean, String> updateFilePath(String newFilePath);
+	public String updateFilePath(String newFilePath);
 	
 }

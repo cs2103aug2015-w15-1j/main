@@ -449,7 +449,7 @@ public class EditCommand extends Command {
 			}
 
 			return String.format(EXECUTION_SET_RECURRING_SUCCESSFUL, taskIndex, 
-					recurrenceFrequency + ", " + recurrenceType);
+					recurrenceFrequency + " " + recurrenceType);
 		} catch (NumberFormatException e) {
 			return EXECUTION_COMMAND_UNSUCCESSFUL;
 		}

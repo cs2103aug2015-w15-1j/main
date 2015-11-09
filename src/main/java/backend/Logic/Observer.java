@@ -506,7 +506,10 @@ public class Observer {
 				data = getAllReminder();
 				break;
 		}		
-		Collections.sort(data);
+		
+		if(!taskList.get(0).isSorted()) {
+			Collections.sort(data);
+		}
 		return data;
 	}
 	

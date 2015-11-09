@@ -1,14 +1,15 @@
-//@@author A0126258A
 package main.java.backend.Storage.Task;
 
 import main.java.backend.Logic.Constant;
 
 public class Task implements Comparable<Task> {
 	
+	//@@author A0126258A
 	public enum TaskType {
 		FLOATING, TODO, EVENT;
 	}
 	
+	//@@author A0126258A
 	public enum RecurrenceType {
 		NONE, DAY, WEEK, MONTH, YEAR;
 	}
@@ -35,6 +36,7 @@ public class Task implements Comparable<Task> {
 	
 	private boolean isDone;
 	private boolean isRecurred;
+	private boolean isSorted;
 	
 	private String name;
 	private String description;
@@ -42,16 +44,19 @@ public class Task implements Comparable<Task> {
 	private String end;
 	private String reminder;
 	
+	//@@author A0126258A
 	public Task () {
 		
 	}
 	
+	//@@author A0126258A
 	public Task(Task task) {
 		this(task.getTaskType(), task.getRecurrenceType(), task.getRecurrenceFrequency(),
 				task.getPriority(), task.getName(), task.getDescription(), task.getStart(), 
 				task.getEnd(), task.getReminder());
 	}
 	
+	//@@author A0126258A
 	public Task(TaskType taskType, RecurrenceType recurrenceType, int recurrenceFrequency, 
 			int priority, String name, String description, 
 			String start, String end, String reminder) {
@@ -65,6 +70,7 @@ public class Task implements Comparable<Task> {
 		this.priority = priority;
 		this.isDone = false;
 		this.isRecurred = false;
+		this.setSorted(false);
 		this.name = name;
 		this.description = description;
 		this.start = start;
@@ -72,106 +78,142 @@ public class Task implements Comparable<Task> {
 		this.reminder = reminder;
 	}
 	
+	//@@author A0126258A
 	public TaskType getTaskType() {
 		return taskType;
 	}
 
+	//@@author A0126258A
 	public void setTaskType(TaskType taskType) {
 		this.taskType = taskType;
 	}
 	
+	//@@author A0126258A
 	public RecurrenceType getRecurrenceType() {
 		return recurrenceType;
 	}
 
+	//@@author A0126258A
 	public void setRecurrenceType(RecurrenceType recurrenceType) {
 		this.recurrenceType = recurrenceType;
 	}
 	
+	//@@author A0126258A
 	public int getRecurrenceFrequency() {
 		return recurrenceFrequency;
 	}
 
+	//@@author A0126258A
 	public void setRecurrenceFrequency(int recurrenceFrequency) {
 		this.recurrenceFrequency = recurrenceFrequency;
 	}
 	
+	//@@author A0126258A
 	public int getTaskId() {
 		return taskId;
 	}
 	
+	//@@author A0126258A
 	public void setTaskId(int newTaskId) {
 		this.taskId = newTaskId;
 	}
 	
+	//@@author A0126258A
 	public int getIndex() {
 		return indexForPrinting;
 	}
 	
+	//@@author A0126258A
 	public void setIndex(int index){
 		indexForPrinting = index;
 	}
 	
+	//@@author A0126258A
 	public int getPriority() {
 		return priority;
 	}
 
+	//@@author A0126258A
 	public void setPriority(int priority) {
 		this.priority = priority;
 	}
 
+	//@@author A0126258A
 	public boolean getDone() {
 		return isDone;
 	}
 
+	//@@author A0126258A
 	public void setDone(boolean isDone) {
 		this.isDone = isDone;
 	}
 	
+	//@@author A0126258A
 	public boolean isRecurred() {
 		return isRecurred;
 	}
 
+	//@@author A0126258A
 	public void setRecurred(boolean isRecurred) {
 		this.isRecurred = isRecurred;
 	}
 
+	//@@author A0126258A	
+	public boolean isSorted() {
+		return isSorted;
+	}
+
+	//@@author A0126258A
+	public void setSorted(boolean isSorted) {
+		this.isSorted = isSorted;
+	}
+
+	//@@author A0126258A
 	public String getName() {
 		return name;
 	}
 
+	//@@author A0126258A
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	//@@author A0126258A
 	public String getDescription() {
 		return description;
 	}
 
+	//@@author A0126258A
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
+	//@@author A0126258A
 	public String getStart() {
 		return start;
 	}
 
+	//@@author A0126258A
 	public void setStart(String start) {
 		this.start = start;
 	}
 
+	//@@author A0126258A
 	public String getEnd() {
 		return end;
 	}
 
+	//@@author A0126258A
 	public void setReminder(String reminder) {
 		this.reminder = reminder;
 	}
 	
+	//@@author A0126258A
 	public String getReminder() {
 		return reminder;
 	}
 
+	//@@author A0126258A
 	public void setEnd(String end) {
 		this.end = end;
 	}
@@ -363,5 +405,4 @@ public class Task implements Comparable<Task> {
 			return 0;
 		}
 	}
-
 }

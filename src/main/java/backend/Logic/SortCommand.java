@@ -45,6 +45,7 @@ public class SortCommand extends Command {
 
 		for(Task task : taskList) {
 			task.setTaskId(newTaskId);
+			task.setSorted(true);
 			newTaskList.add(task);
 			newTaskId++;
 		}

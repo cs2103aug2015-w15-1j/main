@@ -53,8 +53,32 @@ import main.java.backend.Storage.Task.Task;
 //@@author A0126125R
 public class Gui extends Application {
 
-	private static final double MAX_WIDTH = 10000.0;
-	private static final double MIN_WIDTH = 1.0;
+	private static final long TIME_REPEAT = 60000L;
+	private static final long TIME_DELAY = 500L;
+	private static final int PANE_PADDING = 15;
+	private static final int PANE_HGAP = 10;
+	private static final int PANE_VGAP = 4;
+	private static final int HEIGHT_CONSOLE = 12;
+	private static final int HEIGHT_TABLE = 75;
+	private static final int HEIGHT_LABEL = 7;
+	private static final int WIDTH_ROW2 = 39;
+	private static final int WIDTH_ROW1B = 13;
+	private static final int WIDTH_ROW1A = 24;
+	private static final int SLEEPTIME = 3000;
+	private static final int SIZE_HEIGHT = 600;
+	private static final int SIZE_WIDTH = 1000;
+	private static final double WIDTH_MAX = 10000.0;
+	private static final double WIDTH_MIN = 1.0;
+	private static final int COUNT_LIMIT = 10000;
+	private static final int SCENE_MAIN = 1;
+	private static final int SCENE_FOCUS = 2;
+	private static final int NUM_TASKS = 1;
+	private static final int NUM_EVENTS = 2;
+	private static final int NUM_OVERDUE = 3;
+	private static final int NUM_FLOAT = 4;
+	private static final int NUM_TODAY_TASKS_EVENTS = 5;
+	private static final int NUM_SEARCH = 6;
+
 	// Possible messages
 	private static final String MESSAGE_WELCOME = "Welcome to TankTask!";
 	private static final String MESSAGE_EMPTY = "List is empty";
@@ -82,25 +106,12 @@ public class Gui extends Application {
 	private static final String COMMAND_EXIT = "exit";
 
 	// Hot key combinations
-	private final KeyCombination UNDO = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
-	private final KeyCombination REDO = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);
-	private final KeyCombination SHIFTUP = new KeyCodeCombination(KeyCode.UP, KeyCombination.SHIFT_DOWN);
-	private final KeyCombination SHIFTDOWN = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.SHIFT_DOWN);
+	private static final KeyCombination UNDO = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
+	private static final KeyCombination REDO = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);
+	private static final KeyCombination SHIFTUP = new KeyCodeCombination(KeyCode.UP, KeyCombination.SHIFT_DOWN);
+	private static final KeyCombination SHIFTDOWN = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.SHIFT_DOWN);
 
-	// necessary variables for one-instance check
-	private File file;
-	private RandomAccessFile randomAccessFile;
-	private FileLock fileLock;
-
-	// necessary variables for nagivation purposes.
-	private static final int SCENE_MAIN = 1;
-	private static final int SCENE_FOCUS = 2;
-	private static final int NUM_TASKS = 1;
-	private static final int NUM_EVENTS = 2;
-	private static final int NUM_OVERDUE = 3;
-	private static final int NUM_FLOAT = 4;
-	private static final int NUM_TODAY_TASKS_EVENTS = 5;
-	private static final int NUM_SEARCH = 6;
+	// necessary variables for navigation purposes.
 	private static int currentList;
 	private static int currentPosition;
 	private static int currentScene;
@@ -121,7 +132,6 @@ public class Gui extends Application {
 	private static ListView<TextFlow> listTasks;
 	private static ListView<TextFlow> listEvents;
 	private static ListView<TextFlow> listOverdue;
-
 	// Specific nodes for Focus View
 	private static Label focusHeading;
 	private static Label detailsHeading;
@@ -137,7 +147,11 @@ public class Gui extends Application {
 	private static Console console;
 	private static PrintStream ps;
 	private static ArrayList<String> recentCommands;
-	private static final int COUNT_LIMIT = 10000;
+
+	// necessary variables for one-instance check
+	private File file;
+	private RandomAccessFile randomAccessFile;
+	private FileLock fileLock;
 
 	public static void main(String[] args) {
 		LauncherImpl.launchApplication(Gui.class, GuiPreloader.class, args);
@@ -171,7 +185,7 @@ public class Gui extends Application {
 					});
 				}
 			});
-			Thread.sleep(3000);
+			Thread.sleep(SLEEPTIME);
 			Platform.exit();
 			System.exit(0);
 		}
@@ -187,9 +201,9 @@ public class Gui extends Application {
 		ps = new PrintStream(console, true);
 		recentCommands = new ArrayList<String>();
 		listFocus = new ListView<TextFlow>();
-		currentList = 1;
+		currentList = NUM_TASKS;
 		currentPosition = 0;
-		currentScene = 1;
+		currentScene = SCENE_MAIN;
 		toggleFloat = false;
 		noti = false;
 		isHelp = false;
@@ -255,27 +269,27 @@ public class Gui extends Application {
 		initGrid(); // setting up individual sizing
 		setUpGridContents();// setting up contents;
 
-		mainScene = new Scene(gridPane, 1000, 600);
+		mainScene = new Scene(gridPane, SIZE_WIDTH, SIZE_HEIGHT);
 		mainScene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 	}
 
 	private void initGrid() {
 		ColumnConstraints column1 = new ColumnConstraints();
-		column1.setPercentWidth(24);
+		column1.setPercentWidth(WIDTH_ROW1A); //ROW 1A WILL BE MERGE WITH ROW 1B
 		ColumnConstraints column2 = new ColumnConstraints();
-		column2.setPercentWidth(13);
+		column2.setPercentWidth(WIDTH_ROW1B);
 		ColumnConstraints column3 = new ColumnConstraints();
-		column3.setPercentWidth(39);
+		column3.setPercentWidth(WIDTH_ROW2);
 		ColumnConstraints column4 = new ColumnConstraints();
-		column4.setPercentWidth(24);
+		column4.setPercentWidth(WIDTH_ROW1A);
 		gridPane.getColumnConstraints().addAll(column1, column2, column3, column4);
 
 		RowConstraints row1 = new RowConstraints();
-		row1.setPercentHeight(7);
+		row1.setPercentHeight(HEIGHT_LABEL);
 		RowConstraints row2 = new RowConstraints();
-		row2.setPercentHeight(75);
+		row2.setPercentHeight(HEIGHT_TABLE);
 		RowConstraints row3 = new RowConstraints();
-		row3.setPercentHeight(12);
+		row3.setPercentHeight(HEIGHT_CONSOLE);
 		gridPane.getRowConstraints().addAll(row1, row2, row3);
 	}
 
@@ -289,10 +303,10 @@ public class Gui extends Application {
 		gridPane.setBackground(background);
 		gridPane.setFocusTraversable(false);
 		gridPane.setGridLinesVisible(false); // checking
-		gridPane.setVgap(4);
-		gridPane.setHgap(10);
-		gridPane.setPadding(new Insets(15, 15, 15, 15));
-		gridPane.setPrefSize(1000, 600);
+		gridPane.setVgap(PANE_VGAP);
+		gridPane.setHgap(PANE_HGAP);
+		gridPane.setPadding(new Insets(PANE_PADDING, PANE_PADDING, PANE_PADDING, PANE_PADDING));
+		gridPane.setPrefSize(SIZE_WIDTH, SIZE_HEIGHT);
 	}
 
 	private static void setUpGridContents() throws IOException, JSONException, ParseException {
@@ -482,9 +496,9 @@ public class Gui extends Application {
 				;
 			}
 			flow.getChildren().add(newlabel);
-			flow.setMinWidth(MIN_WIDTH);
-			flow.setPrefWidth(MIN_WIDTH);
-			flow.setMaxWidth(MAX_WIDTH);
+			flow.setMinWidth(WIDTH_MIN);
+			flow.setPrefWidth(WIDTH_MIN);
+			flow.setMaxWidth(WIDTH_MAX);
 			tasks.add(flow);
 		}
 		ListView<TextFlow> listTask = new ListView<TextFlow>(tasks);
@@ -596,7 +610,7 @@ public class Gui extends Application {
 				});
 
 			}
-		}, 500L, 60000L);
+		}, TIME_DELAY, TIME_REPEAT);
 	}
 
 	protected void runNoti() {
@@ -901,8 +915,8 @@ public class Gui extends Application {
 	private static void runEventLeft() throws IOException, JSONException, ParseException {
 		currentList--;
 		currentPosition = 0;
-		if (currentList <= 0) {
-			currentList = 1;
+		if (currentList <= NUM_TASKS) {
+			currentList = NUM_TASKS;
 		}
 		updateFocus();
 	}
@@ -910,8 +924,8 @@ public class Gui extends Application {
 	private static void runEventRight() throws IOException, JSONException, ParseException {
 		currentList++;
 		currentPosition = 0;
-		if (currentList > 6) {
-			currentList = 6;
+		if (currentList > NUM_SEARCH) {
+			currentList = NUM_SEARCH;
 		}
 		updateFocus();
 	}

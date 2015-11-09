@@ -495,7 +495,6 @@ public class Gui extends Application{
 	}
 
 	private static void refreshAll(){
-		//System.out.println("refreshing");
 		controller.retrieveAllData();
 		if (currentScene == SCENE_MAIN){
 			gridPane.getChildren().removeAll(tasks,events,floating,listOverdue, listFloat,listTasks,listEvents);
@@ -517,7 +516,15 @@ public class Gui extends Application{
 		changeFocusListDetails(currentListNum);
 
 	}
-
+	
+	/**
+	 * This method changes the content of the list in the focus view
+	 * 
+	 * @param listNum
+	 * @throws IOException
+	 * @throws JSONException
+	 * @throws ParseException
+	 */
 	private static void changeFocusList(int listNum) throws IOException, JSONException, ParseException{
 		gridPane.getChildren().remove(listFocus);
 		listFocus = convertList(controller.getFocusList());
@@ -536,6 +543,11 @@ public class Gui extends Application{
 		gridPane.getChildren().add(listFocus);	
 	}
 
+	/**
+	 * This method changes the label text and detail field.
+	 * 
+	 * @param headNum
+	 */
 	private static void changeFocusListDetails(int headNum){
 		switch(headNum){
 		case NUM_OVERDUE:
@@ -606,7 +618,9 @@ public class Gui extends Application{
 		alert.showAndWait();
 		refreshAll();
 	}
-
+	/**
+	 * This method decide what should be executed when user interact with the program
+	 */
 	private void determineEvents(){
 		userInput.setOnKeyPressed(new EventHandler<KeyEvent>()
 		{
@@ -616,7 +630,7 @@ public class Gui extends Application{
 
 				if (ke.getCode().equals(KeyCode.ENTER))
 				{
-					runUserInputEvents();	
+					runEvents();	
 
 				} else if(ke.getCode().equals(KeyCode.TAB)){
 					changeScene();
@@ -801,7 +815,7 @@ public class Gui extends Application{
 		}
 	}
 
-	private static void runUserInputEvents(){
+	private static void runEvents(){
 		if (!userInput.getText().isEmpty()){
 			userCommands = userInput.getText();
 			userCommands = userCommands.trim();

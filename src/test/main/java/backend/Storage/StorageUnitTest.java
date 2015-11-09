@@ -16,7 +16,6 @@ import main.java.backend.Storage.Task.Task.TaskType;
 
 public class StorageUnitTest { 
 	
-	/* ======================== CS2102 Tasks ========================= */
 	private Task FLOAT = new Task(TaskType.FLOATING, RecurrenceType.NONE, 2, -1, "Watch webcast", 
 			"Watch before November", "", "Tue, 20 Oct 8:00am", "");
 	private Task TODO = new Task(TaskType.TODO, RecurrenceType.NONE , 0, 5, "Read up on PHP", "", 

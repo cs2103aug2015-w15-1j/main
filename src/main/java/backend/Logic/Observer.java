@@ -157,10 +157,16 @@ public class Observer {
 					<= getCurrentTime())) {
 				
 				task.setRecurred(true);
-				nextTask.setEnd(getUpcomingDate(nextTask, nextTask.getEnd()));
+				String nextDate = getUpcomingDate(nextTask, nextTask.getEnd());
+				if(!(Constant.stringToMillisecond(nextDate) < 0)) {
+					nextTask.setEnd(getUpcomingDate(nextTask, nextTask.getEnd()));
+				}
 				
 				if(nextTask.getTaskType().equals(TaskType.EVENT)) {
-					nextTask.setStart(getUpcomingDate(nextTask, nextTask.getStart()));
+					nextDate = getUpcomingDate(nextTask, nextTask.getStart());
+					if(!(Constant.stringToMillisecond(nextDate) < 0)) {
+						nextTask.setStart(getUpcomingDate(nextTask, nextTask.getStart()));
+					}
 				}
 				
 				recurringTaskList.add(nextTask);

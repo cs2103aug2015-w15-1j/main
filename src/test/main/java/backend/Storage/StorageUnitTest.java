@@ -17,24 +17,14 @@ import main.java.backend.Storage.Task.Task.TaskType;
 public class StorageUnitTest { 
 	
 	/* ======================== CS2102 Tasks ========================= */
-	private Task CATEGORY1_TODO1 = new Task(TaskType.TODO, RecurrenceType.NONE , 2, 5, "Read up on PHP", "", 
-			"Sat, 3 Oct 8:00am", "", "Fri, 2 Oct 6:00pm");
-	private Task CATEGORY1_TODO2 = new Task(TaskType.TODO, RecurrenceType.NONE, 2, 5, "Revise SQL queries", 
-			"Read up on ALL SQL queries including nested", 
-			"Sat, 10 Oct 9:00am", "", "Fri, 9 Oct 6:00pm");
-
-	/* ======================== CS2103 Tasks ========================= */
-	private Task CATEGORY2_TODO1 = new Task(TaskType.TODO, RecurrenceType.NONE, 2, 4, "Text Buddy CE2", 
-			"Change code to OOP style", "Sat, 19 Oct 8:00am", 
-			"", "Mon, 21 Oct 10:00am");
-	private Task CATEGORY2_FLOAT1 = new Task(TaskType.FLOATING, RecurrenceType.NONE, 2, -1, "Watch webcast", 
+	private Task FLOAT = new Task(TaskType.FLOATING, RecurrenceType.NONE, 2, -1, "Watch webcast", 
 			"Watch before November", "", "Tue, 20 Oct 8:00am", "");
-
-	/* ======================== Personal Tasks ========================= */
-	private Task CATEGORY3_TODO1 = new Task(TaskType.TODO, RecurrenceType.NONE, 2, 5, "Help mum buy groceries", 
-			"Every Saturday!", "", "", "");
-	private Task CATEGORY3_FLOAT1 = new Task(TaskType.FLOATING, RecurrenceType.DAY, 2, -1, "Cut hair someday", 
-			"Cut before December", "", "", "Wed, 10 Oct 10:00am");
+	private Task TODO = new Task(TaskType.TODO, RecurrenceType.NONE , 0, 5, "Read up on PHP", "", 
+			"Sat, 3 Oct 8:00am", "", "Fri, 2 Oct 6:00pm");
+	private Task TODO_RECUR = new Task(TaskType.TODO, RecurrenceType.DAY, 2, -1, "Water plants", 
+			"", "", "", "Wed, 10 Oct 10:00am");
+	private Task EVENT = new Task(TaskType.FLOATING, RecurrenceType.NONE, 2, -1, "Watch webcast", 
+			"Watch before November", "", "Tue, 20 Oct 8:00am", "");
 	
 	private ArrayList<Task> taskList;
 	
@@ -52,12 +42,10 @@ public class StorageUnitTest {
 		
 		taskList = new ArrayList<Task> ();
 		
-		taskList.add(CATEGORY1_TODO1);
-		taskList.add(CATEGORY1_TODO2);
-		taskList.add(CATEGORY2_TODO1);
-		taskList.add(CATEGORY2_FLOAT1);
-		taskList.add(CATEGORY3_TODO1);
-		taskList.add(CATEGORY3_FLOAT1);
+		taskList.add(FLOAT);
+		taskList.add(TODO);
+		taskList.add(TODO_RECUR);
+		taskList.add(EVENT);
 	}
 	
 	@Test

@@ -507,7 +507,7 @@ public class Observer {
 				break;
 		}		
 		
-		if(!taskList.get(0).isSorted()) {
+		if(!taskList.isEmpty() && !taskList.get(0).isSorted()) {
 			Collections.sort(data);
 		}
 		return data;
